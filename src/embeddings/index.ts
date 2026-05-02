@@ -18,8 +18,10 @@ export function getEmbedderDriver(): EmbedderDriver {
 export async function createEmbedder(): Promise<Embedder> {
   const driver = getEmbedderDriver();
   switch (driver) {
-    case 'ollama':
-      throw new Error('OllamaEmbedder not yet implemented (Phase 1 Step 5).');
+    case 'ollama': {
+      const { OllamaEmbedder } = await import('./ollama.js');
+      return new OllamaEmbedder();
+    }
     case 'transformersjs':
       throw new Error('TransformersJsEmbedder not yet implemented (Phase 3).');
     case 'voyage':
