@@ -22,7 +22,7 @@ export const FIXTURE_TOOLS: FixtureSpec[] = [
     version: '3.0',
     author_agent_id: 'demo-tool-author',
     capability_text:
-      'Extract tables from PDF financial reports. Parses earnings statements, balance sheets, income statements, and 10-K filings. Returns each table row as a label-value pair with high numerical accuracy across multi-page PDF documents.',
+      'Income statement and balance sheet extractor for SEC 10-K, 10-Q, and annual report PDFs. Pulls revenue, COGS, gross profit, operating expenses, EBITDA, net income, EPS, cash flow line items. Built for equity research, DCF modelling, and financial diligence on US-listed companies.',
     input_contract: {
       type: 'object',
       properties: { pdf_text: { type: 'string' } },
@@ -64,7 +64,7 @@ export const FIXTURE_TOOLS: FixtureSpec[] = [
     version: '2.0',
     author_agent_id: 'demo-tool-author',
     capability_text:
-      'PDF table extraction for financial documents. Parses tables from PDF earnings reports, financial statements, and invoices into structured rows of label and numeric value. Best on single-page financial PDFs.',
+      'General-purpose PDF table extraction for earnings reports, prospectuses, and financial statements. Single-page focus. Returns each row as label-value pair.',
     input_contract: {
       type: 'object',
       properties: { pdf_text: { type: 'string' } },
@@ -231,7 +231,7 @@ export const FIXTURE_TOOLS: FixtureSpec[] = [
     version: '1.2',
     author_agent_id: 'demo-tool-author',
     capability_text:
-      'PDF invoice parsing: line-item extraction, VAT calculation, totals reconciliation. Optimised for European invoice formats (UK, DE, FR). Returns each line as a label-value pair.',
+      'Supplier invoice and accounts-payable document parser. Reads VAT invoices, purchase orders, and tax receipts from suppliers. Calculates VAT totals and reconciles with subtotal. Specifically for European AP workflows: HMRC, BTW, TVA. Not for SEC filings or financial statements.',
     input_contract: { type: 'object', properties: { pdf_text: { type: 'string' } }, required: ['pdf_text'], additionalProperties: false },
     output_contract: { type: 'object', properties: { rows: { type: 'array', items: { type: 'object', properties: { label: { type: 'string' }, value: { type: 'number' } }, required: ['label', 'value'], additionalProperties: false } } }, required: ['rows'], additionalProperties: false },
     endpoint_stub_name: 'pdftools-pro-v2',

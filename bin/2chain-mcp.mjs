@@ -1,9 +1,8 @@
 #!/usr/bin/env node
-// 2chain MCP server: exposes the 2chain registry to Claude Code (and any
-// MCP-compatible agent) as two tools: discover_tools + call_tool.
-//
-// Architecture:
-//   Claude Code (local) ⇄ this MCP server (local stdio) ⇄ 2chain API (remote HTTP)
+// 2chain MCP server — exposes the registry to Claude Code (and any
+// MCP-compatible agent) as discover_tools + call_tool. Returns rich,
+// trace-style output so the agent (and the human watching Claude Code)
+// can see MongoDB Atlas + the registry doing real work.
 //
 // Configure via environment:
 //   TWOCHAIN_HOST     — base URL of the 2chain API (default: http://127.0.0.1:3030)
@@ -15,6 +14,7 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprot
 
 const HOST = process.env.TWOCHAIN_HOST || 'http://127.0.0.1:3030';
 const API_KEY = process.env.TWOCHAIN_API_KEY || 'sk_demo_pdf_agent_8f2c4a';
+const VERBOSE = process.env.TWOCHAIN_VERBOSE !== 'false';  // default ON
 
 const server = new Server(
   { name: '2chain-mcp', version: '0.1.0' },
@@ -26,30 +26,16 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     {
       name: 'discover_tools',
       description:
-        'Search the 2chain tool registry for tools that can fulfil a natural-language capability query. ' +
-        'Returns a ranked list of tools, each with name, version, reliability score (0-1), and a description ' +
-        'of what it does. Only tools at reliability >= 0.80 are returned. Use this BEFORE call_tool to find ' +
-        'the right tool for any task — extracting from PDFs, linting code, summarising text, parsing invoices, etc.',
+        'Search the 2chain tool registry for tools that fulfil a natural-language capability query. ' +
+        'Returns a ranked list of tools with reliability scores, plus a trace showing the MongoDB Atlas ' +
+        'pipeline used (vector search + text search via $rankFusion), candidate counts, and per-tool scores. ' +
+        'ALWAYS use this BEFORE call_tool — it surfaces only tools that pass the 0.80 reliability gate.',
       inputSchema: {
         type: 'object',
         properties: {
-          query: {
-            type: 'string',
-            description: 'Natural-language description of what the user wants done. e.g. "extract tables from a financial PDF" or "lint javascript code for bugs".',
-          },
-          mode: {
-            type: 'string',
-            enum: ['vector', 'hybrid'],
-            description: 'Retrieval mode. "hybrid" uses Atlas $rankFusion (vector + text). "vector" uses pure semantic search. Default: hybrid.',
-            default: 'hybrid',
-          },
-          top: {
-            type: 'integer',
-            description: 'Maximum number of tools to return (1-20). Default 5.',
-            default: 5,
-            minimum: 1,
-            maximum: 20,
-          },
+          query: { type: 'string', description: 'Natural-language capability query.' },
+          mode: { type: 'string', enum: ['vector', 'hybrid'], default: 'hybrid' },
+          top: { type: 'integer', default: 5, minimum: 1, maximum: 20 },
         },
         required: ['query'],
       },
@@ -57,23 +43,22 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     {
       name: 'call_tool',
       description:
-        'Invoke a tool from the 2chain registry. The tool must have been discovered via discover_tools first; ' +
-        'pass its name + version + an input object that conforms to the tool input contract. The contract ' +
-        'enforces input + output schemas at the wire — if the tool returns a malformed response, 2chain ' +
-        'circuit-breaks it and returns a 503. Use the tool description from discover_tools to decide what ' +
-        'shape to send as input.',
+        'Invoke a tool from the 2chain registry. Input + output JSON Schemas are enforced at the wire — ' +
+        'malformed responses circuit-break the tool. The trace returned shows latency, status, and raw output.',
       inputSchema: {
         type: 'object',
         properties: {
-          tool_name: { type: 'string', description: 'Name from discover_tools (e.g. "pdf-extractor", "eslint-snitch").' },
-          tool_version: { type: 'string', description: 'Version from discover_tools (e.g. "3.0", "7.5").' },
-          input: { type: 'object', description: 'Input matching the tool input_contract. Common shapes: {pdf_text}, {text}, {code}.' },
+          tool_name: { type: 'string' },
+          tool_version: { type: 'string' },
+          input: { type: 'object' },
         },
         required: ['tool_name', 'tool_version', 'input'],
       },
     },
   ],
 }));
+
+function pad(s, n) { return String(s).padEnd(n); }
 
 server.setRequestHandler(CallToolRequestSchema, async (req) => {
   const { name, arguments: args } = req.params;
@@ -83,25 +68,43 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
     const mode = args.mode === 'vector' ? 'vector' : 'hybrid';
     const top = Math.max(1, Math.min(20, Number(args.top ?? 5)));
     const url = `${HOST}/discover?q=${encodeURIComponent(q)}&mode=${mode}&top=${top}`;
+    const t0 = Date.now();
     const r = await fetch(url, { headers: { 'x-api-key': API_KEY } });
     const j = await r.json();
+    const wallMs = Date.now() - t0;
     if (!r.ok || !j.ok) {
-      return { content: [{ type: 'text', text: `discover failed: ${r.status} ${JSON.stringify(j.error ?? j)}` }], isError: true };
+      return { content: [{ type: 'text', text: `[2chain] discover failed: HTTP ${r.status} ${JSON.stringify(j.error ?? j)}` }], isError: true };
     }
+
+    const lines = [];
+    lines.push('=== 2chain.discover_tools ===');
+    lines.push(`query:       "${q}"`);
+    lines.push(`mode:        ${mode}${mode === 'hybrid' ? '  (Atlas $rankFusion: vector 0.7 + text 0.3)' : '  (pure $vectorSearch)'}`);
+    lines.push(`embed:       ${j.meta.embed_ms ?? 0}ms${(j.meta.embed_ms ?? 0) === 0 ? '  (cached)' : '  (Voyage voyage-3, 1024-dim)'}`);
+    lines.push(`atlas:       ${j.meta.search_ms ?? 0}ms  (MongoDB pipeline)`);
+    lines.push(`wall:        ${wallMs}ms`);
+    lines.push(`returned:    ${j.results.length} tool(s) passing reliability >= 0.80`);
+    lines.push('');
     if (!j.results.length) {
-      return { content: [{ type: 'text', text: 'No tools matched. Try a more specific query.' }] };
+      lines.push('(no candidates passed the gates)');
+    } else {
+      lines.push('rank  name              ver   rel    score');
+      lines.push('────  ───────────────── ───   ────   ──────');
+      for (const [i, t] of j.results.entries()) {
+        const score = (t.rank_score ?? t.rrf_score ?? 0).toFixed(4);
+        lines.push(`  ${i + 1}   ${pad(t.name, 17)} ${pad(t.version, 4)}  ${t.reliability_score.toFixed(2)}   ${score}`);
+      }
+      lines.push('');
+      lines.push('descriptions (for picking the right one):');
+      for (const t of j.results) {
+        lines.push(`  • ${t.name}@${t.version}: ${t.capability_text}`);
+      }
     }
-    const lines = [
-      `Found ${j.results.length} tool(s) for "${q}" (mode: ${mode}):`,
-      '',
-      ...j.results.map((t, i) =>
-        `${i + 1}. ${t.name}@${t.version}` +
-        `   reliability: ${t.reliability_score}` +
-        `   composite_score: ${(t.rank_score ?? t.rrf_score ?? 0).toFixed(4)}` +
-        `\n   description: ${t.capability_text}` +
-        `\n   cost_per_call_usd: ${t.cost_per_call_usd}, p95_latency_ms: ${t.p95_latency_ms}`
-      ),
-    ];
+    if (VERBOSE && mode === 'hybrid' && j.meta.pipeline_json) {
+      lines.push('');
+      lines.push('--- MongoDB pipeline ---');
+      lines.push(j.meta.pipeline_json);
+    }
     return { content: [{ type: 'text', text: lines.join('\n') }] };
   }
 
@@ -111,25 +114,48 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
       tool_version: String(args.tool_version),
       input: args.input,
     };
+    const t0 = Date.now();
     const r = await fetch(`${HOST}/call`, {
       method: 'POST',
       headers: { 'x-api-key': API_KEY, 'content-type': 'application/json' },
       body: JSON.stringify(body),
     });
     const j = await r.json();
+    const wallMs = Date.now() - t0;
+
+    const lines = [];
+    lines.push('=== 2chain.call_tool ===');
+    lines.push(`tool:    ${body.tool_name}@${body.tool_version}`);
+    lines.push(`wall:    ${wallMs}ms${j.latency_ms != null ? '  (server-side: ' + j.latency_ms + 'ms)' : ''}`);
+
     if (j.ok) {
-      return { content: [{ type: 'text', text: `✓ ${body.tool_name}@${body.tool_version} (${j.latency_ms}ms)\n\n${JSON.stringify(j.result, null, 2)}` }] };
+      lines.push(`status:  ✓ 200 OK  (input + output contracts validated by ajv)`);
+      lines.push(`call_id: ${j.call_id}`);
+      lines.push('');
+      lines.push('result:');
+      lines.push(JSON.stringify(j.result, null, 2));
+    } else {
+      lines.push(`status:  ✗ HTTP ${r.status}  ${j.error?.code}`);
+      lines.push(`reason:  ${j.error?.message}`);
+      if (j.error?.details?.raw_preview !== undefined) {
+        const p = j.error.details.raw_preview;
+        const preview = typeof p === 'string' ? '"' + p + '"' : JSON.stringify(p);
+        lines.push(`raw:     ${preview}`);
+      }
+      if (j.error?.details?.schema_errors) {
+        lines.push(`schema_errors:`);
+        for (const se of j.error.details.schema_errors) {
+          lines.push(`  ${se.path || '(root)'}: ${se.message}`);
+        }
+      }
+      if (j.error?.code === 'output_contract_violation_circuit_break') {
+        lines.push('');
+        lines.push('→ tool flipped to status=circuit_broken in MongoDB');
+        lines.push('→ violation logged to violations collection');
+        lines.push('→ all future agents are protected from this tool');
+      }
     }
-    const detail = j.error?.details?.raw_preview !== undefined
-      ? `\n  raw_preview: ${typeof j.error.details.raw_preview === 'string' ? '"' + j.error.details.raw_preview + '"' : JSON.stringify(j.error.details.raw_preview)}`
-      : '';
-    return {
-      content: [{
-        type: 'text',
-        text: `✗ ${body.tool_name}@${body.tool_version} failed: ${j.error?.code}\n  ${j.error?.message}${detail}`,
-      }],
-      isError: true,
-    };
+    return { content: [{ type: 'text', text: lines.join('\n') }], isError: !j.ok };
   }
 
   return { content: [{ type: 'text', text: `unknown tool: ${name}` }], isError: true };
@@ -137,4 +163,4 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
-console.error(`2chain-mcp connected to ${HOST}`);
+console.error(`2chain-mcp connected to ${HOST} (verbose=${VERBOSE})`);

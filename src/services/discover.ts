@@ -42,9 +42,48 @@ export async function getQueryEmbedding(query: string): Promise<{ vec: number[];
   return { vec, cached: false, ms: Date.now() - t0 };
 }
 
-// Pre-warm at server boot so Beat 1 cold call is sub-100ms.
+// Demo queries to pre-cache at server boot. Voyage free tier is 3 RPM —
+// without these, a live demo can rate-limit. Pre-warming costs 1 minute of
+// boot time (with 20s sleep between calls to respect 3 RPM) but eliminates
+// any Voyage call during the demo itself.
+export const PREWARM_QUERIES: string[] = [
+  DEMO_AGENT_QUERY,
+  // Prompt 1 variations Claude is likely to issue
+  'extract income statement from 10-K for DCF model',
+  'extract financial statement line items SEC filing',
+  // Prompt 2 — code review
+  'review javascript code for bugs',
+  'lint javascript for style issues',
+  // Prompt 3 — security
+  'audit python code for security vulnerabilities OWASP',
+  'find security issues in python source code',
+  // Prompt 4 — summarisation
+  'summarise arxiv paper abstract',
+  'summarise article into one paragraph',
+  // Prompt 5 — invoice
+  'parse UK supplier invoice for accounts payable',
+  'extract VAT line items from invoice',
+];
+
 export async function prewarmDemoEmbedding(): Promise<void> {
-  await getQueryEmbedding(DEMO_AGENT_QUERY);
+  // Sequential with a short sleep — 3 RPM means 20s gap minimum.
+  // For boot speed, we batch them through Voyage's array input (one HTTP call,
+  // returns N embeddings, counts as a single rate-limit hit).
+  const cached = PREWARM_QUERIES.filter((q) => queryEmbeddingCache.has(q));
+  const todo = PREWARM_QUERIES.filter((q) => !queryEmbeddingCache.has(q));
+  if (todo.length === 0) return;
+
+  // One batched embed call — Voyage charges this as a single request.
+  try {
+    const { embedMany } = await import('../embeddings/voyage.js');
+    const vecs = await embedMany(todo, 'query');
+    for (let i = 0; i < todo.length; i++) {
+      queryEmbeddingCache.set(todo[i], vecs[i]);
+    }
+  } catch (e) {
+    // Fall back to sequential cache of just the canonical demo query.
+    await getQueryEmbedding(DEMO_AGENT_QUERY).catch(() => {});
+  }
 }
 
 export async function discover(
