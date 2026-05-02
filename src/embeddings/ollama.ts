@@ -13,6 +13,9 @@ import { LruEmbeddingCache } from './cache.js';
 export interface OllamaEmbedderOpts {
   host?: string;             // default http://localhost:11434
   model?: string;            // default nomic-embed-text
+  /** Expected embedding dim. Defaults to 768 (nomic-embed-text).
+   *  Set to 1024 for mxbai-embed-large. Validated at first call. */
+  dim?: number;
   timeoutMs?: number;        // default 10_000
   cacheCapacity?: number;    // default 256
   concurrency?: number;      // default 4
@@ -25,6 +28,10 @@ interface OllamaEmbeddingResponse {
 }
 
 const NOMIC_EMBED_DIM = 768;
+const KNOWN_DIMS: Record<string, number> = {
+  'nomic-embed-text': 768,
+  'mxbai-embed-large': 1024,
+};
 
 function l2Normalize(v: number[]): Float32Array {
   let sum = 0;
@@ -49,6 +56,7 @@ async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: numbe
 export class OllamaEmbedder implements Embedder {
   private readonly host: string;
   private readonly model: string;
+  private readonly _dim: number;
   private readonly timeoutMs: number;
   private readonly concurrency: number;
   private readonly cache: LruEmbeddingCache;
@@ -57,6 +65,7 @@ export class OllamaEmbedder implements Embedder {
   constructor(opts: OllamaEmbedderOpts = {}) {
     this.host = opts.host ?? process.env.OLLAMA_HOST ?? 'http://localhost:11434';
     this.model = opts.model ?? process.env.OLLAMA_EMBED_MODEL ?? 'nomic-embed-text';
+    this._dim = opts.dim ?? KNOWN_DIMS[this.model] ?? NOMIC_EMBED_DIM;
     this.timeoutMs = opts.timeoutMs ?? 10_000;
     this.concurrency = Math.max(1, opts.concurrency ?? 4);
     this.cache = new LruEmbeddingCache(opts.cacheCapacity ?? 256);
@@ -71,7 +80,7 @@ export class OllamaEmbedder implements Embedder {
   }
 
   dim(): number {
-    return NOMIC_EMBED_DIM;
+    return this._dim;
   }
 
   async embed(text: string, _kind: 'document' | 'query'): Promise<Float32Array> {
@@ -92,9 +101,9 @@ export class OllamaEmbedder implements Embedder {
     if (!data.embedding || data.embedding.length === 0) {
       throw new Error(`ollama returned empty embedding (model=${this.model})`);
     }
-    if (data.embedding.length !== NOMIC_EMBED_DIM) {
+    if (data.embedding.length !== this._dim) {
       throw new Error(
-        `ollama returned ${data.embedding.length}-dim vector; expected ${NOMIC_EMBED_DIM}. ` +
+        `ollama returned ${data.embedding.length}-dim vector; expected ${this._dim}. ` +
           `Wrong model? (got ${this.model})`,
       );
     }

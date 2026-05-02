@@ -33,6 +33,9 @@ export interface SqliteStorageOpts {
   path: string;                 // ':memory:' for tests, real path for prod
   migrationsDir?: string;       // override (defaults to src/storage/migrations/sqlite)
   readonly?: boolean;           // for read-snapshot consumers
+  /** Embedding dim for the vec0 virtual table. Defaults to 768 (nomic).
+   *  1024 for mxbai-embed-large parity tests. Locks at first init. */
+  embeddingDim?: number;
 }
 
 interface ToolRow {
@@ -154,7 +157,14 @@ export class SqliteStorage implements Storage {
       } catch {
         throw new Error(`migration file missing: ${path}`);
       }
-      const sql = readFileSync(path, 'utf-8');
+      let sql = readFileSync(path, 'utf-8');
+      // Allow overriding the vec0 embedding dim from opts so parity
+      // checks against 1024-dim embedders (mxbai-embed-large) can use a
+      // separate DB without forking the migration file.
+      const dim = this.opts.embeddingDim ?? 768;
+      if (dim !== 768) {
+        sql = sql.replace(/float\[768\]/g, `float[${dim}]`);
+      }
       this.db.transaction(() => {
         this.db.exec(sql);
         // Ensure _migrations exists even if 001 forgot to create it (it does).
