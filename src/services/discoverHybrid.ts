@@ -5,6 +5,7 @@ import {
   VECTOR_INDEX_NAME,
 } from '../types.js';
 import type { DiscoverResult, DiscoverMeta } from './discover.js';
+import { rerank, rerankStrategy } from './rerank.js';
 
 const TEXT_INDEX_NAME = 'tools_text_idx';
 
@@ -13,11 +14,14 @@ export interface HybridResult extends DiscoverResult {
 }
 
 export interface HybridMeta extends DiscoverMeta {
-  mode: 'hybrid_rankfusion';
+  mode: 'hybrid_rankfusion' | 'hybrid_rankfusion_reranked';
   weights: { vector: number; text: number };
   pipelines_in: number;
   pipelines_out: number;
   pipeline_json?: string;
+  rerank_strategy?: 'cohere' | 'heuristic' | 'none';
+  rerank_ms?: number;
+  candidates_before_rerank?: number;
 }
 
 const VEC_WEIGHT = 0.7;
@@ -26,7 +30,8 @@ const TEXT_WEIGHT = 0.3;
 export async function discoverHybrid(
   db: Db,
   query: string,
-  top: number = 5
+  top: number = 5,
+  withRerank: boolean = true
 ): Promise<{ results: HybridResult[]; meta: HybridMeta }> {
   const tTotal = Date.now();
   const { vec: queryVec, ms: embedMs } = await getQueryEmbedding(query);
@@ -143,36 +148,54 @@ export async function discoverHybrid(
     { $group: { _id: '$name', best: { $first: '$$ROOT' } } },
     { $replaceRoot: { newRoot: '$best' } },
     { $sort: { rrf_score: -1 } },
-    { $limit: top },
+    { $limit: withRerank ? Math.max(top * 4, 20) : top },  // over-fetch if re-ranking
   ]).toArray();
   const searchMs = Date.now() - tSearch;
 
-  const results: HybridResult[] = docs.map((d: Document) => ({
+  const candidates: HybridResult[] = docs.map((d: Document) => ({
     name: d.name,
     version: d.version,
     capability_text: d.capability_text,
     endpoint_stub_name: d.endpoint_stub_name,
     reliability_score: d.metadata.reliability_score,
-    vec_score: 0,        // not directly available from rankFusion output
+    vec_score: 0,
     rank_score: d.rrf_score,
     rrf_score: d.rrf_score,
     cost_per_call_usd: d.metadata.cost_per_call_usd,
     p95_latency_ms: d.metadata.p95_latency_ms,
   }));
 
+  if (!withRerank) {
+    return {
+      results: candidates.slice(0, top),
+      meta: {
+        query, embed_ms: embedMs, search_ms: searchMs, total_ms: Date.now() - tTotal,
+        candidates_after_filter: candidates.length,
+        mode: 'hybrid_rankfusion',
+        weights: { vector: VEC_WEIGHT, text: TEXT_WEIGHT },
+        pipelines_in: 2, pipelines_out: candidates.length,
+        pipeline_json: pipelineJson,
+      },
+    };
+  }
+
+  // 4th stage: re-rank the over-fetched candidate pool with a cross-encoder
+  // (Cohere) or heuristic. This is what gives precision boost at scale.
+  const rr = await rerank(query, candidates, top);
   return {
-    results,
+    results: rr.results,
     meta: {
-      query,
-      embed_ms: embedMs,
-      search_ms: searchMs,
-      total_ms: Date.now() - tTotal,
-      candidates_after_filter: results.length,
-      mode: 'hybrid_rankfusion',
+      query, embed_ms: embedMs, search_ms: searchMs, total_ms: Date.now() - tTotal,
+      candidates_after_filter: rr.results.length,
+      mode: 'hybrid_rankfusion_reranked',
       weights: { vector: VEC_WEIGHT, text: TEXT_WEIGHT },
-      pipelines_in: 2,
-      pipelines_out: results.length,
+      pipelines_in: 2, pipelines_out: rr.results.length,
       pipeline_json: pipelineJson,
+      rerank_strategy: rr.strategy,
+      rerank_ms: rr.rerank_ms,
+      candidates_before_rerank: candidates.length,
     },
   };
 }
+
+export { rerankStrategy };
