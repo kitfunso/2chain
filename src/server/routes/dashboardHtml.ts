@@ -298,6 +298,11 @@ export const DASHBOARD_HTML = `<!doctype html>
       if (d.outcome in usageCounts) usageCounts[d.outcome]++;
       updateUsage();
     });
+    es.addEventListener('tool_invoked', (e) => {
+      const d = JSON.parse(e.data);
+      const key = d.tool_name + '@' + d.tool_version;
+      requestAnimationFrame(() => flashRow(key));
+    });
     es.addEventListener('pipeline_ran', (e) => {
       const d = JSON.parse(e.data);
       document.getElementById('pipeline-card').style.display = 'block';

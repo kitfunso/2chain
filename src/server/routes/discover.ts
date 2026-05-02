@@ -29,21 +29,19 @@ export function registerDiscoverRoute(app: FastifyInstance, db: Db): void {
         ? await discoverHybrid(db, q, top)
         : await discover(db, q, top);
 
-      // Broadcast for the dashboard panels.
-      // For the demo query: live ranking. For ALL queries: pipeline inspector if hybrid.
-      if (q === DEMO_AGENT_QUERY) {
-        broadcast('discover_ran', {
-          query: q,
-          results: results.map((r) => ({
-            name: r.name, version: r.version,
-            reliability_score: r.reliability_score,
-            vec_score: r.vec_score,
-            rank_score: r.rank_score,
-          })),
-          meta,
-          ts: new Date().toISOString(),
-        });
-      }
+      // Broadcast every discover so the dashboard's live ranking panel
+      // shows the most recent query (regardless of which prompt was used).
+      broadcast('discover_ran', {
+        query: q,
+        results: results.map((r) => ({
+          name: r.name, version: r.version,
+          reliability_score: r.reliability_score,
+          vec_score: r.vec_score,
+          rank_score: r.rank_score,
+        })),
+        meta,
+        ts: new Date().toISOString(),
+      });
       const pipelineJson = (meta as unknown as { pipeline_json?: string }).pipeline_json;
       if (mode === 'hybrid' && pipelineJson) {
         broadcast('pipeline_ran', {

@@ -2,6 +2,7 @@ import type { FastifyInstance } from 'fastify';
 import type { Db } from 'mongodb';
 import { call, type CallInput } from '../../services/call.js';
 import { requireAuth } from '../auth.js';
+import { broadcast } from '../sse.js';
 
 export function registerCallRoute(app: FastifyInstance, db: Db): void {
   app.post<{ Body: CallInput }>('/call', async (req, reply) => {
@@ -18,6 +19,14 @@ export function registerCallRoute(app: FastifyInstance, db: Db): void {
 
     try {
       const r = await call(db, ctx.agent_id, ctx.role, b, bypass);
+      // Tell the dashboard a tool was just invoked — it'll flash the row.
+      broadcast('tool_invoked', {
+        tool_name: b.tool_name,
+        tool_version: b.tool_version,
+        outcome: r.ok ? 'ok' : (r.error?.code ?? 'error'),
+        latency_ms: r.ok ? r.latency_ms : undefined,
+        ts: new Date().toISOString(),
+      });
       if (r.ok) {
         reply.code(200).send(r);
       } else {
