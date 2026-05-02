@@ -16,9 +16,11 @@ import { FIXTURE_TOOLS, type FixtureSpec } from '../src/fixtures/tools.js';
 import { FIXTURE_AGENTS } from '../src/fixtures/agents.js';
 import { hashKey } from '../src/server/auth.js';
 import { generateFixtures } from '../src/fixtures/generated.js';
+import { REAL_CORPUS } from '../src/fixtures/real-corpus.js';
 import type { ToolSpecV2 } from '../src/types.js';
 
 const INCLUDE_GENERATED = process.env.INCLUDE_GENERATED !== 'false';
+const INCLUDE_REAL_CORPUS = process.env.INCLUDE_REAL_CORPUS !== 'false';
 const ALL_TOOLS: FixtureSpec[] = INCLUDE_GENERATED
   ? [...FIXTURE_TOOLS, ...generateFixtures()]
   : FIXTURE_TOOLS;
@@ -35,8 +37,18 @@ const storage = new SqliteStorage({ path: tmpPath });
 await storage.init();
 const embedder = new OllamaEmbedder({ concurrency: 4 });
 
+const realCorpusCount = INCLUDE_REAL_CORPUS ? REAL_CORPUS.length : 0;
+const totalCount = ALL_TOOLS.length + realCorpusCount;
+
 console.log(`seed: writing to ${tmpPath}`);
-console.log(`seed: ${ALL_TOOLS.length} tools (${FIXTURE_TOOLS.length} hand-crafted, ${ALL_TOOLS.length - FIXTURE_TOOLS.length} generated)`);
+console.log(
+  `seed: ${totalCount} tools (${FIXTURE_TOOLS.length} hand-crafted` +
+    (ALL_TOOLS.length > FIXTURE_TOOLS.length
+      ? `, ${ALL_TOOLS.length - FIXTURE_TOOLS.length} generated`
+      : '') +
+    (realCorpusCount > 0 ? `, ${realCorpusCount} real-corpus across 12 domains` : '') +
+    `)`,
+);
 console.log(`seed: embedder=${embedder.name()} dim=${embedder.dim()}`);
 
 try {
@@ -55,9 +67,10 @@ try {
   }
 
   // 2. Embed all capability_text in chunks of 32 (OllamaEmbedder caps inner concurrency at 4)
-  console.log(`\n=== embedding ${ALL_TOOLS.length} capability_texts ===`);
+  const realTexts = INCLUDE_REAL_CORPUS ? REAL_CORPUS.map((t) => t.capability_text) : [];
+  const texts = [...ALL_TOOLS.map((t) => t.capability_text), ...realTexts];
+  console.log(`\n=== embedding ${texts.length} capability_texts ===`);
   const tEmbed = Date.now();
-  const texts = ALL_TOOLS.map((t) => t.capability_text);
   const embeddings: Float32Array[] = [];
   const CHUNK = 32;
   for (let i = 0; i < texts.length; i += CHUNK) {
@@ -108,7 +121,18 @@ try {
       duration_ms: totalLatency,
     });
   }
-  console.log(`  inserted ${ALL_TOOLS.length} tools + eval_runs in ${Date.now() - tInsert}ms`);
+  // 3b. Real-corpus tools: catalog-only entries with status='active' but
+  // pointing at the catalog-only-stub. Searchable but /call returns
+  // a "spec only" structured error.
+  if (INCLUDE_REAL_CORPUS) {
+    const offset = ALL_TOOLS.length;
+    for (let i = 0; i < REAL_CORPUS.length; i++) {
+      await storage.upsertTool(REAL_CORPUS[i], embeddings[offset + i]);
+    }
+    console.log(`  inserted ${ALL_TOOLS.length} fixture + ${REAL_CORPUS.length} real-corpus tools in ${Date.now() - tInsert}ms`);
+  } else {
+    console.log(`  inserted ${ALL_TOOLS.length} tools + eval_runs in ${Date.now() - tInsert}ms`);
+  }
 
   // 4. Stats
   const stats = await storage.dbStats();

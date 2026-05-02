@@ -1,13 +1,13 @@
 {
-  "generated_at": "2026-05-02T20:57:44.655Z",
+  "generated_at": "2026-05-02T21:06:18.765Z",
   "db_path": "C:/Users/skf_s/AppData/Local/Temp/v2.db",
   "embedder": "ollama:nomic-embed-text",
   "storage": "sqlite",
   "total_queries": 32,
-  "v2_passes_expected": 20,
-  "v2_matches_v1_top1": 22,
-  "top3_overlap_avg": 1.875,
-  "margin_ratio_avg": 0.962936951954986,
+  "v2_passes_expected": 18,
+  "v2_matches_v1_top1": 18,
+  "top3_overlap_avg": 1.5625,
+  "margin_ratio_avg": 0.9697933434464449,
   "margin_ratio_min": 0,
   "results": [
     {
@@ -18,7 +18,7 @@
       "v2_top3": [
         "sec-edgar-financials",
         "pdf-extractor",
-        "pdftools-pro"
+        "yahoo-finance-fundamentals"
       ],
       "v2_rrf_margin": 0.00026441036488630484,
       "baseline_top1": "sec-edgar-financials",
@@ -41,9 +41,9 @@
       "v2_top3": [
         "pdf-extractor",
         "sec-edgar-financials",
-        "pdftools-pro"
+        "yahoo-finance-fundamentals"
       ],
-      "v2_rrf_margin": 0.00026441036488630484,
+      "v2_rrf_margin": 0.0003924185574106266,
       "baseline_top1": "sec-edgar-financials",
       "baseline_top3": [
         "sec-edgar-financials",
@@ -54,7 +54,7 @@
       "expected_match": false,
       "v2_matches_v1_top1": false,
       "top3_overlap": 2,
-      "margin_ratio": 2.500000000000033
+      "margin_ratio": 3.7103174603175053
     },
     {
       "id": "demo-2-arxiv",
@@ -63,10 +63,10 @@
       "v2_top1": "arxiv-paper-search",
       "v2_top3": [
         "arxiv-paper-search",
-        "sciparse",
-        "benchmark-extractor"
+        "semantic-scholar-paper",
+        "arxiv-search-papers"
       ],
-      "v2_rrf_margin": 0.0003924185574106266,
+      "v2_rrf_margin": 0.00026441036488630484,
       "baseline_top1": "arxiv-paper-search",
       "baseline_top3": [
         "arxiv-paper-search",
@@ -77,7 +77,7 @@
       "expected_match": true,
       "v2_matches_v1_top1": true,
       "top3_overlap": 1,
-      "margin_ratio": 0.8845789971617747
+      "margin_ratio": 0.5960264900662231
     },
     {
       "id": "demo-2-arxiv-short",
@@ -86,10 +86,10 @@
       "v2_top1": "arxiv-paper-search",
       "v2_top3": [
         "arxiv-paper-search",
-        "sciparse",
-        "benchmark-extractor"
+        "semantic-scholar-paper",
+        "arxiv-search-papers"
       ],
-      "v2_rrf_margin": 0.00026441036488630484,
+      "v2_rrf_margin": 0.0003924185574106266,
       "baseline_top1": "arxiv-paper-search",
       "baseline_top3": [
         "arxiv-paper-search",
@@ -99,8 +99,8 @@
       "baseline_rrf_margin": 0.0005204267499349484,
       "expected_match": true,
       "v2_matches_v1_top1": true,
-      "top3_overlap": 3,
-      "margin_ratio": 0.508064516129033
+      "top3_overlap": 1,
+      "margin_ratio": 0.7540322580645166
     },
     {
       "id": "demo-3-pr-lint",
@@ -112,7 +112,7 @@
         "sh-pr-review",
         "paper-digest"
       ],
-      "v2_rrf_margin": 0.0001311292356068472,
+      "v2_rrf_margin": 0.0001542070523499403,
       "baseline_top1": "sh-pr-review",
       "baseline_top3": [
         "sh-pr-review",
@@ -132,10 +132,10 @@
       "v2_top1": "security-scanner",
       "v2_top3": [
         "security-scanner",
-        "code-review-mini",
-        "taintscanner"
+        "sec-edgar-companyfacts",
+        "code-review-mini"
       ],
-      "v2_rrf_margin": 0.0022640893891199745,
+      "v2_rrf_margin": 0.0010051850471932446,
       "baseline_top1": "security-scanner",
       "baseline_top3": [
         "security-scanner",
@@ -145,8 +145,8 @@
       "baseline_rrf_margin": 0.0007552939553491372,
       "expected_match": true,
       "v2_matches_v1_top1": true,
-      "top3_overlap": 2,
-      "margin_ratio": 2.9976267823742764
+      "top3_overlap": 1,
+      "margin_ratio": 1.330852762787694
     },
     {
       "id": "demo-5-malformed",
@@ -157,7 +157,7 @@
         "soql-loop-finder",
         "governor-limit-checker"
       ],
-      "v2_rrf_margin": 0.00022854517830720594,
+      "v2_rrf_margin": 0.0003565533708315277,
       "baseline_top1": "pylint-pro",
       "baseline_top3": [
         "pylint-pro",
@@ -168,7 +168,7 @@
       "expected_match": false,
       "v2_matches_v1_top1": false,
       "top3_overlap": 0,
-      "margin_ratio": 0.5038279170656239
+      "margin_ratio": 0.7860220175255895
     },
     {
       "id": "prewarm-1",
@@ -221,7 +221,7 @@
       "v2_top3": [
         "pdf-extractor",
         "annual-report-extract",
-        "sec-letter-reader"
+        "shopify-orders-list"
       ],
       "v2_rrf_margin": 0.0005164264939185627,
       "baseline_top1": "pdf-extractor",
@@ -244,9 +244,9 @@
       "v2_top3": [
         "pdf-extractor",
         "sec-edgar-financials",
-        "fundvalue-bot"
+        "yahoo-finance-fundamentals"
       ],
-      "v2_rrf_margin": 0.00026441036488630484,
+      "v2_rrf_margin": 0.0003924185574106266,
       "baseline_top1": "sec-edgar-financials",
       "baseline_top3": [
         "sec-edgar-financials",
@@ -267,7 +267,7 @@
       "v2_top3": [
         "sec-edgar-financials",
         "pdf-extractor",
-        "fundvalue-bot"
+        "yahoo-finance-fundamentals"
       ],
       "v2_rrf_margin": 0.00026441036488630484,
       "baseline_top1": "sec-edgar-financials",
@@ -279,20 +279,20 @@
       "baseline_rrf_margin": 0.00026441036488630484,
       "expected_match": true,
       "v2_matches_v1_top1": true,
-      "top3_overlap": 3,
+      "top3_overlap": 2,
       "margin_ratio": 1
     },
     {
       "id": "prewarm-6",
       "q": "get income statement for ticker from SEC EDGAR",
       "expected_top1": "sec-edgar-financials",
-      "v2_top1": "sec-edgar-financials",
+      "v2_top1": "yahoo-finance-fundamentals",
       "v2_top3": [
+        "yahoo-finance-fundamentals",
         "sec-edgar-financials",
-        "pdf-extractor",
-        "sec-letter-reader"
+        "pdf-extractor"
       ],
-      "v2_rrf_margin": 0.00026441036488630484,
+      "v2_rrf_margin": 0,
       "baseline_top1": "sec-edgar-financials",
       "baseline_top3": [
         "sec-edgar-financials",
@@ -300,10 +300,10 @@
         "sec-letter-reader"
       ],
       "baseline_rrf_margin": 0.00026441036488630484,
-      "expected_match": true,
-      "v2_matches_v1_top1": true,
-      "top3_overlap": 3,
-      "margin_ratio": 1
+      "expected_match": false,
+      "v2_matches_v1_top1": false,
+      "top3_overlap": 2,
+      "margin_ratio": 0
     },
     {
       "id": "prewarm-7",
@@ -312,10 +312,10 @@
       "v2_top1": "arxiv-paper-search",
       "v2_top3": [
         "arxiv-paper-search",
-        "sciparse",
-        "benchmark-extractor"
+        "arxiv-search-papers",
+        "semantic-scholar-paper"
       ],
-      "v2_rrf_margin": 0.00026441036488630484,
+      "v2_rrf_margin": 0.0003924185574106266,
       "baseline_top1": "arxiv-paper-search",
       "baseline_top3": [
         "arxiv-paper-search",
@@ -325,8 +325,8 @@
       "baseline_rrf_margin": 0.0005204267499349484,
       "expected_match": true,
       "v2_matches_v1_top1": true,
-      "top3_overlap": 3,
-      "margin_ratio": 0.508064516129033
+      "top3_overlap": 1,
+      "margin_ratio": 0.7540322580645166
     },
     {
       "id": "prewarm-8",
@@ -335,8 +335,8 @@
       "v2_top1": "arxiv-paper-search",
       "v2_top3": [
         "arxiv-paper-search",
-        "sciparse",
-        "benchmark-extractor"
+        "arxiv-search-papers",
+        "semantic-scholar-paper"
       ],
       "v2_rrf_margin": 0.00026441036488630484,
       "baseline_top1": "arxiv-paper-search",
@@ -348,7 +348,7 @@
       "baseline_rrf_margin": 0.0007684426229508205,
       "expected_match": true,
       "v2_matches_v1_top1": true,
-      "top3_overlap": 2,
+      "top3_overlap": 1,
       "margin_ratio": 0.34408602150537765
     },
     {
@@ -358,10 +358,10 @@
       "v2_top1": "arxiv-paper-search",
       "v2_top3": [
         "arxiv-paper-search",
-        "sciparse",
-        "benchmark-extractor"
+        "core-fulltext-search",
+        "sciparse"
       ],
-      "v2_rrf_margin": 0.0003924185574106266,
+      "v2_rrf_margin": 0.0016076196179497342,
       "baseline_top1": "arxiv-paper-search",
       "baseline_top3": [
         "arxiv-paper-search",
@@ -371,19 +371,19 @@
       "baseline_rrf_margin": 0.0007855021763006967,
       "expected_match": true,
       "v2_matches_v1_top1": true,
-      "top3_overlap": 2,
-      "margin_ratio": 0.49957666477604457
+      "top3_overlap": 1,
+      "margin_ratio": 2.046613830557134
     },
     {
       "id": "prewarm-10",
       "q": "review javascript code for bugs",
-      "v2_top1": "security-scanner",
+      "v2_top1": "shellcheck-bash",
       "v2_top3": [
-        "security-scanner",
-        "sf-pr-review",
-        "terraform-pr-review"
+        "shellcheck-bash",
+        "sonarqube-quality-gate",
+        "eslint-stylecheck"
       ],
-      "v2_rrf_margin": 0.000024488523787259686,
+      "v2_rrf_margin": 0,
       "baseline_top1": "security-scanner",
       "baseline_top3": [
         "security-scanner",
@@ -392,9 +392,9 @@
       ],
       "baseline_rrf_margin": 0.00010576414595452055,
       "expected_match": false,
-      "v2_matches_v1_top1": true,
-      "top3_overlap": 1,
-      "margin_ratio": 0.23153899240854223
+      "v2_matches_v1_top1": false,
+      "top3_overlap": 0,
+      "margin_ratio": 0
     },
     {
       "id": "prewarm-11",
@@ -405,7 +405,7 @@
         "malformed-bot",
         "eslint-snitch"
       ],
-      "v2_rrf_margin": 0.00025201612903225784,
+      "v2_rrf_margin": 0.00024000325428141095,
       "baseline_top1": "code-review-mini",
       "baseline_top3": [
         "code-review-mini",
@@ -425,10 +425,10 @@
       "v2_top1": "security-scanner",
       "v2_top3": [
         "security-scanner",
-        "iac-policy-bot",
-        "terraform-pr-review"
+        "sonarqube-quality-gate",
+        "iac-policy-bot"
       ],
-      "v2_rrf_margin": 0.0007684426229508205,
+      "v2_rrf_margin": 0.0003924185574106266,
       "baseline_top1": "security-scanner",
       "baseline_top3": [
         "security-scanner",
@@ -439,7 +439,7 @@
       "expected_match": true,
       "v2_matches_v1_top1": true,
       "top3_overlap": 1,
-      "margin_ratio": 2.906249999999989
+      "margin_ratio": 1.4841269841269826
     },
     {
       "id": "prewarm-13",
@@ -447,10 +447,10 @@
       "v2_top1": "security-scanner",
       "v2_top3": [
         "security-scanner",
-        "code-review-mini",
-        "iac-policy-bot"
+        "pylint-lint",
+        "sonarqube-quality-gate"
       ],
-      "v2_rrf_margin": 0.0010538641686182702,
+      "v2_rrf_margin": 0.0006614456112076401,
       "baseline_top1": "pylint-pro",
       "baseline_top3": [
         "pylint-pro",
@@ -466,13 +466,13 @@
     {
       "id": "prewarm-14",
       "q": "summarise arxiv paper abstract",
-      "v2_top1": "arxiv-paper-search",
+      "v2_top1": "arxiv-paper-pdf",
       "v2_top3": [
-        "arxiv-paper-search",
-        "sciparse",
-        "clinical-recap"
+        "arxiv-paper-pdf",
+        "semantic-scholar-paper",
+        "arxiv-paper-search"
       ],
-      "v2_rrf_margin": 0.0005835667600373497,
+      "v2_rrf_margin": 0.00025201612903225784,
       "baseline_top1": "arxiv-paper-search",
       "baseline_top3": [
         "arxiv-paper-search",
@@ -481,9 +481,9 @@
       ],
       "baseline_rrf_margin": 0.00041562004230566094,
       "expected_match": false,
-      "v2_matches_v1_top1": true,
+      "v2_matches_v1_top1": false,
       "top3_overlap": 1,
-      "margin_ratio": 1.4040871484445283
+      "margin_ratio": 0.6063618290258407
     },
     {
       "id": "prewarm-15",
@@ -517,7 +517,7 @@
         "b2b-invoice",
         "po-parser"
       ],
-      "v2_rrf_margin": 0.00063661880161087,
+      "v2_rrf_margin": 0.0007646269941351917,
       "baseline_top1": "invoice-grok",
       "baseline_top3": [
         "invoice-grok",
@@ -528,19 +528,19 @@
       "expected_match": true,
       "v2_matches_v1_top1": true,
       "top3_overlap": 2,
-      "margin_ratio": 1.865739426625022
+      "margin_ratio": 2.2408931781625347
     },
     {
       "id": "prewarm-17",
       "q": "extract VAT line items from invoice",
       "expected_top1": "invoice-grok",
-      "v2_top1": "invoiceline-bot",
+      "v2_top1": "b2b-invoice",
       "v2_top3": [
-        "invoiceline-bot",
         "b2b-invoice",
+        "invoiceline-bot",
         "lineitem-extractor"
       ],
-      "v2_rrf_margin": 0,
+      "v2_rrf_margin": 0.00012400793650793607,
       "baseline_top1": "lineitem-extractor",
       "baseline_top3": [
         "lineitem-extractor",
@@ -551,7 +551,7 @@
       "expected_match": false,
       "v2_matches_v1_top1": false,
       "top3_overlap": 2,
-      "margin_ratio": 0
+      "margin_ratio": 0.691964285714274
     },
     {
       "id": "edge-1-fin-vs-invoice",
@@ -560,9 +560,9 @@
       "v2_top3": [
         "annual-report-extract",
         "pdf-extractor",
-        "lineitem-extractor"
+        "companies-house-filings"
       ],
-      "v2_rrf_margin": 0.0007531689181609867,
+      "v2_rrf_margin": 0.0008662399267543829,
       "baseline_top1": "pdf-extractor",
       "baseline_top3": [
         "pdf-extractor",
@@ -573,7 +573,7 @@
       "expected_match": false,
       "v2_matches_v1_top1": false,
       "top3_overlap": 2,
-      "margin_ratio": 0.8042780748663105
+      "margin_ratio": 0.9250219490781384
     },
     {
       "id": "edge-2-py-sec-vs-style",
@@ -583,7 +583,7 @@
       "v2_top3": [
         "security-scanner",
         "sql-injection-bot",
-        "parameterised-query-checker"
+        "eslint-stylecheck"
       ],
       "v2_rrf_margin": 0.00026441036488630484,
       "baseline_top1": "security-scanner",
@@ -606,9 +606,9 @@
       "v2_top3": [
         "arxiv-paper-search",
         "paper-digest",
-        "benchmark-extractor"
+        "core-fulltext-search"
       ],
-      "v2_rrf_margin": 0.00026441036488630484,
+      "v2_rrf_margin": 0.0007411560434101433,
       "baseline_top1": "arxiv-paper-search",
       "baseline_top3": [
         "arxiv-paper-search",
@@ -630,7 +630,7 @@
         "pubmed-tldr",
         "rct-digest"
       ],
-      "v2_rrf_margin": 0.0007646269941351917,
+      "v2_rrf_margin": 0.0013140775435857427,
       "baseline_top1": "paper-digest",
       "baseline_top3": [
         "paper-digest",
@@ -641,19 +641,19 @@
       "expected_match": true,
       "v2_matches_v1_top1": true,
       "top3_overlap": 2,
-      "margin_ratio": 0.8711038172217628
+      "margin_ratio": 1.4970671623196012
     },
     {
       "id": "edge-5-edgar-vs-pdf",
       "q": "I have NVIDIA ticker NVDA and want their latest annual report numbers",
       "expected_top1": "sec-edgar-financials",
-      "v2_top1": "sec-edgar-financials",
+      "v2_top1": "yahoo-finance-fundamentals",
       "v2_top3": [
+        "yahoo-finance-fundamentals",
         "sec-edgar-financials",
-        "annual-report-extract",
-        "shareholder-pdf"
+        "annual-report-extract"
       ],
-      "v2_rrf_margin": 0.00026441036488630484,
+      "v2_rrf_margin": 0.0003924185574106266,
       "baseline_top1": "sec-edgar-financials",
       "baseline_top3": [
         "sec-edgar-financials",
@@ -661,10 +661,10 @@
         "annual-report-extract"
       ],
       "baseline_rrf_margin": 0.0007684426229508205,
-      "expected_match": true,
-      "v2_matches_v1_top1": true,
+      "expected_match": false,
+      "v2_matches_v1_top1": false,
       "top3_overlap": 2,
-      "margin_ratio": 0.34408602150537765
+      "margin_ratio": 0.5106673493770282
     },
     {
       "id": "edge-6-pdf-vs-edgar",
@@ -674,7 +674,7 @@
       "v2_top3": [
         "pdf-extractor",
         "sec-edgar-financials",
-        "guidance-extract"
+        "yahoo-finance-fundamentals"
       ],
       "v2_rrf_margin": 0.00026441036488630484,
       "baseline_top1": "sec-edgar-financials",
@@ -721,7 +721,7 @@
         "shell-rules-checker",
         "shellcheck-bot"
       ],
-      "v2_rrf_margin": 0.00024420024420024333,
+      "v2_rrf_margin": 0.0003607503607503601,
       "baseline_top1": "pylint-pro",
       "baseline_top3": [
         "pylint-pro",
@@ -732,7 +732,7 @@
       "expected_match": false,
       "v2_matches_v1_top1": false,
       "top3_overlap": 1,
-      "margin_ratio": 0.1387735837845081
+      "margin_ratio": 0.20500643059075097
     }
   ]
 }
