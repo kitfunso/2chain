@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-02T19:55:11.772Z",
+  "generated_at": "2026-05-02T20:07:32.503Z",
   "host": "http://127.0.0.1:3030",
   "mode": "hybrid",
   "total_queries": 32,
-  "pass": 15,
-  "fail": 4,
+  "pass": 25,
+  "fail": 7,
   "unspecified": 0,
-  "errors": 13,
+  "errors": 0,
   "entries": [
     {
       "id": "demo-1-dcf",
@@ -43,7 +43,7 @@
       "rrf_margin_top1_top2": 0.00010576414595452055,
       "rerank_margin_top1_top2": 0.10350938656795372,
       "candidates_after_filter": 5,
-      "total_ms": 1090,
+      "total_ms": 43,
       "expected_match": true,
       "meta_pipeline_present": true
     },
@@ -82,7 +82,7 @@
       "rrf_margin_top1_top2": 0.00010576414595452055,
       "rerank_margin_top1_top2": 0.009759386567953499,
       "candidates_after_filter": 5,
-      "total_ms": 288,
+      "total_ms": 35,
       "expected_match": true,
       "meta_pipeline_present": true
     },
@@ -121,7 +121,7 @@
       "rrf_margin_top1_top2": 0.0004436218344203574,
       "rerank_margin_top1_top2": 0.12496298254891625,
       "candidates_after_filter": 5,
-      "total_ms": 317,
+      "total_ms": 45,
       "expected_match": true,
       "meta_pipeline_present": true
     },
@@ -160,7 +160,124 @@
       "rrf_margin_top1_top2": 0.0005204267499349484,
       "rerank_margin_top1_top2": 0.13341920374707272,
       "candidates_after_filter": 5,
-      "total_ms": 59,
+      "total_ms": 47,
+      "expected_match": true,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "demo-3-pr-lint",
+      "category": "demo-prompt",
+      "q": "Use 2chain to find a JS linter for structured findings on a PR review",
+      "mode": "hybrid",
+      "top1": {
+        "name": "sh-pr-review",
+        "version": "1.0",
+        "rrf_score": 0.014838709677419352,
+        "vec_score": 0,
+        "rerank_score": 0.9347419354838709
+      },
+      "top3": [
+        {
+          "name": "sh-pr-review",
+          "version": "1.0",
+          "rrf_score": 0.014838709677419352,
+          "rerank_score": 0.9347419354838709
+        },
+        {
+          "name": "fc-pr-bot",
+          "version": "4.2",
+          "rrf_score": 0.015625,
+          "rerank_score": 0.932125
+        },
+        {
+          "name": "typed-lint",
+          "version": "1.0-beta",
+          "rrf_score": 0.014839572192513369,
+          "rerank_score": 0.9100307486631015
+        }
+      ],
+      "rrf_margin_top1_top2": -0.0007862903225806482,
+      "rerank_margin_top1_top2": 0.0026169354838708747,
+      "candidates_after_filter": 5,
+      "total_ms": 298,
+      "expected_match": false,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "demo-4-security",
+      "category": "demo-prompt",
+      "q": "audit this Python authentication function for OWASP recall",
+      "mode": "hybrid",
+      "top1": {
+        "name": "security-scanner",
+        "version": "1.5",
+        "rrf_score": 0.01639344262295082,
+        "vec_score": 0,
+        "rerank_score": 1.200204918032787
+      },
+      "top3": [
+        {
+          "name": "security-scanner",
+          "version": "1.5",
+          "rrf_score": 0.01639344262295082,
+          "rerank_score": 1.200204918032787
+        },
+        {
+          "name": "pylint-pro",
+          "version": "4.0",
+          "rrf_score": 0.015638148667601683,
+          "rerank_score": 1.0257166900420758
+        },
+        {
+          "name": "taintscanner",
+          "version": "2.5",
+          "rrf_score": 0.015552884615384614,
+          "rerank_score": 1.0093798076923077
+        }
+      ],
+      "rrf_margin_top1_top2": 0.0007552939553491372,
+      "rerank_margin_top1_top2": 0.17448822799071118,
+      "candidates_after_filter": 5,
+      "total_ms": 278,
+      "expected_match": true,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "demo-5-malformed",
+      "category": "demo-prompt",
+      "q": "review this code, find the issues with structured output",
+      "mode": "hybrid",
+      "top1": {
+        "name": "pylint-pro",
+        "version": "4.0",
+        "rrf_score": 0.015726495726495725,
+        "vec_score": 0,
+        "rerank_score": 1.0213589743589742
+      },
+      "top3": [
+        {
+          "name": "pylint-pro",
+          "version": "4.0",
+          "rrf_score": 0.015726495726495725,
+          "rerank_score": 1.0213589743589742
+        },
+        {
+          "name": "mainframe-pr-bot",
+          "version": "4.2",
+          "rrf_score": 0.015272878190495952,
+          "rerank_score": 0.9934461852389845
+        },
+        {
+          "name": "crab-checker",
+          "version": "3.0",
+          "rrf_score": 0.014348171701112878,
+          "rerank_score": 0.9570843932167462
+        }
+      ],
+      "rrf_margin_top1_top2": 0.00045361753599977225,
+      "rerank_margin_top1_top2": 0.027912789119989623,
+      "candidates_after_filter": 5,
+      "total_ms": 294,
       "expected_match": true,
       "meta_pipeline_present": true
     },
@@ -199,7 +316,7 @@
       "rrf_margin_top1_top2": 0.00041293389045555726,
       "rerank_margin_top1_top2": 0.00008202507050025787,
       "candidates_after_filter": 5,
-      "total_ms": 47,
+      "total_ms": 34,
       "expected_match": false,
       "meta_pipeline_present": true
     },
@@ -238,7 +355,7 @@
       "rrf_margin_top1_top2": -0.00026441036488630484,
       "rerank_margin_top1_top2": 0.035958676437259474,
       "candidates_after_filter": 5,
-      "total_ms": 42,
+      "total_ms": 39,
       "expected_match": true,
       "meta_pipeline_present": true
     },
@@ -277,7 +394,7 @@
       "rrf_margin_top1_top2": 0.001989735934796108,
       "rerank_margin_top1_top2": 0.17025240278011045,
       "candidates_after_filter": 5,
-      "total_ms": 36,
+      "total_ms": 35,
       "expected_match": true,
       "meta_pipeline_present": true
     },
@@ -316,7 +433,7 @@
       "rrf_margin_top1_top2": -0.00026441036488630484,
       "rerank_margin_top1_top2": 0.030601533580116413,
       "candidates_after_filter": 5,
-      "total_ms": 36,
+      "total_ms": 33,
       "expected_match": true,
       "meta_pipeline_present": true
     },
@@ -355,7 +472,7 @@
       "rrf_margin_top1_top2": 0.00026441036488630484,
       "rerank_margin_top1_top2": 0.11689846641988377,
       "candidates_after_filter": 5,
-      "total_ms": 39,
+      "total_ms": 35,
       "expected_match": true,
       "meta_pipeline_present": true
     },
@@ -394,7 +511,85 @@
       "rrf_margin_top1_top2": 0.00026441036488630484,
       "rerank_margin_top1_top2": 0.12939846641988373,
       "candidates_after_filter": 5,
-      "total_ms": 37,
+      "total_ms": 34,
+      "expected_match": true,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "prewarm-7",
+      "category": "prewarm",
+      "q": "I am doing a literature review fetch the latest papers on Mamba state-space models from arxiv",
+      "mode": "hybrid",
+      "top1": {
+        "name": "arxiv-paper-search",
+        "version": "1.0",
+        "rrf_score": 0.01639344262295082,
+        "vec_score": 0,
+        "rerank_score": 1.1261664564943255
+      },
+      "top3": [
+        {
+          "name": "arxiv-paper-search",
+          "version": "1.0",
+          "rrf_score": 0.01639344262295082,
+          "rerank_score": 1.1261664564943255
+        },
+        {
+          "name": "benchmark-extractor",
+          "version": "3.0",
+          "rrf_score": 0.015873015873015872,
+          "rerank_score": 1.0235164835164836
+        },
+        {
+          "name": "sciparse",
+          "version": "0.9",
+          "rrf_score": 0.016129032258064516,
+          "rerank_score": 0.9805372208436725
+        }
+      ],
+      "rrf_margin_top1_top2": 0.0005204267499349484,
+      "rerank_margin_top1_top2": 0.10264997297784184,
+      "candidates_after_filter": 5,
+      "total_ms": 325,
+      "expected_match": true,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "prewarm-8",
+      "category": "prewarm",
+      "q": "search arxiv for papers on a topic",
+      "mode": "hybrid",
+      "top1": {
+        "name": "arxiv-paper-search",
+        "version": "1.0",
+        "rrf_score": 0.01639344262295082,
+        "vec_score": 0,
+        "rerank_score": 1.2877049180327869
+      },
+      "top3": [
+        {
+          "name": "arxiv-paper-search",
+          "version": "1.0",
+          "rrf_score": 0.01639344262295082,
+          "rerank_score": 1.2877049180327869
+        },
+        {
+          "name": "paper-digest",
+          "version": "1.0",
+          "rrf_score": 0.015625,
+          "rerank_score": 1.1281249999999998
+        },
+        {
+          "name": "benchmark-extractor",
+          "version": "3.0",
+          "rrf_score": 0.015873015873015872,
+          "rerank_score": 1.0742857142857143
+        }
+      ],
+      "rrf_margin_top1_top2": 0.0007684426229508205,
+      "rerank_margin_top1_top2": 0.15957991803278704,
+      "candidates_after_filter": 5,
+      "total_ms": 282,
       "expected_match": true,
       "meta_pipeline_present": true
     },
@@ -433,7 +628,7 @@
       "rrf_margin_top1_top2": 0.0007855021763006967,
       "rerank_margin_top1_top2": 0.04034759793353149,
       "candidates_after_filter": 5,
-      "total_ms": 33,
+      "total_ms": 34,
       "expected_match": true,
       "meta_pipeline_present": true
     },
@@ -472,7 +667,7 @@
       "rrf_margin_top1_top2": 0.00010576414595452055,
       "rerank_margin_top1_top2": 0.11425938656795354,
       "candidates_after_filter": 5,
-      "total_ms": 44,
+      "total_ms": 37,
       "expected_match": false,
       "meta_pipeline_present": true
     },
@@ -511,7 +706,7 @@
       "rrf_margin_top1_top2": -0.00033629693283976705,
       "rerank_margin_top1_top2": 0.04311663802221033,
       "candidates_after_filter": 5,
-      "total_ms": 32,
+      "total_ms": 36,
       "expected_match": true,
       "meta_pipeline_present": true
     },
@@ -550,7 +745,7 @@
       "rrf_margin_top1_top2": 0.00026441036488630484,
       "rerank_margin_top1_top2": 0.13096989499131229,
       "candidates_after_filter": 5,
-      "total_ms": 33,
+      "total_ms": 38,
       "expected_match": true,
       "meta_pipeline_present": true
     },
@@ -589,7 +784,7 @@
       "rrf_margin_top1_top2": -0.00010576414595452055,
       "rerank_margin_top1_top2": 0.004740613432046237,
       "candidates_after_filter": 5,
-      "total_ms": 31,
+      "total_ms": 33,
       "expected_match": true,
       "meta_pipeline_present": true
     },
@@ -628,7 +823,7 @@
       "rrf_margin_top1_top2": 0.00041562004230566094,
       "rerank_margin_top1_top2": 0.09870290190375464,
       "candidates_after_filter": 5,
-      "total_ms": 38,
+      "total_ms": 35,
       "expected_match": false,
       "meta_pipeline_present": true
     },
@@ -667,7 +862,7 @@
       "rrf_margin_top1_top2": 0.0004436218344203574,
       "rerank_margin_top1_top2": 0.041462982548916116,
       "candidates_after_filter": 5,
-      "total_ms": 43,
+      "total_ms": 32,
       "expected_match": true,
       "meta_pipeline_present": true
     },
@@ -706,7 +901,7 @@
       "rrf_margin_top1_top2": 0.0003412152804008993,
       "rerank_margin_top1_top2": 0.18885468761804058,
       "candidates_after_filter": 5,
-      "total_ms": 30,
+      "total_ms": 37,
       "expected_match": true,
       "meta_pipeline_present": true
     },
@@ -745,8 +940,320 @@
       "rrf_margin_top1_top2": 0.00017921146953405256,
       "rerank_margin_top1_top2": 0.014064516129032478,
       "candidates_after_filter": 5,
-      "total_ms": 32,
+      "total_ms": 35,
       "expected_match": false,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "edge-1-fin-vs-invoice",
+      "category": "edge-case",
+      "q": "extract financial line items from a public company filing",
+      "mode": "hybrid",
+      "top1": {
+        "name": "pdf-extractor",
+        "version": "3.0",
+        "rrf_score": 0.01639344262295082,
+        "vec_score": 0,
+        "rerank_score": 1.0952049180327867
+      },
+      "top3": [
+        {
+          "name": "pdf-extractor",
+          "version": "3.0",
+          "rrf_score": 0.01639344262295082,
+          "rerank_score": 1.0952049180327867
+        },
+        {
+          "name": "sec-edgar-financials",
+          "version": "1.0",
+          "rrf_score": 0.015456989247311828,
+          "rerank_score": 1.0580645161290323
+        },
+        {
+          "name": "annual-report-extract",
+          "version": "1.0",
+          "rrf_score": 0.015162852112676055,
+          "rerank_score": 1.0033283450704227
+        }
+      ],
+      "rrf_margin_top1_top2": 0.0009364533756389924,
+      "rerank_margin_top1_top2": 0.03714040190375445,
+      "candidates_after_filter": 5,
+      "total_ms": 387,
+      "expected_match": true,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "edge-2-py-sec-vs-style",
+      "category": "edge-case",
+      "q": "check this Python file for SQL injection and hardcoded API keys",
+      "mode": "hybrid",
+      "top1": {
+        "name": "security-scanner",
+        "version": "1.5",
+        "rrf_score": 0.01639344262295082,
+        "vec_score": 0,
+        "rerank_score": 1.2206594634873325
+      },
+      "top3": [
+        {
+          "name": "security-scanner",
+          "version": "1.5",
+          "rrf_score": 0.01639344262295082,
+          "rerank_score": 1.2206594634873325
+        },
+        {
+          "name": "sql-injection-bot",
+          "version": "1.1",
+          "rrf_score": 0.016129032258064516,
+          "rerank_score": 1.0591700879765396
+        },
+        {
+          "name": "sqli-finder",
+          "version": "1.0",
+          "rrf_score": 0.015726495726495725,
+          "rerank_score": 1.0482832167832168
+        }
+      ],
+      "rrf_margin_top1_top2": 0.00026441036488630484,
+      "rerank_margin_top1_top2": 0.1614893755107929,
+      "candidates_after_filter": 5,
+      "total_ms": 266,
+      "expected_match": true,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "edge-3-paper-search-vs-summary",
+      "category": "edge-case",
+      "q": "I want to find research papers on diffusion models",
+      "mode": "hybrid",
+      "top1": {
+        "name": "arxiv-paper-search",
+        "version": "1.0",
+        "rrf_score": 0.016020864381520117,
+        "vec_score": 0,
+        "rerank_score": 1.1209388971684053
+      },
+      "top3": [
+        {
+          "name": "arxiv-paper-search",
+          "version": "1.0",
+          "rrf_score": 0.016020864381520117,
+          "rerank_score": 1.1209388971684053
+        },
+        {
+          "name": "paper-digest",
+          "version": "1.0",
+          "rrf_score": 0.016208355367530406,
+          "rerank_score": 1.0743759915388682
+        },
+        {
+          "name": "pubmed-tldr",
+          "version": "2.0",
+          "rrf_score": 0.015949820788530463,
+          "rerank_score": 1.005741935483871
+        }
+      ],
+      "rrf_margin_top1_top2": -0.00018749098601028927,
+      "rerank_margin_top1_top2": 0.04656290562953713,
+      "candidates_after_filter": 5,
+      "total_ms": 269,
+      "expected_match": true,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "edge-4-paper-summary-vs-search",
+      "category": "edge-case",
+      "q": "summarise this paper text I already have",
+      "mode": "hybrid",
+      "top1": {
+        "name": "paper-digest",
+        "version": "1.0",
+        "rrf_score": 0.01639344262295082,
+        "vec_score": 0,
+        "rerank_score": 1.1827049180327869
+      },
+      "top3": [
+        {
+          "name": "paper-digest",
+          "version": "1.0",
+          "rrf_score": 0.01639344262295082,
+          "rerank_score": 1.1827049180327869
+        },
+        {
+          "name": "tldr-bot",
+          "version": "2.1",
+          "rrf_score": 0.015515674693321217,
+          "rerank_score": 0.9969553611994547
+        },
+        {
+          "name": "pubmed-tldr",
+          "version": "2.0",
+          "rrf_score": 0.01569940476190476,
+          "rerank_score": 0.9944732142857144
+        }
+      ],
+      "rrf_margin_top1_top2": 0.000877767929629604,
+      "rerank_margin_top1_top2": 0.18574955683333216,
+      "candidates_after_filter": 5,
+      "total_ms": 293,
+      "expected_match": true,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "edge-5-edgar-vs-pdf",
+      "category": "edge-case",
+      "q": "I have NVIDIA ticker NVDA and want their latest annual report numbers",
+      "mode": "hybrid",
+      "top1": {
+        "name": "sec-edgar-financials",
+        "version": "1.0",
+        "rrf_score": 0.01639344262295082,
+        "vec_score": 0,
+        "rerank_score": 1.1513412816691506
+      },
+      "top3": [
+        {
+          "name": "sec-edgar-financials",
+          "version": "1.0",
+          "rrf_score": 0.01639344262295082,
+          "rerank_score": 1.1513412816691506
+        },
+        {
+          "name": "ceo-letter-bot",
+          "version": "1.3",
+          "rrf_score": 0.015625,
+          "rerank_score": 1.0279431818181817
+        },
+        {
+          "name": "annual-report-extract",
+          "version": "1.0",
+          "rrf_score": 0.016129032258064516,
+          "rerank_score": 1.0161246334310852
+        }
+      ],
+      "rrf_margin_top1_top2": 0.0007684426229508205,
+      "rerank_margin_top1_top2": 0.12339809985096895,
+      "candidates_after_filter": 5,
+      "total_ms": 272,
+      "expected_match": true,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "edge-6-pdf-vs-edgar",
+      "category": "edge-case",
+      "q": "I have a 10-K PDF text pasted, extract the income statement rows",
+      "mode": "hybrid",
+      "top1": {
+        "name": "sec-edgar-financials",
+        "version": "1.0",
+        "rrf_score": 0.015949820788530463,
+        "vec_score": 0,
+        "rerank_score": 1.0677419354838709
+      },
+      "top3": [
+        {
+          "name": "sec-edgar-financials",
+          "version": "1.0",
+          "rrf_score": 0.015949820788530463,
+          "rerank_score": 1.0677419354838709
+        },
+        {
+          "name": "pdf-extractor",
+          "version": "3.0",
+          "rrf_score": 0.01639344262295082,
+          "rerank_score": 1.0493715846994536
+        },
+        {
+          "name": "open-banking-pdf",
+          "version": "1.0",
+          "rrf_score": 0.015552884615384614,
+          "rerank_score": 1.0015464743589744
+        }
+      ],
+      "rrf_margin_top1_top2": -0.0004436218344203574,
+      "rerank_margin_top1_top2": 0.01837035078441729,
+      "candidates_after_filter": 5,
+      "total_ms": 283,
+      "expected_match": false,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "edge-7-jslint-vs-pylint",
+      "category": "edge-case",
+      "q": "lint this code: function f() { var x = null; x.foo(); }",
+      "mode": "hybrid",
+      "top1": {
+        "name": "react-hooks-lint",
+        "version": "0.5",
+        "rrf_score": 0.015855532786885247,
+        "vec_score": 0,
+        "rerank_score": 0.999106118266979
+      },
+      "top3": [
+        {
+          "name": "react-hooks-lint",
+          "version": "0.5",
+          "rrf_score": 0.015855532786885247,
+          "rerank_score": 0.999106118266979
+        },
+        {
+          "name": "typed-lint",
+          "version": "1.0-beta",
+          "rrf_score": 0.015246842709529276,
+          "rerank_score": 0.9712150647859602
+        },
+        {
+          "name": "security-scanner",
+          "version": "1.5",
+          "rrf_score": 0.013706293706293705,
+          "rerank_score": 0.9399975024975024
+        }
+      ],
+      "rrf_margin_top1_top2": 0.0006086900773559709,
+      "rerank_margin_top1_top2": 0.027891053481018835,
+      "candidates_after_filter": 5,
+      "total_ms": 267,
+      "expected_match": false,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "edge-8-pylint-vs-jslint",
+      "category": "edge-case",
+      "q": "lint this code: def f(): import os; os.system('rm')",
+      "mode": "hybrid",
+      "top1": {
+        "name": "pylint-pro",
+        "version": "4.0",
+        "rrf_score": 0.016237314597970336,
+        "vec_score": 0,
+        "rerank_score": 1.0276791569086652
+      },
+      "top3": [
+        {
+          "name": "pylint-pro",
+          "version": "4.0",
+          "rrf_score": 0.016237314597970336,
+          "rerank_score": 1.0276791569086652
+        },
+        {
+          "name": "security-scanner",
+          "version": "1.5",
+          "rrf_score": 0.014477611940298505,
+          "rerank_score": 0.9889925373134328
+        },
+        {
+          "name": "shellcheck-bot",
+          "version": "1.3",
+          "rrf_score": 0.015522875816993463,
+          "rerank_score": 0.9432794117647058
+        }
+      ],
+      "rrf_margin_top1_top2": 0.0017597026576718303,
+      "rerank_margin_top1_top2": 0.03868661959523234,
+      "candidates_after_filter": 5,
+      "total_ms": 298,
+      "expected_match": true,
       "meta_pipeline_present": true
     }
   ]
