@@ -27,6 +27,7 @@
     "demo:beat3": "node bin/2chain.mjs discover \"Extract tables from this financial report PDF\"",
     "demo:beat4": "node bin/2chain.mjs call malformed-bot@1.0 array-of-issues '{\"code\":\"function f() { var x = null; x.foo(); }\"}'",
     "demo:full": "tsx scripts/demo-full.ts",
+    "demo:queries": "tsx scripts/demo-queries.ts",
     "demo:warmup": "node bin/2chain.mjs discover \"Extract tables from this financial report PDF\"",
     "typecheck": "tsc --noEmit"
   },
