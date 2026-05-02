@@ -374,6 +374,11 @@ async function discover(query: string, agentId: string, top: number = 5) {
         vec_score: { $meta: 'vectorSearchScore' }
       }
     },
+    // D33 (locked at H1): vec_score relevance gate. Voyage-3's similarity floor for
+    // AI-tool-vs-AI-tool descriptions is ~0.55-0.65 regardless of topic separation.
+    // Without this gate, off-topic tools at rel=1.0 (composite ~0.84) outrank
+    // on-topic tools at rel=0.8 (composite ~0.81). Standard semantic-search hygiene.
+    { $match: { vec_score: { $gte: 0.70 } } },
     {
       $addFields: {
         rank_score: {                                             // Fix 7: latency dropped from ranking
