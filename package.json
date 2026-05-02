@@ -4,7 +4,8 @@
   "description": "Tool registry with continuous evals + reliability gating for AI agents. MongoDB Atlas + Voyage embeddings + LangGraph.",
   "type": "module",
   "bin": {
-    "2chain": "bin/2chain.mjs"
+    "2chain": "bin/2chain.mjs",
+    "2chain-mcp": "bin/2chain-mcp.mjs"
   },
   "scripts": {
     "dev": "tsx scripts/dev-server.ts",
@@ -29,14 +30,24 @@
     "demo:full": "tsx scripts/demo-full.ts",
     "demo:queries": "tsx scripts/demo-queries.ts",
     "demo:warmup": "node bin/2chain.mjs discover \"Extract tables from this financial report PDF\"",
+    "mcp": "node bin/2chain-mcp.mjs",
     "typecheck": "tsc --noEmit"
   },
-  "keywords": ["mongodb", "atlas", "vector-search", "agents", "langgraph", "voyage", "evals"],
+  "keywords": [
+    "mongodb",
+    "atlas",
+    "vector-search",
+    "agents",
+    "langgraph",
+    "voyage",
+    "evals"
+  ],
   "author": "Keith So <skfskf27@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "@langchain/langgraph": "^1.2.9",
     "@langchain/langgraph-checkpoint-mongodb": "^1.3.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "ajv": "^8.20.0",
     "dotenv": "^17.4.2",
     "fastify": "^5.8.5",

@@ -212,6 +212,49 @@ The full 34-decision log lives in [DESIGN.md](./DESIGN.md). The most consequenti
 
 ---
 
+## Live agent demo (MCP)
+
+2chain ships an MCP server so Claude Code (and any MCP-compatible agent) can use the registry natively. Configure it in your MCP client:
+
+```json
+{
+  "mcpServers": {
+    "2chain": {
+      "command": "node",
+      "args": ["/path/to/2chain/bin/2chain-mcp.mjs"],
+      "env": {
+        "TWOCHAIN_HOST": "https://your-codespace-3030.app.github.dev",
+        "TWOCHAIN_API_KEY": "sk_demo_pdf_agent_8f2c4a"
+      }
+    }
+  }
+}
+```
+
+The MCP server exposes two tools:
+
+- **`discover_tools(query, mode?, top?)`** — search the registry, get a ranked list with reliability scores. Returns only tools that pass the 0.80 reliability gate.
+- **`call_tool(tool_name, tool_version, input)`** — invoke a tool. Input/output schemas are enforced; bad responses circuit-break the tool automatically.
+
+After configuring the MCP server, prompts like *"extract the line items from this PDF text"* or *"lint this JavaScript for bugs"* trigger Claude to call `discover_tools`, pick the right tool, then call it via `call_tool` — all visible on the dashboard's live call feed in real time.
+
+See [demo/prompts.md](./demo/prompts.md) for 7 ready-to-paste demo prompts covering financial extraction, code review, security scanning, summarisation, invoice parsing, contract violations, and live re-ranking.
+
+## What 2chain works for (beyond PDFs)
+
+PDF extraction is the demo because the eval grader is one line: compare numbers within tolerance. The same registry mechanism handles any agent task with multiple competing tools and a JSON contract:
+
+| Domain | Multiple tools because... | Eval style |
+|---|---|---|
+| Audio transcription (Whisper, Deepgram, AssemblyAI) | Accuracy varies per accent, jargon, multi-speaker | WER vs reference |
+| Text-to-SQL (Vanna, sqlcoder, Claude, GPT) | Quality varies per schema complexity, dialect | Run vs fixture DB, compare result rows |
+| OCR / document understanding (Textract, Document AI) | Per-document-type reliability varies wildly | Field-by-field exact match |
+| Code review (already in fixtures) | Different rule sets, different langs, different specialities | Synthetic buggy code, pass/fail per rule |
+| Translation (DeepL, Google, Azure) | Reliability per language pair + domain | BLEU vs reference |
+| Image generation (DALL-E, SD, Flux) | Style fidelity, brand safety vary | LLM-as-judge with rubric |
+
+The discovery + reliability gate + contract layers stay identical. Only the eval grader changes per domain.
+
 ## Roadmap (v0.2)
 
 - **Atlas auto-embedding** — drop the Voyage env var; Atlas Vector Search now generates embeddings on insert.

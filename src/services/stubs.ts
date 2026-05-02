@@ -34,9 +34,18 @@ const PDF_V3_CORRECT: Record<string, unknown> = {
   'multi-page-text': { rows: [{ label: 'Total', value: 50.0 }] },
   'currency-symbol-strip': { rows: [{ label: 'Revenue', value: 1000.0 }] },
 };
-registerStub('pdf-extractor-v3', (_input, caseId) => {
-  if (!caseId || !(caseId in PDF_V3_CORRECT)) return { rows: [] };
-  return PDF_V3_CORRECT[caseId];
+registerStub('pdf-extractor-v3', (input, caseId) => {
+  if (caseId && caseId in PDF_V3_CORRECT) return PDF_V3_CORRECT[caseId];
+  // Flexible fallback for live MCP / chat queries: parse any "Label: number" lines
+  const text = (input as { pdf_text?: string })?.pdf_text ?? '';
+  const rows = text.split(/\r?\n/).flatMap((line) => {
+    const m = line.match(/^([A-Za-z][A-Za-z\s\-]+?):\s*[$£€¥]?\s*(-?\d{1,3}(?:[,]\d{3})*(?:\.\d+)?|\-?\d+(?:\.\d+)?)/);
+    if (!m) return [];
+    const label = m[1].trim();
+    const value = parseFloat(m[2].replace(/,/g, ''));
+    return [{ label, value }];
+  });
+  return { rows };
 });
 
 // =====================================================================
@@ -80,9 +89,17 @@ const PDFTOOLS_PRO_V2: Record<string, unknown> = {
   'multi-page-text': { rows: [] },  // FAIL: multi-page boundary lost
   'currency-symbol-strip': PDF_V3_CORRECT['currency-symbol-strip'],
 };
-registerStub('pdftools-pro-v2', (_input, caseId) => {
-  if (!caseId || !(caseId in PDFTOOLS_PRO_V2)) return { rows: [] };
-  return PDFTOOLS_PRO_V2[caseId];
+registerStub('pdftools-pro-v2', (input, caseId) => {
+  if (caseId && caseId in PDFTOOLS_PRO_V2) return PDFTOOLS_PRO_V2[caseId];
+  // Same flexible parser, but drops anything past the first --PAGE BREAK--
+  const text = (input as { pdf_text?: string })?.pdf_text ?? '';
+  const beforeBreak = text.split(/--PAGE BREAK--/i)[0];
+  const rows = beforeBreak.split(/\r?\n/).flatMap((line) => {
+    const m = line.match(/^([A-Za-z][A-Za-z\s\-]+?):\s*[$£€¥]?\s*(-?\d{1,3}(?:[,]\d{3})*(?:\.\d+)?|\-?\d+(?:\.\d+)?)/);
+    if (!m) return [];
+    return [{ label: m[1].trim(), value: parseFloat(m[2].replace(/,/g, '')) }];
+  });
+  return { rows };
 });
 
 // =====================================================================
@@ -100,15 +117,21 @@ registerStub('summariser-mini-v1', (input, caseId) => {
       return { summary: 'The article describes quantum mechanics, wave functions, and the uncertainty principle in physics.' };
     case 'non-empty':
       return { summary: 'The text describes the input content.' };
-    default:
-      return { summary: 'No summary available.' };
   }
+  // Flexible fallback: extract first sentence + a topic keyword
+  const text = (input as { text?: string })?.text ?? '';
+  const firstSentence = text.split(/[.!?]\s/)[0].slice(0, 180);
+  const tokens = text.toLowerCase().match(/\b[a-z]{6,}\b/g) ?? [];
+  const topic = tokens[0] ?? 'the topic';
+  return {
+    summary: `The text describes ${firstSentence ? `${firstSentence}.` : `content about ${topic}.`} The passage covers ${topic} in detail.`,
+  };
 });
 
 // =====================================================================
 // code-review-mini v1.0 — passes all 5 cases
 // =====================================================================
-registerStub('code-review-mini-v1', (_input, caseId) => {
+registerStub('code-review-mini-v1', (input, caseId) => {
   switch (caseId) {
     case 'array-of-issues':
       return { issues: [{ file: 'a.js', line: 1, comment: 'null pointer dereference at x.foo()' }] };
@@ -124,9 +147,25 @@ registerStub('code-review-mini-v1', (_input, caseId) => {
       return { issues: [{ file: 'a.js', line: 1, comment: 'reads after null assignment' }] };
     case 'clean-code-empty':
       return { issues: [] };
-    default:
-      return { issues: [] };
   }
+  // Flexible fallback: scan for known smells. Hand-rolled "linter" — just enough
+  // for live demo coverage. Real implementation would be ESLint/Pylint.
+  const code = (input as { code?: string })?.code ?? '';
+  const issues: Array<{ file: string; line: number; comment: string }> = [];
+  const lines = code.split(/\r?\n/);
+  const ext = /\bpython|def\s|import\s|self\./i.test(code) ? 'py' : 'js';
+  const file = `submitted.${ext}`;
+  lines.forEach((line, i) => {
+    const lineNo = i + 1;
+    if (/\bvar\s/.test(line)) issues.push({ file, line: lineNo, comment: 'use of "var" — prefer let or const' });
+    if (/\beval\s*\(/.test(line)) issues.push({ file, line: lineNo, comment: 'eval() is unsafe; refactor to remove' });
+    if (/console\.log|print\s*\(/.test(line) && !/^\s*\/\//.test(line)) issues.push({ file, line: lineNo, comment: 'debug print left in production code' });
+    if (/\.foo\(\)/.test(line) || /\.bar\(\)/.test(line)) issues.push({ file, line: lineNo, comment: 'method called on potentially null value' });
+    if (/SELECT.*\+/i.test(line) || /f"SELECT/.test(line)) issues.push({ file, line: lineNo, comment: 'possible SQL injection — use parameterised query' });
+    if (/password\s*=\s*["']/.test(line) || /api_key\s*=\s*["']/.test(line)) issues.push({ file, line: lineNo, comment: 'hardcoded secret — move to environment variable' });
+    if (/except\s*:/i.test(line)) issues.push({ file, line: lineNo, comment: 'bare except clause — catch specific exceptions' });
+  });
+  return { issues };
 });
 
 // =====================================================================
