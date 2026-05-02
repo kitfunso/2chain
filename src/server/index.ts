@@ -4,6 +4,8 @@ import { getDb } from '../db/client.js';
 import { registerDiscoverRoute } from './routes/discover.js';
 import { registerPushRoute } from './routes/push.js';
 import { registerCallRoute } from './routes/call.js';
+import { registerDashboardRoutes } from './routes/dashboard.js';
+import { startChangeStreams } from './streams.js';
 // Side-effect: register all stubs in the in-process registry.
 import '../services/stubs.js';
 
@@ -20,6 +22,9 @@ export async function buildServer(): Promise<FastifyInstance> {
   registerDiscoverRoute(app, db);
   registerPushRoute(app, db);
   registerCallRoute(app, db);
+  registerDashboardRoutes(app, db);
+
+  startChangeStreams(db);
 
   return app;
 }

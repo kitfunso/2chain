@@ -1,15 +1,33 @@
 {
   "name": "2chain",
-  "version": "1.0.0",
-  "description": "**npm + TypeScript + CI for agent tools.**",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "version": "0.1.0",
+  "description": "Tool registry with continuous evals + reliability gating for AI agents. MongoDB Atlas + Voyage embeddings + LangGraph.",
   "type": "module",
+  "bin": {
+    "2chain": "bin/2chain.mjs"
+  },
+  "scripts": {
+    "dev": "tsx scripts/dev-server.ts",
+    "seed": "tsx scripts/seed-fixtures.ts",
+    "smoke:connect": "tsx scripts/smoke-connect.mjs",
+    "smoke:voyage": "node scripts/smoke-voyage.mjs",
+    "smoke:setup": "node scripts/setup-db.mjs",
+    "smoke:discover": "tsx scripts/smoke-discover.ts",
+    "smoke:discover:http": "tsx scripts/smoke-discover-http.ts",
+    "smoke:push": "tsx scripts/smoke-push.ts",
+    "smoke:call": "tsx scripts/smoke-call.ts",
+    "smoke:all": "npm run smoke:connect && npm run smoke:voyage && npm run smoke:discover && npm run smoke:discover:http && npm run smoke:push && npm run smoke:call",
+    "demo:reset": "tsx scripts/seed-fixtures.ts",
+    "demo:beat1": "node bin/2chain.mjs discover \"Extract tables from this financial report PDF\"",
+    "demo:beat2": "node bin/2chain.mjs push demo/pdf-extractor-3.1.json",
+    "demo:beat3": "node bin/2chain.mjs discover \"Extract tables from this financial report PDF\"",
+    "demo:beat4": "node bin/2chain.mjs call malformed-bot@1.0 array-of-issues '{\"code\":\"function f() { var x = null; x.foo(); }\"}'",
+    "demo:warmup": "node bin/2chain.mjs discover \"Extract tables from this financial report PDF\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": ["mongodb", "atlas", "vector-search", "agents", "langgraph", "voyage", "evals"],
+  "author": "Keith So <skfskf27@gmail.com>",
+  "license": "MIT",
   "dependencies": {
     "@langchain/langgraph": "^1.2.9",
     "@langchain/langgraph-checkpoint-mongodb": "^1.3.0",

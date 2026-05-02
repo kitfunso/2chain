@@ -1,0 +1,30 @@
+{
+  "name": "pdf-extractor",
+  "version": "3.1",
+  "capability_text": "Extract tables from PDF financial reports. Parses earnings statements, balance sheets, income statements, and 10-K filings. Returns each table row as a label-value pair. Improved multi-page accuracy over v3.0.",
+  "input_contract": {
+    "type": "object",
+    "properties": { "pdf_text": { "type": "string" } },
+    "required": ["pdf_text"],
+    "additionalProperties": false
+  },
+  "output_contract": {
+    "type": "object",
+    "properties": {
+      "rows": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": { "label": { "type": "string" }, "value": { "type": "number" } },
+          "required": ["label", "value"],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": ["rows"],
+    "additionalProperties": false
+  },
+  "output_repair_strategy": "fail-fast",
+  "endpoint_stub_name": "pdf-extractor-v3-1",
+  "metadata": { "cost_per_call_usd": 0.002, "p95_latency_ms": 310 }
+}
