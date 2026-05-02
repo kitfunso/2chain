@@ -1,0 +1,207 @@
+{
+  "_doc": "Golden retrieval queries for v1 -> v2 parity testing. v2 must match v1 on top-1 identity, top-3 set membership, and RRF margin within 10% across these queries. See docs/plans/2026-05-02-phase-1-personal-tier.md Step 0.",
+  "_generated_at": "2026-05-02",
+  "_count": 32,
+  "queries": [
+    {
+      "id": "demo-1-dcf",
+      "category": "demo-prompt",
+      "q": "I am building a DCF model for NVIDIA. Use 2chain to pull the latest year's income statement from NVIDIA's 10-K. I need it as JSON for my model.",
+      "expected_top1": "sec-edgar-financials"
+    },
+    {
+      "id": "demo-1-dcf-short",
+      "category": "demo-prompt",
+      "q": "build a DCF for NVIDIA pull income statement",
+      "expected_top1": "sec-edgar-financials"
+    },
+    {
+      "id": "demo-2-arxiv",
+      "category": "demo-prompt",
+      "q": "I am doing a literature review on Mamba state-space models. Use 2chain to fetch the latest papers on this topic from arxiv. I need top 3 with title, authors, and abstract.",
+      "expected_top1": "arxiv-paper-search"
+    },
+    {
+      "id": "demo-2-arxiv-short",
+      "category": "demo-prompt",
+      "q": "fetch latest papers on mamba from arxiv for literature review",
+      "expected_top1": "arxiv-paper-search"
+    },
+    {
+      "id": "demo-3-pr-lint",
+      "category": "demo-prompt",
+      "q": "Use 2chain to find a JS linter for structured findings on a PR review",
+      "expected_top1": "eslint-snitch"
+    },
+    {
+      "id": "demo-4-security",
+      "category": "demo-prompt",
+      "q": "audit this Python authentication function for OWASP recall",
+      "expected_top1": "security-scanner"
+    },
+    {
+      "id": "demo-5-malformed",
+      "category": "demo-prompt",
+      "q": "review this code, find the issues with structured output",
+      "expected_top1_in": ["eslint-snitch", "code-review-mini", "malformed-bot", "pylint-pro"]
+    },
+    {
+      "id": "prewarm-1",
+      "category": "prewarm",
+      "q": "Extract tables from this financial report PDF",
+      "expected_top1_in": ["pdf-extractor", "pdftools-pro"]
+    },
+    {
+      "id": "prewarm-2",
+      "category": "prewarm",
+      "q": "extract income statement from 10-K for DCF model",
+      "expected_top1_in": ["sec-edgar-financials", "pdf-extractor"]
+    },
+    {
+      "id": "prewarm-3",
+      "category": "prewarm",
+      "q": "extract financial statement line items SEC filing",
+      "expected_top1_in": ["sec-edgar-financials", "pdf-extractor"]
+    },
+    {
+      "id": "prewarm-4",
+      "category": "prewarm",
+      "q": "I am building a DCF for NVIDIA pull the income statement",
+      "expected_top1": "sec-edgar-financials"
+    },
+    {
+      "id": "prewarm-5",
+      "category": "prewarm",
+      "q": "fetch latest 10-K income statement for NVDA",
+      "expected_top1": "sec-edgar-financials"
+    },
+    {
+      "id": "prewarm-6",
+      "category": "prewarm",
+      "q": "get income statement for ticker from SEC EDGAR",
+      "expected_top1": "sec-edgar-financials"
+    },
+    {
+      "id": "prewarm-7",
+      "category": "prewarm",
+      "q": "I am doing a literature review fetch the latest papers on Mamba state-space models from arxiv",
+      "expected_top1": "arxiv-paper-search"
+    },
+    {
+      "id": "prewarm-8",
+      "category": "prewarm",
+      "q": "search arxiv for papers on a topic",
+      "expected_top1": "arxiv-paper-search"
+    },
+    {
+      "id": "prewarm-9",
+      "category": "prewarm",
+      "q": "fetch latest papers on state space models",
+      "expected_top1": "arxiv-paper-search"
+    },
+    {
+      "id": "prewarm-10",
+      "category": "prewarm",
+      "q": "review javascript code for bugs",
+      "expected_top1_in": ["eslint-snitch", "code-review-mini"]
+    },
+    {
+      "id": "prewarm-11",
+      "category": "prewarm",
+      "q": "lint javascript for style issues",
+      "expected_top1_in": ["eslint-snitch", "code-review-mini"]
+    },
+    {
+      "id": "prewarm-12",
+      "category": "prewarm",
+      "q": "audit python code for security vulnerabilities OWASP",
+      "expected_top1": "security-scanner"
+    },
+    {
+      "id": "prewarm-13",
+      "category": "prewarm",
+      "q": "find security issues in python source code",
+      "expected_top1_in": ["security-scanner", "pylint-pro"]
+    },
+    {
+      "id": "prewarm-14",
+      "category": "prewarm",
+      "q": "summarise arxiv paper abstract",
+      "expected_top1_in": ["paper-digest", "tldr-bot", "summariser-mini"]
+    },
+    {
+      "id": "prewarm-15",
+      "category": "prewarm",
+      "q": "summarise article into one paragraph",
+      "expected_top1_in": ["tldr-bot", "summariser-mini", "paper-digest"]
+    },
+    {
+      "id": "prewarm-16",
+      "category": "prewarm",
+      "q": "parse UK supplier invoice for accounts payable",
+      "expected_top1": "invoice-grok"
+    },
+    {
+      "id": "prewarm-17",
+      "category": "prewarm",
+      "q": "extract VAT line items from invoice",
+      "expected_top1": "invoice-grok"
+    },
+    {
+      "id": "edge-1-fin-vs-invoice",
+      "category": "edge-case",
+      "q": "extract financial line items from a public company filing",
+      "_note": "Should beat invoice-grok with sec-edgar-financials or pdf-extractor; tests semantic vs lexical fight",
+      "expected_top1_in": ["sec-edgar-financials", "pdf-extractor"]
+    },
+    {
+      "id": "edge-2-py-sec-vs-style",
+      "category": "edge-case",
+      "q": "check this Python file for SQL injection and hardcoded API keys",
+      "_note": "security-scanner should beat pylint-pro because graded on OWASP not PEP-8",
+      "expected_top1": "security-scanner"
+    },
+    {
+      "id": "edge-3-paper-search-vs-summary",
+      "category": "edge-case",
+      "q": "I want to find research papers on diffusion models",
+      "_note": "arxiv-paper-search (FETCH) should beat paper-digest (SUMMARIZE)",
+      "expected_top1": "arxiv-paper-search"
+    },
+    {
+      "id": "edge-4-paper-summary-vs-search",
+      "category": "edge-case",
+      "q": "summarise this paper text I already have",
+      "_note": "paper-digest (SUMMARIZE existing text) should beat arxiv-paper-search (FETCH)",
+      "expected_top1_in": ["paper-digest", "tldr-bot", "summariser-mini"]
+    },
+    {
+      "id": "edge-5-edgar-vs-pdf",
+      "category": "edge-case",
+      "q": "I have NVIDIA ticker NVDA and want their latest annual report numbers",
+      "_note": "Live fetch should win over PDF extractor when no PDF text in query",
+      "expected_top1": "sec-edgar-financials"
+    },
+    {
+      "id": "edge-6-pdf-vs-edgar",
+      "category": "edge-case",
+      "q": "I have a 10-K PDF text pasted, extract the income statement rows",
+      "_note": "PDF extractor should win when PDF text is mentioned in query",
+      "expected_top1": "pdf-extractor"
+    },
+    {
+      "id": "edge-7-jslint-vs-pylint",
+      "category": "edge-case",
+      "q": "lint this code: function f() { var x = null; x.foo(); }",
+      "_note": "JS code in body should route to eslint-snitch over pylint-pro",
+      "expected_top1": "eslint-snitch"
+    },
+    {
+      "id": "edge-8-pylint-vs-jslint",
+      "category": "edge-case",
+      "q": "lint this code: def f(): import os; os.system('rm')",
+      "_note": "Python code in body should route to pylint-pro or security-scanner over eslint-snitch",
+      "expected_top1_in": ["pylint-pro", "security-scanner"]
+    }
+  ]
+}

@@ -1,5 +1,5 @@
-import { fetchIncomeStatement, knownTickers } from './secEdgar.js';
-import { searchArxiv } from './arxivSearch.js';
+import { fetchIncomeStatement, knownTickers } from '../tools/secEdgar.js';
+import { searchArxiv } from '../tools/arxivSearch.js';
 
 type StubFn = (input: Record<string, unknown>, caseId?: string) => unknown;
 

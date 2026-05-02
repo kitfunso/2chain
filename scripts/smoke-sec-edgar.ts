@@ -1,4 +1,4 @@
-import { fetchIncomeStatement } from '../src/services/secEdgar.js';
+import { fetchIncomeStatement } from '../src/tools/secEdgar.js';
 
 const ticker = process.argv[2] ?? 'NVDA';
 const t0 = Date.now();

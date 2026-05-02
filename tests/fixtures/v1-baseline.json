@@ -1,0 +1,753 @@
+{
+  "generated_at": "2026-05-02T19:55:11.772Z",
+  "host": "http://127.0.0.1:3030",
+  "mode": "hybrid",
+  "total_queries": 32,
+  "pass": 15,
+  "fail": 4,
+  "unspecified": 0,
+  "errors": 13,
+  "entries": [
+    {
+      "id": "demo-1-dcf",
+      "category": "demo-prompt",
+      "q": "I am building a DCF model for NVIDIA. Use 2chain to pull the latest year's income statement from NVIDIA's 10-K. I need it as JSON for my model.",
+      "mode": "hybrid",
+      "top1": {
+        "name": "sec-edgar-financials",
+        "version": "1.0",
+        "rrf_score": 0.016314119513484927,
+        "vec_score": 0,
+        "rerank_score": 1.1528853781068218
+      },
+      "top3": [
+        {
+          "name": "sec-edgar-financials",
+          "version": "1.0",
+          "rrf_score": 0.016314119513484927,
+          "rerank_score": 1.1528853781068218
+        },
+        {
+          "name": "pdf-extractor",
+          "version": "3.0",
+          "rrf_score": 0.016208355367530406,
+          "rerank_score": 1.049375991538868
+        },
+        {
+          "name": "sec-letter-reader",
+          "version": "1.1",
+          "rrf_score": 0.012658227848101264,
+          "rerank_score": 0.8173702531645569
+        }
+      ],
+      "rrf_margin_top1_top2": 0.00010576414595452055,
+      "rerank_margin_top1_top2": 0.10350938656795372,
+      "candidates_after_filter": 5,
+      "total_ms": 1090,
+      "expected_match": true,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "demo-1-dcf-short",
+      "category": "demo-prompt",
+      "q": "build a DCF for NVIDIA pull income statement",
+      "mode": "hybrid",
+      "top1": {
+        "name": "sec-edgar-financials",
+        "version": "1.0",
+        "rrf_score": 0.016314119513484927,
+        "vec_score": 0,
+        "rerank_score": 1.155563949535393
+      },
+      "top3": [
+        {
+          "name": "sec-edgar-financials",
+          "version": "1.0",
+          "rrf_score": 0.016314119513484927,
+          "rerank_score": 1.155563949535393
+        },
+        {
+          "name": "pdf-extractor",
+          "version": "3.0",
+          "rrf_score": 0.016208355367530406,
+          "rerank_score": 1.1458045629674396
+        },
+        {
+          "name": "guidance-extract",
+          "version": "1.0-beta",
+          "rrf_score": 0.014833603896103895,
+          "rerank_score": 0.8585121753246754
+        }
+      ],
+      "rrf_margin_top1_top2": 0.00010576414595452055,
+      "rerank_margin_top1_top2": 0.009759386567953499,
+      "candidates_after_filter": 5,
+      "total_ms": 288,
+      "expected_match": true,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "demo-2-arxiv",
+      "category": "demo-prompt",
+      "q": "I am doing a literature review on Mamba state-space models. Use 2chain to fetch the latest papers on this topic from arxiv. I need top 3 with title, authors, and abstract.",
+      "mode": "hybrid",
+      "top1": {
+        "name": "arxiv-paper-search",
+        "version": "1.0",
+        "rrf_score": 0.01639344262295082,
+        "vec_score": 0,
+        "rerank_score": 1.175204918032787
+      },
+      "top3": [
+        {
+          "name": "arxiv-paper-search",
+          "version": "1.0",
+          "rrf_score": 0.01639344262295082,
+          "rerank_score": 1.175204918032787
+        },
+        {
+          "name": "paper-digest",
+          "version": "1.0",
+          "rrf_score": 0.015949820788530463,
+          "rerank_score": 1.0502419354838708
+        },
+        {
+          "name": "cochrane-summary",
+          "version": "0.9",
+          "rrf_score": 0.015835777126099706,
+          "rerank_score": 0.9518599706744868
+        }
+      ],
+      "rrf_margin_top1_top2": 0.0004436218344203574,
+      "rerank_margin_top1_top2": 0.12496298254891625,
+      "candidates_after_filter": 5,
+      "total_ms": 317,
+      "expected_match": true,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "demo-2-arxiv-short",
+      "category": "demo-prompt",
+      "q": "fetch latest papers on mamba from arxiv for literature review",
+      "mode": "hybrid",
+      "top1": {
+        "name": "arxiv-paper-search",
+        "version": "1.0",
+        "rrf_score": 0.01639344262295082,
+        "vec_score": 0,
+        "rerank_score": 1.187704918032787
+      },
+      "top3": [
+        {
+          "name": "arxiv-paper-search",
+          "version": "1.0",
+          "rrf_score": 0.01639344262295082,
+          "rerank_score": 1.187704918032787
+        },
+        {
+          "name": "benchmark-extractor",
+          "version": "3.0",
+          "rrf_score": 0.015873015873015872,
+          "rerank_score": 1.0542857142857143
+        },
+        {
+          "name": "sciparse",
+          "version": "0.9",
+          "rrf_score": 0.016129032258064516,
+          "rerank_score": 1.0113064516129033
+        }
+      ],
+      "rrf_margin_top1_top2": 0.0005204267499349484,
+      "rerank_margin_top1_top2": 0.13341920374707272,
+      "candidates_after_filter": 5,
+      "total_ms": 59,
+      "expected_match": true,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "prewarm-1",
+      "category": "prewarm",
+      "q": "Extract tables from this financial report PDF",
+      "mode": "hybrid",
+      "top1": {
+        "name": "shareholder-pdf",
+        "version": "1.0-beta",
+        "rrf_score": 0.01569940476190476,
+        "vec_score": 0,
+        "rerank_score": 1.0679017857142858
+      },
+      "top3": [
+        {
+          "name": "shareholder-pdf",
+          "version": "1.0-beta",
+          "rrf_score": 0.01569940476190476,
+          "rerank_score": 1.0679017857142858
+        },
+        {
+          "name": "annual-report-extract",
+          "version": "1.0",
+          "rrf_score": 0.015286470871449204,
+          "rerank_score": 1.0678197606437856
+        },
+        {
+          "name": "pdf-extractor",
+          "version": "3.0",
+          "rrf_score": 0.015515674693321217,
+          "rerank_score": 1.0289196469137405
+        }
+      ],
+      "rrf_margin_top1_top2": 0.00041293389045555726,
+      "rerank_margin_top1_top2": 0.00008202507050025787,
+      "candidates_after_filter": 5,
+      "total_ms": 47,
+      "expected_match": false,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "prewarm-2",
+      "category": "prewarm",
+      "q": "extract income statement from 10-K for DCF model",
+      "mode": "hybrid",
+      "top1": {
+        "name": "sec-edgar-financials",
+        "version": "1.0",
+        "rrf_score": 0.016129032258064516,
+        "vec_score": 0,
+        "rerank_score": 1.1900921658986177
+      },
+      "top3": [
+        {
+          "name": "sec-edgar-financials",
+          "version": "1.0",
+          "rrf_score": 0.016129032258064516,
+          "rerank_score": 1.1900921658986177
+        },
+        {
+          "name": "pdf-extractor",
+          "version": "3.0",
+          "rrf_score": 0.01639344262295082,
+          "rerank_score": 1.1541334894613582
+        },
+        {
+          "name": "annual-report-extract",
+          "version": "1.0",
+          "rrf_score": 0.015415111940298506,
+          "rerank_score": 0.9878943230277185
+        }
+      ],
+      "rrf_margin_top1_top2": -0.00026441036488630484,
+      "rerank_margin_top1_top2": 0.035958676437259474,
+      "candidates_after_filter": 5,
+      "total_ms": 42,
+      "expected_match": true,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "prewarm-3",
+      "category": "prewarm",
+      "q": "extract financial statement line items SEC filing",
+      "mode": "hybrid",
+      "top1": {
+        "name": "pdf-extractor",
+        "version": "3.0",
+        "rrf_score": 0.01639344262295082,
+        "vec_score": 0,
+        "rerank_score": 1.1969906323185011
+      },
+      "top3": [
+        {
+          "name": "pdf-extractor",
+          "version": "3.0",
+          "rrf_score": 0.01639344262295082,
+          "rerank_score": 1.1969906323185011
+        },
+        {
+          "name": "sec-edgar-financials",
+          "version": "1.0",
+          "rrf_score": 0.014403706688154713,
+          "rerank_score": 1.0267382295383907
+        },
+        {
+          "name": "po-parser",
+          "version": "1.0-beta",
+          "rrf_score": 0.015702087286527514,
+          "rerank_score": 0.975951070750881
+        }
+      ],
+      "rrf_margin_top1_top2": 0.001989735934796108,
+      "rerank_margin_top1_top2": 0.17025240278011045,
+      "candidates_after_filter": 5,
+      "total_ms": 36,
+      "expected_match": true,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "prewarm-4",
+      "category": "prewarm",
+      "q": "I am building a DCF for NVIDIA pull the income statement",
+      "mode": "hybrid",
+      "top1": {
+        "name": "sec-edgar-financials",
+        "version": "1.0",
+        "rrf_score": 0.016129032258064516,
+        "vec_score": 0,
+        "rerank_score": 1.1633064516129032
+      },
+      "top3": [
+        {
+          "name": "sec-edgar-financials",
+          "version": "1.0",
+          "rrf_score": 0.016129032258064516,
+          "rerank_score": 1.1633064516129032
+        },
+        {
+          "name": "pdf-extractor",
+          "version": "3.0",
+          "rrf_score": 0.01639344262295082,
+          "rerank_score": 1.1327049180327868
+        },
+        {
+          "name": "guidance-extract",
+          "version": "1.0-beta",
+          "rrf_score": 0.015007215007215005,
+          "rerank_score": 0.9038246753246753
+        }
+      ],
+      "rrf_margin_top1_top2": -0.00026441036488630484,
+      "rerank_margin_top1_top2": 0.030601533580116413,
+      "candidates_after_filter": 5,
+      "total_ms": 36,
+      "expected_match": true,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "prewarm-5",
+      "category": "prewarm",
+      "q": "fetch latest 10-K income statement for NVDA",
+      "mode": "hybrid",
+      "top1": {
+        "name": "sec-edgar-financials",
+        "version": "1.0",
+        "rrf_score": 0.01639344262295082,
+        "vec_score": 0,
+        "rerank_score": 1.237704918032787
+      },
+      "top3": [
+        {
+          "name": "sec-edgar-financials",
+          "version": "1.0",
+          "rrf_score": 0.01639344262295082,
+          "rerank_score": 1.237704918032787
+        },
+        {
+          "name": "pdf-extractor",
+          "version": "3.0",
+          "rrf_score": 0.016129032258064516,
+          "rerank_score": 1.1208064516129033
+        },
+        {
+          "name": "fundvalue-bot",
+          "version": "2.0",
+          "rrf_score": 0.014070048309178743,
+          "rerank_score": 0.9284021739130435
+        }
+      ],
+      "rrf_margin_top1_top2": 0.00026441036488630484,
+      "rerank_margin_top1_top2": 0.11689846641988377,
+      "candidates_after_filter": 5,
+      "total_ms": 39,
+      "expected_match": true,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "prewarm-6",
+      "category": "prewarm",
+      "q": "get income statement for ticker from SEC EDGAR",
+      "mode": "hybrid",
+      "top1": {
+        "name": "sec-edgar-financials",
+        "version": "1.0",
+        "rrf_score": 0.01639344262295082,
+        "vec_score": 0,
+        "rerank_score": 1.250204918032787
+      },
+      "top3": [
+        {
+          "name": "sec-edgar-financials",
+          "version": "1.0",
+          "rrf_score": 0.01639344262295082,
+          "rerank_score": 1.250204918032787
+        },
+        {
+          "name": "pdf-extractor",
+          "version": "3.0",
+          "rrf_score": 0.016129032258064516,
+          "rerank_score": 1.1208064516129033
+        },
+        {
+          "name": "sec-letter-reader",
+          "version": "1.1",
+          "rrf_score": 0.015625,
+          "rerank_score": 1.0071249999999998
+        }
+      ],
+      "rrf_margin_top1_top2": 0.00026441036488630484,
+      "rerank_margin_top1_top2": 0.12939846641988373,
+      "candidates_after_filter": 5,
+      "total_ms": 37,
+      "expected_match": true,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "prewarm-9",
+      "category": "prewarm",
+      "q": "fetch latest papers on state space models",
+      "mode": "hybrid",
+      "top1": {
+        "name": "arxiv-paper-search",
+        "version": "1.0",
+        "rrf_score": 0.01639344262295082,
+        "vec_score": 0,
+        "rerank_score": 1.087704918032787
+      },
+      "top3": [
+        {
+          "name": "arxiv-paper-search",
+          "version": "1.0",
+          "rrf_score": 0.01639344262295082,
+          "rerank_score": 1.087704918032787
+        },
+        {
+          "name": "paper-digest",
+          "version": "1.0",
+          "rrf_score": 0.015607940446650124,
+          "rerank_score": 1.0473573200992554
+        },
+        {
+          "name": "benchmark-extractor",
+          "version": "3.0",
+          "rrf_score": 0.015726495726495725,
+          "rerank_score": 0.9976923076923077
+        }
+      ],
+      "rrf_margin_top1_top2": 0.0007855021763006967,
+      "rerank_margin_top1_top2": 0.04034759793353149,
+      "candidates_after_filter": 5,
+      "total_ms": 33,
+      "expected_match": true,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "prewarm-10",
+      "category": "prewarm",
+      "q": "review javascript code for bugs",
+      "mode": "hybrid",
+      "top1": {
+        "name": "security-scanner",
+        "version": "1.5",
+        "rrf_score": 0.016314119513484927,
+        "vec_score": 0,
+        "rerank_score": 1.2116353781068219
+      },
+      "top3": [
+        {
+          "name": "security-scanner",
+          "version": "1.5",
+          "rrf_score": 0.016314119513484927,
+          "rerank_score": 1.2116353781068219
+        },
+        {
+          "name": "eslint-snitch",
+          "version": "7.5",
+          "rrf_score": 0.016208355367530406,
+          "rerank_score": 1.0973759915388683
+        },
+        {
+          "name": "code-review-mini",
+          "version": "1.0",
+          "rrf_score": 0.01486111111111111,
+          "rerank_score": 1.035
+        }
+      ],
+      "rrf_margin_top1_top2": 0.00010576414595452055,
+      "rerank_margin_top1_top2": 0.11425938656795354,
+      "candidates_after_filter": 5,
+      "total_ms": 44,
+      "expected_match": false,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "prewarm-11",
+      "category": "prewarm",
+      "q": "lint javascript for style issues",
+      "mode": "hybrid",
+      "top1": {
+        "name": "code-review-mini",
+        "version": "1.0",
+        "rrf_score": 0.01597782258064516,
+        "vec_score": 0,
+        "rerank_score": 1.145252016129032
+      },
+      "top3": [
+        {
+          "name": "code-review-mini",
+          "version": "1.0",
+          "rrf_score": 0.01597782258064516,
+          "rerank_score": 1.145252016129032
+        },
+        {
+          "name": "eslint-snitch",
+          "version": "7.5",
+          "rrf_score": 0.016314119513484927,
+          "rerank_score": 1.1021353781068217
+        },
+        {
+          "name": "pylint-pro",
+          "version": "4.0",
+          "rrf_score": 0.01477718771646271,
+          "rerank_score": 1.0919734472408218
+        }
+      ],
+      "rrf_margin_top1_top2": -0.00033629693283976705,
+      "rerank_margin_top1_top2": 0.04311663802221033,
+      "candidates_after_filter": 5,
+      "total_ms": 32,
+      "expected_match": true,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "prewarm-12",
+      "category": "prewarm",
+      "q": "audit python code for security vulnerabilities OWASP",
+      "mode": "hybrid",
+      "top1": {
+        "name": "security-scanner",
+        "version": "1.5",
+        "rrf_score": 0.01639344262295082,
+        "vec_score": 0,
+        "rerank_score": 1.275204918032787
+      },
+      "top3": [
+        {
+          "name": "security-scanner",
+          "version": "1.5",
+          "rrf_score": 0.01639344262295082,
+          "rerank_score": 1.275204918032787
+        },
+        {
+          "name": "pylint-pro",
+          "version": "4.0",
+          "rrf_score": 0.016129032258064516,
+          "rerank_score": 1.1442350230414746
+        },
+        {
+          "name": "code-review-mini",
+          "version": "1.0",
+          "rrf_score": 0.015277777777777776,
+          "rerank_score": 1.0194642857142855
+        }
+      ],
+      "rrf_margin_top1_top2": 0.00026441036488630484,
+      "rerank_margin_top1_top2": 0.13096989499131229,
+      "candidates_after_filter": 5,
+      "total_ms": 33,
+      "expected_match": true,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "prewarm-13",
+      "category": "prewarm",
+      "q": "find security issues in python source code",
+      "mode": "hybrid",
+      "top1": {
+        "name": "pylint-pro",
+        "version": "4.0",
+        "rrf_score": 0.016208355367530406,
+        "vec_score": 0,
+        "rerank_score": 1.176375991538868
+      },
+      "top3": [
+        {
+          "name": "pylint-pro",
+          "version": "4.0",
+          "rrf_score": 0.016208355367530406,
+          "rerank_score": 1.176375991538868
+        },
+        {
+          "name": "security-scanner",
+          "version": "1.5",
+          "rrf_score": 0.016314119513484927,
+          "rerank_score": 1.1716353781068218
+        },
+        {
+          "name": "malformed-bot",
+          "version": "1.0",
+          "rrf_score": 0.01569940476190476,
+          "rerank_score": 1.0539732142857143
+        }
+      ],
+      "rrf_margin_top1_top2": -0.00010576414595452055,
+      "rerank_margin_top1_top2": 0.004740613432046237,
+      "candidates_after_filter": 5,
+      "total_ms": 31,
+      "expected_match": true,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "prewarm-14",
+      "category": "prewarm",
+      "q": "summarise arxiv paper abstract",
+      "mode": "hybrid",
+      "top1": {
+        "name": "arxiv-paper-search",
+        "version": "1.0",
+        "rrf_score": 0.01639344262295082,
+        "vec_score": 0,
+        "rerank_score": 1.212704918032787
+      },
+      "top3": [
+        {
+          "name": "arxiv-paper-search",
+          "version": "1.0",
+          "rrf_score": 0.01639344262295082,
+          "rerank_score": 1.212704918032787
+        },
+        {
+          "name": "paper-digest",
+          "version": "1.0",
+          "rrf_score": 0.01597782258064516,
+          "rerank_score": 1.1140020161290323
+        },
+        {
+          "name": "pubmed-tldr",
+          "version": "2.0",
+          "rrf_score": 0.015552884615384614,
+          "rerank_score": 1.0128798076923078
+        }
+      ],
+      "rrf_margin_top1_top2": 0.00041562004230566094,
+      "rerank_margin_top1_top2": 0.09870290190375464,
+      "candidates_after_filter": 5,
+      "total_ms": 38,
+      "expected_match": false,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "prewarm-15",
+      "category": "prewarm",
+      "q": "summarise article into one paragraph",
+      "mode": "hybrid",
+      "top1": {
+        "name": "tldr-bot",
+        "version": "2.1",
+        "rrf_score": 0.01639344262295082,
+        "vec_score": 0,
+        "rerank_score": 1.166454918032787
+      },
+      "top3": [
+        {
+          "name": "tldr-bot",
+          "version": "2.1",
+          "rrf_score": 0.01639344262295082,
+          "rerank_score": 1.166454918032787
+        },
+        {
+          "name": "leadsection-bot",
+          "version": "1.0",
+          "rrf_score": 0.015949820788530463,
+          "rerank_score": 1.1249919354838709
+        },
+        {
+          "name": "encyclopedia-summary",
+          "version": "1.1",
+          "rrf_score": 0.016129032258064516,
+          "rerank_score": 1.1110564516129033
+        }
+      ],
+      "rrf_margin_top1_top2": 0.0004436218344203574,
+      "rerank_margin_top1_top2": 0.041462982548916116,
+      "candidates_after_filter": 5,
+      "total_ms": 43,
+      "expected_match": true,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "prewarm-16",
+      "category": "prewarm",
+      "q": "parse UK supplier invoice for accounts payable",
+      "mode": "hybrid",
+      "top1": {
+        "name": "invoice-grok",
+        "version": "1.2",
+        "rrf_score": 0.01639344262295082,
+        "vec_score": 0,
+        "rerank_score": 1.187704918032787
+      },
+      "top3": [
+        {
+          "name": "invoice-grok",
+          "version": "1.2",
+          "rrf_score": 0.01639344262295082,
+          "rerank_score": 1.187704918032787
+        },
+        {
+          "name": "po-parser",
+          "version": "1.0-beta",
+          "rrf_score": 0.01605222734254992,
+          "rerank_score": 0.9988502304147464
+        },
+        {
+          "name": "lineitem-extractor",
+          "version": "0.5",
+          "rrf_score": 0.01569940476190476,
+          "rerank_score": 0.9889732142857144
+        }
+      ],
+      "rrf_margin_top1_top2": 0.0003412152804008993,
+      "rerank_margin_top1_top2": 0.18885468761804058,
+      "candidates_after_filter": 5,
+      "total_ms": 30,
+      "expected_match": true,
+      "meta_pipeline_present": true
+    },
+    {
+      "id": "prewarm-17",
+      "category": "prewarm",
+      "q": "extract VAT line items from invoice",
+      "mode": "hybrid",
+      "top1": {
+        "name": "lineitem-extractor",
+        "version": "0.5",
+        "rrf_score": 0.016129032258064516,
+        "vec_score": 0,
+        "rerank_score": 1.1083064516129033
+      },
+      "top3": [
+        {
+          "name": "lineitem-extractor",
+          "version": "0.5",
+          "rrf_score": 0.016129032258064516,
+          "rerank_score": 1.1083064516129033
+        },
+        {
+          "name": "po-parser",
+          "version": "1.0-beta",
+          "rrf_score": 0.015949820788530463,
+          "rerank_score": 1.0942419354838708
+        },
+        {
+          "name": "b2b-invoice",
+          "version": "4.2",
+          "rrf_score": 0.01639344262295082,
+          "rerank_score": 1.080204918032787
+        }
+      ],
+      "rrf_margin_top1_top2": 0.00017921146953405256,
+      "rerank_margin_top1_top2": 0.014064516129032478,
+      "candidates_after_filter": 5,
+      "total_ms": 32,
+      "expected_match": false,
+      "meta_pipeline_present": true
+    }
+  ]
+}

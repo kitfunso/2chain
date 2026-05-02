@@ -1,4 +1,4 @@
-import { searchArxiv } from '../src/services/arxivSearch.js';
+import { searchArxiv } from '../src/tools/arxivSearch.js';
 const r = await searchArxiv(process.argv[2] ?? 'mamba state space', 3);
 console.log(`fetched ${r.results.length}/${r.total_results} results`);
 for (const p of r.results) {
