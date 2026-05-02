@@ -3,6 +3,10 @@ import { MongoClient, ObjectId } from 'mongodb';
 import { createHash } from 'node:crypto';
 import { FIXTURE_TOOLS } from '../src/fixtures/tools.js';
 import { FIXTURE_AGENTS, hashKey } from '../src/fixtures/agents.js';
+import { generateFixtures } from '../src/fixtures/generated.js';
+
+const INCLUDE_GENERATED = process.env.INCLUDE_GENERATED !== 'false';
+const ALL_TOOLS = INCLUDE_GENERATED ? [...FIXTURE_TOOLS, ...generateFixtures()] : FIXTURE_TOOLS;
 
 const uri = process.env.MONGODB_URI;
 const dbName = process.env.MONGODB_DB || 'twochain';
@@ -21,8 +25,26 @@ async function embedBatch(texts) {
   if (!res.ok) throw new Error(`voyage ${res.status}: ${await res.text()}`);
   const json = await res.json();
   const vecs = json.data.map((d) => d.embedding);
-  console.log(`embedded ${vecs.length} docs in ${Date.now() - t0}ms`);
+  console.log(`  embedded batch of ${vecs.length} docs in ${Date.now() - t0}ms`);
   return vecs;
+}
+
+// Voyage free tier: 3 RPM. Batch up to ~120 per call (well under 10K TPM),
+// sleep 25s between batches.
+async function embedAllBatched(texts) {
+  const BATCH_SIZE = 120;
+  const SLEEP_BETWEEN_MS = 25_000;
+  const all = [];
+  for (let i = 0; i < texts.length; i += BATCH_SIZE) {
+    const batch = texts.slice(i, i + BATCH_SIZE);
+    if (i > 0) {
+      console.log(`  sleeping ${SLEEP_BETWEEN_MS / 1000}s for Voyage rate limit...`);
+      await new Promise((r) => setTimeout(r, SLEEP_BETWEEN_MS));
+    }
+    const vecs = await embedBatch(batch);
+    all.push(...vecs);
+  }
+  return all;
 }
 
 try {
@@ -52,14 +74,14 @@ try {
     console.log(`  ${a._id} [${a.role}] key=${a.api_key.slice(0, 12)}...`);
   }
 
-  // 3. Embed all 5 capability_texts in one batch
-  console.log('\n=== embedding capability_texts ===');
-  const texts = FIXTURE_TOOLS.map((t) => t.capability_text);
-  const embeddings = await embedBatch(texts);
+  // 3. Embed all capability_texts (batched to respect Voyage rate limits)
+  console.log(`\n=== embedding ${ALL_TOOLS.length} capability_texts ===`);
+  const texts = ALL_TOOLS.map((t) => t.capability_text);
+  const embeddings = texts.length > 50 ? await embedAllBatched(texts) : await embedBatch(texts);
 
   // 4. Build tool docs
   console.log('\n=== seeding tools ===');
-  const toolDocs = FIXTURE_TOOLS.map((spec, i) => {
+  const toolDocs = ALL_TOOLS.map((spec, i) => {
     const evalRunId = new ObjectId();
     return {
       _doc: {
@@ -89,8 +111,9 @@ try {
   });
 
   const toolInsert = await db.collection('tools').insertMany(toolDocs.map((t) => t._doc));
-  for (let i = 0; i < FIXTURE_TOOLS.length; i++) {
-    const t = FIXTURE_TOOLS[i];
+  console.log(`  inserted ${toolDocs.length} tools (showing first 13 hand-crafted, ${ALL_TOOLS.length - 13} more generated)`);
+  for (let i = 0; i < Math.min(13, ALL_TOOLS.length); i++) {
+    const t = ALL_TOOLS[i];
     console.log(`  ${t.name}@${t.version} rel=${t.reliability_score.toFixed(2)} active`);
   }
 
@@ -114,9 +137,7 @@ try {
     };
   });
   await db.collection('eval_runs').insertMany(evalRuns);
-  for (const r of evalRuns) {
-    console.log(`  ${r.tool_name}@${r.tool_version} ${r.pass_count}/${r.total_count} (${r.pass_rate.toFixed(2)})`);
-  }
+  console.log(`  inserted ${evalRuns.length} eval_runs`);
 
   // 6. Sanity: count + sample query
   console.log('\n=== verification ===');
