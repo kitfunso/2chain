@@ -53,6 +53,24 @@ interface ToolRow {
   updated_at: string;
 }
 
+// FTS5 query sanitizer: strip characters that conflict with the FTS5 query
+// grammar, then OR-join remaining tokens. Empty result means "no text arm".
+// Defensive: drops anything that could be parsed as a column-filter or
+// boolean operator. The user query is untrusted text, not query syntax.
+function sanitizeFtsQuery(raw: string): string {
+  const tokens = raw
+    .toLowerCase()
+    .replace(/[^a-z0-9\s\-]/g, ' ')
+    .split(/\s+/)
+    .map((t) => t.trim())
+    .filter((t) => t.length >= 2);
+  if (tokens.length === 0) return '';
+  // Wrap each in double-quotes to disable phrase-operator interpretation.
+  // FTS5 requires the special "delete" command for content sync (see
+  // migration), but at MATCH time double-quoted terms are treated as literal.
+  return tokens.map((t) => `"${t}"`).join(' OR ');
+}
+
 function rowToTool(r: ToolRow): ToolV2 {
   return {
     id: r.id,
@@ -252,7 +270,7 @@ export class SqliteStorage implements Storage {
 
   // ----- Retrieval ---------------------------------------------------------
 
-  async runRRF(_opts: {
+  async runRRF(opts: {
     queryEmbedding: Float32Array;
     queryText: string;
     topK: number;
@@ -260,7 +278,108 @@ export class SqliteStorage implements Storage {
     weights: { vector: number; text: number };
     namespace?: string;
   }): Promise<RrfResult[]> {
-    throw new Error('runRRF not yet implemented (Phase 1 Step 6)');
+    const namespace = opts.namespace ?? DEFAULT_NAMESPACE;
+    const queryBuf = Buffer.from(
+      opts.queryEmbedding.buffer,
+      opts.queryEmbedding.byteOffset,
+      opts.queryEmbedding.byteLength,
+    );
+    // FTS5 query: tokenize the user query into terms, OR-join. Matches v1's
+    // implicit OR-of-terms behavior and tolerates noisy queries that have
+    // some terms not in capability_text.
+    const ftsQuery = sanitizeFtsQuery(opts.queryText);
+
+    // ---- Vector arm ----
+    const vecRows = this.db
+      .prepare<[Buffer, number, number, string], { rowid: number; distance: number }>(
+        `SELECT v.rowid AS rowid, v.distance AS distance
+         FROM tools_vec v
+         JOIN tools t ON t.rowid = v.rowid
+         WHERE v.capability_embedding MATCH ?
+           AND k = ?
+           AND t.status = 'active'
+           AND CAST(json_extract(t.metadata, '$.reliability_score') AS REAL) >= ?
+           AND t.namespace_id = ?
+         ORDER BY v.distance ASC`,
+      )
+      .all(queryBuf, 50, opts.gate, namespace);
+
+    // ---- Text arm ---- (FTS5 with bm25 ASC; lower-is-better)
+    let txtRows: Array<{ rowid: number }> = [];
+    if (ftsQuery.length > 0) {
+      txtRows = this.db
+        .prepare<[string, string, number, number], { rowid: number }>(
+          `SELECT f.rowid AS rowid
+           FROM tools_fts f
+           JOIN tools t ON t.rowid = f.rowid
+           WHERE tools_fts MATCH ?
+             AND t.namespace_id = ?
+             AND t.status = 'active'
+             AND CAST(json_extract(t.metadata, '$.reliability_score') AS REAL) >= ?
+           ORDER BY bm25(tools_fts) ASC
+           LIMIT ?`,
+        )
+        .all(ftsQuery, namespace, opts.gate, 50) as Array<{ rowid: number }>;
+    }
+
+    // ---- RRF fusion (in JS — far simpler than the equivalent SQL CTE,
+    // and the vec/text arrays are already small at this point). ----
+    const K_CONSTANT = 60;
+    const fused = new Map<number, { score: number; vec_rank?: number; text_rank?: number; vec_distance?: number }>();
+    vecRows.forEach((r, idx) => {
+      const rank = idx + 1;
+      const e = fused.get(r.rowid) ?? { score: 0 };
+      e.score += opts.weights.vector / (K_CONSTANT + rank);
+      e.vec_rank = rank;
+      e.vec_distance = r.distance;
+      fused.set(r.rowid, e);
+    });
+    txtRows.forEach((r, idx) => {
+      const rank = idx + 1;
+      const e = fused.get(r.rowid) ?? { score: 0 };
+      e.score += opts.weights.text / (K_CONSTANT + rank);
+      e.text_rank = rank;
+      fused.set(r.rowid, e);
+    });
+
+    if (fused.size === 0) return [];
+
+    // Top-K by RRF
+    const ranked = [...fused.entries()]
+      .sort((a, b) => b[1].score - a[1].score)
+      .slice(0, opts.topK);
+
+    // Hydrate tool rows
+    const placeholders = ranked.map(() => '?').join(',');
+    const rowids = ranked.map(([rowid]) => rowid);
+    const toolRows = this.db
+      .prepare<number[], ToolRow>(
+        `SELECT rowid, * FROM tools WHERE rowid IN (${placeholders})`,
+      )
+      .all(...rowids);
+    const byRowid = new Map(toolRows.map((r) => [r.rowid, r]));
+
+    const out: RrfResult[] = [];
+    for (const [rowid, info] of ranked) {
+      const r = byRowid.get(rowid);
+      if (!r) continue;
+      const tool = rowToTool(r);
+      const vec_score = info.vec_distance !== undefined ? 1.0 - info.vec_distance : 0;
+      out.push({
+        id: tool.id,
+        name: tool.name,
+        version: tool.version,
+        capability_text: tool.capability_text,
+        endpoint_stub_name: tool.endpoint_stub_name,
+        metadata: tool.metadata,
+        status: tool.status,
+        rrf_score: info.score,
+        vec_score,
+        vec_rank: info.vec_rank,
+        text_rank: info.text_rank,
+      });
+    }
+    return out;
   }
 
   // ----- Logging writes ----------------------------------------------------

@@ -210,18 +210,15 @@ test('dbStats reports collection counts and version string', async () => {
   await s.close();
 });
 
-test('runRRF throws not_implemented (lands in Step 6)', async () => {
+test('runRRF returns empty for an empty registry (no crash)', async () => {
   const s = await freshStorage();
-  await assert.rejects(
-    () =>
-      s.runRRF({
-        queryEmbedding: makeEmbedding(1),
-        queryText: 'test',
-        topK: 5,
-        gate: 0.8,
-        weights: { vector: 0.7, text: 0.3 },
-      }),
-    /Step 6/,
-  );
+  const results = await s.runRRF({
+    queryEmbedding: makeEmbedding(1),
+    queryText: 'test',
+    topK: 5,
+    gate: 0.8,
+    weights: { vector: 0.7, text: 0.3 },
+  });
+  assert.deepEqual(results, []);
   await s.close();
 });
