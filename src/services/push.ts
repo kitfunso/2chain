@@ -1,7 +1,10 @@
-import type { Db } from 'mongodb';
-import { ObjectId } from 'mongodb';
-import { embedOne } from '../embeddings/voyage.js';
+// v2 push — Storage + Embedder via DI. No MongoDB. No Voyage.
+
+import type { Storage, Embedder, ToolSpecV2 } from '../types.js';
+import { DEFAULT_NAMESPACE } from '../types.js';
 import { runEvals } from './evalRunner.js';
+import { getStub } from './stubs.js';
+import { validateContract } from './contract-bounds.js';
 
 export interface PushInput {
   name: string;
@@ -12,6 +15,7 @@ export interface PushInput {
   output_repair_strategy: 'llm' | 'fail-fast';
   endpoint_stub_name: string;
   metadata: { cost_per_call_usd: number; p95_latency_ms: number };
+  domain?: string;
 }
 
 export interface PushResult {
@@ -34,44 +38,57 @@ export type PushError =
   | { ok: false; code: 'duplicate_version'; message: string }
   | { ok: false; code: 'name_owned_by_other'; message: string }
   | { ok: false; code: 'unknown_stub'; message: string }
+  | { ok: false; code: 'contract_too_large'; message: string }
   | { ok: false; code: 'embed_failed'; message: string };
 
 export async function push(
-  db: Db,
+  storage: Storage,
+  embedder: Embedder,
   authorAgentId: string,
-  body: PushInput
+  body: PushInput,
+  namespace: string = DEFAULT_NAMESPACE,
 ): Promise<PushResult | PushError> {
   const tStart = Date.now();
-  const now = new Date();
+  const now = new Date().toISOString();
+
+  // CLAUDE.md rule 11: bound JSON Schema size + depth before any compile.
+  const inputCheck = validateContract(body.input_contract, 'input');
+  if (!inputCheck.ok) return { ok: false, code: 'contract_too_large', message: inputCheck.reason };
+  const outputCheck = validateContract(body.output_contract, 'output');
+  if (!outputCheck.ok) return { ok: false, code: 'contract_too_large', message: outputCheck.reason };
+
+  // Stub must be registered (CLAUDE.md rule 12: first-party stubs only).
+  if (!getStub(body.endpoint_stub_name)) {
+    return { ok: false, code: 'unknown_stub', message: `endpoint_stub_name '${body.endpoint_stub_name}' is not a registered first-party stub` };
+  }
 
   // Pre-checks
-  const existing = await db.collection('tools').findOne({ name: body.name, version: body.version });
+  const existing = await storage.getToolByNameVersion(body.name, body.version, namespace);
   if (existing) {
     return { ok: false, code: 'duplicate_version', message: `tool ${body.name}@${body.version} already exists` };
   }
-  const sameName = await db.collection('tools').findOne({ name: body.name });
-  if (sameName && sameName.author_agent_id !== authorAgentId) {
+  const sameName = await storage.listTools({ namespace, limit: 5_000 });
+  const conflict = sameName.find((t) => t.name === body.name && t.author_agent_id !== authorAgentId);
+  if (conflict) {
     return { ok: false, code: 'name_owned_by_other', message: `tool ${body.name} is owned by another author` };
   }
 
   // Embed
   const tEmbed = Date.now();
-  let embedding: number[];
+  let embedding: Float32Array;
   try {
-    embedding = await embedOne(body.capability_text, 'document');
+    embedding = await embedder.embed(body.capability_text, 'document');
   } catch (e) {
     return { ok: false, code: 'embed_failed', message: (e as Error).message };
   }
   const embedMs = Date.now() - tEmbed;
 
-  // Insert with status='pending', reliability=0 (D9 invariant)
-  const evalRunId = new ObjectId();
-  const insert = await db.collection('tools').insertOne({
+  // Insert with status='pending', reliability=0 (D9 invariant).
+  const pendingSpec: ToolSpecV2 = {
     name: body.name,
     version: body.version,
     author_agent_id: authorAgentId,
     capability_text: body.capability_text,
-    capability_embedding: embedding,
     input_contract: body.input_contract,
     output_contract: body.output_contract,
     output_repair_strategy: body.output_repair_strategy,
@@ -81,12 +98,11 @@ export async function push(
       p95_latency_ms: body.metadata.p95_latency_ms,
       reliability_score: 0,
       last_eval_run: now,
-      last_eval_run_id: evalRunId,
     },
     status: 'pending',
-    created_at: now,
-    updated_at: now,
-  });
+    domain: body.domain,
+  };
+  const inserted = await storage.upsertTool(pendingSpec, embedding, namespace);
 
   // Run evals (D34: status always flips to 'active', reliability does the gating)
   const tEval = Date.now();
@@ -98,12 +114,11 @@ export async function push(
   });
   const evalMs = Date.now() - tEval;
 
-  // Persist eval_run
-  await db.collection('eval_runs').insertOne({
-    _id: evalRunId,
-    tool_id: insert.insertedId,
+  await storage.insertEvalRun({
+    tool_id: inserted.id,
     tool_name: body.name,
     tool_version: body.version,
+    namespace_id: namespace,
     triggered_at: now,
     triggered_by: 'push',
     cases: evalResult.cases,
@@ -113,23 +128,19 @@ export async function push(
     duration_ms: evalResult.duration_ms,
   });
 
-  // D34: always flip to 'active' when evals complete; reliability does the gate.
-  await db.collection('tools').updateOne(
-    { _id: insert.insertedId },
+  await storage.updateToolAfterEval(
+    inserted.id,
     {
-      $set: {
-        'metadata.reliability_score': evalResult.pass_rate,
-        'metadata.last_eval_run': now,
-        'metadata.last_eval_run_id': evalRunId,
-        status: 'active',
-        updated_at: now,
-      },
-    }
+      ...pendingSpec.metadata,
+      reliability_score: evalResult.pass_rate,
+      last_eval_run: new Date().toISOString(),
+    },
+    'active',
   );
 
   return {
     ok: true,
-    tool_id: insert.insertedId.toString(),
+    tool_id: inserted.id,
     name: body.name,
     version: body.version,
     status: 'active',

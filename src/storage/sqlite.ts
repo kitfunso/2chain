@@ -23,6 +23,7 @@ import type {
   RankingRow,
   DbStats,
   ChangeEvent,
+  AgentRow,
 } from '../types.js';
 import { DEFAULT_NAMESPACE } from '../types.js';
 import { SqliteWriteQueue } from './sqlite-write-queue.js';
@@ -266,6 +267,46 @@ export class SqliteStorage implements Storage {
         .prepare(`UPDATE tools SET status = ?, updated_at = ? WHERE id = ?`)
         .run(status, new Date().toISOString(), toolId);
     }, 'tools');
+  }
+
+  async updateToolAfterEval(
+    toolId: string,
+    metadata: ToolSpecV2['metadata'],
+    status: ToolStatus,
+  ): Promise<void> {
+    await this.queue.run(() => {
+      this.db
+        .prepare(
+          `UPDATE tools SET metadata = ?, status = ?, updated_at = ? WHERE id = ?`,
+        )
+        .run(JSON.stringify(metadata), status, new Date().toISOString(), toolId);
+    }, 'tools');
+  }
+
+  // ----- Agents ------------------------------------------------------------
+
+  async getAgentByKeyHash(hash: string): Promise<AgentRow | null> {
+    const row = this.db
+      .prepare<[string], AgentRow>(
+        `SELECT id, name, api_key_hash, role, created_at FROM agents WHERE api_key_hash = ?`,
+      )
+      .get(hash);
+    return row ?? null;
+  }
+
+  async upsertAgent(agent: AgentRow): Promise<void> {
+    await this.queue.run(() => {
+      this.db
+        .prepare(
+          `INSERT INTO agents (id, name, api_key_hash, role, created_at)
+           VALUES (?, ?, ?, ?, ?)
+           ON CONFLICT(id) DO UPDATE SET
+             name = excluded.name,
+             api_key_hash = excluded.api_key_hash,
+             role = excluded.role`,
+        )
+        .run(agent.id, agent.name, agent.api_key_hash, agent.role, agent.created_at);
+    }, 'agents');
   }
 
   // ----- Retrieval ---------------------------------------------------------

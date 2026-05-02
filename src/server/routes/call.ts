@@ -1,12 +1,12 @@
 import type { FastifyInstance } from 'fastify';
-import type { Db } from 'mongodb';
+import type { Storage } from '../../types.js';
 import { call, type CallInput } from '../../services/call.js';
 import { requireAuth } from '../auth.js';
 import { broadcast } from '../sse.js';
 
-export function registerCallRoute(app: FastifyInstance, db: Db): void {
+export function registerCallRoute(app: FastifyInstance, storage: Storage): void {
   app.post<{ Body: CallInput }>('/call', async (req, reply) => {
-    const ctx = await requireAuth(db, req, reply);
+    const ctx = await requireAuth(storage, req, reply);
     if (!ctx) return;
 
     const b = req.body;
@@ -18,8 +18,7 @@ export function registerCallRoute(app: FastifyInstance, db: Db): void {
     const bypass = req.headers['x-2chain-bypass-gate'] === 'true';
 
     try {
-      const r = await call(db, ctx.agent_id, ctx.role, b, bypass);
-      // Tell the dashboard a tool was just invoked — it'll flash the row.
+      const r = await call(storage, ctx.agent_id, ctx.role, b, bypass);
       broadcast('tool_invoked', {
         tool_name: b.tool_name,
         tool_version: b.tool_version,

@@ -209,6 +209,14 @@ export interface DbStats {
   indexes_ready: Record<string, 'ready' | 'building' | 'missing'>;
 }
 
+export interface AgentRow {
+  id: string;
+  name: string;
+  api_key_hash: string;
+  role: 'caller' | 'tool_author' | 'admin';
+  created_at: string;
+}
+
 export interface RrfResult {
   id: string;
   name: string;
@@ -242,6 +250,15 @@ export interface Storage {
     namespace?: string,
   ): Promise<ToolV2>;
   setStatus(toolId: string, status: ToolStatus): Promise<void>;
+  updateToolAfterEval(
+    toolId: string,
+    metadata: ToolSpecV2['metadata'],
+    status: ToolStatus,
+  ): Promise<void>;
+
+  // Agent auth (used by /push, /call, /discover guards)
+  getAgentByKeyHash(hash: string): Promise<AgentRow | null>;
+  upsertAgent(agent: AgentRow): Promise<void>;
 
   // Retrieval (the heart of /discover)
   runRRF(opts: {
