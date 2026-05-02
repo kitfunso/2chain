@@ -12,6 +12,8 @@
     "smoke:connect": "tsx scripts/smoke-connect.mjs",
     "smoke:voyage": "node scripts/smoke-voyage.mjs",
     "smoke:setup": "node scripts/setup-db.mjs",
+    "setup:text": "node scripts/setup-text-index.mjs",
+    "probe:rankfusion": "tsx scripts/probe-rankfusion.ts",
     "smoke:discover": "tsx scripts/smoke-discover.ts",
     "smoke:discover:http": "tsx scripts/smoke-discover-http.ts",
     "smoke:push": "tsx scripts/smoke-push.ts",

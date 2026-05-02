@@ -39,6 +39,10 @@ Built on MongoDB Atlas Vector Search + Voyage AI embeddings + LangGraph. Every p
 2. **Relevance gate** — post-search, vector similarity must be ≥ 0.70 (drops semantic noise).
 3. **Contract enforcement** — at call time, input + output schemas are validated; tools that lie circuit-break.
 
+**Two retrieval modes**:
+- **Vector** (`/discover?mode=vector`, default) — `$vectorSearch` + composite re-rank (`0.4·vec + 0.6·reliability`). Best for natural-language queries.
+- **Hybrid** (`/discover?mode=hybrid`) — Atlas `$rankFusion` of `$vectorSearch` (Voyage embeddings) + `$search` (Atlas Search text). Reciprocal rank fusion with `0.7 vector / 0.3 text` weights. Best for queries that mix semantic intent with concrete keywords ("lint javascript", "extract financial tables from PDF"). Pure adaptive retrieval — different rank arms agree on the trustworthy answer.
+
 ---
 
 ## Demo
@@ -88,6 +92,7 @@ VOYAGE_API_KEY=pa-xxxxxxxxxxxxxxxx
 EOF
 
 npm run smoke:setup     # creates collections, indexes, vector index (1024d cosine)
+npm run setup:text      # creates Atlas Search text index (for hybrid mode)
 npm run seed            # seeds 5 fixture tools + 3 agents + pre-computed eval_runs
 npm run dev             # http://127.0.0.1:3030
 ```

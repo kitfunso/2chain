@@ -1,12 +1,14 @@
 import type { FastifyInstance } from 'fastify';
 import type { Db } from 'mongodb';
 import { discover, DEMO_AGENT_QUERY } from '../../services/discover.js';
+import { discoverHybrid } from '../../services/discoverHybrid.js';
 import { requireAuth } from '../auth.js';
 import { broadcast } from '../sse.js';
 
 interface DiscoverQuery {
   q?: string;
   top?: string;
+  mode?: 'vector' | 'hybrid';
 }
 
 export function registerDiscoverRoute(app: FastifyInstance, db: Db): void {
@@ -20,9 +22,12 @@ export function registerDiscoverRoute(app: FastifyInstance, db: Db): void {
       return;
     }
     const top = req.query.top ? Math.max(1, Math.min(20, Number(req.query.top))) : 5;
+    const mode = req.query.mode === 'hybrid' ? 'hybrid' : 'vector';
 
     try {
-      const { results, meta } = await discover(db, q, top);
+      const { results, meta } = mode === 'hybrid'
+        ? await discoverHybrid(db, q, top)
+        : await discover(db, q, top);
 
       // Broadcast for the dashboard's live ranking panel — only the demo query.
       if (q === DEMO_AGENT_QUERY) {
@@ -39,7 +44,7 @@ export function registerDiscoverRoute(app: FastifyInstance, db: Db): void {
         });
       }
 
-      reply.code(200).send({ ok: true, results, meta });
+      reply.code(200).send({ ok: true, mode, results, meta });
     } catch (err) {
       req.log.error(err, 'discover failed');
       reply.code(500).send({ ok: false, error: { code: 'discover_failed', message: (err as Error).message } });
