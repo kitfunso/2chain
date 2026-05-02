@@ -131,7 +131,15 @@ export const DASHBOARD_HTML = `<!doctype html>
 </header>
 <main>
   <div>
-    <section class="card">
+    <section class="card" id="discover-card">
+      <h2>Live ranking · query: <em id="d-query">—</em></h2>
+      <div id="d-meta" class="ts" style="margin-bottom:8px;font-size:11.5px"></div>
+      <table id="discover-table">
+        <thead><tr><th>#</th><th>Name</th><th>Ver</th><th>Rel</th><th>Vec</th><th>Composite</th></tr></thead>
+        <tbody><tr><td colspan="6" class="empty">no /discover call yet — run <code style="font-family:var(--mono)">npm run demo:beat1</code></td></tr></tbody>
+      </table>
+    </section>
+    <section class="card" style="margin-top:18px">
       <h2>Tools registry</h2>
       <table id="tools-table">
         <thead><tr><th>Name</th><th>Ver</th><th>Status</th><th>Reliability</th><th>Last eval</th></tr></thead>
@@ -280,6 +288,27 @@ export const DASHBOARD_HTML = `<!doctype html>
       const d = JSON.parse(e.data);
       if (d.outcome in usageCounts) usageCounts[d.outcome]++;
       updateUsage();
+    });
+    es.addEventListener('discover_ran', (e) => {
+      const d = JSON.parse(e.data);
+      document.getElementById('d-query').textContent = '"' + d.query + '"';
+      const meta = d.meta || {};
+      document.getElementById('d-meta').textContent =
+        \`embed: \${meta.embed_ms ?? 0}ms · search: \${meta.search_ms ?? 0}ms · candidates: \${meta.candidates_after_filter ?? 0}\${d.trigger ? ' · trigger: ' + d.trigger : ''}\`;
+      const tbody = document.querySelector('#discover-table tbody');
+      if (!d.results.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty">no results — relevance gate filtered all candidates</td></tr>';
+        return;
+      }
+      tbody.innerHTML = d.results.map((r, i) => \`
+        <tr class="flash">
+          <td>\${i + 1}</td>
+          <td class="name">\${r.name}</td>
+          <td class="ver">\${r.version}</td>
+          <td>\${r.reliability_score.toFixed(2)}</td>
+          <td>\${r.vec_score.toFixed(3)}</td>
+          <td><strong>\${r.rank_score.toFixed(3)}</strong></td>
+        </tr>\`).join('');
     });
   }
 

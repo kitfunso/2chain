@@ -31,6 +31,8 @@ export interface DiscoverMeta {
 
 const queryEmbeddingCache = new Map<string, number[]>();
 
+export const DEMO_AGENT_QUERY = 'Extract tables from this financial report PDF';
+
 export async function getQueryEmbedding(query: string): Promise<{ vec: number[]; cached: boolean; ms: number }> {
   const cached = queryEmbeddingCache.get(query);
   if (cached) return { vec: cached, cached: true, ms: 0 };
@@ -38,6 +40,11 @@ export async function getQueryEmbedding(query: string): Promise<{ vec: number[];
   const vec = await embedOne(query, 'query');
   queryEmbeddingCache.set(query, vec);
   return { vec, cached: false, ms: Date.now() - t0 };
+}
+
+// Pre-warm at server boot so Beat 1 cold call is sub-100ms.
+export async function prewarmDemoEmbedding(): Promise<void> {
+  await getQueryEmbedding(DEMO_AGENT_QUERY);
 }
 
 export async function discover(

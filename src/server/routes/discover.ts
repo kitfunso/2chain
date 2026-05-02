@@ -1,7 +1,8 @@
 import type { FastifyInstance } from 'fastify';
 import type { Db } from 'mongodb';
-import { discover } from '../../services/discover.js';
+import { discover, DEMO_AGENT_QUERY } from '../../services/discover.js';
 import { requireAuth } from '../auth.js';
+import { broadcast } from '../sse.js';
 
 interface DiscoverQuery {
   q?: string;
@@ -22,6 +23,22 @@ export function registerDiscoverRoute(app: FastifyInstance, db: Db): void {
 
     try {
       const { results, meta } = await discover(db, q, top);
+
+      // Broadcast for the dashboard's live ranking panel — only the demo query.
+      if (q === DEMO_AGENT_QUERY) {
+        broadcast('discover_ran', {
+          query: q,
+          results: results.map((r) => ({
+            name: r.name, version: r.version,
+            reliability_score: r.reliability_score,
+            vec_score: r.vec_score,
+            rank_score: r.rank_score,
+          })),
+          meta,
+          ts: new Date().toISOString(),
+        });
+      }
+
       reply.code(200).send({ ok: true, results, meta });
     } catch (err) {
       req.log.error(err, 'discover failed');
