@@ -27,6 +27,7 @@ import type {
 } from '../types.js';
 import { DEFAULT_NAMESPACE } from '../types.js';
 import { SqliteWriteQueue } from './sqlite-write-queue.js';
+import { SqliteChangeHook } from '../live/sqlite-hook.js';
 
 export interface SqliteStorageOpts {
   path: string;                 // ':memory:' for tests, real path for prod
@@ -96,10 +97,16 @@ function rowToTool(r: ToolRow): ToolV2 {
 export class SqliteStorage implements Storage {
   private db!: Database.Database;
   private readonly queue: SqliteWriteQueue;
-  private listeners: Array<(e: ChangeEvent) => void> = [];
+  private readonly hook: SqliteChangeHook;
 
   constructor(private readonly opts: SqliteStorageOpts) {
     this.queue = new SqliteWriteQueue();
+    this.hook = new SqliteChangeHook();
+  }
+
+  /** Test-only: synchronously flush the change-hook queue. */
+  flushChanges(): void {
+    this.hook.flush();
   }
 
   async init(): Promise<void> {
@@ -114,7 +121,11 @@ export class SqliteStorage implements Storage {
     this.db.exec('PRAGMA busy_timeout = 5000');
     this.db.exec('PRAGMA foreign_keys = ON');
     if (!this.opts.readonly) {
+      // Hook must install BEFORE migrations so that triggers created in any
+      // future migration which references notify_change() find the function.
+      // Triggers themselves are created inside install() — idempotent.
       await this.runMigrations();
+      this.hook.install(this.db);
     }
   }
 
@@ -666,9 +677,7 @@ export class SqliteStorage implements Storage {
   // ----- Live updates ------------------------------------------------------
 
   watchChanges(onChange: (e: ChangeEvent) => void): void {
-    this.listeners.push(onChange);
-    // updateHook wiring lands in Step 9 (live/sqlite-hook.ts). For Step 4
-    // we just register the listener; nothing fires it yet.
+    this.hook.addListener(onChange);
   }
 
   // ----- Lifecycle ---------------------------------------------------------
