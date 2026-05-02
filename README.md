@@ -2,9 +2,30 @@
 
 **A tool registry with continuous evals and reliability gating for AI agents.**
 
-Built on MongoDB Atlas Vector Search + Voyage AI embeddings + LangGraph. Every published tool is evaluated automatically; agents discovering tools see only the ones that pass a 0.80 reliability gate. Bad tools are filtered from results, broken tools circuit-break on contract violation. Live re-rank on every push via Atlas change streams.
+Built on MongoDB Atlas Vector Search + Atlas Search + `$rankFusion` + change streams + Voyage AI embeddings. Agents type a natural-language task; 2chain picks the right tool from 199 candidates, calls it, and validates the response on the wire. Bad tools are filtered from results before they're ever returned, broken tools circuit-break on contract violation, and the dashboard re-ranks live via Atlas change streams.
 
 > MongoDB Agentic Evolution Hackathon, May 2026 — track: **Adaptive Retrieval**.
+
+🎬 **60-second demo video**: [youtu.be/puINYgtQXdM](https://youtu.be/puINYgtQXdM)
+
+📖 **3-min stage script**: [demo/SCRIPT.md](./demo/SCRIPT.md) · **demo prompts**: [demo/prompts.md](./demo/prompts.md)
+
+---
+
+## Why MongoDB Atlas
+
+Every layer of 2chain is an Atlas primitive. Nothing custom-built that Atlas does better.
+
+| Layer | Atlas primitive | Role |
+|---|---|---|
+| **Semantic match** | Atlas Vector Search (1024-dim cosine, Voyage `voyage-3`) | Finds tools whose capability *means* the same thing as the user's query |
+| **Lexical match** | Atlas Search (`lucene.english` BM25) | Catches concrete keyword hits the embedding misses |
+| **Hybrid fusion** | **`$rankFusion`** (new Atlas operator) | Reciprocal rank fusion of both pipelines in a single server-side aggregation. No client merge, no two-DB juggle |
+| **Reliability gate** | Filtered `$vectorSearch` | `metadata.reliability_score >= 0.80` enforced *inside* the index — bad tools never even score |
+| **Live dashboard** | Change streams (`tools.watch()`, `usage.watch()`, `violations.watch()`) | SSE-driven UI with zero polling |
+| **Audit trail** | Standard collections | `usage`, `violations`, `eval_runs`, `rankings` — every action observable |
+
+The whole hybrid retrieval + reliability gate is **six lines of aggregation pipeline**. That's only possible because `$rankFusion` ships in Atlas.
 
 ---
 
@@ -47,21 +68,26 @@ Built on MongoDB Atlas Vector Search + Voyage AI embeddings + LangGraph. Every p
 
 ## Demo
 
-The locked 4-beat narrative is in [DEMO.md](./DEMO.md). One command to dry-run end-to-end:
+199 tools live in the registry. Headline demo prompts run via Claude Code over MCP:
+
+| # | User prompt to Claude Code | Tool 2chain picks | What happens |
+|---|---|---|---|
+| **1** | *"Build a DCF for NVIDIA, pull the income statement"* | `sec-edgar-financials@1.0` | **Real fetch** from `data.sec.gov` XBRL API. Live numbers, source URL, schema-validated |
+| **2** | *"Lit review on Mamba state-space models, fetch top 3 papers"* | `arxiv-paper-search@1.0` | **Real fetch** from `export.arxiv.org`. Live papers, abstracts, PDF URLs |
+| **3** | *"Lint this JS for our CI dashboard, structured findings"* | `eslint-snitch@7.5` | Returns the `{issues: [...]}` contract every time |
+| **4** | *"Audit this Python auth function, OWASP-graded"* | `security-scanner@1.5` | Wins over `pylint-pro` because reliability is graded on security, not style |
+| **5** | *"Try malformed-bot v1.0 directly"* | `malformed-bot@1.0` | Returns prose instead of JSON → ajv catches it on the wire → tool flips to `circuit_broken` in MongoDB → change stream fires → dashboard ticks red. **Every future agent is now protected.** |
+
+One command to dry-run end-to-end without an agent:
 
 ```bash
 npm run dev          # in terminal 1
 npm run demo:full    # in terminal 2
 ```
 
-Open `http://127.0.0.1:3030` for the live dashboard.
+Open `http://127.0.0.1:3030` for the live dashboard. Between recording takes, `npm run reset:state` clears violations and unbreaks circuit-broken tools without re-seeding.
 
-| Beat | What happens | Endpoint |
-|---|---|---|
-| 1 | Caller agent queries the registry, gets a ranked top-N | `GET /discover` |
-| 2 | Tool author pushes `pdf-extractor v3.1` with a decimal-comma swap bug; eval runner catches 3/5 → reliability 0.6 | `POST /push` |
-| 3 | Caller agent re-queries — v3.1 is filtered, v3.0 still wins. **No agent code changed.** Live re-rank via Atlas change stream. | `GET /discover` |
-| 4 | Caller calls `malformed-bot` (passes its own evals but returns prose, not the contracted JSON shape). Contract layer catches the violation and circuit-breaks the tool. | `POST /call` |
+Full prompt set with expected dashboard reactions: [demo/prompts.md](./demo/prompts.md). Stage script: [demo/SCRIPT.md](./demo/SCRIPT.md). Original 4-beat dry-run narrative (pdf-extractor v3.1 reliability drop): [DEMO.md](./DEMO.md).
 
 Measured latencies (real Atlas M10, eu-west-2):
 
@@ -93,7 +119,7 @@ EOF
 
 npm run smoke:setup     # creates collections, indexes, vector index (1024d cosine)
 npm run setup:text      # creates Atlas Search text index (for hybrid mode)
-npm run seed            # seeds 5 fixture tools + 3 agents + pre-computed eval_runs
+npm run seed            # seeds 199 tools (14 hand-crafted + 185 generated) + 3 agents + eval_runs
 npm run dev             # http://127.0.0.1:3030
 ```
 
@@ -120,15 +146,19 @@ src/
 ├── db/client.ts            Singleton MongoClient
 ├── embeddings/voyage.ts    Voyage v3 fetch wrapper (1024d)
 ├── fixtures/
-│   ├── tools.ts            5 fixture tool specs (capability_text + cases)
+│   ├── tools.ts            14 hand-crafted tool specs (incl. sec-edgar-financials, arxiv-paper-search)
+│   ├── generated.ts        185 generated specs across pdf-extract, code, summarisation, lint domains
 │   ├── cases.ts            15 eval cases across 3 domains
 │   └── agents.ts           3 demo agents with sha256-hashed API keys
 ├── services/
 │   ├── discover.ts         $vectorSearch + 0.70 vec-gate + composite re-rank + dedupe
+│   ├── discoverHybrid.ts   $rankFusion (vector 0.7 + text 0.3) + heuristic / Cohere re-rank
 │   ├── push.ts             insert pending → embed → run evals → flip to active
 │   ├── call.ts             ajv input/output validation + fail-fast circuit-break
 │   ├── evalRunner.ts       Sequential domain-case runner with 5s per-case timeout
-│   ├── stubs.ts            In-process tool registry (case_id-keyed responses)
+│   ├── stubs.ts            In-process tool registry (case_id-keyed responses + real-fetch wrappers)
+│   ├── secEdgar.ts         Real SEC EDGAR XBRL client (CIK lookup, concept fallback chain)
+│   ├── arxivSearch.ts      Real arxiv.org Atom feed client
 │   └── graders.ts          numeric_tolerance, regex, length, json_schema_array_field
 └── server/
     ├── index.ts            buildServer() + change-stream subscriptions
@@ -153,7 +183,8 @@ scripts/                    Smoke tests + seed + demo:full orchestrator
 | Script | Purpose |
 |---|---|
 | `npm run dev` | Start the API server on `127.0.0.1:3030` |
-| `npm run seed` | Reset to demo-clean state |
+| `npm run seed` | Full re-seed: 199 tools, embeddings, agents, eval_runs (~1m25s, hits Voyage) |
+| `npm run reset:state` | Fast reset between recording takes: clears violations/usage/rankings, un-breaks circuit-broken tools (no re-embed) |
 | `npm run demo:full` | Orchestrated 4-beat dry run with timing labels |
 | `npm run demo:beat1`..`4` | Run individual beats |
 | `npm run smoke:all` | Run every smoke test in sequence |
@@ -240,9 +271,9 @@ After configuring the MCP server, prompts like *"extract the line items from thi
 
 See [demo/prompts.md](./demo/prompts.md) for 7 ready-to-paste demo prompts covering financial extraction, code review, security scanning, summarisation, invoice parsing, contract violations, and live re-ranking.
 
-## What 2chain works for (beyond PDFs)
+## What 2chain works for (beyond the demo prompts)
 
-PDF extraction is the demo because the eval grader is one line: compare numbers within tolerance. The same registry mechanism handles any agent task with multiple competing tools and a JSON contract:
+The headline demo shows two real-fetch tools (SEC EDGAR financials, arxiv paper search) plus three contract-enforced specialists (linter, security scanner, malformed-bot). The same registry mechanism handles any agent task with multiple competing tools and a JSON contract:
 
 | Domain | Multiple tools because... | Eval style |
 |---|---|---|
@@ -270,7 +301,7 @@ The discovery + reliability gate + contract layers stay identical. Only the eval
 - **Atlas Sandbox**: required by hackathon (M10 dedicated, eu-west-2 London).
 - **Public repo**: yes, this one.
 - **Live demo**: see [DEMO.md](./DEMO.md) for the locked 3-min stage script.
-- **Submission video**: see SUBMISSION.md (script + shotlist).
+- **Submission video**: [youtu.be/puINYgtQXdM](https://youtu.be/puINYgtQXdM) (60s) · script + shotlist in [SUBMISSION.md](./SUBMISSION.md).
 
 ---
 

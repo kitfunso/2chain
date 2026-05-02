@@ -23,6 +23,7 @@
     "test": "tsx --test tests/*.test.ts",
     "test:integration": "tsx scripts/integration-test.ts",
     "demo:reset": "tsx scripts/seed-fixtures.ts",
+    "reset:state": "tsx scripts/reset-demo-state.ts",
     "demo:beat1": "node bin/2chain.mjs discover \"Extract tables from this financial report PDF\"",
     "demo:beat2": "node bin/2chain.mjs push demo/pdf-extractor-3.1.json",
     "demo:beat3": "node bin/2chain.mjs discover \"Extract tables from this financial report PDF\"",
