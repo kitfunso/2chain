@@ -27,7 +27,7 @@ export const FIXTURE_TOOLS: FixtureSpec[] = [
       type: 'object',
       properties: { ticker: { type: 'string' } },
       required: ['ticker'],
-      additionalProperties: false,
+      additionalProperties: true,
     },
     output_contract: {
       type: 'object',
@@ -83,7 +83,7 @@ export const FIXTURE_TOOLS: FixtureSpec[] = [
         limit: { type: 'integer', minimum: 1, maximum: 10 },
       },
       required: ['query'],
-      additionalProperties: false,
+      additionalProperties: true,
     },
     output_contract: {
       type: 'object',
@@ -137,7 +137,7 @@ export const FIXTURE_TOOLS: FixtureSpec[] = [
       type: 'object',
       properties: { pdf_text: { type: 'string' } },
       required: ['pdf_text'],
-      additionalProperties: false,
+      additionalProperties: true,
     },
     output_contract: {
       type: 'object',
@@ -179,7 +179,7 @@ export const FIXTURE_TOOLS: FixtureSpec[] = [
       type: 'object',
       properties: { pdf_text: { type: 'string' } },
       required: ['pdf_text'],
-      additionalProperties: false,
+      additionalProperties: true,
     },
     output_contract: {
       type: 'object',
@@ -221,7 +221,7 @@ export const FIXTURE_TOOLS: FixtureSpec[] = [
       type: 'object',
       properties: { text: { type: 'string' } },
       required: ['text'],
-      additionalProperties: false,
+      additionalProperties: true,
     },
     output_contract: {
       type: 'object',
@@ -253,7 +253,7 @@ export const FIXTURE_TOOLS: FixtureSpec[] = [
       type: 'object',
       properties: { code: { type: 'string' } },
       required: ['code'],
-      additionalProperties: false,
+      additionalProperties: true,
     },
     output_contract: {
       type: 'object',
@@ -299,7 +299,7 @@ export const FIXTURE_TOOLS: FixtureSpec[] = [
       type: 'object',
       properties: { code: { type: 'string' } },
       required: ['code'],
-      additionalProperties: false,
+      additionalProperties: true,
     },
     output_contract: {
       type: 'object',
@@ -342,7 +342,7 @@ export const FIXTURE_TOOLS: FixtureSpec[] = [
     author_agent_id: 'demo-tool-author',
     capability_text:
       'Supplier invoice and accounts-payable document parser. Reads VAT invoices, purchase orders, and tax receipts from suppliers. Calculates VAT totals and reconciles with subtotal. Specifically for European AP workflows: HMRC, BTW, TVA. Not for SEC filings or financial statements.',
-    input_contract: { type: 'object', properties: { pdf_text: { type: 'string' } }, required: ['pdf_text'], additionalProperties: false },
+    input_contract: { type: 'object', properties: { pdf_text: { type: 'string' } }, required: ['pdf_text'], additionalProperties: true },
     output_contract: { type: 'object', properties: { rows: { type: 'array', items: { type: 'object', properties: { label: { type: 'string' }, value: { type: 'number' } }, required: ['label', 'value'], additionalProperties: false } } }, required: ['rows'], additionalProperties: false },
     endpoint_stub_name: 'pdftools-pro-v2',
     cost_per_call_usd: 0.004,
@@ -363,7 +363,7 @@ export const FIXTURE_TOOLS: FixtureSpec[] = [
     author_agent_id: 'demo-tool-author',
     capability_text:
       'Slow but thorough PDF table extractor. Reads scanned PDFs, financial statements, and OCR text. Higher cost, higher latency, designed for batch processing.',
-    input_contract: { type: 'object', properties: { pdf_text: { type: 'string' } }, required: ['pdf_text'], additionalProperties: false },
+    input_contract: { type: 'object', properties: { pdf_text: { type: 'string' } }, required: ['pdf_text'], additionalProperties: true },
     output_contract: { type: 'object', properties: { rows: { type: 'array', items: { type: 'object', properties: { label: { type: 'string' }, value: { type: 'number' } }, required: ['label', 'value'], additionalProperties: false } } }, required: ['rows'], additionalProperties: false },
     endpoint_stub_name: 'pdf-extractor-v3',
     cost_per_call_usd: 0.012,
@@ -384,7 +384,7 @@ export const FIXTURE_TOOLS: FixtureSpec[] = [
     author_agent_id: 'demo-tool-author',
     capability_text:
       'Wikipedia-grade text summariser. Compresses long English prose into one short paragraph. Reads articles, blog posts, news. Cheap, fast, single-paragraph output.',
-    input_contract: { type: 'object', properties: { text: { type: 'string' } }, required: ['text'], additionalProperties: false },
+    input_contract: { type: 'object', properties: { text: { type: 'string' } }, required: ['text'], additionalProperties: true },
     output_contract: { type: 'object', properties: { summary: { type: 'string' } }, required: ['summary'], additionalProperties: false },
     endpoint_stub_name: 'summariser-mini-v1',
     cost_per_call_usd: 0.0005,
@@ -405,7 +405,7 @@ export const FIXTURE_TOOLS: FixtureSpec[] = [
     author_agent_id: 'demo-tool-author',
     capability_text:
       'Summarises the full text of an academic paper that the caller already has in hand. Input is paper prose (abstract + body); output is a one-paragraph plain-language digest covering methodology and key findings. Use when the user pastes paper text and wants a TL;DR. Do NOT use when the user wants to find, fetch, or search for papers — this only summarises text it is given.',
-    input_contract: { type: 'object', properties: { text: { type: 'string' } }, required: ['text'], additionalProperties: false },
+    input_contract: { type: 'object', properties: { text: { type: 'string' } }, required: ['text'], additionalProperties: true },
     output_contract: { type: 'object', properties: { summary: { type: 'string' } }, required: ['summary'], additionalProperties: false },
     endpoint_stub_name: 'summariser-mini-v1',
     cost_per_call_usd: 0.002,
@@ -426,7 +426,7 @@ export const FIXTURE_TOOLS: FixtureSpec[] = [
     author_agent_id: 'demo-tool-author',
     capability_text:
       'Python style linter for code-quality reviews. Detects PEP-8 style issues, unused imports, mutable default arguments, and shadowing of builtins. For style and readability — not a security tool.',
-    input_contract: { type: 'object', properties: { code: { type: 'string' } }, required: ['code'], additionalProperties: false },
+    input_contract: { type: 'object', properties: { code: { type: 'string' } }, required: ['code'], additionalProperties: true },
     output_contract: { type: 'object', properties: { issues: { type: 'array', items: { type: 'object', properties: { file: { type: 'string' }, line: { type: 'integer' }, comment: { type: 'string' } }, required: ['file', 'line', 'comment'], additionalProperties: false } } }, required: ['issues'], additionalProperties: false },
     endpoint_stub_name: 'code-review-mini-v1',
     cost_per_call_usd: 0.0012,
@@ -447,7 +447,7 @@ export const FIXTURE_TOOLS: FixtureSpec[] = [
     author_agent_id: 'demo-tool-author',
     capability_text:
       'JavaScript and TypeScript linter. Walks the AST, flags bugs, type coercion smells, unused variables, console.log statements, and airbnb style violations.',
-    input_contract: { type: 'object', properties: { code: { type: 'string' } }, required: ['code'], additionalProperties: false },
+    input_contract: { type: 'object', properties: { code: { type: 'string' } }, required: ['code'], additionalProperties: true },
     output_contract: { type: 'object', properties: { issues: { type: 'array', items: { type: 'object', properties: { file: { type: 'string' }, line: { type: 'integer' }, comment: { type: 'string' } }, required: ['file', 'line', 'comment'], additionalProperties: false } } }, required: ['issues'], additionalProperties: false },
     endpoint_stub_name: 'code-review-mini-v1',
     cost_per_call_usd: 0.0008,
@@ -468,7 +468,7 @@ export const FIXTURE_TOOLS: FixtureSpec[] = [
     author_agent_id: 'demo-tool-author',
     capability_text:
       'Security audit for Python and JavaScript source code. Specifically targets OWASP top-10 vulnerabilities: SQL injection patterns, XSS vectors, hardcoded credentials and API keys, unsafe eval and exec calls, bare except clauses that hide errors, and authentication weaknesses. Use this for pre-deploy security review, not for general code-quality linting.',
-    input_contract: { type: 'object', properties: { code: { type: 'string' } }, required: ['code'], additionalProperties: false },
+    input_contract: { type: 'object', properties: { code: { type: 'string' } }, required: ['code'], additionalProperties: true },
     output_contract: { type: 'object', properties: { issues: { type: 'array', items: { type: 'object', properties: { file: { type: 'string' }, line: { type: 'integer' }, comment: { type: 'string' } }, required: ['file', 'line', 'comment'], additionalProperties: false } } }, required: ['issues'], additionalProperties: false },
     endpoint_stub_name: 'code-review-mini-v1',
     cost_per_call_usd: 0.005,
@@ -489,7 +489,7 @@ export const FIXTURE_TOOLS: FixtureSpec[] = [
     author_agent_id: 'demo-tool-author',
     capability_text:
       'Experimental PDF table reader. Promising on financial statements, but inconsistent: about 1 in 4 calls returns wrong row counts. Use with caution.',
-    input_contract: { type: 'object', properties: { pdf_text: { type: 'string' } }, required: ['pdf_text'], additionalProperties: false },
+    input_contract: { type: 'object', properties: { pdf_text: { type: 'string' } }, required: ['pdf_text'], additionalProperties: true },
     output_contract: { type: 'object', properties: { rows: { type: 'array', items: { type: 'object', properties: { label: { type: 'string' }, value: { type: 'number' } }, required: ['label', 'value'], additionalProperties: false } } }, required: ['rows'], additionalProperties: false },
     endpoint_stub_name: 'pdftools-pro-v2',
     cost_per_call_usd: 0.0015,
