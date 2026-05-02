@@ -1,0 +1,42 @@
+feat(v2): wire JK-hybrid TUI dashboard into the Fastify route
+
+Replaces the v1 MongoDB-flavored dashboard at src/server/routes/
+dashboardHtml.ts with the JK-hybrid layout (cream paper, ink-bordered,
+K-palette colored, 3-pane TUI structure). Live-wired to /state and
+/events SSE.
+
+What the new dashboard does:
+- /atlas-stats on boot + every 15s: hydrates the storage driver
+  ("sqlite-vec"), tools count, violations count, MCP/fixture/catalog
+  counts in the left nav.
+- /state on boot: populates the ranking table (alphabetical browse
+  mode by default), domain counts in the nav, domain-tab counters.
+  Picks the highest-reliability active tool as the initial selection.
+- /events SSE: pushes structured rows into the LIVE FEED in the right
+  pane (DSCV/CALL/CB/PUSH/EVAL chips). Capped to 20.
+- discover_ran event switches the table to ranking mode (top-1 yellow
+  row + orange arrow), updates the pane head with the query + total_ms.
+- tool_invoked event flashes the matching row orange for 1s.
+- violation_logged increments the red violations counter in the top
+  bar + nav.
+- Domain tab click filters the browse view; left-nav domain rows are
+  also clickable and proxy to the matching tab.
+- Row click in the table updates the right-pane DETAIL with the
+  selected tool's blurb, reliability bar, p95, cost, status, stub.
+
+Required infra fix:
+- src/storage/index.ts factory was still throwing 'SqliteStorage not
+  yet implemented' from the Step 4 placeholder. Now lazy-imports
+  SqliteStorage and resolves TWOCHAIN_DB_PATH (default
+  ~/.2chain/db.sqlite).
+- Default STORAGE_DRIVER changed from 'mongodb' to 'sqlite' so
+  `npm run dev:v2` works out of the box.
+
+Verified locally on PORT=3031: /health reports storage=sqlite +
+embedder=ollama:nomic-embed-text, /atlas-stats returns 430 tools /
+199 eval_runs / 1 violation, dashboard HTML serves with the new
+<title>2chain · tool registry</title>.
+
+91 tests pass. lint:no-mongodb clean. typecheck clean.
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
