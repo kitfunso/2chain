@@ -3,6 +3,7 @@ import type { FastifyInstance } from 'fastify';
 import { getDb } from '../db/client.js';
 import { registerDiscoverRoute } from './routes/discover.js';
 import { registerPushRoute } from './routes/push.js';
+import { registerCallRoute } from './routes/call.js';
 // Side-effect: register all stubs in the in-process registry.
 import '../services/stubs.js';
 
@@ -18,6 +19,7 @@ export async function buildServer(): Promise<FastifyInstance> {
 
   registerDiscoverRoute(app, db);
   registerPushRoute(app, db);
+  registerCallRoute(app, db);
 
   return app;
 }
