@@ -1,13 +1,17 @@
-# 2chain · 3-min stage script
+# 2chain · stage script (~3:15)
 
 Running order: **#1 SEC fetch → #2 arxiv fetch → #5 contract violation**.
 Dashboard open on the projector. Claude Code window beside it.
 
 ---
 
-## OPEN — 15s
+## OPEN — origin story · ~60s
 
-> AI agents need tools. There are 199 tools in this registry. The problem isn't picking one — it's picking the **right one** for **this** prompt, with the **right contract**, that **actually works**. That's 2chain. MongoDB Atlas Vector Search plus $rankFusion plus a contract layer. Let me show you.
+> Part of my job is helping colleagues use AI better. Most of them don't know what tools, hooks, or MCP servers are. They just want to extract some data, update a file, or get a clean answer out of an email. When the answer comes back wrong, they blame the AI and stop using it.
+
+> Heavy AI users like me spend hours hunting for the right tool to wire around the model. Most people will never do that. That gap, between someone who knows the tooling layer exists and someone who doesn't, is the real reason corporate AI adoption is still small. The model isn't the problem. The harness around it is. AI is brilliant at retrieving and reasoning over information, but only when the right specialist tools are plugged in.
+
+> 2chain closes that gap. The user types what they want, the registry picks the right tool, the answer comes back correct. They never see the tooling layer, and they don't have to. Let me show you how.
 
 ---
 
@@ -85,5 +89,6 @@ Show me what happens.
 
 - If a beat lags: dashboard tells the story — point at it, say *"watch what happens"*.
 - If MCP hiccups: have `npm run demo:beat1` ready in a terminal as fallback.
-- Total runtime: ~2:35. Q&A spares: prompt #3 (PR linter), #4 (security scanner).
+- Total runtime: ~3:15 with the origin-story open. Trim the open to one paragraph if you need ~2:30.
+- Q&A spares: prompt #3 (PR linter), #4 (security scanner).
 - Stack: Node 24, Fastify, MongoDB Atlas M10 (eu-west-2), Voyage `voyage-3` 1024-dim, $rankFusion, ajv contract validation, change streams → SSE dashboard.
