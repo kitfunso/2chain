@@ -485,7 +485,11 @@ EvalRunner.run(tool)        ← INLINE, blocks the push response
         'metadata.reliability_score': pass_rate,
         'metadata.last_eval_run': new Date(),
         'metadata.last_eval_run_id': run._id,
-        'status': pass_rate < CIRCUIT_BREAK_THRESHOLD ? 'circuit_broken' : 'active'   ← A1 flip
+        'status': 'active'                    ← D34 (locked at H3): push always flips to 'active'.
+                                              ← Reliability filtering is done by /discover's 0.80 gate.
+                                              ← Circuit-break is reserved for /call contract violations only.
+                                              ← (Earlier draft incorrectly tied this to CIRCUIT_BREAK_THRESHOLD;
+                                              ← contradicts §3.4 table and EVALS Beat 2.)
     }})
   If totalTimeout fires:
   - db.tools.updateOne({_id}, {$set: {status: 'circuit_broken'}})
