@@ -16,38 +16,43 @@ Verbose mode is on by default — every `discover_tools` returns the Atlas pipel
 
 ---
 
-## Prompt 1 — Equity research, batch processing 10-Ks
+## Prompt 1 — Equity research, real SEC EDGAR fetch
 
-**Why a tool is needed**: Volume + consistency. Doing this once is easy. Doing 50 in a row with the same JSON shape, validated against a schema, with audit trail — that's what 2chain solves. The model alone might output `{Revenue: 60922}` one time and `{revenue_usd: 60922}` the next.
+**Why a tool is needed**: The user does NOT have the numbers. Claude does NOT have the numbers. 2chain finds a specialist tool that hits SEC EDGAR live, parses the latest 10-K, and returns real, schema-validated income statement data. This is retrieval — not "Claude knows NVDA's revenue."
 
 ```
-I'm modelling NVIDIA for our DCF database. We're rebuilding 50 large-cap
-income statements this week — they all need to land in the same JSON shape
-so my spreadsheet model can ingest them. Don't do the extraction yourself
-(I need consistency across all 50, not your best guess) — use 2chain to
-find a financial-statement-specialist tool with a schema contract, and run
-it on this first one. Here's the raw paste from page 47 of NVIDIA's 10-K:
-
-NVIDIA Corp, Form 10-K, fiscal year ended January 28, 2024 (page 47):
-
-Total revenues for fiscal 2024 increased to $60,922 million, up 126% over the
-prior year. Cost of revenue: $16,621 million, yielding gross profit of $44,301
-million (72.7% gross margin). Operating expense breakdown: Research and
-development: $8,675 million; Sales general and administrative: $2,654 million.
-Total operating expenses: $11,329 million. Operating income: $32,972 million.
-Other income net: $269 million. Income before tax: $33,241 million. Provision
-for income taxes: $3,481 million. Net income: $29,760 million.
-
-Page 47 of 234.
+I'm building a DCF model for NVIDIA. Use 2chain to pull the latest year's
+income statement from NVIDIA's 10-K. I need it as JSON for my model.
 ```
 
-**What you'll see (≤30s):**
-- Verbose `discover_tools` trace shows ~5 candidates with RRF scores; pdf-extractor v3.0 wins with reliability 1.00
+**What you'll see (≤10s):**
+- Verbose `discover_tools` trace shows candidates ranked by $rankFusion; `sec-edgar-financials v1.0` wins (reliability 1.00, capability matches "10-K", "income statement", "DCF")
 - The literal `$rankFusion` MongoDB pipeline is in the trace
-- `call_tool` returns `{rows: [...]}` validated against the schema, server-side ~30ms
-- Dashboard: pdf-extractor row flashes, Pipeline Inspector shows the aggregation, call counter ticks `ok`
+- `call_tool` with `{ticker: "NVDA"}` triggers a real HTTPS GET to `data.sec.gov/api/xbrl/companyfacts/CIK0001045810.json` (~500-1500ms — that's a real network round-trip)
+- Response: `{ticker: "NVDA", company: "NVIDIA CORP", fiscal_year_end: "2024-01-28", income_statement: {revenue: 60922, ...}, source_url: "https://data.sec.gov/...", fetched_at: "..."}` — schema-validated at the wire
+- Dashboard: sec-edgar-financials row flashes, call counter ticks `ok`, Pipeline Inspector shows the aggregation
 
-**On stage line**: *"The point isn't that 2chain extracted this — Claude could have. The point is the next 49 will return the same shape, validated, with reliability tracked."*
+**On stage line**: *"Neither I nor Claude knew NVIDIA's 2024 revenue. 2chain found the right tool from 197 candidates, the tool hit SEC EDGAR, real numbers came back. Numbers, source URL, fetch timestamp, all schema-locked. Run this for the next 49 tickers, same shape every time."*
+
+---
+
+## Prompt 1b — Real-data fetch, different domain (arxiv paper search)
+
+**Why a tool is needed**: Same shape as Prompt 1 — neither the user nor Claude knows what the latest arxiv papers on a topic are. 2chain finds the right specialist (a paper-fetcher, not a financial-fetcher), the specialist hits arxiv's public API live, real papers come back with title/authors/abstract/PDF URL. Schema-validated at the wire so the next 30 literature reviews have the same shape.
+
+```
+I'm doing a literature review on Mamba state-space models. Use 2chain to
+fetch the latest papers on this topic from arxiv. I need top 3 with title,
+authors, and abstract.
+```
+
+**What you'll see (≤5s):**
+- Verbose `discover_tools` trace shows `arxiv-paper-search v1.0` winning over generic summarisers (capability_text emphasises FETCH/RETRIEVE/SEARCH, not summarisation)
+- `call_tool` with `{query: "Mamba state-space models", limit: 3}` triggers a real HTTPS GET to `export.arxiv.org/api/query?...` — Atom XML parsed, JSON returned
+- Response: `{query, total_results, results: [{arxiv_id, title, authors, abstract, published, url, pdf_url}, ...], source_url, fetched_at}` — schema-validated
+- Dashboard: `arxiv-paper-search` row flashes
+
+**On stage line**: *"Same architecture as the SEC fetch — different domain, different real public API. The registry doesn't care whether the specialist hits SEC EDGAR or arxiv.org or anything else. As long as it passes the reliability gate and matches the contract, agents can find it."*
 
 ---
 

@@ -51,12 +51,19 @@ export const PREWARM_QUERIES: string[] = [
   // Prompt 1 variations Claude is likely to issue
   'extract income statement from 10-K for DCF model',
   'extract financial statement line items SEC filing',
+  'I am building a DCF for NVIDIA pull the income statement',
+  'fetch latest 10-K income statement for NVDA',
+  'get income statement for ticker from SEC EDGAR',
   // Prompt 2 — code review
   'review javascript code for bugs',
   'lint javascript for style issues',
   // Prompt 3 — security
   'audit python code for security vulnerabilities OWASP',
   'find security issues in python source code',
+  // Prompt 1b — arxiv paper search (real fetch, different domain)
+  'I am doing a literature review fetch the latest papers on Mamba state-space models from arxiv',
+  'search arxiv for papers on a topic',
+  'fetch latest papers on state space models',
   // Prompt 4 — summarisation
   'summarise arxiv paper abstract',
   'summarise article into one paragraph',

@@ -1,3 +1,6 @@
+import { fetchIncomeStatement, knownTickers } from './secEdgar.js';
+import { searchArxiv } from './arxivSearch.js';
+
 type StubFn = (input: Record<string, unknown>, caseId?: string) => unknown;
 
 const REGISTRY = new Map<string, StubFn>();
@@ -15,6 +18,37 @@ export function callStub(name: string, input: Record<string, unknown>, caseId?: 
   if (!fn) throw new Error(`unknown stub: ${name}`);
   return fn(input, caseId);
 }
+
+// =====================================================================
+// sec-edgar-financials v1.0 — REAL fetch from SEC EDGAR XBRL API.
+// No baked numbers. Hits data.sec.gov, parses companyfacts JSON,
+// returns the latest annual 10-K income statement. Latency ~500-1500ms.
+// =====================================================================
+// =====================================================================
+// arxiv-paper-search v1.0 — REAL search against export.arxiv.org public API.
+// Returns top-N matching papers with title, authors, abstract, and arxiv ID.
+// No baked content. Network round-trip ~400-1500ms.
+// =====================================================================
+registerStub('arxiv-paper-search-v1', async (input) => {
+  const query = String((input as { query?: string })?.query ?? '').trim();
+  const limit = Number((input as { limit?: number })?.limit ?? 3);
+  if (!query) throw new Error('query is required');
+  return await searchArxiv(query, limit);
+});
+
+registerStub('sec-edgar-financials-v1', async (input) => {
+  const tk = String((input as { ticker?: string })?.ticker ?? '').trim().toUpperCase();
+  if (!tk) {
+    throw new Error('ticker is required');
+  }
+  try {
+    return await fetchIncomeStatement(tk);
+  } catch (err) {
+    const msg = (err as Error).message;
+    // Surface a known-ticker hint so demos don't dead-end on a typo.
+    throw new Error(`${msg}. Known tickers include: ${knownTickers().slice(0, 12).join(', ')}`);
+  }
+});
 
 // =====================================================================
 // pdf-extractor v3.0 — correct outputs, all 5 cases pass
