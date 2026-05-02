@@ -36,14 +36,29 @@ const PDF_V3_CORRECT: Record<string, unknown> = {
 };
 registerStub('pdf-extractor-v3', (input, caseId) => {
   if (caseId && caseId in PDF_V3_CORRECT) return PDF_V3_CORRECT[caseId];
-  // Flexible fallback for live MCP / chat queries: parse any "Label: number" lines
+  // Flexible parser for real 10-K paste. Handles:
+  //   "Label: $1,234.56"             (colon-separated)
+  //   "Label .......... $ 1,234"     (dotted leaders, common in PDF text)
+  //   "Label                $ 1,234" (whitespace-aligned columns)
+  //   "Label  1,234  5,678"          (multi-column tables — takes first value)
+  //   Negative values in parens: "(123)" → -123
   const text = (input as { pdf_text?: string })?.pdf_text ?? '';
-  const rows = text.split(/\r?\n/).flatMap((line) => {
-    const m = line.match(/^([A-Za-z][A-Za-z\s\-]+?):\s*[$£€¥]?\s*(-?\d{1,3}(?:[,]\d{3})*(?:\.\d+)?|\-?\d+(?:\.\d+)?)/);
+  const rows = text.split(/\r?\n/).flatMap((rawLine) => {
+    const line = rawLine.replace(/\.{2,}/g, '  ').trim();  // collapse dotted leaders
+    if (!line) return [];
+    // Pattern A: "Label: ..."
+    let m = line.match(/^([A-Za-z][A-Za-z\s,\-\(\)&\.]+?):\s*[$£€¥]?\s*([\(\-]?[\d,]+(?:\.\d+)?\)?)/);
+    // Pattern B: "Label  ...  number" (≥2 spaces or tab between label and number)
+    if (!m) m = line.match(/^([A-Za-z][A-Za-z\s,\-\(\)&]+?)\s{2,}[$£€¥]?\s*([\(\-]?[\d,]+(?:\.\d+)?\)?)/);
     if (!m) return [];
     const label = m[1].trim();
-    const value = parseFloat(m[2].replace(/,/g, ''));
-    return [{ label, value }];
+    if (label.length < 3) return [];  // avoid garbage matches
+    let valStr = m[2];
+    let neg = false;
+    if (valStr.startsWith('(') && valStr.endsWith(')')) { neg = true; valStr = valStr.slice(1, -1); }
+    const value = parseFloat(valStr.replace(/,/g, ''));
+    if (Number.isNaN(value)) return [];
+    return [{ label, value: neg ? -value : value }];
   });
   return { rows };
 });
