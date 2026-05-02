@@ -315,7 +315,7 @@ export const FIXTURE_TOOLS: FixtureSpec[] = [
     version: '4.0',
     author_agent_id: 'demo-tool-author',
     capability_text:
-      'Python code review and static analysis. Detects PEP-8 style issues, unused imports, mutable default arguments, bare except clauses, and shadowing of builtins.',
+      'Python style linter for code-quality reviews. Detects PEP-8 style issues, unused imports, mutable default arguments, and shadowing of builtins. For style and readability — not a security tool.',
     input_contract: { type: 'object', properties: { code: { type: 'string' } }, required: ['code'], additionalProperties: false },
     output_contract: { type: 'object', properties: { issues: { type: 'array', items: { type: 'object', properties: { file: { type: 'string' }, line: { type: 'integer' }, comment: { type: 'string' } }, required: ['file', 'line', 'comment'], additionalProperties: false } } }, required: ['issues'], additionalProperties: false },
     endpoint_stub_name: 'code-review-mini-v1',
@@ -357,7 +357,7 @@ export const FIXTURE_TOOLS: FixtureSpec[] = [
     version: '1.5',
     author_agent_id: 'demo-tool-author',
     capability_text:
-      'Security-focused source code review. Detects SQL injection patterns, XSS vectors, hardcoded credentials, unsafe eval and exec calls, and OWASP top-10 anti-patterns.',
+      'Security audit for Python and JavaScript source code. Specifically targets OWASP top-10 vulnerabilities: SQL injection patterns, XSS vectors, hardcoded credentials and API keys, unsafe eval and exec calls, bare except clauses that hide errors, and authentication weaknesses. Use this for pre-deploy security review, not for general code-quality linting.',
     input_contract: { type: 'object', properties: { code: { type: 'string' } }, required: ['code'], additionalProperties: false },
     output_contract: { type: 'object', properties: { issues: { type: 'array', items: { type: 'object', properties: { file: { type: 'string' }, line: { type: 'integer' }, comment: { type: 'string' } }, required: ['file', 'line', 'comment'], additionalProperties: false } } }, required: ['issues'], additionalProperties: false },
     endpoint_stub_name: 'code-review-mini-v1',
