@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>A · 2chain · Linear / Vercel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --panel: #0f1014;
+    --panel-2: #14151b;
+    --border: #1c1e26;
+    --border-strong: #2a2d38;
+    --fg: #e4e4ea;
+    --fg-2: #c2c4cc;
+    --muted: #71747f;
+    --accent: #c4b8ff;       /* Linear lavender */
+    --green: #4ade80;
+    --amber: #f5c249;
+    --red: #f87171;
+    --mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--bg); color: var(--fg);
+    font: 13px/1.5 -apple-system, "Inter", "Segoe UI", system-ui, sans-serif;
+    letter-spacing: -0.01em;
+  }
+  /* shell */
+  .shell { display: grid; grid-template: "side top" 56px "side main" 1fr / 220px 1fr; height: 100%; }
+  aside {
+    grid-area: side; border-right: 1px solid var(--border);
+    background: var(--panel); padding: 14px 8px;
+  }
+  aside .brand { padding: 6px 10px; font-weight: 600; letter-spacing: -0.3px;
+    display: flex; align-items: center; gap: 8px; font-size: 14px; }
+  aside .brand .logo { width: 16px; height: 16px; border-radius: 4px;
+    background: linear-gradient(135deg, #c4b8ff, #6ee7ff); }
+  aside .group { margin-top: 18px; }
+  aside .glabel { padding: 0 10px; color: var(--muted); font-size: 10.5px;
+    text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px; font-weight: 500; }
+  aside a, aside button { display: flex; align-items: center; gap: 8px;
+    padding: 5px 10px; border-radius: 5px; color: var(--fg-2);
+    font-size: 13px; cursor: pointer; border: none; background: none;
+    text-decoration: none; width: 100%; text-align: left; }
+  aside a:hover, aside button:hover { background: rgba(255,255,255,0.04); color: var(--fg); }
+  aside a.active { background: rgba(196, 184, 255, 0.10); color: var(--fg); }
+  aside .ico { width: 14px; height: 14px; opacity: 0.8;
+    display: inline-block; }
+  aside .count { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  /* topbar */
+  .top { grid-area: top; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 14px; padding: 0 18px; background: var(--panel); }
+  .crumbs { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 13px; }
+  .crumbs .sep { color: #2a2d38; }
+  .crumbs b { color: var(--fg); font-weight: 500; }
+  .qbox { flex: 1; max-width: 520px; margin: 0 auto;
+    display: flex; align-items: center; gap: 8px;
+    background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px;
+    padding: 5px 10px; }
+  .qbox input { flex: 1; background: none; border: none; color: var(--fg);
+    font: inherit; outline: none; }
+  .qbox input::placeholder { color: var(--muted); }
+  .qbox kbd { font-family: var(--mono); font-size: 10.5px;
+    background: var(--bg); border: 1px solid var(--border-strong);
+    border-bottom-width: 2px; padding: 1px 5px; border-radius: 3px; color: var(--muted); }
+  .right { display: flex; align-items: center; gap: 10px; }
+  .live-dot { display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .live-dot::before { content: ""; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse 1.6s infinite; }
+  @keyframes pulse { 50% { opacity: 0.4; } }
+  /* main */
+  main { grid-area: main; padding: 22px 28px; overflow: auto; }
+  .h-row { display: flex; align-items: end; gap: 18px; margin-bottom: 22px; }
+  h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.4px; }
+  .hsub { color: var(--muted); font-size: 13px; }
+  .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+  .stat { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+  .stat .l { color: var(--muted); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.5px;
+    font-weight: 500; }
+  .stat .v { font-family: var(--mono); font-size: 22px; margin-top: 4px; letter-spacing: -0.5px; }
+  .stat .v small { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-left: 4px; }
+  .stat .delta { font-family: var(--mono); font-size: 11px; color: var(--green); }
+  .stat .delta.down { color: var(--amber); }
+  /* main grid */
+  .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; }
+  .card-head { padding: 11px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between; }
+  .card-head h3 { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: -0.1px; }
+  .card-head .meta { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  /* ranking table */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  td, th { padding: 9px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+    background: var(--panel-2); }
+  td.mono { font-family: var(--mono); font-size: 12px; }
+  tr.top1 td { background: rgba(196, 184, 255, 0.06); }
+  td .name { font-weight: 500; color: var(--fg); }
+  td .ver { color: var(--muted); margin-left: 6px; font-family: var(--mono); font-size: 11px; }
+  td .domain { color: var(--muted); font-family: var(--mono); font-size: 11px; }
+  .bar { display: inline-block; vertical-align: middle; width: 56px; height: 4px; border-radius: 2px;
+    background: var(--border-strong); position: relative; overflow: hidden; margin-right: 8px; }
+  .bar > span { display: block; height: 100%; background: var(--accent);
+    box-shadow: 0 0 6px rgba(196,184,255,0.6); }
+  .pip { font-family: var(--mono); font-size: 11.5px; color: var(--fg-2); }
+  /* feed */
+  .feed-row { display: flex; align-items: start; gap: 10px; padding: 10px 16px;
+    border-bottom: 1px solid var(--border); font-size: 13px; }
+  .feed-row:last-child { border-bottom: none; }
+  .feed-row .t { font-family: var(--mono); font-size: 11px; color: var(--muted); width: 56px; flex-shrink: 0; }
+  .feed-row .ico { width: 6px; height: 6px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+  .feed-row .ico.ok { background: var(--green); }
+  .feed-row .ico.cb { background: var(--red); }
+  .feed-row .ico.gate { background: var(--amber); }
+  .feed-row .ico.disc { background: var(--accent); }
+  .feed-row b { font-weight: 500; }
+  .feed-row .det { color: var(--muted); font-size: 12px; margin-top: 2px; font-family: var(--mono); }
+
+  /* mini chart inline */
+  .mini { display: inline-block; vertical-align: middle; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside>
+    <div class="brand"><span class="logo"></span> 2chain</div>
+    <div class="group">
+      <div class="glabel">Workspace</div>
+      <a class="active">▦ Overview <span class="count">L</span></a>
+      <a>⌘ Discover <span class="count">/</span></a>
+      <a>↗ Tools <span class="count">418</span></a>
+      <a>⚡ Calls <span class="count">2.1k</span></a>
+      <a>⚠ Violations <span class="count">7</span></a>
+      <a>✓ Evals <span class="count">418</span></a>
+    </div>
+    <div class="group">
+      <div class="glabel">Sources</div>
+      <a>◦ MCP servers <span class="count">20</span></a>
+      <a>◦ Fixtures <span class="count">199</span></a>
+      <a>◦ Real catalog <span class="count">142</span></a>
+    </div>
+    <div class="group">
+      <div class="glabel">Settings</div>
+      <a>⚙ Storage</a>
+      <a>⌘ Embedder</a>
+      <a>● API keys</a>
+    </div>
+  </aside>
+
+  <div class="top">
+    <div class="crumbs"><span>Home</span><span class="sep">/</span><b>Overview</b></div>
+    <div class="qbox">
+      <span style="color:var(--muted);">⌘</span>
+      <input placeholder="Discover a tool — capability, domain, package…">
+      <kbd>/</kbd>
+    </div>
+    <div class="right">
+      <span class="live-dot">SQLite · nomic-embed-text</span>
+    </div>
+  </div>
+
+  <main>
+    <div class="h-row">
+      <h1>Tool registry</h1>
+      <span class="hsub">418 active tools · 77 MCP-bridged · last reranked 2s ago</span>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat">
+        <div class="l">Active tools</div>
+        <div class="v">418<small>tools</small></div>
+        <div class="delta">+77 imported via MCP</div>
+      </div>
+      <div class="stat">
+        <div class="l">P95 retrieval</div>
+        <div class="v">68<small>ms</small></div>
+        <div class="delta">3× under 200ms target</div>
+      </div>
+      <div class="stat">
+        <div class="l">Calls (1h)</div>
+        <div class="v">2,143</div>
+        <div class="delta">99.6% ok</div>
+      </div>
+      <div class="stat">
+        <div class="l">Violations</div>
+        <div class="v">7</div>
+        <div class="delta down">malformed-bot circuit-broken</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-head">
+          <h3>Live ranking — "build a DCF model for NVIDIA from the latest 10-K"</h3>
+          <div class="meta">RRF · 0.5 vec / 0.5 text · gate 0.80</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th>#</th><th>Tool</th><th>Domain</th><th>RRF</th><th>Reliability</th></tr>
+          </thead>
+          <tbody>
+            <tr class="top1">
+              <td class="mono">1</td>
+              <td><span class="name">sec-edgar-financials</span><span class="ver">@1.0</span></td>
+              <td><span class="domain">finance</span></td>
+              <td><span class="bar"><span style="width:100%"></span></span><span class="pip">0.0164</span></td>
+              <td><span class="bar"><span style="width:100%"></span></span><span class="pip">1.00</span></td>
+            </tr>
+            <tr>
+              <td class="mono">2</td>
+              <td><span class="name">pdf-extractor</span><span class="ver">@3.0</span></td>
+              <td><span class="domain">finance</span></td>
+              <td><span class="bar"><span style="width:99%"></span></span><span class="pip">0.0162</span></td>
+              <td><span class="bar"><span style="width:100%"></span></span><span class="pip">1.00</span></td>
+            </tr>
+            <tr>
+              <td class="mono">3</td>
+              <td><span class="name">yahoo-finance-fundamentals</span><span class="ver">@1.0</span></td>
+              <td><span class="domain">finance</span></td>
+              <td><span class="bar"><span style="width:90%"></span></span><span class="pip">0.0148</span></td>
+              <td><span class="bar"><span style="width:92%"></span></span><span class="pip">0.92</span></td>
+            </tr>
+            <tr>
+              <td class="mono">4</td>
+              <td><span class="name">annual-report-extract</span><span class="ver">@1.0</span></td>
+              <td><span class="domain">finance</span></td>
+              <td><span class="bar"><span style="width:84%"></span></span><span class="pip">0.0138</span></td>
+              <td><span class="bar"><span style="width:80%"></span></span><span class="pip">0.80</span></td>
+            </tr>
+            <tr>
+              <td class="mono">5</td>
+              <td><span class="name">mcp-github__get_file_contents</span><span class="ver">@1.0</span></td>
+              <td><span class="domain">code</span></td>
+              <td><span class="bar"><span style="width:70%"></span></span><span class="pip">0.0114</span></td>
+              <td><span class="bar"><span style="width:95%"></span></span><span class="pip">0.95</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Activity</h3><div class="meta">last 60s</div></div>
+        <div>
+          <div class="feed-row">
+            <span class="t">12:41:08</span>
+            <span class="ico disc"></span>
+            <div><b>discover_ran</b><div class="det">"DCF NVIDIA 10-K" → 5 results · 68ms · top1=sec-edgar-financials</div></div>
+          </div>
+          <div class="feed-row">
+            <span class="t">12:41:04</span>
+            <span class="ico ok"></span>
+            <div><b>tool_invoked</b><div class="det">sec-edgar-financials@1.0 · NVDA · 1191ms · ok</div></div>
+          </div>
+          <div class="feed-row">
+            <span class="t">12:40:51</span>
+            <span class="ico disc"></span>
+            <div><b>discover_ran</b><div class="det">"add two integers" → top1=mcp-everything__get-sum</div></div>
+          </div>
+          <div class="feed-row">
+            <span class="t">12:40:47</span>
+            <span class="ico ok"></span>
+            <div><b>tool_invoked</b><div class="det">mcp-everything__get-sum · {a:7,b:5} → "12" · 1191ms</div></div>
+          </div>
+          <div class="feed-row">
+            <span class="t">12:40:33</span>
+            <span class="ico cb"></span>
+            <div><b>circuit_broken</b><div class="det">malformed-bot@1.0 → output_contract_violation · returned prose</div></div>
+          </div>
+          <div class="feed-row">
+            <span class="t">12:40:22</span>
+            <span class="ico gate"></span>
+            <div><b>gated</b><div class="det">flaky-extractor@0.4 · reliability 0.40 &lt; 0.80</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

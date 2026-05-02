@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>B · 2chain · Posthog / Cron</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --bg: #1c1c1e;
+    --panel: #25252a;
+    --panel-2: #2e2e35;
+    --border: #3a3a44;
+    --fg: #f5f3eb;
+    --muted: #a09e94;
+    --orange: #ff8a3c;
+    --yellow: #f7d65a;
+    --teal: #5ce1c4;
+    --pink: #ff6da6;
+    --blue: #6ea7ff;
+    --red: #ff7a7a;
+    --serif: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --mono: ui-monospace, "JetBrains Mono", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--bg); color: var(--fg); font: 14px/1.5 var(--serif); }
+
+  header { padding: 18px 28px; border-bottom: 2px dashed var(--border);
+    display: flex; align-items: center; justify-content: space-between; }
+  .brand { font-size: 18px; font-weight: 800; letter-spacing: -0.4px;
+    display: flex; align-items: center; gap: 10px; }
+  .brand .logo { display: inline-block; width: 28px; height: 28px;
+    background: var(--orange); border: 2px solid var(--fg);
+    border-radius: 6px; transform: rotate(-3deg);
+    box-shadow: 3px 3px 0 var(--fg); }
+  .brand small { font-weight: 500; color: var(--muted); margin-left: 4px; font-size: 12px; }
+  .nav { display: flex; gap: 4px; }
+  .nav a { padding: 6px 12px; border-radius: 6px; color: var(--fg); text-decoration: none;
+    font-weight: 500; font-size: 13px; }
+  .nav a.active { background: var(--yellow); color: #1a1a1c; }
+  .nav a:hover:not(.active) { background: var(--panel); }
+
+  main { padding: 28px; max-width: 1400px; margin: 0 auto; }
+  .hero { display: flex; align-items: end; justify-content: space-between; margin-bottom: 22px; gap: 24px; }
+  h1 { margin: 0; font-size: 36px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; }
+  h1 em { font-style: normal; background: linear-gradient(120deg, var(--orange), var(--pink));
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hsub { color: var(--muted); margin-top: 8px; max-width: 520px; }
+  .live-pill { background: var(--panel); padding: 6px 14px; border-radius: 999px;
+    font-family: var(--mono); font-size: 12px; display: inline-flex; align-items: center; gap: 8px; }
+  .live-pill::before { content: ""; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--teal); box-shadow: 0 0 12px var(--teal); animation: blink 1.4s infinite; }
+  @keyframes blink { 50% { opacity: 0.3; } }
+
+  .grid { display: grid; grid-template-columns: 5fr 3fr; gap: 18px; }
+  .card { background: var(--panel); border-radius: 14px; padding: 22px;
+    border: 1px solid var(--border); position: relative; }
+  .card.color { background: linear-gradient(135deg, #2a2a32 0%, #2e2e35 100%); }
+  .card-tag { position: absolute; top: -10px; left: 18px;
+    background: var(--orange); color: #1c1c1e; padding: 3px 10px; border-radius: 6px;
+    font-family: var(--mono); font-size: 10px; letter-spacing: 1px; font-weight: 700;
+    transform: rotate(-2deg); box-shadow: 2px 2px 0 var(--fg); }
+  h3 { margin: 6px 0 18px; font-size: 19px; font-weight: 700; }
+  .stat-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+  .stat { padding: 18px 20px; border-radius: 12px; }
+  .stat:nth-child(1) { background: var(--orange); color: #1c1c1e; }
+  .stat:nth-child(2) { background: var(--teal); color: #1c1c1e; }
+  .stat:nth-child(3) { background: var(--yellow); color: #1c1c1e; }
+  .stat:nth-child(4) { background: var(--pink); color: #1c1c1e; }
+  .stat .l { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .stat .v { font-size: 38px; font-weight: 800; line-height: 1; margin-top: 4px; letter-spacing: -1.5px; }
+  .stat .d { margin-top: 6px; font-size: 12px; font-weight: 600; opacity: 0.85; }
+
+  /* chart */
+  .chart-card { padding: 22px; }
+  .chart { height: 200px; position: relative; }
+  .chart svg { width: 100%; height: 100%; overflow: visible; }
+  .axis { stroke: var(--border); stroke-dasharray: 2 4; }
+  .area { fill: url(#g); opacity: 0.4; }
+  .line { fill: none; stroke: var(--orange); stroke-width: 2.5; stroke-linejoin: round; }
+  .line-2 { fill: none; stroke: var(--teal); stroke-width: 2.5; stroke-linejoin: round; }
+  .dot { fill: var(--orange); stroke: var(--bg); stroke-width: 2; }
+  .legend { display: flex; gap: 18px; margin-bottom: 16px; font-size: 13px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+  /* ranking table */
+  .ranking { border-radius: 12px; overflow: hidden; background: var(--panel-2); }
+  .ranking .row { display: grid; grid-template-columns: 32px 1fr 90px 90px;
+    align-items: center; padding: 12px 16px; border-bottom: 1px dashed var(--border); gap: 14px; }
+  .ranking .row:last-child { border-bottom: none; }
+  .ranking .row:hover { background: rgba(255,255,255,0.03); }
+  .ranking .rank { font-family: var(--mono); font-size: 14px; font-weight: 700; }
+  .ranking .row.top1 .rank { color: var(--orange); font-size: 18px; }
+  .ranking .name { font-weight: 600; }
+  .ranking .name small { color: var(--muted); font-weight: 400; font-family: var(--mono); margin-left: 5px; }
+  .ranking .name .domain-tag { display: inline-block; padding: 1px 6px;
+    border-radius: 4px; font-size: 10px; font-family: var(--mono); margin-left: 6px;
+    text-transform: uppercase; letter-spacing: 0.5px; }
+  .domain-tag.finance { background: var(--orange); color: #1c1c1e; }
+  .domain-tag.code { background: var(--teal); color: #1c1c1e; }
+  .domain-tag.research { background: var(--yellow); color: #1c1c1e; }
+  .domain-tag.docs { background: var(--pink); color: #1c1c1e; }
+  .ranking .pip { font-family: var(--mono); font-weight: 700; font-size: 13px; text-align: right; }
+  .pip.score { color: var(--orange); }
+  .pip.rel { color: var(--teal); }
+
+  /* domain donut */
+  .donut { display: grid; grid-template-columns: 140px 1fr; gap: 18px; align-items: center; }
+  .donut svg { width: 140px; height: 140px; }
+  .legend-list { font-size: 13px; }
+  .legend-list .row { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+  .legend-list .row span:first-child { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+  .legend-list .row b { font-weight: 600; }
+  .legend-list .row em { color: var(--muted); margin-left: auto; font-style: normal; font-family: var(--mono); }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <span class="logo"></span>
+    2chain<small>· tool registry</small>
+  </div>
+  <nav class="nav">
+    <a class="active">Overview</a>
+    <a>Discover</a>
+    <a>Tools</a>
+    <a>Calls</a>
+    <a>Evals</a>
+    <a>Settings</a>
+  </nav>
+</header>
+
+<main>
+  <div class="hero">
+    <div>
+      <h1>418 tools, <em>one good ranking</em>.</h1>
+      <p class="hsub">Hybrid retrieval (vector + BM25), reliability gating, contracts validated on the wire. 77 of these are live MCP servers; the rest are bundled or imported.</p>
+    </div>
+    <span class="live-pill">SQLite · nomic · p95 68ms</span>
+  </div>
+
+  <div class="stat-strip">
+    <div class="stat">
+      <div class="l">Active tools</div>
+      <div class="v">418</div>
+      <div class="d">+77 from MCP this session</div>
+    </div>
+    <div class="stat">
+      <div class="l">P95 retrieval</div>
+      <div class="v">68ms</div>
+      <div class="d">3× under target</div>
+    </div>
+    <div class="stat">
+      <div class="l">Calls last hour</div>
+      <div class="v">2,143</div>
+      <div class="d">99.6% ok</div>
+    </div>
+    <div class="stat">
+      <div class="l">Violations</div>
+      <div class="v">7</div>
+      <div class="d">malformed-bot CB</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card chart-card">
+      <span class="card-tag">last 24h</span>
+      <h3>Calls per minute, by outcome</h3>
+      <div class="legend">
+        <span><i style="background:var(--orange)"></i>ok</span>
+        <span><i style="background:var(--teal)"></i>retried</span>
+        <span><i style="background:var(--red)"></i>circuit-broken</span>
+      </div>
+      <div class="chart">
+        <svg viewBox="0 0 600 200" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="g" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#ff8a3c" stop-opacity="0.5"/>
+              <stop offset="100%" stop-color="#ff8a3c" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <line class="axis" x1="0" x2="600" y1="50" y2="50"/>
+          <line class="axis" x1="0" x2="600" y1="100" y2="100"/>
+          <line class="axis" x1="0" x2="600" y1="150" y2="150"/>
+          <path class="area" d="M0,160 L40,140 L80,150 L120,120 L160,90 L200,100 L240,70 L280,80 L320,55 L360,75 L400,40 L440,55 L480,30 L520,50 L560,35 L600,30 L600,200 L0,200 Z"/>
+          <path class="line" d="M0,160 L40,140 L80,150 L120,120 L160,90 L200,100 L240,70 L280,80 L320,55 L360,75 L400,40 L440,55 L480,30 L520,50 L560,35 L600,30"/>
+          <path class="line-2" d="M0,180 L40,175 L80,178 L120,170 L160,160 L200,165 L240,155 L280,162 L320,150 L360,158 L400,145 L440,150 L480,140 L520,148 L560,142 L600,140"/>
+          <circle class="dot" cx="600" cy="30" r="5"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="card-tag" style="background:var(--teal)">domains</span>
+      <h3>What's in the registry</h3>
+      <div class="donut">
+        <svg viewBox="0 0 36 36">
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--panel-2)" stroke-width="3"/>
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--orange)" stroke-width="3"
+            stroke-dasharray="38 100" stroke-dashoffset="0" transform="rotate(-90 18 18)"/>
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--teal)" stroke-width="3"
+            stroke-dasharray="22 100" stroke-dashoffset="-38" transform="rotate(-90 18 18)"/>
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--yellow)" stroke-width="3"
+            stroke-dasharray="14 100" stroke-dashoffset="-60" transform="rotate(-90 18 18)"/>
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--pink)" stroke-width="3"
+            stroke-dasharray="10 100" stroke-dashoffset="-74" transform="rotate(-90 18 18)"/>
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--blue)" stroke-width="3"
+            stroke-dasharray="16 100" stroke-dashoffset="-84" transform="rotate(-90 18 18)"/>
+        </svg>
+        <div class="legend-list">
+          <div class="row"><span style="background:var(--orange)"></span><b>finance</b><em>158</em></div>
+          <div class="row"><span style="background:var(--teal)"></span><b>code</b><em>92</em></div>
+          <div class="row"><span style="background:var(--yellow)"></span><b>research</b><em>58</em></div>
+          <div class="row"><span style="background:var(--pink)"></span><b>docs</b><em>42</em></div>
+          <div class="row"><span style="background:var(--blue)"></span><b>data</b><em>38</em></div>
+          <div class="row"><span style="color:var(--muted)"></span><em style="font-style:italic;">+ 8 more</em><em>30</em></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="grid-column: 1/-1">
+      <span class="card-tag" style="background:var(--pink)">live ranking</span>
+      <h3>"build a DCF model for NVIDIA from the latest 10-K"</h3>
+      <div class="ranking">
+        <div class="row top1">
+          <div class="rank">1</div>
+          <div class="name">sec-edgar-financials<small>@1.0</small><span class="domain-tag finance">finance</span></div>
+          <div class="pip score">0.0164</div>
+          <div class="pip rel">rel 1.00</div>
+        </div>
+        <div class="row">
+          <div class="rank">2</div>
+          <div class="name">pdf-extractor<small>@3.0</small><span class="domain-tag finance">finance</span></div>
+          <div class="pip score">0.0162</div>
+          <div class="pip rel">rel 1.00</div>
+        </div>
+        <div class="row">
+          <div class="rank">3</div>
+          <div class="name">yahoo-finance-fundamentals<small>@1.0</small><span class="domain-tag finance">finance</span></div>
+          <div class="pip score">0.0148</div>
+          <div class="pip rel">rel 0.92</div>
+        </div>
+        <div class="row">
+          <div class="rank">4</div>
+          <div class="name">annual-report-extract<small>@1.0</small><span class="domain-tag docs">docs</span></div>
+          <div class="pip score">0.0138</div>
+          <div class="pip rel">rel 0.80</div>
+        </div>
+        <div class="row">
+          <div class="rank">5</div>
+          <div class="name">mcp-github__get_file_contents<small>@1.0</small><span class="domain-tag code">code</span></div>
+          <div class="pip score">0.0114</div>
+          <div class="pip rel">rel 0.95</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+</body>
+</html>

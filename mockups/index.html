@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>2chain · Frontend mock-ups</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --bg: #0a0a0c; --fg: #ededf0; --muted: #6e7180; --border: #1d1f27;
+    --accent: #6ee7ff;
+  }
+  *,*:before,*:after { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg);
+    font: 14px/1.55 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif; }
+  header { padding: 32px 40px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: baseline; gap: 16px; }
+  h1 { margin: 0; font-size: 17px; letter-spacing: -0.2px; font-weight: 600; }
+  .sub { color: var(--muted); }
+  .grid { padding: 24px 40px 60px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 16px; max-width: 1280px; margin: 0 auto; }
+  a.card { display: block; background: #11131a; border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px; color: inherit; text-decoration: none;
+    transition: border-color .15s, transform .15s, background .15s;  }
+  a.card:hover { border-color: var(--accent); transform: translateY(-1px); background: #131620; }
+  .letter { font-family: ui-monospace, "JetBrains Mono", "SF Mono", monospace;
+    font-size: 11px; color: var(--accent); letter-spacing: 1px; }
+  h2 { margin: 4px 0 6px; font-size: 16px; font-weight: 600; }
+  p.tag { margin: 0 0 12px; color: var(--muted); font-size: 13px; }
+  .pill-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pill { font-family: ui-monospace, monospace; font-size: 10px; padding: 3px 7px;
+    border-radius: 4px; background: rgba(110, 231, 255, 0.06);
+    border: 1px solid rgba(110, 231, 255, 0.2); color: var(--accent); letter-spacing: 0.5px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>2chain · frontend mock-ups</h1>
+  <span class="sub">12 directions, pick one</span>
+</header>
+<div class="grid">
+  <a class="card" href="A-linear.html">
+    <div class="letter">A · LINEAR / VERCEL</div>
+    <h2>Dense dark, monospace accents</h2>
+    <p class="tag">Tight grid, low-contrast surface, deliberate type, fast.</p>
+    <div class="pill-row"><span class="pill">DARK</span><span class="pill">DENSE</span><span class="pill">FAMILIAR</span></div>
+  </a>
+  <a class="card" href="B-posthog.html">
+    <div class="letter">B · POSTHOG / CRON</div>
+    <h2>Playful but serious, warm dark</h2>
+    <p class="tag">Charts that move, tooltips that pop, more whimsy.</p>
+    <div class="pill-row"><span class="pill">WARM</span><span class="pill">CHARTS</span><span class="pill">PLAYFUL</span></div>
+  </a>
+  <a class="card" href="C-stripe.html">
+    <div class="letter">C · STRIPE / APPLE</div>
+    <h2>Heavy gradients, hero panels</h2>
+    <p class="tag">Marketing-page-meets-dashboard. The retrieval flow is hero.</p>
+    <div class="pill-row"><span class="pill">GRADIENT</span><span class="pill">HERO</span><span class="pill">POLISHED</span></div>
+  </a>
+  <a class="card" href="D-raycast.html">
+    <div class="letter">D · RAYCAST / ARC</div>
+    <h2>Command palette as primary surface</h2>
+    <p class="tag">Press / and the registry opens. Keyboard-first.</p>
+    <div class="pill-row"><span class="pill">KEYBOARD</span><span class="pill">PALETTE</span><span class="pill">FAST</span></div>
+  </a>
+  <a class="card" href="F-bloomberg.html">
+    <div class="letter">F · BLOOMBERG TERMINAL</div>
+    <h2>Amber-on-black, ticker tape</h2>
+    <p class="tag">Live ranks stream across the top. "This is real, this is moving."</p>
+    <div class="pill-row"><span class="pill">AMBER</span><span class="pill">TICKER</span><span class="pill">SERIOUS</span></div>
+  </a>
+  <a class="card" href="G-replicate.html">
+    <div class="letter">G · HF SPACES / REPLICATE</div>
+    <h2>Model marketplace card grid</h2>
+    <p class="tag">Each tool a card with hero icon + capability lede + try-it.</p>
+    <div class="pill-row"><span class="pill">CARDS</span><span class="pill">BROWSE</span><span class="pill">APPSTORE</span></div>
+  </a>
+  <a class="card" href="H-chatgpt-apps.html">
+    <div class="letter">H · CHATGPT APPS / GRANOLA</div>
+    <h2>AI-first app shell, persistent prompt</h2>
+    <p class="tag">Chat input always at the bottom. Dashboards fold out.</p>
+    <div class="pill-row"><span class="pill">CHAT-FIRST</span><span class="pill">PROMPT</span></div>
+  </a>
+  <a class="card" href="I-network-graph.html">
+    <div class="letter">I · SUBWAY / NETWORK GRAPH</div>
+    <h2>Spatial — tools as nodes, edges as relationships</h2>
+    <p class="tag">Zoom into a domain, see related tools cluster.</p>
+    <div class="pill-row"><span class="pill">SPATIAL</span><span class="pill">D3</span><span class="pill">EXPLORATORY</span></div>
+  </a>
+  <a class="card" href="J-tui.html">
+    <div class="letter">J · TUI IN BROWSER</div>
+    <h2>k9s / btop / lazygit aesthetic</h2>
+    <p class="tag">Box-drawing characters, j/k panes, keyboard-first.</p>
+    <div class="pill-row"><span class="pill">TUI</span><span class="pill">VI-KEYS</span><span class="pill">INFRA</span></div>
+  </a>
+  <a class="card" href="K-teenage-engineering.html">
+    <div class="letter">K · TEENAGE ENGINEERING</div>
+    <h2>Playful brutalist, hardware-product UI</h2>
+    <p class="tag">Bold geometry, ugly-good color, oversize indicators.</p>
+    <div class="pill-row"><span class="pill">BRUTALIST</span><span class="pill">PLAYFUL</span><span class="pill">DISTINCT</span></div>
+  </a>
+  <a class="card" href="L-oscilloscope.html">
+    <div class="letter">L · CRT / OSCILLOSCOPE</div>
+    <h2>Phosphor green, RRF as waveform</h2>
+    <p class="tag">Live retrieval scores drawn as waves. More watchable than readable.</p>
+    <div class="pill-row"><span class="pill">PHOSPHOR</span><span class="pill">AMBIENT</span><span class="pill">GENERATIVE</span></div>
+  </a>
+</div>
+</body>
+</html>

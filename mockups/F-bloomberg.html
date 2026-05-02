@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>F · 2chain · Bloomberg Terminal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --bg: #000000;
+    --panel: #050505;
+    --border: #1c1500;
+    --amber: #ff9500;
+    --amber-dim: #c66e00;
+    --amber-deep: #6b3a00;
+    --green: #66ff66;
+    --green-dim: #2d8a2d;
+    --red: #ff5050;
+    --white: #f0e8d8;
+    --muted: #7a6a3a;
+    --mono: ui-monospace, "JetBrains Mono", "Consolas", "Courier New", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); }
+  body { color: var(--amber); font: 12.5px/1.4 var(--mono); }
+
+  /* CRT scanline + phosphor glow */
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 100;
+    background: repeating-linear-gradient(
+      0deg, rgba(255,149,0,0.02) 0px, rgba(255,149,0,0.02) 1px,
+            transparent 1px, transparent 3px);
+  }
+  body::after {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 99;
+    background: radial-gradient(circle at center, transparent 50%, rgba(0,0,0,0.4) 100%);
+  }
+  .glow { text-shadow: 0 0 4px rgba(255,149,0,0.6); }
+
+  /* function bar */
+  .funcbar { padding: 4px 10px; border-bottom: 1px solid var(--amber-deep);
+    font-size: 11px; display: flex; gap: 14px; align-items: center; background: #0a0700; }
+  .funcbar .key { color: var(--white); margin-right: 4px; }
+  .funcbar .span { flex: 1; }
+  .funcbar .clock { color: var(--green); }
+
+  /* ticker tape */
+  .ticker {
+    height: 28px; overflow: hidden; border-bottom: 1px solid var(--amber-deep);
+    background: #0a0700; position: relative;
+  }
+  .ticker .reel {
+    display: flex; gap: 38px; padding: 7px 14px;
+    white-space: nowrap; animation: marquee 50s linear infinite;
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .tk { font-size: 11.5px; }
+  .tk.up { color: var(--green); }
+  .tk.dn { color: var(--red); }
+  .tk b { color: var(--white); margin-right: 5px; }
+
+  /* main grid: 4 quadrants like a real Bloomberg layout */
+  .terminal { display: grid; grid-template:
+    "title title title title" 28px
+    "rank info call live" 1fr / 1.4fr 1fr 1fr 0.9fr;
+    height: calc(100vh - 60px);
+  }
+  .pane { border-right: 1px solid var(--amber-deep); border-bottom: 1px solid var(--amber-deep);
+    padding: 8px 12px; overflow: hidden; }
+  .pane:last-child { border-right: none; }
+  .pane .head { color: var(--white); border-bottom: 1px solid var(--amber-deep);
+    padding-bottom: 4px; margin-bottom: 8px; display: flex; justify-content: space-between; }
+  .pane .head .lab { letter-spacing: 1px; }
+  .pane .head .mini { color: var(--amber-dim); font-size: 10.5px; }
+
+  .title-bar { grid-area: title; padding: 4px 12px; background: #150e00;
+    border-bottom: 1px solid var(--amber-deep);
+    display: flex; align-items: center; gap: 16px; font-size: 12px; }
+  .title-bar b { color: var(--white); }
+  .title-bar .tag { color: var(--green); }
+  .title-bar .right { margin-left: auto; }
+
+  /* RANK pane (top-left, biggest) */
+  .rank { grid-area: rank; }
+  .rank table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+  .rank th { text-align: left; color: var(--amber-dim); font-weight: normal;
+    border-bottom: 1px solid var(--amber-deep); padding: 4px 6px 5px; letter-spacing: 0.5px; }
+  .rank td { padding: 5px 6px; border-bottom: 1px solid #0d0900; }
+  .rank tr.t1 td { background: #1a0e00; color: var(--white); font-weight: bold; }
+  .rank tr.t1 td.flash { animation: flash 1.5s ease-out; }
+  @keyframes flash { 0% { background: var(--amber); color: black; } 100% { background: #1a0e00; color: var(--white); } }
+  .rank td.num { text-align: right; }
+  .rank .arr { color: var(--green); }
+  .rank .arr.dn { color: var(--red); }
+  .rank .bar { display: inline-block; height: 8px; background: var(--amber); width: 36px; margin-left: 4px;
+    box-shadow: 0 0 6px rgba(255,149,0,0.5); }
+
+  /* INFO pane: tool detail */
+  .info { grid-area: info; }
+  .info .row { display: grid; grid-template-columns: 110px 1fr; gap: 8px;
+    padding: 3px 0; border-bottom: 1px dotted #1c1500; font-size: 11.5px; }
+  .info .row:last-child { border-bottom: none; }
+  .info .lab { color: var(--amber-dim); }
+  .info .val { color: var(--white); }
+  .info .val.green { color: var(--green); }
+  .info .blurb { padding: 8px 0 12px; line-height: 1.5; color: var(--amber); border-bottom: 1px solid var(--amber-deep); margin-bottom: 8px; }
+
+  /* CALL pane: input contract preview */
+  .call { grid-area: call; }
+  .call pre { margin: 0; color: var(--amber); font-size: 11px; line-height: 1.45; white-space: pre-wrap; }
+  .call .field { color: var(--white); }
+  .call .str { color: var(--green); }
+  .call .num { color: #6ea7ff; }
+  .call .key { color: var(--amber); }
+  .call .keyword { color: #ff6da6; }
+
+  /* LIVE pane: feed */
+  .live { grid-area: live; font-size: 11px; }
+  .live .evt { padding: 3px 0; border-bottom: 1px dotted #1c1500;
+    display: grid; grid-template-columns: 64px 1fr; gap: 6px; }
+  .live .t { color: var(--amber-dim); }
+  .live .ok { color: var(--green); }
+  .live .cb { color: var(--red); }
+  .live .gate { color: var(--amber); }
+
+  /* status bar */
+  .statusbar { height: 22px; background: #0a0700; border-top: 1px solid var(--amber-deep);
+    display: flex; align-items: center; padding: 0 14px; gap: 20px; font-size: 10.5px; color: var(--amber-dim); }
+  .statusbar .pulse { color: var(--green); }
+</style>
+</head>
+<body>
+<div class="funcbar">
+  <span><span class="key">F1</span>HELP</span>
+  <span><span class="key">F2</span>RANK</span>
+  <span><span class="key">F3</span>CALL</span>
+  <span><span class="key">F4</span>EVAL</span>
+  <span><span class="key">F5</span>STAT</span>
+  <span class="span"></span>
+  <span class="clock glow">2026.05.02 12:41:08 LON</span>
+</div>
+
+<div class="ticker">
+  <div class="reel">
+    <span class="tk"><b>SEC-EDGAR</b> <span class="up">●</span> 0.0164 +0.31%</span>
+    <span class="tk"><b>PDF-EXTRACT</b> <span class="up">●</span> 0.0162 +0.18%</span>
+    <span class="tk"><b>YH-FUND</b> <span class="up">●</span> 0.0148 +0.92%</span>
+    <span class="tk"><b>ARXIV-SRCH</b> <span class="up">●</span> 0.0164 STBL</span>
+    <span class="tk"><b>SEC-SCAN</b> <span class="up">●</span> 0.0164 STBL</span>
+    <span class="tk"><b>MCP-EVTH</b> <span class="up">●</span> 0.0164 NEW</span>
+    <span class="tk"><b>MALFORMED</b> <span class="dn">●</span> CB -100%</span>
+    <span class="tk"><b>FLAKY-EXT</b> <span class="dn">●</span> GATED</span>
+    <span class="tk"><b>SEC-EDGAR</b> <span class="up">●</span> 0.0164 +0.31%</span>
+    <span class="tk"><b>PDF-EXTRACT</b> <span class="up">●</span> 0.0162 +0.18%</span>
+    <span class="tk"><b>YH-FUND</b> <span class="up">●</span> 0.0148 +0.92%</span>
+    <span class="tk"><b>ARXIV-SRCH</b> <span class="up">●</span> 0.0164 STBL</span>
+    <span class="tk"><b>SEC-SCAN</b> <span class="up">●</span> 0.0164 STBL</span>
+    <span class="tk"><b>MCP-EVTH</b> <span class="up">●</span> 0.0164 NEW</span>
+    <span class="tk"><b>MALFORMED</b> <span class="dn">●</span> CB -100%</span>
+    <span class="tk"><b>FLAKY-EXT</b> <span class="dn">●</span> GATED</span>
+  </div>
+</div>
+
+<div class="terminal">
+  <div class="title-bar">
+    <span><b class="glow">2CHN</b> &lt;GO&gt;</span>
+    <span class="tag">REGISTRY/HBYRID-RETR</span>
+    <span>418 ACTIVE TOOLS</span>
+    <span>P95: 68MS</span>
+    <span class="right">CALLS 1H: 2143 | OK 99.6%</span>
+  </div>
+
+  <div class="pane rank">
+    <div class="head"><span class="lab">RANKING — DCF NVIDIA 10-K INCOME STATEMENT</span><span class="mini">RRF / vec0.5 / txt0.5 / gate 0.80</span></div>
+    <table>
+      <thead>
+        <tr><th>#</th><th>NAME</th><th>VER</th><th>DOM</th><th class="num">RRF</th><th class="num">REL</th><th class="num">P95ms</th><th class="num">$</th></tr>
+      </thead>
+      <tbody>
+        <tr class="t1"><td>1</td><td class="flash glow">SEC-EDGAR-FINANCIALS</td><td>1.0</td><td>FIN</td><td class="num">0.01640<span class="arr">▲</span></td><td class="num">1.000</td><td class="num">1500</td><td class="num">0.0000</td></tr>
+        <tr><td>2</td><td>PDF-EXTRACTOR</td><td>3.0</td><td>FIN</td><td class="num">0.01620<span class="arr">▲</span></td><td class="num">1.000</td><td class="num">800</td><td class="num">0.0010</td></tr>
+        <tr><td>3</td><td>YAHOO-FINANCE-FUNDAMENTALS</td><td>1.0</td><td>FIN</td><td class="num">0.01480<span class="arr">▲</span></td><td class="num">0.920</td><td class="num">1200</td><td class="num">0.0000</td></tr>
+        <tr><td>4</td><td>ANNUAL-REPORT-EXTRACT</td><td>1.0</td><td>DOC</td><td class="num">0.01380<span class="arr">▲</span></td><td class="num">0.800</td><td class="num">2000</td><td class="num">0.0050</td></tr>
+        <tr><td>5</td><td>MCP-GITHUB__GET_FILE</td><td>1.0</td><td>COD</td><td class="num">0.01140<span class="arr">▲</span></td><td class="num">0.950</td><td class="num">600</td><td class="num">0.0000</td></tr>
+        <tr><td>6</td><td>SEC-EDGAR-FILINGS-LIST</td><td>1.0</td><td>FIN</td><td class="num">0.01100<span class="arr dn">▼</span></td><td class="num">0.920</td><td class="num">1000</td><td class="num">0.0000</td></tr>
+        <tr><td>7</td><td>FRED-SERIES</td><td>1.0</td><td>FIN</td><td class="num">0.00980<span class="arr">▲</span></td><td class="num">0.920</td><td class="num">700</td><td class="num">0.0000</td></tr>
+        <tr><td>8</td><td>POLYGON-AGGREGATES</td><td>1.0</td><td>FIN</td><td class="num">0.00910<span class="arr dn">▼</span></td><td class="num">0.920</td><td class="num">400</td><td class="num">0.0050</td></tr>
+        <tr><td>9</td><td>FINNHUB-EARNINGS-CAL</td><td>1.0</td><td>FIN</td><td class="num">0.00830<span class="arr">▲</span></td><td class="num">0.920</td><td class="num">600</td><td class="num">0.0000</td></tr>
+        <tr><td>10</td><td>TIINGO-EOD</td><td>1.0</td><td>FIN</td><td class="num">0.00770<span class="arr">▲</span></td><td class="num">0.920</td><td class="num">800</td><td class="num">0.0000</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pane info">
+    <div class="head"><span class="lab">SECURITY: SEC-EDGAR-FINANCIALS@1.0</span><span class="mini">FIN/REGISTRY</span></div>
+    <p class="blurb glow">FETCHES THE LATEST ANNUAL 10-K INCOME STATEMENT DIRECTLY FROM SEC EDGAR FOR ANY US-LISTED COMPANY BY TICKER SYMBOL. LIVE DATA: HITS DATA.SEC.GOV XBRL COMPANYFACTS API. FREE, NO API KEY.</p>
+    <div class="row"><span class="lab">RELIABILITY</span><span class="val green">1.000  ●●●●●</span></div>
+    <div class="row"><span class="lab">EVAL CASES</span><span class="val">5/5 PASS</span></div>
+    <div class="row"><span class="lab">P95 LATENCY</span><span class="val">1500 MS</span></div>
+    <div class="row"><span class="lab">COST/CALL</span><span class="val">USD 0.0000</span></div>
+    <div class="row"><span class="lab">CALLS 24H</span><span class="val">142</span></div>
+    <div class="row"><span class="lab">OK RATE</span><span class="val green">99.30%</span></div>
+    <div class="row"><span class="lab">STUB</span><span class="val">SEC-EDGAR-FINANCIALS-V1</span></div>
+    <div class="row"><span class="lab">DOMAIN</span><span class="val">FINANCE</span></div>
+    <div class="row"><span class="lab">STATUS</span><span class="val green">●ACTIVE</span></div>
+    <div class="row"><span class="lab">CIRCUIT</span><span class="val">CLOSED</span></div>
+  </div>
+
+  <div class="pane call">
+    <div class="head"><span class="lab">INPUT CONTRACT</span><span class="mini">JSON SCHEMA</span></div>
+<pre>{
+  <span class="key">"type"</span>: <span class="str">"object"</span>,
+  <span class="key">"required"</span>: [<span class="str">"ticker"</span>],
+  <span class="key">"properties"</span>: {
+    <span class="key">"ticker"</span>: {
+      <span class="key">"type"</span>: <span class="str">"string"</span>,
+      <span class="key">"pattern"</span>: <span class="str">"^[A-Z]{1,5}$"</span>,
+      <span class="key">"description"</span>: <span class="str">"US ticker (NVDA, AAPL...)"</span>
+    }
+  }
+}</pre>
+    <div class="head" style="margin-top:14px;"><span class="lab">SUGGESTED CALL</span></div>
+<pre><span class="keyword">POST</span> /call
+{
+  <span class="key">"tool_name"</span>: <span class="str">"sec-edgar-financials"</span>,
+  <span class="key">"tool_version"</span>: <span class="str">"1.0"</span>,
+  <span class="key">"input"</span>: {
+    <span class="key">"ticker"</span>: <span class="str">"NVDA"</span>
+  }
+}</pre>
+  </div>
+
+  <div class="pane live">
+    <div class="head"><span class="lab">LIVE FEED</span><span class="mini">WAL/SSE</span></div>
+    <div class="evt"><span class="t">12:41:08</span><span><span class="ok">DSCV</span> "DCF NVIDIA" → 5 RES 68MS</span></div>
+    <div class="evt"><span class="t">12:41:04</span><span><span class="ok">CALL</span> SEC-EDGAR-FINANCIALS NVDA OK 1191MS</span></div>
+    <div class="evt"><span class="t">12:40:51</span><span><span class="ok">DSCV</span> "ADD INTS" → MCP-EVTH-SUM</span></div>
+    <div class="evt"><span class="t">12:40:47</span><span><span class="ok">CALL</span> MCP-EVTH-SUM 7+5=12 OK</span></div>
+    <div class="evt"><span class="t">12:40:33</span><span><span class="cb">CB!!</span> MALFORMED-BOT OUTPUT VIO</span></div>
+    <div class="evt"><span class="t">12:40:22</span><span><span class="gate">GATE</span> FLAKY-EXT REL 0.40 &lt; 0.80</span></div>
+    <div class="evt"><span class="t">12:40:11</span><span><span class="ok">DSCV</span> "EXTRACT VAT INVOICE" 5 RES</span></div>
+    <div class="evt"><span class="t">12:40:04</span><span><span class="ok">CALL</span> ARXIV-PAPER-SEARCH MAMBA OK</span></div>
+    <div class="evt"><span class="t">12:39:58</span><span><span class="ok">DSCV</span> "PYTHON SECURITY OWASP" 5 RES</span></div>
+    <div class="evt"><span class="t">12:39:51</span><span><span class="ok">CALL</span> SECURITY-SCANNER OWASP OK</span></div>
+    <div class="evt"><span class="t">12:39:33</span><span><span class="ok">PUSH</span> NEW MCP-EVERYTHING@1.0</span></div>
+  </div>
+</div>
+
+<div class="statusbar">
+  <span class="pulse glow">● LIVE</span>
+  <span>STORAGE: SQLITE+VEC0+FTS5</span>
+  <span>EMBED: NOMIC-EMBED-TEXT/768</span>
+  <span>WAL: 1.2MB</span>
+  <span>QUEUE: 0</span>
+  <span style="margin-left:auto;">2CHN/V0.2 · BETA</span>
+</div>
+</body>
+</html>

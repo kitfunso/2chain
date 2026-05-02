@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>L · 2chain · Oscilloscope</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --bg: #050a08;
+    --fg: #00ff8e;     /* phosphor green */
+    --fg-dim: #008542;
+    --fg-bg:  #002a17;
+    --fg-bright: #c8ffd9;
+    --grid: rgba(0, 255, 142, 0.12);
+    --amber: #ffaa00;
+    --red: #ff3344;
+    --mono: ui-monospace, "JetBrains Mono", "Consolas", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; }
+  body { background: var(--bg); color: var(--fg);
+    font: 13px/1.5 var(--mono);
+    text-shadow: 0 0 5px rgba(0,255,142,0.5);
+  }
+  /* CRT scanlines + flicker */
+  body::before {
+    content: ""; position: fixed; inset: 0; z-index: 100; pointer-events: none;
+    background: repeating-linear-gradient(0deg,
+      rgba(0,0,0,0.16) 0px, rgba(0,0,0,0.16) 1px,
+      transparent 1px, transparent 3px);
+    animation: flicker 0.15s infinite;
+  }
+  @keyframes flicker {
+    0%, 100% { opacity: 1; }
+    47% { opacity: 0.96; } 48% { opacity: 1; }
+    73% { opacity: 0.97; } 74% { opacity: 1; }
+  }
+  /* CRT bulge / vignette */
+  body::after {
+    content: ""; position: fixed; inset: 0; z-index: 99; pointer-events: none;
+    background:
+      radial-gradient(ellipse 90% 70% at center, transparent 60%, rgba(0,0,0,0.7) 100%);
+  }
+  .glow { text-shadow: 0 0 6px var(--fg), 0 0 12px rgba(0,255,142,0.7); }
+
+  .stage { display: grid; height: 100%;
+    grid-template-rows: 36px 1fr 32px; }
+
+  /* top header — channel labels */
+  .head { display: flex; align-items: center; padding: 0 16px; border-bottom: 1px solid var(--fg-dim);
+    background: var(--fg-bg); gap: 24px; }
+  .head .b { font-weight: 700; font-size: 14px; }
+  .head .ch { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; }
+  .head .ch::before { content: ""; width: 8px; height: 8px; background: currentColor; border-radius: 50%;
+    box-shadow: 0 0 6px currentColor; }
+  .head .ch.b { color: var(--fg); }
+  .head .ch.t { color: var(--amber); }
+  .head .ch.r { color: var(--red); }
+  .head .right { margin-left: auto; font-size: 11px; color: var(--fg-dim); }
+
+  /* main scope display */
+  .scope { display: grid; grid-template-columns: 1fr 320px; height: 100%; }
+  .canvas { position: relative; background: var(--bg);
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  .canvas::before {
+    content: ""; position: absolute; inset: 0;
+    background:
+      linear-gradient(rgba(0,255,142,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,142,0.04) 1px, transparent 1px);
+    background-size: 8px 8px;
+    pointer-events: none;
+  }
+  .canvas svg { width: 100%; height: 100%; position: relative; z-index: 1; }
+  .axis { stroke: var(--fg-dim); stroke-width: 1; stroke-dasharray: 2 4; opacity: 0.6; }
+  .wave { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round;
+    filter: drop-shadow(0 0 6px currentColor) drop-shadow(0 0 12px currentColor); }
+  .wave-1 { stroke: var(--fg); }
+  .wave-2 { stroke: var(--amber); }
+  .wave-3 { stroke: var(--red); }
+  .label { fill: var(--fg); font-size: 10px; font-family: var(--mono);
+    filter: drop-shadow(0 0 4px var(--fg)); }
+  .ph-tick { stroke: var(--fg-dim); stroke-width: 1; }
+  .top-trace { fill: var(--fg); }
+
+  /* tool blip overlay — rising edge when a /call fires */
+  .blip { position: absolute; pointer-events: none;
+    font-size: 11px; padding: 4px 8px; background: var(--fg-bg); border: 1px solid var(--fg);
+    border-radius: 3px; text-shadow: 0 0 4px var(--fg); animation: blip 1.2s ease-out forwards; }
+  @keyframes blip {
+    0% { opacity: 0; transform: translateY(8px) scale(0.8); }
+    20% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-8px) scale(1); }
+  }
+
+  /* side rack — measurement readouts like a real scope */
+  .rack { border-left: 1px solid var(--fg-dim); padding: 12px 14px;
+    display: flex; flex-direction: column; gap: 14px; background: var(--fg-bg);
+    overflow-y: auto;
+  }
+  .rack section { border: 1px solid var(--fg-dim); padding: 8px 12px; }
+  .rack section h4 { margin: 0 0 8px; font-size: 11px; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--fg-dim); }
+  .rack .v { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+  .rack .v.amber { color: var(--amber); }
+  .rack .v.red { color: var(--red); }
+  .rack .sub { font-size: 11px; color: var(--fg-dim); }
+  .rack .kv { display: grid; grid-template-columns: 80px 1fr; gap: 3px 10px; font-size: 11.5px; }
+  .rack .kv .k { color: var(--fg-dim); }
+
+  /* ranking list as a "trigger queue" */
+  .triggers { display: grid; grid-template-columns: 22px 1fr 60px;
+    gap: 6px; align-items: center; padding: 4px 0; font-size: 11.5px; border-bottom: 1px dashed var(--fg-dim); }
+  .triggers:last-child { border-bottom: none; }
+  .triggers.t1 { color: var(--fg-bright); font-weight: 700; }
+  .triggers .rk { color: var(--fg-dim); }
+  .triggers .pip { text-align: right; color: var(--fg-bright); }
+
+  /* status bar */
+  .foot { padding: 0 16px; border-top: 1px solid var(--fg-dim); background: var(--fg-bg);
+    display: flex; align-items: center; gap: 24px; font-size: 11px; }
+  .foot b { color: var(--fg-bright); }
+  .foot .right { margin-left: auto; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="head">
+    <span class="b glow">2chain · OSC</span>
+    <span class="ch b">CH1 · top1 RRF</span>
+    <span class="ch t">CH2 · ok rate</span>
+    <span class="ch r">CH3 · violations</span>
+    <span class="right">TIME 50ms/div · TRIG ⤴ /discover · 12:41:08</span>
+  </div>
+
+  <div class="scope">
+    <div class="canvas">
+      <svg viewBox="0 0 1000 600" preserveAspectRatio="none">
+        <!-- center axes -->
+        <line class="axis" x1="0" y1="300" x2="1000" y2="300"/>
+        <line class="axis" x1="500" y1="0" x2="500" y2="600"/>
+
+        <!-- CH1: top1 RRF over time (organic, mostly stable around 0.0164) -->
+        <path class="wave wave-1" d="
+          M0,310 L40,308 L80,312 L120,302 L160,295 L200,290 L240,295 L280,300
+          L320,285 L360,278 L400,265 L440,260 L480,250 L520,245 L560,238 L600,228
+          L640,220 L680,215 L720,210 L760,200 L800,195 L840,190 L880,185 L920,180 L960,175 L1000,170
+        "/>
+
+        <!-- CH2: ok rate (tighter wave near top) -->
+        <path class="wave wave-2" d="
+          M0,140 L40,142 L80,138 L120,141 L160,140 L200,138 L240,140 L280,139
+          L320,137 L360,140 L400,138 L440,141 L480,140 L520,139 L560,141 L600,140
+          L640,138 L680,140 L720,139 L760,140 L800,141 L840,140 L880,138 L920,140 L960,141 L1000,140
+        "/>
+
+        <!-- CH3: violations (mostly silent, single spike for malformed-bot CB) -->
+        <path class="wave wave-3" d="
+          M0,440 L40,440 L80,440 L120,440 L160,440 L200,440 L240,440 L280,440
+          L320,440 L360,440 L400,440 L440,440 L480,440 L520,440 L560,440 L600,440
+          L640,440 L680,440 L720,440 L750,440 L760,400 L770,360 L780,440 L800,440 L840,440 L880,440 L920,440 L960,440 L1000,440
+        "/>
+
+        <!-- horizontal phosphor reference ticks -->
+        <g>
+          <line class="ph-tick" x1="0" y1="100" x2="6" y2="100"/>
+          <line class="ph-tick" x1="0" y1="200" x2="6" y2="200"/>
+          <line class="ph-tick" x1="0" y1="400" x2="6" y2="400"/>
+          <line class="ph-tick" x1="0" y1="500" x2="6" y2="500"/>
+        </g>
+
+        <!-- annotations -->
+        <text class="label" x="14" y="142">CH2 · 99.6%</text>
+        <text class="label" x="14" y="172" style="fill:var(--fg-dim);">100%</text>
+        <text class="label" x="14" y="304">0V baseline</text>
+        <text class="label" x="14" y="442" style="fill:var(--fg-dim);">CH3 · 0</text>
+
+        <!-- Tool-call blip markers (amber on x axis) -->
+        <g style="filter: drop-shadow(0 0 4px var(--amber));">
+          <line x1="180" y1="290" x2="180" y2="310" stroke="var(--amber)" stroke-width="2"/>
+          <line x1="380" y1="270" x2="380" y2="290" stroke="var(--amber)" stroke-width="2"/>
+          <line x1="600" y1="220" x2="600" y2="240" stroke="var(--amber)" stroke-width="2"/>
+          <line x1="760" y1="195" x2="760" y2="215" stroke="var(--amber)" stroke-width="2"/>
+          <line x1="940" y1="180" x2="940" y2="200" stroke="var(--amber)" stroke-width="2"/>
+        </g>
+
+        <!-- ChMP write — top1 candidates as a phosphor "bargraph" along bottom -->
+        <g class="top-trace">
+          <rect x="20" y="555" width="80" height="20" fill="var(--fg)" opacity="0.85"/>
+          <rect x="105" y="558" width="78" height="17" fill="var(--fg)" opacity="0.7"/>
+          <rect x="188" y="562" width="68" height="13" fill="var(--fg)" opacity="0.55"/>
+          <rect x="261" y="565" width="58" height="10" fill="var(--fg)" opacity="0.45"/>
+          <rect x="324" y="568" width="48" height="7" fill="var(--fg)" opacity="0.35"/>
+        </g>
+        <g style="font-family:var(--mono); font-size:9px; fill:var(--fg-bright);">
+          <text x="22" y="551">SEC-EDGAR-FINANCIALS</text>
+          <text x="107" y="551">PDF-EXTRACT</text>
+          <text x="190" y="551">YH-FUND</text>
+          <text x="263" y="551">ANN-RPT</text>
+          <text x="326" y="551">MCP-GH</text>
+        </g>
+      </svg>
+
+      <!-- "blip" labels -->
+      <div class="blip" style="left: 18%; top: 38%;">/call sec-edgar 1191ms ✓</div>
+      <div class="blip" style="left: 38%; top: 32%; animation-delay: 0.4s;">/call mcp-everything 12 ✓</div>
+      <div class="blip" style="left: 76%; top: 50%; animation-delay: 0.8s; border-color: var(--red); color: var(--red);
+        text-shadow: 0 0 4px var(--red);">malformed-bot CB!</div>
+    </div>
+
+    <div class="rack">
+      <section>
+        <h4>top1 readout</h4>
+        <div class="v glow">0.0164</div>
+        <div class="sub">sec-edgar-financials@1.0</div>
+        <div class="kv" style="margin-top:8px;">
+          <span class="k">domain</span><span>finance</span>
+          <span class="k">vec_score</span><span>0.78</span>
+          <span class="k">reliability</span><span>1.00</span>
+          <span class="k">stability</span><span>steady · 6 ranks</span>
+        </div>
+      </section>
+
+      <section>
+        <h4>ch1 measurements</h4>
+        <div class="kv">
+          <span class="k">peak</span><span>0.0164</span>
+          <span class="k">trough</span><span>0.0098</span>
+          <span class="k">avg</span><span>0.0142</span>
+          <span class="k">σ</span><span>0.0021</span>
+          <span class="k">period</span><span>~50ms</span>
+        </div>
+      </section>
+
+      <section>
+        <h4>trigger queue · top-5 candidates</h4>
+        <div class="triggers t1"><span class="rk">1</span><span>sec-edgar-financials</span><span class="pip">0.0164</span></div>
+        <div class="triggers"><span class="rk">2</span><span>pdf-extractor</span><span class="pip">0.0162</span></div>
+        <div class="triggers"><span class="rk">3</span><span>yahoo-finance-fund</span><span class="pip">0.0148</span></div>
+        <div class="triggers"><span class="rk">4</span><span>annual-report-extr</span><span class="pip">0.0138</span></div>
+        <div class="triggers"><span class="rk">5</span><span>mcp-github__file</span><span class="pip">0.0114</span></div>
+      </section>
+
+      <section>
+        <h4>ch3 alarm</h4>
+        <div class="v red glow">CB-1</div>
+        <div class="sub" style="color:var(--red);">malformed-bot 12:40:33</div>
+        <div class="kv" style="margin-top:8px;">
+          <span class="k">stage</span><span>output</span>
+          <span class="k">rule</span><span>fail-fast</span>
+          <span class="k">caller</span><span>demo-coder-agent</span>
+          <span class="k">action</span><span>circuit_broken</span>
+        </div>
+      </section>
+
+      <section>
+        <h4>scan · /discover queries 1m</h4>
+        <div class="v amber glow">38</div>
+        <div class="sub">avg 64ms · p95 82ms</div>
+      </section>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span><b>CH1</b> top1 RRF</span>
+    <span><b>CH2</b> ok rate %</span>
+    <span><b>CH3</b> violations</span>
+    <span>TIME <b>50 ms/div</b></span>
+    <span>TRIG <b>/discover ⤴</b></span>
+    <span>COUPLING <b>DC</b></span>
+    <span class="right">2chn-osc-mk1 · phos green · 60Hz</span>
+  </div>
+</div>
+</body>
+</html>

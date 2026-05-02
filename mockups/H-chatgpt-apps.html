@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>H · 2chain · ChatGPT Apps / Granola</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --bg: #f7f6f3;
+    --surface: #ffffff;
+    --ink: #1a1a1c;
+    --ink-2: #45464d;
+    --muted: #82848d;
+    --hairline: #e8e7e2;
+    --accent: #2d5cff;
+    --accent-bg: #eff2ff;
+    --green: #10b981;
+    --red: #ef4444;
+    --amber: #f59e0b;
+    --serif: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --mono: ui-monospace, "JetBrains Mono", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--serif); -webkit-font-smoothing: antialiased; }
+
+  /* shell — chat thread + persistent prompt at bottom */
+  .shell { display: grid; grid-template-rows: 1fr auto; height: 100%; max-width: 920px; margin: 0 auto;
+    padding: 0 24px; }
+
+  .topbar { padding: 14px 0; display: flex; align-items: center; justify-content: space-between; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+  .brand .logo { width: 26px; height: 26px; border-radius: 8px;
+    background: linear-gradient(135deg, #2d5cff, #6e7bff); }
+  .topbar .right { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--muted); }
+  .topbar .right .pill { padding: 4px 10px; background: var(--surface); border: 1px solid var(--hairline);
+    border-radius: 999px; }
+
+  .thread { overflow-y: auto; padding: 24px 0 16px;
+    display: flex; flex-direction: column; gap: 28px; }
+
+  /* chat turn */
+  .turn { display: flex; gap: 14px; }
+  .turn .av { width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+    display: grid; place-items: center; font-weight: 600; font-size: 13px; }
+  .turn.user .av { background: var(--ink); color: white; }
+  .turn.agent .av { background: linear-gradient(135deg, #2d5cff, #6e7bff); color: white; }
+  .turn .body { flex: 1; min-width: 0; }
+  .turn .name { font-weight: 600; font-size: 13.5px; margin-bottom: 6px; }
+  .turn .name .meta { color: var(--muted); font-weight: 400; font-family: var(--mono); font-size: 11.5px; margin-left: 8px; }
+  .turn .text { font-size: 15.5px; line-height: 1.55; }
+
+  /* tool-card embedded in agent turn */
+  .tool-card { background: var(--surface); border: 1px solid var(--hairline); border-radius: 14px;
+    margin-top: 14px; overflow: hidden; }
+  .tool-card .head { padding: 12px 16px; display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--hairline); }
+  .tool-card .head .ico { width: 28px; height: 28px; border-radius: 8px; background: var(--accent-bg);
+    display: grid; place-items: center; font-family: var(--mono); font-size: 14px; font-weight: 600; color: var(--accent); }
+  .tool-card .head .name { font-weight: 600; flex: 1; font-size: 14.5px; }
+  .tool-card .head .name small { color: var(--muted); font-weight: 400; margin-left: 5px; font-family: var(--mono); font-size: 12px; }
+  .tool-card .head .badge { font-size: 11.5px; font-family: var(--mono);
+    color: var(--green); display: inline-flex; align-items: center; gap: 4px; }
+  .tool-card .head .badge::before { content: "●"; font-size: 8px; }
+  .tool-card .body-c { padding: 14px 16px; }
+  .tool-card p.cap { margin: 0; color: var(--ink-2); font-size: 14px; line-height: 1.5; }
+
+  /* result block */
+  .res-table { margin-top: 10px; font-size: 13.5px; }
+  .res-table .row { display: grid; grid-template-columns: 22px 1fr 80px 60px;
+    align-items: center; padding: 6px 0; border-bottom: 1px solid var(--hairline); gap: 10px; }
+  .res-table .row:last-child { border-bottom: none; }
+  .res-table .rank { font-family: var(--mono); color: var(--muted); font-size: 12px; }
+  .res-table .row.top1 .rank { color: var(--accent); font-weight: 700; }
+  .res-table .name { font-weight: 500; }
+  .res-table .name small { color: var(--muted); font-weight: 400; font-family: var(--mono); margin-left: 5px; font-size: 12px; }
+  .res-table .pip { font-family: var(--mono); font-size: 12px; color: var(--muted); text-align: right; }
+  .res-table .domain { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+
+  /* call-result panel */
+  .result-panel { background: linear-gradient(180deg, #f7faff, #eff4ff);
+    border: 1px solid #d1dcff; border-radius: 14px; padding: 16px; margin-top: 12px; }
+  .result-panel .lab { font-family: var(--mono); font-size: 11px; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 1px; }
+  .result-panel pre { margin: 6px 0 0; font-family: var(--mono); font-size: 13px;
+    color: var(--ink); white-space: pre-wrap; line-height: 1.45; background: var(--surface);
+    border-radius: 8px; padding: 12px; border: 1px solid var(--hairline); }
+  .result-panel .meta { font-size: 12px; color: var(--muted); margin-top: 8px; font-family: var(--mono); }
+
+  /* persistent prompt at bottom */
+  .prompt-box { padding: 12px 0 22px; }
+  .prompt { background: var(--surface); border: 1px solid var(--hairline); border-radius: 16px;
+    padding: 12px 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); }
+  .prompt .row1 { display: flex; align-items: start; gap: 10px; }
+  .prompt input { flex: 1; background: none; border: none; outline: none;
+    font: inherit; padding: 4px 0; }
+  .prompt input::placeholder { color: var(--muted); }
+  .prompt .actions { display: flex; align-items: center; gap: 8px; }
+  .prompt .send { background: var(--ink); color: white; border-radius: 10px;
+    width: 32px; height: 32px; display: grid; place-items: center; font-size: 16px; cursor: pointer; }
+  .prompt .row2 { display: flex; align-items: center; gap: 8px; margin-top: 8px;
+    padding-top: 8px; border-top: 1px solid var(--hairline); font-size: 12px; color: var(--muted); }
+  .prompt .row2 button { padding: 4px 9px; border-radius: 6px; border: 1px solid var(--hairline);
+    background: var(--bg); color: var(--ink-2); font: inherit; font-size: 12px; cursor: pointer; }
+  .prompt .row2 button.active { background: var(--accent-bg); color: var(--accent);
+    border-color: var(--accent); }
+  .prompt .row2 .right { margin-left: auto; font-family: var(--mono); }
+
+  /* divider */
+  .divider { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 11px;
+    text-transform: uppercase; letter-spacing: 1px; margin: 6px 0; }
+  .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--hairline); }
+
+  /* mini stat strip in agent turn */
+  .stat-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+  .stat { background: var(--surface); border: 1px solid var(--hairline); border-radius: 10px; padding: 10px 12px; }
+  .stat .l { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat .v { font-family: var(--mono); font-size: 18px; font-weight: 600; margin-top: 2px; }
+  .stat .d { font-size: 11.5px; color: var(--green); }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <div class="brand"><span class="logo"></span> 2chain</div>
+    <div class="right">
+      <span class="pill">● 418 tools</span>
+      <span class="pill">SQLite + nomic</span>
+      <span class="pill">p95 68ms</span>
+    </div>
+  </div>
+
+  <div class="thread">
+    <div class="turn user">
+      <div class="av">K</div>
+      <div class="body">
+        <div class="name">You <span class="meta">12:40</span></div>
+        <div class="text">I'm building a DCF model for NVIDIA. Pull the latest annual income statement from their 10-K.</div>
+      </div>
+    </div>
+
+    <div class="turn agent">
+      <div class="av">2c</div>
+      <div class="body">
+        <div class="name">2chain <span class="meta">picked sec-edgar-financials · 68ms</span></div>
+        <div class="text">I searched 418 tools for that. Here's what I'd use:</div>
+
+        <div class="tool-card">
+          <div class="head">
+            <div class="ico">$</div>
+            <div class="name">sec-edgar-financials <small>@1.0</small></div>
+            <div class="badge">reliability 1.00</div>
+          </div>
+          <div class="body-c">
+            <p class="cap">Fetches the latest annual 10-K income statement from SEC EDGAR for any US-listed ticker. Live data via data.sec.gov XBRL companyfacts API. Free, no key.</p>
+            <div class="res-table">
+              <div class="row top1">
+                <span class="rank">1</span><span class="name">sec-edgar-financials<small>@1.0</small></span>
+                <span class="pip">RRF 0.0164</span><span class="domain">finance</span>
+              </div>
+              <div class="row">
+                <span class="rank">2</span><span class="name">pdf-extractor<small>@3.0</small></span>
+                <span class="pip">RRF 0.0162</span><span class="domain">finance</span>
+              </div>
+              <div class="row">
+                <span class="rank">3</span><span class="name">yahoo-finance-fundamentals<small>@1.0</small></span>
+                <span class="pip">RRF 0.0148</span><span class="domain">finance</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text" style="margin-top:14px;">Calling it now with ticker=NVDA…</div>
+
+        <div class="result-panel">
+          <div class="lab">/call · sec-edgar-financials@1.0 · 1191ms · ok</div>
+          <pre>{
+  "ticker": "NVDA",
+  "fiscal_year": 2025,
+  "rows": [
+    { "label": "Revenue",          "value_usd_millions": 60922 },
+    { "label": "Cost of revenue",  "value_usd_millions": 16621 },
+    { "label": "Gross profit",     "value_usd_millions": 44301 },
+    { "label": "Operating income", "value_usd_millions": 32972 },
+    { "label": "Net income",       "value_usd_millions": 29760 }
+  ],
+  "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001045810.json"
+}</pre>
+          <div class="meta">contract: pass · revenue=$60.9B · gross margin 72.7% · output validated against ajv</div>
+        </div>
+
+        <div class="stat-strip">
+          <div class="stat"><div class="l">Embed</div><div class="v">23ms</div><div class="d">cached</div></div>
+          <div class="stat"><div class="l">RRF</div><div class="v">45ms</div><div class="d">5/5 candidates</div></div>
+          <div class="stat"><div class="l">Stub fetch</div><div class="v">1123ms</div><div class="d">SEC EDGAR live</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider">12:41</div>
+
+    <div class="turn user">
+      <div class="av">K</div>
+      <div class="body">
+        <div class="name">You <span class="meta">just now</span></div>
+        <div class="text">Now find me a Python OWASP scanner.</div>
+      </div>
+    </div>
+
+    <div class="turn agent">
+      <div class="av">2c</div>
+      <div class="body">
+        <div class="name">2chain <span class="meta">picked security-scanner · 64ms</span></div>
+        <div class="text">Top match is <b>security-scanner@1.5</b> — flags command injection, eval, pickle deserialisation, hardcoded secrets, bare except. <a style="color:var(--accent);">Try it on a file →</a></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="prompt-box">
+    <div class="prompt">
+      <div class="row1">
+        <input placeholder="Ask 2chain to find or call a tool…" autofocus>
+        <div class="actions">
+          <span class="send">↑</span>
+        </div>
+      </div>
+      <div class="row2">
+        <button class="active">⚡ Auto-call best match</button>
+        <button>✦ Discover only</button>
+        <button>⊞ View 418 tools</button>
+        <button>＋ Push new tool</button>
+        <span class="right">⌘+enter to send</span>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

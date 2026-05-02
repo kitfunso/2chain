@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>D · 2chain · Raycast / Arc</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --bg: #050505;
+    --backdrop: rgba(0,0,0,0.7);
+    --palette: #15151a;
+    --palette-2: #1d1d24;
+    --border: #2a2a35;
+    --fg: #f5f5f8;
+    --muted: #8e8e98;
+    --accent: #ff6363;
+    --green: #4ade80;
+    --gradient: linear-gradient(135deg, #ff6363 0%, #ff8a3c 100%);
+    --mono: ui-monospace, "JetBrains Mono", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; }
+  body { background: var(--bg); color: var(--fg);
+    font: 14px/1.5 -apple-system, "Inter", "SF Pro", sans-serif; }
+
+  /* ambient backdrop — implied desktop */
+  .desktop {
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(255,99,99,0.18), transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(110,231,255,0.12), transparent 50%),
+      #0a0a0e;
+  }
+  .desktop::before { content: ""; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
+    mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+    -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+  }
+
+  /* dim out the desktop while palette is open */
+  .veil { position: fixed; inset: 0; z-index: 1; backdrop-filter: blur(28px) saturate(140%);
+    background: rgba(8, 8, 11, 0.55); }
+
+  /* command palette */
+  .palette {
+    position: fixed; left: 50%; top: 12vh; transform: translateX(-50%);
+    width: min(720px, 92vw); z-index: 2;
+    background: var(--palette); border: 1px solid var(--border); border-radius: 14px;
+    box-shadow: 0 50px 120px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+    overflow: hidden;
+  }
+  .palette-head { display: flex; align-items: center; gap: 10px; padding: 14px 16px;
+    border-bottom: 1px solid var(--border); }
+  .palette-head .icon { width: 16px; height: 16px; border-radius: 4px;
+    background: var(--gradient); flex-shrink: 0; }
+  .palette-head input { flex: 1; background: transparent; border: none; outline: none;
+    color: var(--fg); font-size: 17px; font-weight: 500; letter-spacing: -0.2px; }
+  .palette-head input::placeholder { color: var(--muted); }
+  .palette-head .badge { font-family: var(--mono); font-size: 10.5px;
+    color: var(--muted); padding: 3px 8px; background: var(--palette-2);
+    border-radius: 5px; border: 1px solid var(--border); }
+  .palette-head .crumb { font-size: 12px; color: var(--muted);
+    padding: 3px 8px; background: var(--palette-2); border-radius: 5px;
+    border: 1px solid var(--border); }
+
+  /* result list */
+  .results { max-height: 420px; overflow-y: auto; padding: 6px 0; }
+  .group-label { padding: 8px 16px 4px; color: var(--muted);
+    font-size: 11px; font-weight: 500; letter-spacing: 0.6px; text-transform: uppercase; }
+  .row { display: flex; align-items: center; gap: 12px; padding: 8px 16px; cursor: default; }
+  .row.selected { background: linear-gradient(90deg, rgba(255,99,99,0.10), rgba(255,99,99,0.0)); position: relative; }
+  .row.selected::before { content: ""; position: absolute; left: 0; top: 8px; bottom: 8px; width: 3px;
+    background: var(--gradient); border-radius: 0 3px 3px 0; }
+  .row .ico { width: 24px; height: 24px; border-radius: 6px; display: grid; place-items: center;
+    font-family: var(--mono); font-size: 12px; flex-shrink: 0;
+    background: var(--palette-2); border: 1px solid var(--border); color: var(--muted); }
+  .row.selected .ico { background: var(--gradient); color: white; border-color: transparent; }
+  .row .col { flex: 1; min-width: 0; }
+  .row .name { font-weight: 500; font-size: 14px; }
+  .row .name small { color: var(--muted); font-weight: 400; font-family: var(--mono); margin-left: 6px; font-size: 12px; }
+  .row .desc { color: var(--muted); font-size: 12.5px; margin-top: 2px; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis; }
+  .row .right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .row .pip { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .row .pip.score { color: var(--accent); font-weight: 600; }
+  .row .domain-tag { font-family: var(--mono); font-size: 10px; padding: 2px 6px; border-radius: 4px;
+    background: var(--palette-2); color: var(--muted); border: 1px solid var(--border); }
+
+  /* footer */
+  .palette-foot { padding: 9px 14px; border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px; color: var(--muted); background: var(--palette-2); }
+  .palette-foot .left { display: flex; align-items: center; gap: 6px; }
+  .palette-foot .left .b { width: 18px; height: 18px; border-radius: 4px; background: var(--gradient); }
+  .actions { display: flex; align-items: center; gap: 14px; }
+  kbd { font-family: var(--mono); font-size: 10.5px; background: var(--bg);
+    border: 1px solid var(--border); border-bottom-width: 2px; padding: 1px 6px; border-radius: 4px;
+    color: var(--fg); }
+  .actions .group { display: inline-flex; align-items: center; gap: 5px; }
+
+  /* preview pane (right side, when an item is highlighted) */
+  .preview { position: fixed; right: 6vw; top: 12vh; width: 360px;
+    background: var(--palette); border: 1px solid var(--border); border-radius: 14px;
+    z-index: 2; padding: 22px; box-shadow: 0 50px 120px rgba(0,0,0,0.6); }
+  .preview h3 { margin: 4px 0 2px; font-size: 17px; letter-spacing: -0.3px; }
+  .preview .ver { font-family: var(--mono); color: var(--muted); font-size: 12px; margin-bottom: 16px; }
+  .preview .blurb { font-size: 13px; line-height: 1.55; color: var(--muted); margin: 0 0 16px; }
+  .preview .kv { display: grid; grid-template-columns: 90px 1fr; gap: 6px 16px;
+    font-size: 12px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .preview .kv span:nth-child(odd) { color: var(--muted); }
+  .preview .kv span.mono { font-family: var(--mono); }
+  .preview .meter { height: 4px; border-radius: 2px; background: var(--palette-2);
+    position: relative; overflow: hidden; margin-top: 8px; }
+  .preview .meter > i { display: block; height: 100%; background: var(--gradient); }
+</style>
+</head>
+<body>
+<div class="desktop"></div>
+<div class="veil"></div>
+
+<div class="palette">
+  <div class="palette-head">
+    <span class="icon"></span>
+    <span class="crumb">2chain</span>
+    <input value="dcf nvidia 10-k income statement" autofocus>
+    <span class="badge">RRF · 5 results · 68ms</span>
+  </div>
+  <div class="results">
+    <div class="group-label">Top match</div>
+    <div class="row selected">
+      <div class="ico">✦</div>
+      <div class="col">
+        <div class="name">sec-edgar-financials <small>@1.0</small></div>
+        <div class="desc">Latest 10-K income statement from SEC EDGAR XBRL companyfacts API. Free, live data.</div>
+      </div>
+      <div class="right">
+        <span class="domain-tag">finance</span>
+        <span class="pip score">0.0164</span>
+      </div>
+    </div>
+    <div class="group-label">Also matching</div>
+    <div class="row">
+      <div class="ico">▤</div>
+      <div class="col">
+        <div class="name">pdf-extractor <small>@3.0</small></div>
+        <div class="desc">Income statement and balance sheet extractor for SEC 10-K PDFs already in hand.</div>
+      </div>
+      <div class="right"><span class="domain-tag">finance</span><span class="pip">0.0162</span></div>
+    </div>
+    <div class="row">
+      <div class="ico">$</div>
+      <div class="col">
+        <div class="name">yahoo-finance-fundamentals <small>@1.0</small></div>
+        <div class="desc">Income statement, balance sheet, cash flow for any US-listed ticker.</div>
+      </div>
+      <div class="right"><span class="domain-tag">finance</span><span class="pip">0.0148</span></div>
+    </div>
+    <div class="row">
+      <div class="ico">¶</div>
+      <div class="col">
+        <div class="name">annual-report-extract <small>@1.0</small></div>
+        <div class="desc">10-K narrative + financial table extractor for SEC filings.</div>
+      </div>
+      <div class="right"><span class="domain-tag">docs</span><span class="pip">0.0138</span></div>
+    </div>
+    <div class="row">
+      <div class="ico">⎇</div>
+      <div class="col">
+        <div class="name">mcp-github__get_file_contents <small>@1.0</small></div>
+        <div class="desc">Reads a file from a GitHub repo at a specific ref via the contents API.</div>
+      </div>
+      <div class="right"><span class="domain-tag">code</span><span class="pip">0.0114</span></div>
+    </div>
+    <div class="group-label">Suggested actions</div>
+    <div class="row">
+      <div class="ico">⏎</div>
+      <div class="col">
+        <div class="name">Run with NVDA</div>
+        <div class="desc">Calls sec-edgar-financials@1.0 with ticker=NVDA · estimated 1.2s</div>
+      </div>
+      <div class="right"><span class="pip">↵</span></div>
+    </div>
+    <div class="row">
+      <div class="ico">⌥</div>
+      <div class="col">
+        <div class="name">Open in dashboard</div>
+        <div class="desc">View tool spec, eval history, last 50 calls</div>
+      </div>
+      <div class="right"><span class="pip">⌥+↵</span></div>
+    </div>
+  </div>
+  <div class="palette-foot">
+    <div class="left"><span class="b"></span> 2chain · personal tier</div>
+    <div class="actions">
+      <span class="group">↵ Open</span>
+      <span class="group">⌘K Actions</span>
+      <span class="group">esc Close</span>
+    </div>
+  </div>
+</div>
+
+<aside class="preview">
+  <h3>sec-edgar-financials</h3>
+  <div class="ver">v1.0 · finance · author: hackathon-team</div>
+  <p class="blurb">Fetches the latest annual 10-K income statement directly from SEC EDGAR for any US-listed company by ticker. Live data via data.sec.gov XBRL companyfacts API.</p>
+  <div class="kv">
+    <span>Reliability</span><span class="mono">1.00 (5/5 evals)</span>
+    <div class="meter" style="grid-column:1/-1;"><i style="width:100%"></i></div>
+    <span>P95 latency</span><span class="mono">1500ms (real network)</span>
+    <span>Cost / call</span><span class="mono">$0.00 (free SEC API)</span>
+    <span>Last called</span><span class="mono">12:41:04 · ok</span>
+    <span>Status</span><span class="mono" style="color:var(--green);">● active</span>
+    <span>Stub</span><span class="mono">sec-edgar-financials-v1</span>
+  </div>
+</aside>
+</body>
+</html>

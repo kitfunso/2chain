@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>G · 2chain · HF Spaces / Replicate</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --bg: #0d0d10;
+    --card: #16161b;
+    --card-2: #1c1c22;
+    --border: #25252e;
+    --fg: #f1f1f3;
+    --muted: #8e8e98;
+    --accent: #ffd667;     /* HF yellow */
+    --accent-2: #ff7559;   /* Replicate orange */
+    --green: #4ade80;
+    --blue: #60a5fa;
+    --pink: #f472b6;
+    --purple: #a78bfa;
+    --teal: #22d3ee;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--bg); color: var(--fg);
+    font: 14.5px/1.55 -apple-system, "Inter", "Segoe UI", sans-serif; }
+
+  header { padding: 18px 32px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 28px; position: sticky; top: 0; background: rgba(13,13,16,0.85);
+    backdrop-filter: blur(12px); z-index: 10; }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; }
+  .brand .logo { width: 26px; height: 26px; border-radius: 7px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: grid; place-items: center; color: #1a1a1c; font-size: 14px; font-weight: 800; }
+  .search { flex: 1; max-width: 720px; margin: 0 auto;
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 9px 14px; display: flex; align-items: center; gap: 10px; }
+  .search input { flex: 1; background: none; border: none; outline: none; color: var(--fg); font: inherit; }
+  .search input::placeholder { color: var(--muted); }
+  .search .pip { font-size: 12px; color: var(--muted); font-family: ui-monospace, monospace; }
+  .nav-r { display: flex; gap: 18px; font-size: 14px; }
+  .nav-r a { color: var(--muted); text-decoration: none; }
+  .nav-r a:hover { color: var(--fg); }
+
+  /* layout */
+  .body { display: grid; grid-template-columns: 220px 1fr; gap: 32px; padding: 28px 32px; max-width: 1500px; margin: 0 auto; }
+  /* sidebar — domain filters */
+  aside { font-size: 13.5px; }
+  aside h4 { color: var(--muted); margin: 0 0 10px; font-size: 11px;
+    letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+  aside .item { display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 10px; border-radius: 6px; margin-bottom: 2px; cursor: default; }
+  aside .item:hover { background: var(--card); }
+  aside .item.active { background: var(--card); color: var(--fg); }
+  aside .item .count { font-family: ui-monospace, monospace; font-size: 11px; color: var(--muted); }
+  aside .item .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 8px; }
+
+  /* main grid */
+  main h1 { margin: 0 0 6px; font-size: 28px; letter-spacing: -0.5px; font-weight: 700; }
+  main .sub { color: var(--muted); margin-bottom: 20px; }
+  .filters { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+  .chip { padding: 6px 12px; border-radius: 999px; background: var(--card); color: var(--fg);
+    border: 1px solid var(--border); font-size: 13px; cursor: default; }
+  .chip.active { background: var(--accent); color: #1a1a1c; border-color: var(--accent); font-weight: 600; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+  /* card */
+  .tool { background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    overflow: hidden; transition: border-color 0.15s, transform 0.15s; cursor: default; }
+  .tool:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .hero { height: 110px; position: relative; display: grid; place-items: center;
+    background: linear-gradient(135deg, var(--card-2), var(--card)); border-bottom: 1px solid var(--border); }
+  .hero .glyph { font-size: 38px; font-weight: 800; letter-spacing: -2px; color: rgba(255,255,255,0.85); }
+  .hero.fin { background: linear-gradient(135deg, #1f2410, #382c0e); }
+  .hero.fin .glyph { color: var(--accent); }
+  .hero.code { background: linear-gradient(135deg, #0e1f2c, #082233); }
+  .hero.code .glyph { color: var(--teal); }
+  .hero.research { background: linear-gradient(135deg, #2c1226, #371734); }
+  .hero.research .glyph { color: var(--pink); }
+  .hero.docs { background: linear-gradient(135deg, #2a1c0d, #3a200d); }
+  .hero.docs .glyph { color: var(--accent-2); }
+  .hero.geo { background: linear-gradient(135deg, #0e2a1c, #0f3a26); }
+  .hero.geo .glyph { color: var(--green); }
+  .hero.data { background: linear-gradient(135deg, #1c1430, #20183d); }
+  .hero.data .glyph { color: var(--purple); }
+  .hero .badge { position: absolute; top: 10px; right: 10px;
+    font-family: ui-monospace, monospace; font-size: 10px; padding: 3px 7px; border-radius: 4px;
+    background: rgba(0,0,0,0.4); color: white; backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.08); }
+  .hero .badge.mcp { background: rgba(255, 117, 89, 0.85); color: #1a1a1c; border-color: transparent; }
+
+  .body-card { padding: 14px 16px 16px; }
+  .body-card h3 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.2px; }
+  .body-card h3 small { font-family: ui-monospace, monospace; color: var(--muted); font-weight: 400; margin-left: 4px; font-size: 12px; }
+  .body-card .desc { color: var(--muted); font-size: 13px; line-height: 1.5;
+    margin: 6px 0 12px; height: 60px; overflow: hidden;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+  .body-card .meta { display: flex; align-items: center; gap: 12px; font-size: 12px;
+    color: var(--muted); padding-top: 10px; border-top: 1px solid var(--border); }
+  .body-card .meta b { color: var(--fg); font-weight: 500; font-family: ui-monospace, monospace; }
+  .body-card .domain-tag { font-family: ui-monospace, monospace; font-size: 10px; padding: 2px 6px;
+    border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;
+    background: rgba(255, 214, 103, 0.15); color: var(--accent); }
+  .domain-tag.code { background: rgba(34, 211, 238, 0.15); color: var(--teal); }
+  .domain-tag.research { background: rgba(244, 114, 182, 0.15); color: var(--pink); }
+  .domain-tag.docs { background: rgba(255, 117, 89, 0.15); color: var(--accent-2); }
+  .domain-tag.geo { background: rgba(74, 222, 128, 0.15); color: var(--green); }
+  .domain-tag.data { background: rgba(167, 139, 250, 0.15); color: var(--purple); }
+  .body-card .reliability { display: inline-flex; align-items: center; gap: 4px; }
+  .body-card .reliability::before { content: "●"; color: var(--green); font-size: 8px; }
+  .try { margin-top: 10px; display: flex; gap: 6px; }
+  .try button { flex: 1; padding: 7px 10px; border-radius: 7px; font: inherit;
+    border: 1px solid var(--border); background: var(--card-2); color: var(--fg); font-size: 13px;
+    cursor: default; font-weight: 500; }
+  .try button.primary { background: var(--accent); color: #1a1a1c; border-color: var(--accent); }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><span class="logo">≋</span> 2chain</div>
+  <div class="search">
+    <span style="color:var(--muted)">⌕</span>
+    <input placeholder="Search 418 tools — sec edgar, arxiv, github, time, weather, payments…">
+    <span class="pip">⌘K</span>
+  </div>
+  <nav class="nav-r">
+    <a>Tools</a><a>MCP</a><a>Calls</a><a>Docs</a>
+  </nav>
+</header>
+
+<div class="body">
+  <aside>
+    <h4>Domain</h4>
+    <div class="item active"><span><span class="dot" style="background:var(--accent)"></span>All tools</span><span class="count">418</span></div>
+    <div class="item"><span><span class="dot" style="background:var(--accent)"></span>Finance</span><span class="count">158</span></div>
+    <div class="item"><span><span class="dot" style="background:var(--teal)"></span>Code</span><span class="count">92</span></div>
+    <div class="item"><span><span class="dot" style="background:var(--pink)"></span>Research</span><span class="count">58</span></div>
+    <div class="item"><span><span class="dot" style="background:var(--accent-2)"></span>Docs</span><span class="count">42</span></div>
+    <div class="item"><span><span class="dot" style="background:var(--green)"></span>Geo</span><span class="count">28</span></div>
+    <div class="item"><span><span class="dot" style="background:var(--purple)"></span>Data</span><span class="count">22</span></div>
+    <div class="item"><span><span class="dot" style="background:var(--blue)"></span>Comms</span><span class="count">18</span></div>
+
+    <h4 style="margin-top:24px;">Source</h4>
+    <div class="item"><span>● Bundled</span><span class="count">199</span></div>
+    <div class="item"><span>● Catalog</span><span class="count">142</span></div>
+    <div class="item"><span>● MCP</span><span class="count">77</span></div>
+
+    <h4 style="margin-top:24px;">Reliability</h4>
+    <div class="item"><span>≥ 0.95</span><span class="count">326</span></div>
+    <div class="item"><span>0.80–0.94</span><span class="count">85</span></div>
+    <div class="item"><span>&lt; 0.80 (gated)</span><span class="count">7</span></div>
+  </aside>
+
+  <main>
+    <h1>Browse the registry</h1>
+    <p class="sub">418 named tools across 12 domains. Search uses hybrid retrieval (vector + BM25 over capability text). 77 are live MCP-bridged subprocesses.</p>
+    <div class="filters">
+      <span class="chip active">All</span>
+      <span class="chip">⚡ MCP-live</span>
+      <span class="chip">★ Highest reliability</span>
+      <span class="chip">⊞ Most called (1h)</span>
+      <span class="chip">⏱ Fastest p95</span>
+      <span class="chip">⤓ Free</span>
+    </div>
+
+    <div class="grid">
+      <div class="tool">
+        <div class="hero fin"><div class="glyph">$</div><span class="badge">⭐ 1.00</span></div>
+        <div class="body-card">
+          <h3>sec-edgar-financials<small>@1.0</small></h3>
+          <div class="desc">Fetches the latest annual 10-K income statement directly from SEC EDGAR for any US-listed ticker. Live data, free, no API key.</div>
+          <div class="meta"><span class="domain-tag">finance</span><span class="reliability"><b>1.00</b></span><span>p95 <b>1500ms</b></span></div>
+          <div class="try"><button class="primary">▶ Try it</button><button>view spec</button></div>
+        </div>
+      </div>
+
+      <div class="tool">
+        <div class="hero research"><div class="glyph">¶</div><span class="badge">⭐ 1.00</span></div>
+        <div class="body-card">
+          <h3>arxiv-paper-search<small>@1.0</small></h3>
+          <div class="desc">Searches arxiv.org for academic papers via the Atom export API. Returns title, authors, abstract, arxiv ID, PDF URL.</div>
+          <div class="meta"><span class="domain-tag research">research</span><span class="reliability"><b>1.00</b></span><span>p95 <b>1200ms</b></span></div>
+          <div class="try"><button class="primary">▶ Try it</button><button>view spec</button></div>
+        </div>
+      </div>
+
+      <div class="tool">
+        <div class="hero code"><div class="glyph">⎇</div><span class="badge mcp">MCP</span></div>
+        <div class="body-card">
+          <h3>mcp-github__create_pull_request<small>@1.0</small></h3>
+          <div class="desc">Opens a pull request from a head branch to base via GitHub REST API. Used for AI-driven code submission.</div>
+          <div class="meta"><span class="domain-tag code">code</span><span class="reliability"><b>0.95</b></span><span>p95 <b>1500ms</b></span></div>
+          <div class="try"><button class="primary">▶ Try it</button><button>view spec</button></div>
+        </div>
+      </div>
+
+      <div class="tool">
+        <div class="hero docs"><div class="glyph">▤</div><span class="badge mcp">MCP</span></div>
+        <div class="body-card">
+          <h3>mcp-filesystem__read_text_file<small>@1.0</small></h3>
+          <div class="desc">Reads a text file from the local filesystem within an explicitly allowed root. Used for code review, log inspection.</div>
+          <div class="meta"><span class="domain-tag docs">docs</span><span class="reliability"><b>0.95</b></span><span>p95 <b>50ms</b></span></div>
+          <div class="try"><button class="primary">▶ Try it</button><button>view spec</button></div>
+        </div>
+      </div>
+
+      <div class="tool">
+        <div class="hero geo"><div class="glyph">◯</div><span class="badge mcp">MCP</span></div>
+        <div class="body-card">
+          <h3>mcp-google-maps__maps_directions<small>@1.0</small></h3>
+          <div class="desc">Computes driving/walking/transit directions between origin and destination. Returns ordered steps with distance + duration.</div>
+          <div class="meta"><span class="domain-tag geo">geo</span><span class="reliability"><b>0.95</b></span><span>p95 <b>1800ms</b></span></div>
+          <div class="try"><button class="primary">▶ Try it</button><button>view spec</button></div>
+        </div>
+      </div>
+
+      <div class="tool">
+        <div class="hero fin"><div class="glyph">¥</div><span class="badge">⭐ 0.92</span></div>
+        <div class="body-card">
+          <h3>yahoo-finance-fundamentals<small>@1.0</small></h3>
+          <div class="desc">Pulls income statement, balance sheet, cash flow for any US-listed ticker. Quarterly or annual.</div>
+          <div class="meta"><span class="domain-tag">finance</span><span class="reliability"><b>0.92</b></span><span>p95 <b>1200ms</b></span></div>
+          <div class="try"><button class="primary">▶ Try it</button><button>view spec</button></div>
+        </div>
+      </div>
+
+      <div class="tool">
+        <div class="hero data"><div class="glyph">⌬</div><span class="badge mcp">MCP</span></div>
+        <div class="body-card">
+          <h3>mcp-postgres__query<small>@1.0</small></h3>
+          <div class="desc">Runs a read-only SQL query against a configured Postgres database. Returns rows + column types.</div>
+          <div class="meta"><span class="domain-tag data">data</span><span class="reliability"><b>0.95</b></span><span>p95 <b>200ms</b></span></div>
+          <div class="try"><button class="primary">▶ Try it</button><button>view spec</button></div>
+        </div>
+      </div>
+
+      <div class="tool">
+        <div class="hero code"><div class="glyph">{ }</div><span class="badge">⭐ 1.00</span></div>
+        <div class="body-card">
+          <h3>code-review-mini<small>@1.0</small></h3>
+          <div class="desc">Lightweight JavaScript code reviewer. Spots common bugs, missing null checks, unhandled errors. Structured output.</div>
+          <div class="meta"><span class="domain-tag code">code</span><span class="reliability"><b>1.00</b></span><span>p95 <b>800ms</b></span></div>
+          <div class="try"><button class="primary">▶ Try it</button><button>view spec</button></div>
+        </div>
+      </div>
+
+      <div class="tool">
+        <div class="hero research"><div class="glyph">π</div><span class="badge mcp">MCP</span></div>
+        <div class="body-card">
+          <h3>mcp-everything__get-sum<small>@1.0</small></h3>
+          <div class="desc">Adds two integers and returns the sum. Reference MCP server for transport smoke-testing.</div>
+          <div class="meta"><span class="domain-tag research">research</span><span class="reliability"><b>0.95</b></span><span>p95 <b>1500ms</b></span></div>
+          <div class="try"><button class="primary">▶ Try it</button><button>view spec</button></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>
