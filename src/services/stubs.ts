@@ -1,7 +1,14 @@
 import { fetchIncomeStatement, knownTickers } from '../tools/secEdgar.js';
 import { searchArxiv } from '../tools/arxivSearch.js';
 
-type StubFn = (input: Record<string, unknown>, caseId?: string) => unknown;
+// Stubs receive (input, caseId, ctx) where ctx exposes the calling tool's
+// name + version. Bridges (e.g. mcp-bridge) use ctx.tool_name to derive
+// per-tool routing without forcing callers to wrap args in an envelope.
+export interface StubContext {
+  tool_name: string;
+  tool_version: string;
+}
+type StubFn = (input: Record<string, unknown>, caseId?: string, ctx?: StubContext) => unknown;
 
 const REGISTRY = new Map<string, StubFn>();
 
@@ -13,10 +20,15 @@ export function getStub(name: string): StubFn | undefined {
   return REGISTRY.get(name);
 }
 
-export function callStub(name: string, input: Record<string, unknown>, caseId?: string): unknown {
+export function callStub(
+  name: string,
+  input: Record<string, unknown>,
+  caseId?: string,
+  ctx?: StubContext,
+): unknown {
   const fn = REGISTRY.get(name);
   if (!fn) throw new Error(`unknown stub: ${name}`);
-  return fn(input, caseId);
+  return fn(input, caseId, ctx);
 }
 
 // =====================================================================

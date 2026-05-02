@@ -109,7 +109,7 @@ export async function call(
   let raw: unknown;
   try {
     raw = await Promise.race([
-      Promise.resolve(callStub(tool.endpoint_stub_name, input.input, input.case_id)),
+      Promise.resolve(callStub(tool.endpoint_stub_name, input.input, input.case_id, { tool_name: tool.name, tool_version: tool.version })),
       new Promise<never>((_, rej) => setTimeout(() => rej(new Error(`stub timeout > ${CALL_TIMEOUT_MS}ms`)), CALL_TIMEOUT_MS)),
     ]);
   } catch (e) {
