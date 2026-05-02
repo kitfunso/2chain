@@ -31,6 +31,7 @@
     "demo:queries": "tsx scripts/demo-queries.ts",
     "demo:warmup": "node bin/2chain.mjs discover \"Extract tables from this financial report PDF\"",
     "mcp": "node bin/2chain-mcp.mjs",
+    "preflight": "tsx scripts/preflight.ts",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [

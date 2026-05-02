@@ -17,6 +17,7 @@ export interface HybridMeta extends DiscoverMeta {
   weights: { vector: number; text: number };
   pipelines_in: number;
   pipelines_out: number;
+  pipeline_json?: string;
 }
 
 const VEC_WEIGHT = 0.7;
@@ -29,6 +30,58 @@ export async function discoverHybrid(
 ): Promise<{ results: HybridResult[]; meta: HybridMeta }> {
   const tTotal = Date.now();
   const { vec: queryVec, ms: embedMs } = await getQueryEmbedding(query);
+
+  // The literal pipeline. We expose this in meta.pipeline_json so the
+  // dashboard can show MongoDB actually doing the work on screen.
+  const pipeline: Record<string, unknown>[] = [
+    {
+      $rankFusion: {
+        input: {
+          pipelines: {
+            vector: [
+              {
+                $vectorSearch: {
+                  index: VECTOR_INDEX_NAME,
+                  path: 'capability_embedding',
+                  queryVector: '<1024-dim voyage-3 embedding>',
+                  numCandidates: 50,
+                  limit: 20,
+                  filter: {
+                    status: { $eq: 'active' },
+                    'metadata.reliability_score': { $gte: RELIABILITY_GATE },
+                  },
+                },
+              },
+            ],
+            text: [
+              {
+                $search: {
+                  index: TEXT_INDEX_NAME,
+                  text: { query, path: 'capability_text' },
+                },
+              },
+              {
+                $match: {
+                  status: 'active',
+                  'metadata.reliability_score': { $gte: RELIABILITY_GATE },
+                },
+              },
+              { $limit: 20 },
+            ],
+          },
+        },
+        combination: { weights: { vector: VEC_WEIGHT, text: TEXT_WEIGHT } },
+        scoreDetails: true,
+      },
+    },
+    { $project: { name: 1, version: 1, capability_text: 1, endpoint_stub_name: 1, metadata: 1, rrf_score: { $meta: 'score' } } },
+    { $sort: { rrf_score: -1 } },
+    { $group: { _id: '$name', best: { $first: '$$ROOT' } } },
+    { $replaceRoot: { newRoot: '$best' } },
+    { $sort: { rrf_score: -1 } },
+    { $limit: top },
+  ];
+  const pipelineJson = JSON.stringify(pipeline, null, 2);
 
   const tSearch = Date.now();
   const docs = await db.collection('tools').aggregate([
@@ -119,6 +172,7 @@ export async function discoverHybrid(
       weights: { vector: VEC_WEIGHT, text: TEXT_WEIGHT },
       pipelines_in: 2,
       pipelines_out: results.length,
+      pipeline_json: pipelineJson,
     },
   };
 }

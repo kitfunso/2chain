@@ -172,8 +172,17 @@ export const DASHBOARD_HTML = `<!doctype html>
         <div class="stat"><span>timeout</span><strong id="u-to" class="warn">0</strong></div>
       </div>
     </section>
+    <section class="card" style="margin-top:18px" id="atlas-card">
+      <h2>MongoDB Atlas</h2>
+      <div id="atlas-stats" class="ts" style="font-family:var(--mono);font-size:11.5px;line-height:1.7">loading…</div>
+    </section>
   </div>
 </main>
+<section class="card" id="pipeline-card" style="margin:0 32px 24px;display:none">
+  <h2>Last MongoDB pipeline (\$rankFusion hybrid retrieval)</h2>
+  <div class="ts" id="pipeline-meta" style="margin-bottom:8px;font-size:11.5px"></div>
+  <pre id="pipeline-json" style="margin:0;padding:14px;background:#0b0d12;border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:11.5px;color:#cdd5e3;overflow-x:auto;max-height:340px;overflow-y:auto"></pre>
+</section>
 <footer>2chain · MongoDB Agentic Evolution Hackathon · Atlas Vector Search + Change Streams · live re-rank on every push</footer>
 <script>
   const fmtTime = (d) => d ? new Date(d).toLocaleTimeString('en-GB', { hour12: false }) : '—';
@@ -289,6 +298,14 @@ export const DASHBOARD_HTML = `<!doctype html>
       if (d.outcome in usageCounts) usageCounts[d.outcome]++;
       updateUsage();
     });
+    es.addEventListener('pipeline_ran', (e) => {
+      const d = JSON.parse(e.data);
+      document.getElementById('pipeline-card').style.display = 'block';
+      document.getElementById('pipeline-meta').textContent =
+        \`query: "\${d.query}" · search: \${d.search_ms}ms · \${new Date(d.ts).toLocaleTimeString('en-GB', { hour12: false })}\`;
+      const pre = document.getElementById('pipeline-json');
+      pre.textContent = d.pipeline_json;
+    });
     es.addEventListener('discover_ran', (e) => {
       const d = JSON.parse(e.data);
       document.getElementById('d-query').textContent = '"' + d.query + '"';
@@ -312,7 +329,31 @@ export const DASHBOARD_HTML = `<!doctype html>
     });
   }
 
-  loadInitial().then(connect);
+  async function loadAtlas() {
+    try {
+      const r = await fetch('/atlas-stats');
+      const s = await r.json();
+      const fmtBytes = (n) => n > 1e6 ? (n / 1e6).toFixed(1) + ' MB' : (n / 1e3).toFixed(1) + ' kB';
+      const idxRow = (i) => \`<div class="stat"><span>\${i.name}</span><strong class="\${i.queryable ? 'ok' : 'warn'}">\${i.type}\${i.queryable ? ' · ready' : ' · building'}</strong></div>\`;
+      const colRow = (k, v) => \`<div class="stat"><span>\${k}</span><strong>\${v}</strong></div>\`;
+      document.getElementById('atlas-stats').innerHTML = [
+        colRow('mongo version', s.mongo.version),
+        colRow('replica set', s.mongo.replica_set + ' · ' + s.mongo.replica_hosts + ' nodes'),
+        colRow('database', s.db.name),
+        colRow('total docs', s.db.objects),
+        colRow('data size', fmtBytes(s.db.dataSize_bytes)),
+        colRow('index size', fmtBytes(s.db.indexSize_bytes)),
+        '<div style="height:6px"></div>',
+        ...Object.entries(s.collection_doc_counts).map(([k, v]) => colRow(k, v)),
+        '<div style="height:6px"></div>',
+        ...s.search_indexes.map(idxRow),
+      ].join('');
+    } catch (e) {
+      document.getElementById('atlas-stats').textContent = '(failed to load atlas stats)';
+    }
+  }
+
+  loadInitial().then(() => { loadAtlas(); connect(); setInterval(loadAtlas, 10000); });
 </script>
 </body>
 </html>`;

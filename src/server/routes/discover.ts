@@ -29,7 +29,8 @@ export function registerDiscoverRoute(app: FastifyInstance, db: Db): void {
         ? await discoverHybrid(db, q, top)
         : await discover(db, q, top);
 
-      // Broadcast for the dashboard's live ranking panel — only the demo query.
+      // Broadcast for the dashboard panels.
+      // For the demo query: live ranking. For ALL queries: pipeline inspector if hybrid.
       if (q === DEMO_AGENT_QUERY) {
         broadcast('discover_ran', {
           query: q,
@@ -40,6 +41,15 @@ export function registerDiscoverRoute(app: FastifyInstance, db: Db): void {
             rank_score: r.rank_score,
           })),
           meta,
+          ts: new Date().toISOString(),
+        });
+      }
+      const pipelineJson = (meta as unknown as { pipeline_json?: string }).pipeline_json;
+      if (mode === 'hybrid' && pipelineJson) {
+        broadcast('pipeline_ran', {
+          query: q,
+          pipeline_json: pipelineJson,
+          search_ms: meta.search_ms,
           ts: new Date().toISOString(),
         });
       }
