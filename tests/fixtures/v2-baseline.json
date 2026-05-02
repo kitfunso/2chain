@@ -1,0 +1,738 @@
+{
+  "generated_at": "2026-05-02T20:57:44.655Z",
+  "db_path": "C:/Users/skf_s/AppData/Local/Temp/v2.db",
+  "embedder": "ollama:nomic-embed-text",
+  "storage": "sqlite",
+  "total_queries": 32,
+  "v2_passes_expected": 20,
+  "v2_matches_v1_top1": 22,
+  "top3_overlap_avg": 1.875,
+  "margin_ratio_avg": 0.962936951954986,
+  "margin_ratio_min": 0,
+  "results": [
+    {
+      "id": "demo-1-dcf",
+      "q": "I am building a DCF model for NVIDIA. Use 2chain to pull the latest year's income statement from NVIDIA's 10-K. I need it as JSON for my model.",
+      "expected_top1": "sec-edgar-financials",
+      "v2_top1": "sec-edgar-financials",
+      "v2_top3": [
+        "sec-edgar-financials",
+        "pdf-extractor",
+        "pdftools-pro"
+      ],
+      "v2_rrf_margin": 0.00026441036488630484,
+      "baseline_top1": "sec-edgar-financials",
+      "baseline_top3": [
+        "sec-edgar-financials",
+        "pdf-extractor",
+        "sec-letter-reader"
+      ],
+      "baseline_rrf_margin": 0.00010576414595452055,
+      "expected_match": true,
+      "v2_matches_v1_top1": true,
+      "top3_overlap": 2,
+      "margin_ratio": 2.500000000000033
+    },
+    {
+      "id": "demo-1-dcf-short",
+      "q": "build a DCF for NVIDIA pull income statement",
+      "expected_top1": "sec-edgar-financials",
+      "v2_top1": "pdf-extractor",
+      "v2_top3": [
+        "pdf-extractor",
+        "sec-edgar-financials",
+        "pdftools-pro"
+      ],
+      "v2_rrf_margin": 0.00026441036488630484,
+      "baseline_top1": "sec-edgar-financials",
+      "baseline_top3": [
+        "sec-edgar-financials",
+        "pdf-extractor",
+        "guidance-extract"
+      ],
+      "baseline_rrf_margin": 0.00010576414595452055,
+      "expected_match": false,
+      "v2_matches_v1_top1": false,
+      "top3_overlap": 2,
+      "margin_ratio": 2.500000000000033
+    },
+    {
+      "id": "demo-2-arxiv",
+      "q": "I am doing a literature review on Mamba state-space models. Use 2chain to fetch the latest papers on this topic from arxiv. I need top 3 with title, authors, and abstract.",
+      "expected_top1": "arxiv-paper-search",
+      "v2_top1": "arxiv-paper-search",
+      "v2_top3": [
+        "arxiv-paper-search",
+        "sciparse",
+        "benchmark-extractor"
+      ],
+      "v2_rrf_margin": 0.0003924185574106266,
+      "baseline_top1": "arxiv-paper-search",
+      "baseline_top3": [
+        "arxiv-paper-search",
+        "paper-digest",
+        "cochrane-summary"
+      ],
+      "baseline_rrf_margin": 0.0004436218344203574,
+      "expected_match": true,
+      "v2_matches_v1_top1": true,
+      "top3_overlap": 1,
+      "margin_ratio": 0.8845789971617747
+    },
+    {
+      "id": "demo-2-arxiv-short",
+      "q": "fetch latest papers on mamba from arxiv for literature review",
+      "expected_top1": "arxiv-paper-search",
+      "v2_top1": "arxiv-paper-search",
+      "v2_top3": [
+        "arxiv-paper-search",
+        "sciparse",
+        "benchmark-extractor"
+      ],
+      "v2_rrf_margin": 0.00026441036488630484,
+      "baseline_top1": "arxiv-paper-search",
+      "baseline_top3": [
+        "arxiv-paper-search",
+        "benchmark-extractor",
+        "sciparse"
+      ],
+      "baseline_rrf_margin": 0.0005204267499349484,
+      "expected_match": true,
+      "v2_matches_v1_top1": true,
+      "top3_overlap": 3,
+      "margin_ratio": 0.508064516129033
+    },
+    {
+      "id": "demo-3-pr-lint",
+      "q": "Use 2chain to find a JS linter for structured findings on a PR review",
+      "expected_top1": "eslint-snitch",
+      "v2_top1": "prisma-pr-review",
+      "v2_top3": [
+        "prisma-pr-review",
+        "sh-pr-review",
+        "paper-digest"
+      ],
+      "v2_rrf_margin": 0.0001311292356068472,
+      "baseline_top1": "sh-pr-review",
+      "baseline_top3": [
+        "sh-pr-review",
+        "fc-pr-bot",
+        "typed-lint"
+      ],
+      "baseline_rrf_margin": -0.0007862903225806482,
+      "expected_match": false,
+      "v2_matches_v1_top1": false,
+      "top3_overlap": 1,
+      "margin_ratio": 0
+    },
+    {
+      "id": "demo-4-security",
+      "q": "audit this Python authentication function for OWASP recall",
+      "expected_top1": "security-scanner",
+      "v2_top1": "security-scanner",
+      "v2_top3": [
+        "security-scanner",
+        "code-review-mini",
+        "taintscanner"
+      ],
+      "v2_rrf_margin": 0.0022640893891199745,
+      "baseline_top1": "security-scanner",
+      "baseline_top3": [
+        "security-scanner",
+        "pylint-pro",
+        "taintscanner"
+      ],
+      "baseline_rrf_margin": 0.0007552939553491372,
+      "expected_match": true,
+      "v2_matches_v1_top1": true,
+      "top3_overlap": 2,
+      "margin_ratio": 2.9976267823742764
+    },
+    {
+      "id": "demo-5-malformed",
+      "q": "review this code, find the issues with structured output",
+      "v2_top1": "sf-pr-review",
+      "v2_top3": [
+        "sf-pr-review",
+        "soql-loop-finder",
+        "governor-limit-checker"
+      ],
+      "v2_rrf_margin": 0.00022854517830720594,
+      "baseline_top1": "pylint-pro",
+      "baseline_top3": [
+        "pylint-pro",
+        "mainframe-pr-bot",
+        "crab-checker"
+      ],
+      "baseline_rrf_margin": 0.00045361753599977225,
+      "expected_match": false,
+      "v2_matches_v1_top1": false,
+      "top3_overlap": 0,
+      "margin_ratio": 0.5038279170656239
+    },
+    {
+      "id": "prewarm-1",
+      "q": "Extract tables from this financial report PDF",
+      "v2_top1": "shareholder-pdf",
+      "v2_top3": [
+        "shareholder-pdf",
+        "annual-report-extract",
+        "sec-letter-reader"
+      ],
+      "v2_rrf_margin": 0,
+      "baseline_top1": "shareholder-pdf",
+      "baseline_top3": [
+        "shareholder-pdf",
+        "annual-report-extract",
+        "pdf-extractor"
+      ],
+      "baseline_rrf_margin": 0.00041293389045555726,
+      "expected_match": false,
+      "v2_matches_v1_top1": true,
+      "top3_overlap": 2,
+      "margin_ratio": 0
+    },
+    {
+      "id": "prewarm-2",
+      "q": "extract income statement from 10-K for DCF model",
+      "v2_top1": "sec-edgar-financials",
+      "v2_top3": [
+        "sec-edgar-financials",
+        "pdf-extractor",
+        "annual-report-extract"
+      ],
+      "v2_rrf_margin": 0,
+      "baseline_top1": "sec-edgar-financials",
+      "baseline_top3": [
+        "sec-edgar-financials",
+        "pdf-extractor",
+        "annual-report-extract"
+      ],
+      "baseline_rrf_margin": -0.00026441036488630484,
+      "expected_match": true,
+      "v2_matches_v1_top1": true,
+      "top3_overlap": 3,
+      "margin_ratio": 0
+    },
+    {
+      "id": "prewarm-3",
+      "q": "extract financial statement line items SEC filing",
+      "v2_top1": "pdf-extractor",
+      "v2_top3": [
+        "pdf-extractor",
+        "annual-report-extract",
+        "sec-letter-reader"
+      ],
+      "v2_rrf_margin": 0.0005164264939185627,
+      "baseline_top1": "pdf-extractor",
+      "baseline_top3": [
+        "pdf-extractor",
+        "sec-edgar-financials",
+        "po-parser"
+      ],
+      "baseline_rrf_margin": 0.001989735934796108,
+      "expected_match": true,
+      "v2_matches_v1_top1": true,
+      "top3_overlap": 1,
+      "margin_ratio": 0.2595452416008569
+    },
+    {
+      "id": "prewarm-4",
+      "q": "I am building a DCF for NVIDIA pull the income statement",
+      "expected_top1": "sec-edgar-financials",
+      "v2_top1": "pdf-extractor",
+      "v2_top3": [
+        "pdf-extractor",
+        "sec-edgar-financials",
+        "fundvalue-bot"
+      ],
+      "v2_rrf_margin": 0.00026441036488630484,
+      "baseline_top1": "sec-edgar-financials",
+      "baseline_top3": [
+        "sec-edgar-financials",
+        "pdf-extractor",
+        "guidance-extract"
+      ],
+      "baseline_rrf_margin": -0.00026441036488630484,
+      "expected_match": false,
+      "v2_matches_v1_top1": false,
+      "top3_overlap": 2,
+      "margin_ratio": 0
+    },
+    {
+      "id": "prewarm-5",
+      "q": "fetch latest 10-K income statement for NVDA",
+      "expected_top1": "sec-edgar-financials",
+      "v2_top1": "sec-edgar-financials",
+      "v2_top3": [
+        "sec-edgar-financials",
+        "pdf-extractor",
+        "fundvalue-bot"
+      ],
+      "v2_rrf_margin": 0.00026441036488630484,
+      "baseline_top1": "sec-edgar-financials",
+      "baseline_top3": [
+        "sec-edgar-financials",
+        "pdf-extractor",
+        "fundvalue-bot"
+      ],
+      "baseline_rrf_margin": 0.00026441036488630484,
+      "expected_match": true,
+      "v2_matches_v1_top1": true,
+      "top3_overlap": 3,
+      "margin_ratio": 1
+    },
+    {
+      "id": "prewarm-6",
+      "q": "get income statement for ticker from SEC EDGAR",
+      "expected_top1": "sec-edgar-financials",
+      "v2_top1": "sec-edgar-financials",
+      "v2_top3": [
+        "sec-edgar-financials",
+        "pdf-extractor",
+        "sec-letter-reader"
+      ],
+      "v2_rrf_margin": 0.00026441036488630484,
+      "baseline_top1": "sec-edgar-financials",
+      "baseline_top3": [
+        "sec-edgar-financials",
+        "pdf-extractor",
+        "sec-letter-reader"
+      ],
+      "baseline_rrf_margin": 0.00026441036488630484,
+      "expected_match": true,
+      "v2_matches_v1_top1": true,
+      "top3_overlap": 3,
+      "margin_ratio": 1
+    },
+    {
+      "id": "prewarm-7",
+      "q": "I am doing a literature review fetch the latest papers on Mamba state-space models from arxiv",
+      "expected_top1": "arxiv-paper-search",
+      "v2_top1": "arxiv-paper-search",
+      "v2_top3": [
+        "arxiv-paper-search",
+        "sciparse",
+        "benchmark-extractor"
+      ],
+      "v2_rrf_margin": 0.00026441036488630484,
+      "baseline_top1": "arxiv-paper-search",
+      "baseline_top3": [
+        "arxiv-paper-search",
+        "benchmark-extractor",
+        "sciparse"
+      ],
+      "baseline_rrf_margin": 0.0005204267499349484,
+      "expected_match": true,
+      "v2_matches_v1_top1": true,
+      "top3_overlap": 3,
+      "margin_ratio": 0.508064516129033
+    },
+    {
+      "id": "prewarm-8",
+      "q": "search arxiv for papers on a topic",
+      "expected_top1": "arxiv-paper-search",
+      "v2_top1": "arxiv-paper-search",
+      "v2_top3": [
+        "arxiv-paper-search",
+        "sciparse",
+        "benchmark-extractor"
+      ],
+      "v2_rrf_margin": 0.00026441036488630484,
+      "baseline_top1": "arxiv-paper-search",
+      "baseline_top3": [
+        "arxiv-paper-search",
+        "paper-digest",
+        "benchmark-extractor"
+      ],
+      "baseline_rrf_margin": 0.0007684426229508205,
+      "expected_match": true,
+      "v2_matches_v1_top1": true,
+      "top3_overlap": 2,
+      "margin_ratio": 0.34408602150537765
+    },
+    {
+      "id": "prewarm-9",
+      "q": "fetch latest papers on state space models",
+      "expected_top1": "arxiv-paper-search",
+      "v2_top1": "arxiv-paper-search",
+      "v2_top3": [
+        "arxiv-paper-search",
+        "sciparse",
+        "benchmark-extractor"
+      ],
+      "v2_rrf_margin": 0.0003924185574106266,
+      "baseline_top1": "arxiv-paper-search",
+      "baseline_top3": [
+        "arxiv-paper-search",
+        "paper-digest",
+        "benchmark-extractor"
+      ],
+      "baseline_rrf_margin": 0.0007855021763006967,
+      "expected_match": true,
+      "v2_matches_v1_top1": true,
+      "top3_overlap": 2,
+      "margin_ratio": 0.49957666477604457
+    },
+    {
+      "id": "prewarm-10",
+      "q": "review javascript code for bugs",
+      "v2_top1": "security-scanner",
+      "v2_top3": [
+        "security-scanner",
+        "sf-pr-review",
+        "terraform-pr-review"
+      ],
+      "v2_rrf_margin": 0.000024488523787259686,
+      "baseline_top1": "security-scanner",
+      "baseline_top3": [
+        "security-scanner",
+        "eslint-snitch",
+        "code-review-mini"
+      ],
+      "baseline_rrf_margin": 0.00010576414595452055,
+      "expected_match": false,
+      "v2_matches_v1_top1": true,
+      "top3_overlap": 1,
+      "margin_ratio": 0.23153899240854223
+    },
+    {
+      "id": "prewarm-11",
+      "q": "lint javascript for style issues",
+      "v2_top1": "pylint-pro",
+      "v2_top3": [
+        "pylint-pro",
+        "malformed-bot",
+        "eslint-snitch"
+      ],
+      "v2_rrf_margin": 0.00025201612903225784,
+      "baseline_top1": "code-review-mini",
+      "baseline_top3": [
+        "code-review-mini",
+        "eslint-snitch",
+        "pylint-pro"
+      ],
+      "baseline_rrf_margin": -0.00033629693283976705,
+      "expected_match": false,
+      "v2_matches_v1_top1": false,
+      "top3_overlap": 2,
+      "margin_ratio": 0
+    },
+    {
+      "id": "prewarm-12",
+      "q": "audit python code for security vulnerabilities OWASP",
+      "expected_top1": "security-scanner",
+      "v2_top1": "security-scanner",
+      "v2_top3": [
+        "security-scanner",
+        "iac-policy-bot",
+        "terraform-pr-review"
+      ],
+      "v2_rrf_margin": 0.0007684426229508205,
+      "baseline_top1": "security-scanner",
+      "baseline_top3": [
+        "security-scanner",
+        "pylint-pro",
+        "code-review-mini"
+      ],
+      "baseline_rrf_margin": 0.00026441036488630484,
+      "expected_match": true,
+      "v2_matches_v1_top1": true,
+      "top3_overlap": 1,
+      "margin_ratio": 2.906249999999989
+    },
+    {
+      "id": "prewarm-13",
+      "q": "find security issues in python source code",
+      "v2_top1": "security-scanner",
+      "v2_top3": [
+        "security-scanner",
+        "code-review-mini",
+        "iac-policy-bot"
+      ],
+      "v2_rrf_margin": 0.0010538641686182702,
+      "baseline_top1": "pylint-pro",
+      "baseline_top3": [
+        "pylint-pro",
+        "security-scanner",
+        "malformed-bot"
+      ],
+      "baseline_rrf_margin": -0.00010576414595452055,
+      "expected_match": true,
+      "v2_matches_v1_top1": false,
+      "top3_overlap": 1,
+      "margin_ratio": 0
+    },
+    {
+      "id": "prewarm-14",
+      "q": "summarise arxiv paper abstract",
+      "v2_top1": "arxiv-paper-search",
+      "v2_top3": [
+        "arxiv-paper-search",
+        "sciparse",
+        "clinical-recap"
+      ],
+      "v2_rrf_margin": 0.0005835667600373497,
+      "baseline_top1": "arxiv-paper-search",
+      "baseline_top3": [
+        "arxiv-paper-search",
+        "paper-digest",
+        "pubmed-tldr"
+      ],
+      "baseline_rrf_margin": 0.00041562004230566094,
+      "expected_match": false,
+      "v2_matches_v1_top1": true,
+      "top3_overlap": 1,
+      "margin_ratio": 1.4040871484445283
+    },
+    {
+      "id": "prewarm-15",
+      "q": "summarise article into one paragraph",
+      "v2_top1": "tldr-bot",
+      "v2_top3": [
+        "tldr-bot",
+        "leadsection-bot",
+        "encyclopedia-summary"
+      ],
+      "v2_rrf_margin": 0,
+      "baseline_top1": "tldr-bot",
+      "baseline_top3": [
+        "tldr-bot",
+        "leadsection-bot",
+        "encyclopedia-summary"
+      ],
+      "baseline_rrf_margin": 0.0004436218344203574,
+      "expected_match": true,
+      "v2_matches_v1_top1": true,
+      "top3_overlap": 3,
+      "margin_ratio": 0
+    },
+    {
+      "id": "prewarm-16",
+      "q": "parse UK supplier invoice for accounts payable",
+      "expected_top1": "invoice-grok",
+      "v2_top1": "invoice-grok",
+      "v2_top3": [
+        "invoice-grok",
+        "b2b-invoice",
+        "po-parser"
+      ],
+      "v2_rrf_margin": 0.00063661880161087,
+      "baseline_top1": "invoice-grok",
+      "baseline_top3": [
+        "invoice-grok",
+        "po-parser",
+        "lineitem-extractor"
+      ],
+      "baseline_rrf_margin": 0.0003412152804008993,
+      "expected_match": true,
+      "v2_matches_v1_top1": true,
+      "top3_overlap": 2,
+      "margin_ratio": 1.865739426625022
+    },
+    {
+      "id": "prewarm-17",
+      "q": "extract VAT line items from invoice",
+      "expected_top1": "invoice-grok",
+      "v2_top1": "invoiceline-bot",
+      "v2_top3": [
+        "invoiceline-bot",
+        "b2b-invoice",
+        "lineitem-extractor"
+      ],
+      "v2_rrf_margin": 0,
+      "baseline_top1": "lineitem-extractor",
+      "baseline_top3": [
+        "lineitem-extractor",
+        "po-parser",
+        "b2b-invoice"
+      ],
+      "baseline_rrf_margin": 0.00017921146953405256,
+      "expected_match": false,
+      "v2_matches_v1_top1": false,
+      "top3_overlap": 2,
+      "margin_ratio": 0
+    },
+    {
+      "id": "edge-1-fin-vs-invoice",
+      "q": "extract financial line items from a public company filing",
+      "v2_top1": "annual-report-extract",
+      "v2_top3": [
+        "annual-report-extract",
+        "pdf-extractor",
+        "lineitem-extractor"
+      ],
+      "v2_rrf_margin": 0.0007531689181609867,
+      "baseline_top1": "pdf-extractor",
+      "baseline_top3": [
+        "pdf-extractor",
+        "sec-edgar-financials",
+        "annual-report-extract"
+      ],
+      "baseline_rrf_margin": 0.0009364533756389924,
+      "expected_match": false,
+      "v2_matches_v1_top1": false,
+      "top3_overlap": 2,
+      "margin_ratio": 0.8042780748663105
+    },
+    {
+      "id": "edge-2-py-sec-vs-style",
+      "q": "check this Python file for SQL injection and hardcoded API keys",
+      "expected_top1": "security-scanner",
+      "v2_top1": "security-scanner",
+      "v2_top3": [
+        "security-scanner",
+        "sql-injection-bot",
+        "parameterised-query-checker"
+      ],
+      "v2_rrf_margin": 0.00026441036488630484,
+      "baseline_top1": "security-scanner",
+      "baseline_top3": [
+        "security-scanner",
+        "sql-injection-bot",
+        "sqli-finder"
+      ],
+      "baseline_rrf_margin": 0.00026441036488630484,
+      "expected_match": true,
+      "v2_matches_v1_top1": true,
+      "top3_overlap": 2,
+      "margin_ratio": 1
+    },
+    {
+      "id": "edge-3-paper-search-vs-summary",
+      "q": "I want to find research papers on diffusion models",
+      "expected_top1": "arxiv-paper-search",
+      "v2_top1": "arxiv-paper-search",
+      "v2_top3": [
+        "arxiv-paper-search",
+        "paper-digest",
+        "benchmark-extractor"
+      ],
+      "v2_rrf_margin": 0.00026441036488630484,
+      "baseline_top1": "arxiv-paper-search",
+      "baseline_top3": [
+        "arxiv-paper-search",
+        "paper-digest",
+        "pubmed-tldr"
+      ],
+      "baseline_rrf_margin": -0.00018749098601028927,
+      "expected_match": true,
+      "v2_matches_v1_top1": true,
+      "top3_overlap": 2,
+      "margin_ratio": 0
+    },
+    {
+      "id": "edge-4-paper-summary-vs-search",
+      "q": "summarise this paper text I already have",
+      "v2_top1": "paper-digest",
+      "v2_top3": [
+        "paper-digest",
+        "pubmed-tldr",
+        "rct-digest"
+      ],
+      "v2_rrf_margin": 0.0007646269941351917,
+      "baseline_top1": "paper-digest",
+      "baseline_top3": [
+        "paper-digest",
+        "tldr-bot",
+        "pubmed-tldr"
+      ],
+      "baseline_rrf_margin": 0.000877767929629604,
+      "expected_match": true,
+      "v2_matches_v1_top1": true,
+      "top3_overlap": 2,
+      "margin_ratio": 0.8711038172217628
+    },
+    {
+      "id": "edge-5-edgar-vs-pdf",
+      "q": "I have NVIDIA ticker NVDA and want their latest annual report numbers",
+      "expected_top1": "sec-edgar-financials",
+      "v2_top1": "sec-edgar-financials",
+      "v2_top3": [
+        "sec-edgar-financials",
+        "annual-report-extract",
+        "shareholder-pdf"
+      ],
+      "v2_rrf_margin": 0.00026441036488630484,
+      "baseline_top1": "sec-edgar-financials",
+      "baseline_top3": [
+        "sec-edgar-financials",
+        "ceo-letter-bot",
+        "annual-report-extract"
+      ],
+      "baseline_rrf_margin": 0.0007684426229508205,
+      "expected_match": true,
+      "v2_matches_v1_top1": true,
+      "top3_overlap": 2,
+      "margin_ratio": 0.34408602150537765
+    },
+    {
+      "id": "edge-6-pdf-vs-edgar",
+      "q": "I have a 10-K PDF text pasted, extract the income statement rows",
+      "expected_top1": "pdf-extractor",
+      "v2_top1": "pdf-extractor",
+      "v2_top3": [
+        "pdf-extractor",
+        "sec-edgar-financials",
+        "guidance-extract"
+      ],
+      "v2_rrf_margin": 0.00026441036488630484,
+      "baseline_top1": "sec-edgar-financials",
+      "baseline_top3": [
+        "sec-edgar-financials",
+        "pdf-extractor",
+        "open-banking-pdf"
+      ],
+      "baseline_rrf_margin": -0.0004436218344203574,
+      "expected_match": true,
+      "v2_matches_v1_top1": false,
+      "top3_overlap": 2,
+      "margin_ratio": 0
+    },
+    {
+      "id": "edge-7-jslint-vs-pylint",
+      "q": "lint this code: function f() { var x = null; x.foo(); }",
+      "expected_top1": "eslint-snitch",
+      "v2_top1": "react-hooks-lint",
+      "v2_top3": [
+        "react-hooks-lint",
+        "typed-lint",
+        "gql-lint"
+      ],
+      "v2_rrf_margin": 0.0006100268078032961,
+      "baseline_top1": "react-hooks-lint",
+      "baseline_top3": [
+        "react-hooks-lint",
+        "typed-lint",
+        "security-scanner"
+      ],
+      "baseline_rrf_margin": 0.0006086900773559709,
+      "expected_match": false,
+      "v2_matches_v1_top1": true,
+      "top3_overlap": 2,
+      "margin_ratio": 1.002196077276521
+    },
+    {
+      "id": "edge-8-pylint-vs-jslint",
+      "q": "lint this code: def f(): import os; os.system('rm')",
+      "v2_top1": "bashlint",
+      "v2_top3": [
+        "bashlint",
+        "shell-rules-checker",
+        "shellcheck-bot"
+      ],
+      "v2_rrf_margin": 0.00024420024420024333,
+      "baseline_top1": "pylint-pro",
+      "baseline_top3": [
+        "pylint-pro",
+        "security-scanner",
+        "shellcheck-bot"
+      ],
+      "baseline_rrf_margin": 0.0017597026576718303,
+      "expected_match": false,
+      "v2_matches_v1_top1": false,
+      "top3_overlap": 1,
+      "margin_ratio": 0.1387735837845081
+    }
+  ]
+}

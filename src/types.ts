@@ -336,7 +336,11 @@ export const VECTOR_INDEX_NAME = 'tools_capability_idx';
 // v2
 export const NOMIC_EMBEDDING_DIM = 768;
 export const RRF_K_CONSTANT = 60;
-export const RRF_DEFAULT_VECTOR_WEIGHT = 0.7;
-export const RRF_DEFAULT_TEXT_WEIGHT = 0.3;
+// Calibrated against the 32-query golden set (Step 10 sweep, 2026-05-02).
+// 0.5/0.5 gave the best v1-top1 match (22/32) and top-3 overlap (1.88/3)
+// for nomic-embed-text vs Voyage. v1 default of 0.7/0.3 leaned too hard on
+// vector for nomic's narrower semantic field. See docs/perf/.
+export const RRF_DEFAULT_VECTOR_WEIGHT = 0.5;
+export const RRF_DEFAULT_TEXT_WEIGHT = 0.5;
 // VEC_RELEVANCE_GATE intentionally not set in v2 until Step 6.5 perf tuning
 // recalibrates against nomic-embed-text. v1 used 0.70 against Voyage cosine.
