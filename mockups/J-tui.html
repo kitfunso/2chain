@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>J · 2chain · TUI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --bg: #0c0c0e;
+    --fg: #d6d6d6;
+    --fg-bright: #ffffff;
+    --muted: #6a6a6f;
+    --comment: #4a4a4f;
+    --selection: #2a3344;
+    --green: #98c379;
+    --yellow: #e5c07b;
+    --red: #e06c75;
+    --blue: #61afef;
+    --magenta: #c678dd;
+    --cyan: #56b6c2;
+    --orange: #d19a66;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; }
+  body { background: var(--bg); color: var(--fg);
+    font: 14px/1.35 ui-monospace, "JetBrains Mono", "Cascadia Code", "SF Mono", "Consolas", monospace;
+    letter-spacing: 0;
+  }
+  pre { margin: 0; }
+  .green { color: var(--green); }
+  .yellow { color: var(--yellow); }
+  .red { color: var(--red); }
+  .blue { color: var(--blue); }
+  .magenta { color: var(--magenta); }
+  .cyan { color: var(--cyan); }
+  .orange { color: var(--orange); }
+  .muted { color: var(--muted); }
+  .comment { color: var(--comment); }
+  .bright { color: var(--fg-bright); font-weight: 700; }
+  .sel { background: var(--selection); }
+  .reverse { background: var(--fg); color: var(--bg); }
+
+  /* layout: top bar, body (3-pane), status bar */
+  .tui { display: grid; grid-template-rows: auto 1fr auto; height: 100%; padding: 4px 8px; gap: 4px; }
+
+  .top {
+    border: 1px solid var(--comment);
+    padding: 2px 8px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .top .b { color: var(--bg); background: var(--green); padding: 0 8px; font-weight: 700; }
+
+  .body {
+    display: grid; grid-template-columns: 280px 1fr 380px; gap: 4px; min-height: 0;
+  }
+  .pane {
+    border: 1px solid var(--comment);
+    display: flex; flex-direction: column; min-height: 0;
+  }
+  .pane.focused { border-color: var(--cyan); }
+  .pane-head {
+    padding: 1px 8px;
+    border-bottom: 1px solid var(--comment);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .pane.focused .pane-head { background: var(--selection); }
+  .pane-body { padding: 6px 8px; overflow: auto; flex: 1; }
+
+  /* sidebar */
+  .sb-row { padding: 1px 4px; }
+  .sb-row.active { background: var(--selection); }
+  .sb-row .ico { display: inline-block; width: 14px; }
+  .sb-cat { color: var(--muted); margin-top: 8px; }
+
+  /* main pane = ranking table */
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; line-height: 1.45; }
+  th { text-align: left; color: var(--muted); padding: 0 8px 4px; font-weight: normal;
+    border-bottom: 1px solid var(--comment); }
+  td { padding: 1px 8px; }
+  tr.t1 td { background: var(--selection); color: var(--fg-bright); font-weight: 700; }
+  tr.t1 td.first::before { content: "▶ "; color: var(--green); }
+  td.num { text-align: right; }
+
+  /* right pane = detail + feed */
+  .detail { font-size: 13.5px; }
+  .detail h3 { margin: 0 0 4px; font-size: 15px; }
+  .detail .blurb { color: var(--fg); margin: 4px 0 10px; line-height: 1.55; }
+  .kv { display: grid; grid-template-columns: 90px 1fr; gap: 1px 8px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--comment); margin-bottom: 8px; }
+  .kv .k { color: var(--muted); }
+  .feed-row { line-height: 1.4; }
+
+  /* status bar */
+  .status {
+    border: 1px solid var(--comment);
+    padding: 0 8px;
+    display: flex; align-items: center; gap: 16px; font-size: 13px;
+  }
+  .status .key { background: var(--cyan); color: var(--bg); padding: 0 6px; font-weight: 700; }
+  .status .key.r { background: var(--red); }
+  .status .key.g { background: var(--green); }
+  .status .key.y { background: var(--yellow); }
+  .status .key.m { background: var(--magenta); }
+  .status .right { margin-left: auto; }
+
+  /* box-drawing helpers */
+  .box-h { letter-spacing: -1px; }
+  .nameblock { display: inline-block; }
+</style>
+</head>
+<body>
+<div class="tui">
+  <div class="top">
+    <span class="b">2chain v0.2</span>
+    <span><span class="muted">[</span><span class="green">Overview</span><span class="muted">]</span> <span class="muted">Discover Tools Calls Evals</span></span>
+    <span class="muted">·</span>
+    <span><span class="muted">storage:</span> <span class="cyan">sqlite-vec</span> <span class="muted">embed:</span> <span class="cyan">nomic-embed-text:768</span></span>
+    <span class="muted">·</span>
+    <span><span class="muted">418 tools · 77 mcp · 7 violations</span></span>
+    <span class="right" style="margin-left:auto;"><span class="green">●</span> live <span class="muted">12:41:08 LON</span></span>
+  </div>
+
+  <div class="body">
+    <div class="pane">
+      <div class="pane-head"><span class="muted">[1]</span> <span>NAV</span> <span class="muted">jk to move</span></div>
+      <div class="pane-body">
+<pre><span class="muted">┌─ Workspace ─────────┐</span>
+<span class="sb-row"><span class="ico">▦</span> Overview</span>
+<span class="sb-row sel"><span class="ico">⌘</span> Discover</span>
+<span class="sb-row"><span class="ico">↗</span> Tools <span class="muted">418</span></span>
+<span class="sb-row"><span class="ico">⚡</span> Calls <span class="muted">2.1k</span></span>
+<span class="sb-row"><span class="ico">⚠</span> Violations <span class="red">7</span></span>
+<span class="sb-row"><span class="ico">✓</span> Evals <span class="muted">418</span></span>
+
+<span class="muted">┌─ Sources ───────────┐</span>
+<span class="sb-row"><span class="ico">●</span> MCP <span class="muted">20 srv / 77</span></span>
+<span class="sb-row"><span class="ico">●</span> Fixtures <span class="muted">199</span></span>
+<span class="sb-row"><span class="ico">●</span> Catalog <span class="muted">142</span></span>
+
+<span class="muted">┌─ Domains ───────────┐</span>
+<span class="sb-row"><span class="ico orange">●</span> finance <span class="muted">158</span></span>
+<span class="sb-row"><span class="ico cyan">●</span> code <span class="muted">92</span></span>
+<span class="sb-row"><span class="ico magenta">●</span> research <span class="muted">58</span></span>
+<span class="sb-row"><span class="ico red">●</span> docs <span class="muted">42</span></span>
+<span class="sb-row"><span class="ico green">●</span> geo <span class="muted">28</span></span>
+<span class="sb-row"><span class="ico blue">●</span> data <span class="muted">22</span></span>
+<span class="sb-row"><span class="ico yellow">●</span> comms <span class="muted">18</span></span>
+
+<span class="comment"># press / for fuzzy</span>
+</pre>
+      </div>
+    </div>
+
+    <div class="pane focused">
+      <div class="pane-head">
+        <span><span class="cyan">[2]</span> <span class="bright">RANKING</span> <span class="muted">— "build a DCF model for NVIDIA from the latest 10-K"</span></span>
+        <span class="muted">RRF · vec0.5 / txt0.5 · gate 0.80 · <span class="green">68ms</span></span>
+      </div>
+      <div class="pane-body">
+<pre><span class="muted">      ┌────────────────────────────────────────────────────────────────────────────────────┐</span>
+<span class="muted">      │</span>  <span class="comment">/discover ?q="build a DCF model for NVIDIA from the latest 10-K"</span>          <span class="muted">│</span>
+<span class="muted">      │</span>  <span class="comment">└─ embed 23ms (cached)  └─ vec0 14ms  └─ fts5 8ms  └─ rrf 0ms  total 45ms</span>  <span class="muted">│</span>
+<span class="muted">      └────────────────────────────────────────────────────────────────────────────────────┘</span>
+</pre>
+        <table>
+          <thead>
+            <tr><th>#</th><th>tool</th><th>ver</th><th>domain</th><th class="num">rrf</th><th class="num">rel</th><th class="num">vec</th><th class="num">p95</th><th class="num">$/call</th></tr>
+          </thead>
+          <tbody>
+            <tr class="t1"><td class="first">1</td><td><span class="bright">sec-edgar-financials</span></td><td class="muted">1.0</td><td class="orange">finance</td><td class="num green">0.0164</td><td class="num green">1.00</td><td class="num">0.78</td><td class="num">1500</td><td class="num">0.0000</td></tr>
+            <tr><td>2</td><td>pdf-extractor</td><td class="muted">3.0</td><td class="orange">finance</td><td class="num">0.0162</td><td class="num">1.00</td><td class="num">0.76</td><td class="num">800</td><td class="num">0.0010</td></tr>
+            <tr><td>3</td><td>yahoo-finance-fund</td><td class="muted">1.0</td><td class="orange">finance</td><td class="num">0.0148</td><td class="num">0.92</td><td class="num">0.71</td><td class="num">1200</td><td class="num">0.0000</td></tr>
+            <tr><td>4</td><td>annual-report-extract</td><td class="muted">1.0</td><td class="red">docs</td><td class="num">0.0138</td><td class="num">0.80</td><td class="num">0.69</td><td class="num">2000</td><td class="num">0.0050</td></tr>
+            <tr><td>5</td><td>mcp-github__get_file</td><td class="muted">1.0</td><td class="cyan">code</td><td class="num">0.0114</td><td class="num">0.95</td><td class="num">0.61</td><td class="num">1500</td><td class="num">0.0000</td></tr>
+            <tr><td>6</td><td>sec-edgar-filings-list</td><td class="muted">1.0</td><td class="orange">finance</td><td class="num">0.0110</td><td class="num">0.92</td><td class="num">0.60</td><td class="num">1000</td><td class="num">0.0000</td></tr>
+            <tr><td>7</td><td>fred-series</td><td class="muted">1.0</td><td class="orange">finance</td><td class="num">0.0098</td><td class="num">0.92</td><td class="num">0.55</td><td class="num">700</td><td class="num">0.0000</td></tr>
+            <tr><td>8</td><td>polygon-aggregates</td><td class="muted">1.0</td><td class="orange">finance</td><td class="num">0.0091</td><td class="num">0.92</td><td class="num">0.54</td><td class="num">400</td><td class="num">0.0050</td></tr>
+            <tr><td>9</td><td>finnhub-earnings-cal</td><td class="muted">1.0</td><td class="orange">finance</td><td class="num">0.0083</td><td class="num">0.92</td><td class="num">0.52</td><td class="num">600</td><td class="num">0.0000</td></tr>
+            <tr><td>10</td><td>tiingo-eod</td><td class="muted">1.0</td><td class="orange">finance</td><td class="num">0.0077</td><td class="num">0.92</td><td class="num">0.50</td><td class="num">800</td><td class="num">0.0000</td></tr>
+          </tbody>
+        </table>
+<pre style="margin-top:14px;"><span class="muted">┌─ INPUT CONTRACT ───── sec-edgar-financials@1.0 ─────────────────────────────┐</span>
+<span class="muted">│</span> <span class="cyan">{</span>                                                                            <span class="muted">│</span>
+<span class="muted">│</span>   <span class="green">"type"</span>: <span class="yellow">"object"</span>,                                                          <span class="muted">│</span>
+<span class="muted">│</span>   <span class="green">"required"</span>: [<span class="yellow">"ticker"</span>],                                                      <span class="muted">│</span>
+<span class="muted">│</span>   <span class="green">"properties"</span>: <span class="cyan">{</span>                                                              <span class="muted">│</span>
+<span class="muted">│</span>     <span class="green">"ticker"</span>: <span class="cyan">{</span> <span class="green">"type"</span>: <span class="yellow">"string"</span>, <span class="green">"pattern"</span>: <span class="yellow">"^[A-Z]{1,5}$"</span> <span class="cyan">}</span>                  <span class="muted">│</span>
+<span class="muted">│</span>   <span class="cyan">}</span>                                                                            <span class="muted">│</span>
+<span class="muted">│</span> <span class="cyan">}</span>                                                                            <span class="muted">│</span>
+<span class="muted">└─────────────────────────────────────────────────────────────────────────────┘</span>
+
+<span class="muted">┌─ SUGGESTED CALL ────────────────────────────────────────────────────────────┐</span>
+<span class="muted">│</span> <span class="magenta">POST</span> /call                                                                  <span class="muted">│</span>
+<span class="muted">│</span> {                                                                            <span class="muted">│</span>
+<span class="muted">│</span>   <span class="green">"tool_name"</span>: <span class="yellow">"sec-edgar-financials"</span>, <span class="green">"tool_version"</span>: <span class="yellow">"1.0"</span>,              <span class="muted">│</span>
+<span class="muted">│</span>   <span class="green">"input"</span>: { <span class="green">"ticker"</span>: <span class="yellow">"NVDA"</span> }                                              <span class="muted">│</span>
+<span class="muted">│</span> }                                                                            <span class="muted">│</span>
+<span class="muted">└─────────────────────────────────────────────────────────────────────────────┘</span></pre>
+      </div>
+    </div>
+
+    <div class="pane">
+      <div class="pane-head"><span class="muted">[3]</span> DETAIL & FEED <span class="muted">↑↓ scroll</span></div>
+      <div class="pane-body">
+        <div class="detail">
+          <h3 class="bright">sec-edgar-financials@1.0</h3>
+          <div class="muted">finance · author hackathon-team</div>
+          <p class="blurb">Fetches the latest annual 10-K income statement directly from SEC EDGAR for any US-listed company by ticker. Live via XBRL companyfacts API. Free, no API key.</p>
+          <div class="kv">
+            <span class="k">reliability</span><span><span class="green">1.000</span> <span class="muted">●●●●●</span></span>
+            <span class="k">eval cases</span><span>5/5 pass</span>
+            <span class="k">p95 latency</span><span>1500 ms</span>
+            <span class="k">cost / call</span><span>$0.0000</span>
+            <span class="k">calls 24h</span><span>142</span>
+            <span class="k">ok rate</span><span class="green">99.30%</span>
+            <span class="k">stub</span><span>sec-edgar-financials-v1</span>
+            <span class="k">domain</span><span class="orange">finance</span>
+            <span class="k">circuit</span><span class="green">closed</span>
+          </div>
+        </div>
+
+<pre><span class="muted">┌─ LIVE FEED ─────────────────────────┐</span></pre>
+        <div class="feed-row"><span class="muted">12:41:08</span> <span class="green">DSCV</span> "DCF NVIDIA" <span class="muted">→ 5 res 68ms</span></div>
+        <div class="feed-row"><span class="muted">12:41:04</span> <span class="green">CALL</span> sec-edgar-financials NVDA <span class="green">ok</span> 1191ms</div>
+        <div class="feed-row"><span class="muted">12:40:51</span> <span class="green">DSCV</span> "add ints" <span class="muted">→ mcp-everything__get-sum</span></div>
+        <div class="feed-row"><span class="muted">12:40:47</span> <span class="green">CALL</span> mcp-everything__get-sum 7+5=12 <span class="green">ok</span></div>
+        <div class="feed-row"><span class="muted">12:40:33</span> <span class="red">CB!!</span> malformed-bot <span class="red">output_violation</span></div>
+        <div class="feed-row"><span class="muted">12:40:22</span> <span class="yellow">GATE</span> flaky-extractor rel 0.40 &lt; 0.80</div>
+        <div class="feed-row"><span class="muted">12:40:11</span> <span class="green">DSCV</span> "extract VAT invoice" 5 res</div>
+        <div class="feed-row"><span class="muted">12:40:04</span> <span class="green">CALL</span> arxiv-paper-search Mamba <span class="green">ok</span></div>
+        <div class="feed-row"><span class="muted">12:39:58</span> <span class="green">DSCV</span> "python OWASP" 5 res</div>
+        <div class="feed-row"><span class="muted">12:39:51</span> <span class="green">CALL</span> security-scanner OWASP <span class="green">ok</span></div>
+        <div class="feed-row"><span class="muted">12:39:33</span> <span class="cyan">PUSH</span> mcp-everything imported (13 tools)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="status">
+    <span><span class="key g">/</span><span class="muted">search</span></span>
+    <span><span class="key">⏎</span><span class="muted">call</span></span>
+    <span><span class="key">j/k</span><span class="muted">move</span></span>
+    <span><span class="key m">tab</span><span class="muted">pane</span></span>
+    <span><span class="key">d</span><span class="muted">discover</span></span>
+    <span><span class="key">p</span><span class="muted">push</span></span>
+    <span><span class="key y">e</span><span class="muted">eval</span></span>
+    <span><span class="key r">!</span><span class="muted">cb</span></span>
+    <span><span class="key">?</span><span class="muted">help</span></span>
+    <span><span class="key r">q</span><span class="muted">quit</span></span>
+    <span class="right" style="margin-left:auto;"><span class="muted">CPU 4%  MEM 89MB  WAL 1.2MB  pane 2/3</span></span>
+  </div>
+</div>
+</body>
+</html>

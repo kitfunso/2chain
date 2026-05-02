@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>K · 2chain · Teenage Engineering</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --paper: #f3eee2;       /* TE cream */
+    --ink: #1a1a1a;
+    --ink-2: #4a4a4a;
+    --muted: #8a8678;
+    --line: #1a1a1a;
+    --orange: #ff5c1c;      /* OP-1 orange */
+    --red: #e3231a;
+    --yellow: #ffd400;
+    --green: #2da94f;
+    --blue: #1f5cff;
+    --cream-2: #ece6d4;
+    --serif: "Inter", -apple-system, system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--paper); color: var(--ink); font: 14px/1.45 var(--serif);
+    -webkit-font-smoothing: antialiased; }
+
+  /* outer chassis with TE-style hardware feel */
+  .chassis { max-width: 1280px; margin: 18px auto; padding: 22px;
+    background: var(--cream-2);
+    border: 3px solid var(--ink);
+    box-shadow: 6px 6px 0 var(--ink);
+    position: relative;
+  }
+  .chassis::before, .chassis::after {
+    content: ""; position: absolute; width: 12px; height: 12px;
+    border: 2px solid var(--ink); background: var(--paper); border-radius: 50%;
+  }
+  .chassis::before { top: 8px; left: 8px; }
+  .chassis::after  { bottom: 8px; right: 8px; }
+
+  /* TOP HEADER: large logo + faceplate label */
+  .face-top { display: flex; align-items: end; justify-content: space-between;
+    border-bottom: 2px solid var(--ink); padding-bottom: 16px; margin-bottom: 18px; }
+  .logo { display: flex; align-items: end; gap: 10px; }
+  .logo .mark { width: 38px; height: 38px; background: var(--orange);
+    border: 2px solid var(--ink); transform: rotate(-2deg);
+    display: grid; place-items: center; color: var(--paper); font-weight: 800; font-size: 22px;
+    box-shadow: 3px 3px 0 var(--ink); }
+  .logo .word { font-family: var(--mono); font-size: 30px; font-weight: 800; letter-spacing: -1.5px; line-height: 0.9; }
+  .logo .word small { font-family: var(--serif); font-size: 11px; letter-spacing: 3px; color: var(--muted); display: block; margin-top: 4px; font-weight: 600; }
+  .face-top .ctype { font-family: var(--mono); font-size: 11px; letter-spacing: 2px; }
+  .face-top .ctype b { background: var(--ink); color: var(--paper); padding: 3px 8px; }
+  .ser { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .ser b { color: var(--ink); }
+
+  /* hardware indicator strip — colored squares like TE knobs */
+  .indicator-row { display: grid; grid-template-columns: repeat(8, 1fr); gap: 0;
+    border: 2px solid var(--ink); margin-bottom: 18px;}
+  .indicator-row .cell { padding: 10px 12px; border-right: 2px solid var(--ink); position: relative; }
+  .indicator-row .cell:last-child { border-right: none; }
+  .indicator-row .lab { font-family: var(--mono); font-size: 9px; letter-spacing: 1px; text-transform: uppercase; }
+  .indicator-row .v { font-family: var(--mono); font-size: 22px; font-weight: 800; line-height: 1; margin-top: 4px; letter-spacing: -1px; }
+  .indicator-row .cell.orange { background: var(--orange); color: var(--paper); }
+  .indicator-row .cell.yellow { background: var(--yellow); color: var(--ink); }
+  .indicator-row .cell.green  { background: var(--green); color: var(--paper); }
+  .indicator-row .cell.red    { background: var(--red); color: var(--paper); }
+  .indicator-row .cell.blue   { background: var(--blue); color: var(--paper); }
+  .indicator-row .cell.k      { background: var(--ink); color: var(--paper); }
+
+  /* knob / VU meter */
+  .row-2 { display: grid; grid-template-columns: 1fr 320px; gap: 18px; margin-bottom: 18px; }
+  .module { border: 2px solid var(--ink); background: var(--paper); }
+  .module-head { padding: 6px 14px; border-bottom: 2px solid var(--ink);
+    display: flex; align-items: center; justify-content: space-between; background: var(--cream-2); }
+  .module-head h3 { margin: 0; font-family: var(--mono); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; }
+  .module-head .right { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+
+  /* ranking list — minimal, blocky */
+  .ranking { padding: 4px 0; }
+  .ranking .row { display: grid; grid-template-columns: 50px 1fr 100px 70px;
+    align-items: center; padding: 8px 14px; border-bottom: 2px solid var(--ink); gap: 12px; }
+  .ranking .row:last-child { border-bottom: none; }
+  .ranking .rank { font-family: var(--mono); font-size: 26px; font-weight: 800; letter-spacing: -1.5px; }
+  .ranking .row.top1 { background: var(--yellow); }
+  .ranking .row.top1 .rank { color: var(--orange); }
+  .ranking .name { font-weight: 700; font-size: 16px; letter-spacing: -0.3px; }
+  .ranking .name small { font-family: var(--mono); font-weight: 400; color: var(--muted); margin-left: 6px; font-size: 11px; }
+  .ranking .meta { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .ranking .pip { font-family: var(--mono); font-size: 14px; font-weight: 700; text-align: right; }
+  .ranking .domain-tag { display: inline-block; padding: 1px 6px; border: 1.5px solid var(--ink); font-family: var(--mono); font-size: 9px;
+    text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+
+  /* big knob */
+  .knob { padding: 18px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .knob-circle { width: 180px; height: 180px; border-radius: 50%; border: 3px solid var(--ink);
+    background: radial-gradient(circle at 35% 35%, #ffffff 0%, var(--cream-2) 60%, #d6cfba 100%);
+    position: relative; box-shadow: inset 0 -6px 12px rgba(0,0,0,0.15), 4px 4px 0 var(--ink); }
+  .knob-circle::after { content: ""; position: absolute; left: 50%; top: 8px;
+    width: 4px; height: 50px; background: var(--orange); transform: translateX(-50%); border-radius: 2px;
+    transform-origin: center 82px; transform: translateX(-50%) rotate(45deg); }
+  .knob-marks { position: absolute; inset: -22px; pointer-events: none; }
+  .knob-marks .m { position: absolute; left: 50%; top: 50%; transform-origin: 0 0;
+    font-family: var(--mono); font-size: 9px; letter-spacing: 1px; transform: translate(-50%,-50%); }
+  .knob .label { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+  .knob .v { font-family: var(--mono); font-size: 32px; font-weight: 800; letter-spacing: -1.5px; }
+  .knob .sub { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+
+  /* live feed strip — like a peak meter */
+  .meter-block { padding: 12px 14px; }
+  .meter-block .row { display: grid; grid-template-columns: 60px 1fr 70px;
+    gap: 10px; align-items: center; padding: 4px 0; font-family: var(--mono); font-size: 11.5px; }
+  .meter-block .t { color: var(--muted); }
+  .meter-block .bars { display: flex; gap: 1px; }
+  .meter-block .bars span { display: inline-block; height: 12px; flex: 1; background: var(--cream-2); }
+  .meter-block .bars span.on { background: var(--green); }
+  .meter-block .bars.warn span.on { background: var(--yellow); }
+  .meter-block .bars.fail span.on { background: var(--red); }
+  .meter-block .v { text-align: right; }
+
+  /* bottom strip: query input + actions */
+  .row-3 { display: grid; grid-template-columns: 1fr 220px; gap: 18px; }
+  .qbox { border: 2px solid var(--ink); background: var(--paper); padding: 14px 18px; }
+  .qbox .label { font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--muted); }
+  .qbox input { width: 100%; background: none; border: none; outline: none;
+    font: 700 22px/1.2 var(--serif); letter-spacing: -0.6px; padding: 6px 0 4px; color: var(--ink); }
+  .qbox .meta { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+
+  .keys { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .keys button { aspect-ratio: 1; border: 2px solid var(--ink); background: var(--cream-2);
+    font-family: var(--mono); font-size: 11px; font-weight: 700; cursor: pointer;
+    display: grid; place-items: center; box-shadow: 3px 3px 0 var(--ink);
+    text-transform: uppercase; letter-spacing: 1px; padding: 0; }
+  .keys button.active { background: var(--orange); color: var(--paper); }
+  .keys button.r { background: var(--red); color: var(--paper); }
+  .keys button.b { background: var(--blue); color: var(--paper); }
+  .keys button.y { background: var(--yellow); color: var(--ink); }
+  .keys button .ic { font-size: 18px; line-height: 1; }
+</style>
+</head>
+<body>
+<div class="chassis">
+
+  <div class="face-top">
+    <div class="logo">
+      <div class="mark">2c</div>
+      <div class="word">2CHAIN<small>· TOOL REGISTRY · MK1</small></div>
+    </div>
+    <div class="ctype"><b>HYBRID-RETRIEVAL · GATING · CONTRACTS</b></div>
+    <div class="ser">SN: <b>2C-V0.2-OPUS-4.7</b> · MADE IN /tmp</div>
+  </div>
+
+  <div class="indicator-row">
+    <div class="cell orange"><div class="lab">tools</div><div class="v">418</div></div>
+    <div class="cell">      <div class="lab">mcp srv</div><div class="v">20</div></div>
+    <div class="cell yellow"><div class="lab">domains</div><div class="v">12</div></div>
+    <div class="cell green"> <div class="lab">p95 ms</div><div class="v">68</div></div>
+    <div class="cell">      <div class="lab">calls 1h</div><div class="v">2143</div></div>
+    <div class="cell">      <div class="lab">ok %</div><div class="v">99.6</div></div>
+    <div class="cell red">  <div class="lab">violations</div><div class="v">7</div></div>
+    <div class="cell k">    <div class="lab">circuit-broke</div><div class="v">1</div></div>
+  </div>
+
+  <div class="row-2">
+    <div class="module">
+      <div class="module-head">
+        <h3>RANKING ▸ DCF NVIDIA 10-K</h3>
+        <span class="right">RRF · 5 RES · 68ms · ⓘ</span>
+      </div>
+      <div class="ranking">
+        <div class="row top1">
+          <div class="rank">01</div>
+          <div>
+            <div class="name">sec-edgar-financials<small>@1.0</small></div>
+            <div class="meta">FETCHES 10-K INCOME STATEMENT FROM SEC EDGAR ▸ LIVE XBRL</div>
+          </div>
+          <div class="pip">RRF 0.0164</div>
+          <div class="domain-tag" style="background:var(--orange);color:var(--paper);border-color:var(--ink);">FIN</div>
+        </div>
+        <div class="row">
+          <div class="rank">02</div>
+          <div>
+            <div class="name">pdf-extractor<small>@3.0</small></div>
+            <div class="meta">10-K PDF INCOME STATEMENT EXTRACTOR</div>
+          </div>
+          <div class="pip">0.0162</div>
+          <div class="domain-tag" style="background:var(--orange);color:var(--paper);">FIN</div>
+        </div>
+        <div class="row">
+          <div class="rank">03</div>
+          <div>
+            <div class="name">yahoo-finance-fundamentals<small>@1.0</small></div>
+            <div class="meta">YAHOO FINANCIALS PER TICKER</div>
+          </div>
+          <div class="pip">0.0148</div>
+          <div class="domain-tag" style="background:var(--orange);color:var(--paper);">FIN</div>
+        </div>
+        <div class="row">
+          <div class="rank">04</div>
+          <div>
+            <div class="name">annual-report-extract<small>@1.0</small></div>
+            <div class="meta">10-K NARRATIVE + TABLE EXTRACTOR</div>
+          </div>
+          <div class="pip">0.0138</div>
+          <div class="domain-tag" style="background:var(--red);color:var(--paper);">DOC</div>
+        </div>
+        <div class="row">
+          <div class="rank">05</div>
+          <div>
+            <div class="name">mcp-github__get_file<small>@1.0</small></div>
+            <div class="meta">MCP-BRIDGED · GITHUB CONTENTS API</div>
+          </div>
+          <div class="pip">0.0114</div>
+          <div class="domain-tag" style="background:var(--blue);color:var(--paper);">COD</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module knob">
+      <div class="knob-circle">
+        <div class="knob-marks">
+          <span class="m" style="transform:translate(-50%,-50%) rotate(-135deg) translate(0,-100px);">0.0</span>
+          <span class="m" style="transform:translate(-50%,-50%) rotate(0deg) translate(0,-100px);">0.5</span>
+          <span class="m" style="transform:translate(-50%,-50%) rotate(135deg) translate(0,-100px);">1.0</span>
+        </div>
+      </div>
+      <div class="label">RRF VEC · TXT BLEND</div>
+      <div class="v">0.5 / 0.5</div>
+      <div class="sub">CALIBRATED · STEP 10</div>
+    </div>
+  </div>
+
+  <div class="module" style="margin-bottom:18px;">
+    <div class="module-head"><h3>LIVE FEED ▸ /events</h3><span class="right">WAL · SSE · BACK-PRESSURE 1000</span></div>
+    <div class="meter-block">
+      <div class="row">
+        <span class="t">12:41:08</span>
+        <div class="bars"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <span class="v">DSCV 68MS</span>
+      </div>
+      <div class="row">
+        <span class="t">12:41:04</span>
+        <div class="bars"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span></span><span></span></div>
+        <span class="v">CALL 1191</span>
+      </div>
+      <div class="row">
+        <span class="t">12:40:51</span>
+        <div class="bars"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <span class="v">DSCV 52MS</span>
+      </div>
+      <div class="row">
+        <span class="t">12:40:33</span>
+        <div class="bars fail"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span></div>
+        <span class="v">CB! MALFORMD</span>
+      </div>
+      <div class="row">
+        <span class="t">12:40:22</span>
+        <div class="bars warn"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <span class="v">GATE 0.40</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="row-3">
+    <div class="qbox">
+      <div class="label">/discover</div>
+      <input value="build a DCF model for NVIDIA from the latest 10-K" />
+      <div class="meta">RRF · vec0.5 / txt0.5 · gate 0.80 · ⏎ to call top-1</div>
+    </div>
+    <div class="keys">
+      <button class="active" title="Discover"><span class="ic">⌕</span></button>
+      <button title="Push new tool"><span class="ic">＋</span></button>
+      <button class="b" title="Browse all"><span class="ic">⊞</span></button>
+      <button class="y" title="Eval"><span class="ic">✓</span></button>
+      <button title="Settings"><span class="ic">⚙</span></button>
+      <button class="r" title="Circuit-break panel"><span class="ic">!</span></button>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

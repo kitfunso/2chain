@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>I · 2chain · Network Graph</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --bg: #07070a;
+    --panel: rgba(20, 22, 30, 0.82);
+    --border: #2a2d3a;
+    --fg: #e8e8ee;
+    --muted: #7c7e8a;
+    --finance: #fbbf24;
+    --code: #22d3ee;
+    --research: #f472b6;
+    --docs: #fb7185;
+    --geo: #34d399;
+    --data: #a78bfa;
+    --comms: #60a5fa;
+    --health: #f87171;
+    --ecommerce: #fb923c;
+    --legal: #94a3b8;
+    --edu: #fde047;
+    --media: #c084fc;
+    --mono: ui-monospace, "JetBrains Mono", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; }
+  body { background: var(--bg); color: var(--fg); font: 13px/1.5 -apple-system, "Inter", sans-serif; }
+
+  /* canvas */
+  #stage { position: absolute; inset: 0; }
+  svg { width: 100%; height: 100%; cursor: grab; display: block; background:
+    radial-gradient(circle at 50% 50%, #0c0d14 0%, #07070a 70%); }
+  svg .grid line { stroke: rgba(255,255,255,0.04); stroke-width: 0.5; }
+
+  /* edges */
+  .edge { stroke: rgba(255,255,255,0.10); stroke-width: 1; fill: none; }
+  .edge.active { stroke: rgba(110,231,255,0.45); stroke-width: 1.5; filter: drop-shadow(0 0 4px rgba(110,231,255,0.6)); }
+
+  /* nodes */
+  .node circle { stroke: rgba(0,0,0,0.4); stroke-width: 1; transition: all 0.2s; }
+  .node text { fill: var(--fg); font-size: 10px; font-family: var(--mono);
+    text-anchor: middle; dominant-baseline: middle; pointer-events: none; }
+  .node.dim circle { opacity: 0.25; }
+  .node.dim text { opacity: 0.3; }
+  .node.hot circle { stroke: white; stroke-width: 2; filter: drop-shadow(0 0 8px currentColor); }
+  .node.hot text { fill: white; font-weight: 600; }
+
+  /* domain center labels */
+  .cluster-label { fill: rgba(255,255,255,0.5); font-size: 11px; font-family: var(--mono);
+    letter-spacing: 2px; text-transform: uppercase; text-anchor: middle; pointer-events: none; }
+
+  /* HUD overlays */
+  .hud { position: absolute; pointer-events: none; }
+  .hud .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 16px; backdrop-filter: blur(16px) saturate(140%); pointer-events: auto; }
+  .hud-tl { top: 18px; left: 18px; }
+  .hud-tr { top: 18px; right: 18px; width: 320px; }
+  .hud-bl { bottom: 18px; left: 18px; }
+  .hud-br { bottom: 18px; right: 18px; }
+
+  .brand { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600; }
+  .brand .logo { width: 22px; height: 22px; border-radius: 6px;
+    background: linear-gradient(135deg, var(--finance), var(--code)); }
+  .brand small { color: var(--muted); font-weight: 400; margin-left: 4px; font-size: 12px; font-family: var(--mono); }
+
+  /* search bar */
+  .search { display: flex; align-items: center; gap: 10px; margin-top: 12px;
+    background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px;
+    padding: 7px 12px; min-width: 360px; }
+  .search input { flex: 1; background: none; border: none; outline: none; color: var(--fg); font: inherit; }
+  .search input::placeholder { color: var(--muted); }
+  .search .pip { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+
+  /* legend */
+  .legend { display: flex; flex-direction: column; gap: 5px; font-size: 12px; }
+  .legend .row { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 2px 6px; border-radius: 4px; }
+  .legend .row:hover { background: rgba(255,255,255,0.04); }
+  .legend .row .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .legend .row .count { margin-left: auto; color: var(--muted); font-family: var(--mono); }
+
+  /* tool detail panel */
+  .detail h3 { margin: 0 0 4px; font-size: 16px; font-weight: 600; letter-spacing: -0.2px; }
+  .detail .ver { font-family: var(--mono); color: var(--muted); font-size: 12px; margin-bottom: 12px; }
+  .detail .blurb { font-size: 13px; line-height: 1.55; color: rgba(255,255,255,0.85); margin-bottom: 12px; }
+  .detail .kv { display: grid; grid-template-columns: 80px 1fr; gap: 4px 12px;
+    font-size: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+  .detail .kv span:nth-child(odd) { color: var(--muted); }
+  .detail .kv span.mono { font-family: var(--mono); }
+  .detail .meter { height: 4px; border-radius: 2px; background: rgba(255,255,255,0.08);
+    position: relative; overflow: hidden; margin-top: 4px; }
+  .detail .meter > i { display: block; height: 100%;
+    background: linear-gradient(90deg, var(--code), var(--research)); }
+
+  /* ranking strip */
+  .rank-strip { display: flex; gap: 8px; }
+  .rank-strip .pill { padding: 6px 12px; background: rgba(0,0,0,0.4); border: 1px solid var(--border);
+    border-radius: 8px; font-size: 12px; backdrop-filter: blur(10px); }
+  .rank-strip .pill b { color: var(--code); }
+  .rank-strip .pill.t1 { border-color: rgba(110,231,255,0.5); background: rgba(110,231,255,0.08); }
+
+  /* mini stats */
+  .mini-stat { display: flex; align-items: baseline; gap: 8px; font-size: 12px; }
+  .mini-stat b { font-family: var(--mono); font-size: 18px; font-weight: 600; letter-spacing: -0.5px; }
+</style>
+</head>
+<body>
+<div id="stage">
+<svg id="net" viewBox="0 0 1400 900" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <radialGradient id="halo" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="rgba(110,231,255,0.10)"/>
+      <stop offset="100%" stop-color="rgba(110,231,255,0)"/>
+    </radialGradient>
+  </defs>
+
+  <!-- subtle background grid -->
+  <g class="grid">
+    <line x1="0" y1="225" x2="1400" y2="225"/>
+    <line x1="0" y1="450" x2="1400" y2="450"/>
+    <line x1="0" y1="675" x2="1400" y2="675"/>
+    <line x1="350" y1="0" x2="350" y2="900"/>
+    <line x1="700" y1="0" x2="700" y2="900"/>
+    <line x1="1050" y1="0" x2="1050" y2="900"/>
+  </g>
+
+  <!-- domain cluster halos -->
+  <circle cx="280" cy="280" r="130" fill="url(#halo)"/>
+  <circle cx="700" cy="220" r="130" fill="url(#halo)"/>
+  <circle cx="1120" cy="280" r="130" fill="url(#halo)"/>
+  <circle cx="280" cy="650" r="130" fill="url(#halo)"/>
+  <circle cx="700" cy="700" r="130" fill="url(#halo)"/>
+  <circle cx="1120" cy="650" r="130" fill="url(#halo)"/>
+
+  <!-- cluster labels -->
+  <text class="cluster-label" x="280" y="155">FINANCE · 16</text>
+  <text class="cluster-label" x="700" y="95">RESEARCH · 12</text>
+  <text class="cluster-label" x="1120" y="155">CODE · 24</text>
+  <text class="cluster-label" x="280" y="525">DOCS · 13</text>
+  <text class="cluster-label" x="700" y="575">DATA · 12</text>
+  <text class="cluster-label" x="1120" y="525">GEO · 14</text>
+
+  <!-- edges -->
+  <g>
+    <!-- finance internal -->
+    <path class="edge active" d="M280 280 Q260 220 220 250"/>
+    <path class="edge active" d="M280 280 Q330 230 360 270"/>
+    <path class="edge" d="M280 280 Q220 320 240 350"/>
+    <path class="edge" d="M280 280 Q360 320 340 350"/>
+    <path class="edge" d="M280 280 Q280 220 300 200"/>
+    <path class="edge" d="M280 280 Q200 280 180 290"/>
+    <path class="edge" d="M280 280 Q380 280 400 295"/>
+
+    <!-- finance to docs (cross domain) -->
+    <path class="edge" d="M280 350 Q280 460 280 580"/>
+    <!-- finance to research (DCF query bridges) -->
+    <path class="edge" d="M340 250 Q500 230 660 220"/>
+
+    <!-- research internal -->
+    <path class="edge" d="M700 220 Q650 180 620 200"/>
+    <path class="edge" d="M700 220 Q750 180 780 200"/>
+    <path class="edge" d="M700 220 Q670 270 680 300"/>
+    <path class="edge" d="M700 220 Q740 270 720 300"/>
+    <path class="edge" d="M700 220 Q620 230 600 240"/>
+    <path class="edge" d="M700 220 Q800 230 820 240"/>
+
+    <!-- code internal -->
+    <path class="edge" d="M1120 280 Q1080 230 1060 250"/>
+    <path class="edge" d="M1120 280 Q1180 220 1200 245"/>
+    <path class="edge" d="M1120 280 Q1100 340 1080 360"/>
+    <path class="edge" d="M1120 280 Q1160 340 1180 350"/>
+    <path class="edge" d="M1120 280 Q1040 290 1020 310"/>
+    <path class="edge" d="M1120 280 Q1220 280 1240 305"/>
+
+    <!-- code to data -->
+    <path class="edge" d="M1080 360 Q900 500 760 700"/>
+
+    <!-- docs internal -->
+    <path class="edge" d="M280 650 Q230 610 215 625"/>
+    <path class="edge" d="M280 650 Q330 610 350 625"/>
+    <path class="edge" d="M280 650 Q260 720 240 730"/>
+    <path class="edge" d="M280 650 Q310 720 320 730"/>
+
+    <!-- data internal -->
+    <path class="edge" d="M700 700 Q650 660 620 675"/>
+    <path class="edge" d="M700 700 Q750 660 780 675"/>
+    <path class="edge" d="M700 700 Q670 760 660 770"/>
+    <path class="edge" d="M700 700 Q740 760 760 770"/>
+
+    <!-- geo internal -->
+    <path class="edge" d="M1120 650 Q1070 610 1060 625"/>
+    <path class="edge" d="M1120 650 Q1170 610 1185 625"/>
+    <path class="edge" d="M1120 650 Q1100 720 1090 730"/>
+    <path class="edge" d="M1120 650 Q1140 720 1155 740"/>
+  </g>
+
+  <!-- nodes — finance cluster -->
+  <g>
+    <g class="node hot" transform="translate(280,280)" style="color:var(--finance)">
+      <circle r="22" fill="#fbbf24"/>
+      <text x="0" y="44">sec-edgar-financials</text>
+    </g>
+    <g class="node" transform="translate(220,250)"><circle r="14" fill="#fbbf24"/><text x="0" y="32">pdf-extractor</text></g>
+    <g class="node hot" transform="translate(360,270)" style="color:var(--finance)"><circle r="16" fill="#fbbf24"/><text x="0" y="34">yahoo-finance-fund</text></g>
+    <g class="node" transform="translate(240,350)"><circle r="11" fill="#fbbf24"/><text x="0" y="28">fred-series</text></g>
+    <g class="node" transform="translate(340,350)"><circle r="11" fill="#fbbf24"/><text x="0" y="28">polygon-aggs</text></g>
+    <g class="node" transform="translate(300,200)"><circle r="10" fill="#fbbf24"/><text x="0" y="26">stripe-pi</text></g>
+    <g class="node" transform="translate(180,290)"><circle r="9" fill="#fbbf24"/><text x="0" y="25">tiingo-eod</text></g>
+    <g class="node" transform="translate(400,295)"><circle r="9" fill="#fbbf24"/><text x="0" y="25">finnhub-cal</text></g>
+  </g>
+
+  <!-- research cluster -->
+  <g>
+    <g class="node hot" transform="translate(700,220)" style="color:var(--research)"><circle r="20" fill="#f472b6"/><text x="0" y="40">arxiv-paper-search</text></g>
+    <g class="node" transform="translate(620,200)"><circle r="13" fill="#f472b6"/><text x="0" y="30">semantic-scholar</text></g>
+    <g class="node" transform="translate(780,200)"><circle r="12" fill="#f472b6"/><text x="0" y="29">openalex-search</text></g>
+    <g class="node" transform="translate(680,300)"><circle r="11" fill="#f472b6"/><text x="0" y="27">pubmed-search</text></g>
+    <g class="node" transform="translate(720,300)"><circle r="10" fill="#f472b6"/><text x="0" y="26">crossref-doi</text></g>
+    <g class="node" transform="translate(600,240)"><circle r="9" fill="#f472b6"/><text x="0" y="25">core-fulltext</text></g>
+    <g class="node" transform="translate(820,240)"><circle r="9" fill="#f472b6"/><text x="0" y="25">openreview</text></g>
+  </g>
+
+  <!-- code cluster -->
+  <g>
+    <g class="node" transform="translate(1120,280)"><circle r="18" fill="#22d3ee"/><text x="0" y="36">mcp-github</text></g>
+    <g class="node" transform="translate(1060,250)"><circle r="14" fill="#22d3ee"/><text x="0" y="32">code-review-mini</text></g>
+    <g class="node" transform="translate(1200,245)"><circle r="13" fill="#22d3ee"/><text x="0" y="30">eslint-snitch</text></g>
+    <g class="node" transform="translate(1080,360)"><circle r="14" fill="#22d3ee"/><text x="0" y="32">security-scanner</text></g>
+    <g class="node" transform="translate(1180,350)"><circle r="11" fill="#22d3ee"/><text x="0" y="28">pylint-pro</text></g>
+    <g class="node" transform="translate(1020,310)"><circle r="9" fill="#22d3ee"/><text x="0" y="25">staticcheck</text></g>
+    <g class="node" transform="translate(1240,305)"><circle r="9" fill="#22d3ee"/><text x="0" y="25">snyk-vuln</text></g>
+  </g>
+
+  <!-- docs -->
+  <g>
+    <g class="node" transform="translate(280,650)"><circle r="15" fill="#fb7185"/><text x="0" y="32">mcp-filesystem</text></g>
+    <g class="node" transform="translate(215,625)"><circle r="11" fill="#fb7185"/><text x="0" y="28">tesseract-ocr</text></g>
+    <g class="node" transform="translate(350,625)"><circle r="11" fill="#fb7185"/><text x="0" y="28">aws-textract</text></g>
+    <g class="node" transform="translate(240,730)"><circle r="9" fill="#fb7185"/><text x="0" y="25">pdf-extract-text</text></g>
+    <g class="node" transform="translate(320,730)"><circle r="9" fill="#fb7185"/><text x="0" y="25">azure-doc-int</text></g>
+  </g>
+
+  <!-- data -->
+  <g>
+    <g class="node" transform="translate(700,700)"><circle r="13" fill="#a78bfa"/><text x="0" y="30">mcp-postgres</text></g>
+    <g class="node" transform="translate(620,675)"><circle r="11" fill="#a78bfa"/><text x="0" y="28">duckdb-analytics</text></g>
+    <g class="node" transform="translate(780,675)"><circle r="11" fill="#a78bfa"/><text x="0" y="28">jq-jsonpath</text></g>
+    <g class="node" transform="translate(660,770)"><circle r="9" fill="#a78bfa"/><text x="0" y="25">csv-parse</text></g>
+    <g class="node" transform="translate(760,770)"><circle r="9" fill="#a78bfa"/><text x="0" y="25">parquet-read</text></g>
+  </g>
+
+  <!-- geo -->
+  <g>
+    <g class="node" transform="translate(1120,650)"><circle r="15" fill="#34d399"/><text x="0" y="32">mcp-google-maps</text></g>
+    <g class="node" transform="translate(1060,625)"><circle r="11" fill="#34d399"/><text x="0" y="28">osm-nominatim</text></g>
+    <g class="node" transform="translate(1185,625)"><circle r="11" fill="#34d399"/><text x="0" y="28">noaa-weather</text></g>
+    <g class="node" transform="translate(1090,730)"><circle r="9" fill="#34d399"/><text x="0" y="25">osm-overpass</text></g>
+    <g class="node" transform="translate(1155,740)"><circle r="9" fill="#34d399"/><text x="0" y="25">open-meteo</text></g>
+  </g>
+
+  <!-- query echo lines (active query "DCF NVIDIA 10-K" highlights finance cluster) -->
+</svg>
+</div>
+
+<div class="hud hud-tl">
+  <div class="panel">
+    <div class="brand"><span class="logo"></span> 2chain<small>· 418 nodes · 12 domains</small></div>
+    <div class="search">
+      <span style="color:var(--muted)">⌕</span>
+      <input value="build a DCF model for NVIDIA from the latest 10-K">
+      <span class="pip">⏎</span>
+    </div>
+  </div>
+</div>
+
+<div class="hud hud-tr">
+  <div class="panel detail">
+    <h3>sec-edgar-financials</h3>
+    <div class="ver">v1.0 · finance · author: hackathon-team</div>
+    <p class="blurb">Fetches the latest annual 10-K income statement directly from SEC EDGAR for any US-listed company by ticker. Live data via XBRL companyfacts API.</p>
+    <div class="kv">
+      <span>Reliability</span><span class="mono">1.00 (5/5)</span>
+      <div class="meter" style="grid-column:1/-1;"><i style="width:100%"></i></div>
+      <span>P95</span><span class="mono">1500ms</span>
+      <span>Cost / call</span><span class="mono">$0.00</span>
+      <span>Calls 24h</span><span class="mono">142</span>
+      <span>Status</span><span class="mono" style="color:#34d399;">● active</span>
+      <span>Connections</span><span class="mono">7 in finance, 1 to docs, 1 to research</span>
+    </div>
+  </div>
+</div>
+
+<div class="hud hud-bl">
+  <div class="panel">
+    <div class="legend">
+      <div class="row"><span class="dot" style="background:var(--finance)"></span>Finance<span class="count">158</span></div>
+      <div class="row"><span class="dot" style="background:var(--code)"></span>Code<span class="count">92</span></div>
+      <div class="row"><span class="dot" style="background:var(--research)"></span>Research<span class="count">58</span></div>
+      <div class="row"><span class="dot" style="background:var(--docs)"></span>Docs<span class="count">42</span></div>
+      <div class="row"><span class="dot" style="background:var(--data)"></span>Data<span class="count">38</span></div>
+      <div class="row"><span class="dot" style="background:var(--geo)"></span>Geo<span class="count">28</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="hud hud-br">
+  <div class="panel">
+    <div class="rank-strip">
+      <div class="pill t1"><b>1</b> sec-edgar 0.0164</div>
+      <div class="pill"><b>2</b> pdf-extract 0.0162</div>
+      <div class="pill"><b>3</b> yh-fund 0.0148</div>
+    </div>
+    <div class="mini-stat" style="margin-top:10px;"><span style="color:var(--muted)">p95 retrieval</span><b>68ms</b><span style="color:#34d399;">3× under</span></div>
+  </div>
+</div>
+</body>
+</html>

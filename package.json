@@ -21,6 +21,14 @@
     "smoke:call": "tsx scripts/smoke-call.ts",
     "smoke:all": "npm run smoke:connect && npm run smoke:voyage && npm run smoke:discover && npm run smoke:discover:http && npm run smoke:push && npm run smoke:call",
     "test": "tsx --test tests/*.test.ts",
+    "lint:no-mongodb": "tsx scripts/check-no-mongodb-imports.ts",
+    "setup:personal": "tsx scripts/setup-personal.ts",
+    "seed:v2": "STORAGE_DRIVER=sqlite EMBEDDER=ollama tsx scripts/seed-fixtures.ts",
+    "dev:v2": "STORAGE_DRIVER=sqlite EMBEDDER=ollama tsx scripts/dev-server.ts",
+    "smoke:v2:demos": "tsx scripts/smoke/v2-demo-prompts.ts",
+    "smoke:v2:regression": "tsx scripts/smoke/v2-golden-regression.ts",
+    "smoke:v2": "npm run smoke:v2:demos && npm run smoke:v2:regression",
+    "import:mcp": "STORAGE_DRIVER=sqlite EMBEDDER=ollama tsx scripts/import-mcp-servers.ts",
     "test:integration": "tsx scripts/integration-test.ts",
     "demo:reset": "tsx scripts/seed-fixtures.ts",
     "reset:state": "tsx scripts/reset-demo-state.ts",
@@ -47,16 +55,19 @@
   "author": "Keith So <skfskf27@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@langchain/langgraph": "^1.2.9",
-    "@langchain/langgraph-checkpoint-mongodb": "^1.3.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "ajv": "^8.20.0",
+    "better-sqlite3": "^12.9.0",
     "dotenv": "^17.4.2",
     "fastify": "^5.8.5",
-    "mongodb": "^7.2.0",
+    "sqlite-vec": "^0.1.9",
     "zod": "^4.4.2"
   },
+  "optionalDependencies": {
+    "mongodb": "^7.2.0"
+  },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^25.6.0",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3"

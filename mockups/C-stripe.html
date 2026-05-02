@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>C · 2chain · Stripe / Apple</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-2: #fafafa;
+    --ink: #0a0a0a;
+    --ink-2: #2c2c34;
+    --muted: #6c6c75;
+    --hairline: #ececef;
+    --indigo: #635bff;     /* Stripe purple */
+    --teal: #00d4ff;
+    --pink: #ff5f9b;
+    --green: #22c55e;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --serif: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+    --mono: ui-monospace, "SF Mono", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--bg); color: var(--ink); font: 16px/1.55 var(--serif); -webkit-font-smoothing: antialiased; }
+  header { padding: 20px 6%; display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--hairline); }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; letter-spacing: -0.4px; }
+  .brand .logo { width: 28px; height: 28px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--indigo), var(--pink), var(--teal)); }
+  nav { display: flex; gap: 28px; font-size: 14px; }
+  nav a { color: var(--ink-2); text-decoration: none; font-weight: 500; }
+  nav a.active { color: var(--ink); position: relative; }
+  nav a.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -22px;
+    height: 2px; background: var(--ink); }
+  .cta { padding: 9px 18px; background: var(--ink); color: white; border-radius: 999px;
+    font-weight: 600; font-size: 14px; text-decoration: none; }
+
+  /* hero */
+  .hero { padding: 80px 6% 40px; position: relative; overflow: hidden; }
+  .hero::before { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(circle 600px at 80% -10%, rgba(99,91,255,0.20), transparent 60%),
+      radial-gradient(circle 500px at 0% 100%, rgba(0,212,255,0.18), transparent 60%),
+      radial-gradient(circle 400px at 60% 80%, rgba(255,95,155,0.15), transparent 60%); }
+  .hero-inner { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto;
+    display: grid; grid-template-columns: 1.1fr 1fr; gap: 64px; align-items: center; }
+  h1 { font-size: 64px; line-height: 1.02; font-weight: 700; letter-spacing: -2px; margin: 0; }
+  h1 em { font-style: normal;
+    background: linear-gradient(120deg, var(--indigo), var(--pink) 60%, var(--teal));
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lede { color: var(--muted); font-size: 19px; line-height: 1.5; max-width: 480px; margin-top: 22px; }
+  .pill-row { display: flex; gap: 10px; margin-top: 28px; flex-wrap: wrap; }
+  .pill { padding: 6px 14px; border: 1px solid var(--hairline); border-radius: 999px;
+    background: white; font-size: 13px; color: var(--ink-2); display: inline-flex; align-items: center; gap: 6px; }
+  .pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+    box-shadow: 0 0 10px var(--green); }
+
+  /* hero side panel — discovery card */
+  .demo-card { background: var(--ink); color: white; border-radius: 28px; padding: 28px;
+    box-shadow: 0 30px 80px rgba(99,91,255,0.25), 0 10px 30px rgba(0,0,0,0.2);
+    transform: rotate(-1deg); }
+  .demo-card .label { font-family: var(--mono); font-size: 11px; color: rgba(255,255,255,0.5);
+    text-transform: uppercase; letter-spacing: 1.5px; }
+  .demo-card .q { font-size: 18px; margin-top: 8px; line-height: 1.4; font-weight: 500; }
+  .demo-card .meta { font-family: var(--mono); font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 16px; }
+  .results { margin-top: 18px; display: flex; flex-direction: column; gap: 8px; }
+  .res { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
+  .res.top { background: linear-gradient(120deg, rgba(99,91,255,0.18), rgba(255,95,155,0.10));
+    border: 1px solid rgba(99,91,255,0.45); }
+  .res .rank { font-family: var(--mono); font-weight: 700; font-size: 12px; color: rgba(255,255,255,0.7);
+    width: 22px; text-align: center; }
+  .res .name { flex: 1; font-weight: 600; font-size: 14px; }
+  .res .name small { color: rgba(255,255,255,0.45); font-weight: 400; font-family: var(--mono); margin-left: 5px; }
+  .res .pip { font-family: var(--mono); font-size: 12px; color: rgba(255,255,255,0.7); }
+
+  /* section panel — three feature columns */
+  section.panels { padding: 60px 6% 120px; max-width: 1200px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .panel { background: var(--bg-2); border: 1px solid var(--hairline); border-radius: 20px; padding: 28px; }
+  .panel h3 { margin: 0 0 6px; font-size: 19px; font-weight: 600; letter-spacing: -0.3px; }
+  .panel p { color: var(--muted); margin: 0 0 18px; font-size: 14px; }
+  .panel .glyph { width: 38px; height: 38px; border-radius: 10px; margin-bottom: 14px;
+    display: grid; place-items: center; font-family: var(--mono); font-size: 16px; font-weight: 700; }
+  .glyph.a { background: linear-gradient(135deg, var(--indigo), #8c84ff); color: white; }
+  .glyph.b { background: linear-gradient(135deg, var(--pink), #ff8ab1); color: white; }
+  .glyph.c { background: linear-gradient(135deg, var(--teal), #5deeff); color: var(--ink); }
+  .panel .stat { font-family: var(--mono); font-size: 13px; color: var(--ink-2);
+    display: flex; align-items: center; gap: 6px; }
+  .panel .stat b { font-size: 26px; font-weight: 700; color: var(--ink); letter-spacing: -0.5px; }
+  .panel .barlist { margin-top: 12px; font-size: 13px; color: var(--muted); }
+  .panel .barlist .row { display: grid; grid-template-columns: 90px 1fr 40px; align-items: center;
+    gap: 10px; padding: 4px 0; }
+  .panel .barlist .bar { height: 6px; border-radius: 3px; background: var(--hairline); position: relative; overflow: hidden; }
+  .panel .barlist .bar > i { display: block; height: 100%;
+    background: linear-gradient(90deg, var(--indigo), var(--pink)); }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><span class="logo"></span> 2chain</div>
+  <nav>
+    <a class="active">Overview</a>
+    <a>Tools</a>
+    <a>Discover</a>
+    <a>Calls</a>
+    <a>Docs</a>
+  </nav>
+  <a href="#" class="cta">Open dashboard</a>
+</header>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <h1>The right tool, <em>found in 68ms</em>.</h1>
+      <p class="lede">Hybrid retrieval over 418 named tools. Reliability gating before ranking. JSON Schema enforced on every call. Self-hostable on a laptop, MCP-native for agents.</p>
+      <div class="pill-row">
+        <span class="pill"><span class="dot"></span>SQLite + sqlite-vec</span>
+        <span class="pill">nomic-embed-text</span>
+        <span class="pill">20 MCP servers · 77 tools bridged</span>
+      </div>
+    </div>
+    <div class="demo-card">
+      <div class="label">Live · /discover</div>
+      <div class="q">"build a DCF model for NVIDIA from the latest 10-K"</div>
+      <div class="meta">RRF · vec 0.5 / text 0.5 · gate 0.80 · 68ms</div>
+      <div class="results">
+        <div class="res top">
+          <div class="rank">1</div>
+          <div class="name">sec-edgar-financials<small>@1.0</small></div>
+          <div class="pip">0.0164</div>
+        </div>
+        <div class="res">
+          <div class="rank">2</div>
+          <div class="name">pdf-extractor<small>@3.0</small></div>
+          <div class="pip">0.0162</div>
+        </div>
+        <div class="res">
+          <div class="rank">3</div>
+          <div class="name">yahoo-finance-fundamentals<small>@1.0</small></div>
+          <div class="pip">0.0148</div>
+        </div>
+        <div class="res">
+          <div class="rank">4</div>
+          <div class="name">annual-report-extract<small>@1.0</small></div>
+          <div class="pip">0.0138</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panels">
+  <div class="panel">
+    <div class="glyph a">⌘</div>
+    <h3>Hybrid retrieval, fused</h3>
+    <p>vector cosine + FTS5 BM25 → reciprocal rank fusion → 5 ranked tools, 50 candidates, all in C in one process.</p>
+    <div class="stat"><b>68ms</b><span>p95 e2e at 10k tools</span></div>
+  </div>
+  <div class="panel">
+    <div class="glyph b">●</div>
+    <h3>Reliability gate, in-line</h3>
+    <p>Tools below 0.80 reliability never enter ranking. Filter is part of the SQL retrieval, not a post-filter.</p>
+    <div class="barlist">
+      <div class="row"><span>≥ 0.95</span><span class="bar"><i style="width:78%"></i></span><b style="font-family:var(--mono);">326</b></div>
+      <div class="row"><span>0.80–0.94</span><span class="bar"><i style="width:21%"></i></span><b style="font-family:var(--mono);">85</b></div>
+      <div class="row"><span>&lt; 0.80</span><span class="bar"><i style="width:2%"></i></span><b style="font-family:var(--mono);">7</b></div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="glyph c">▤</div>
+    <h3>Contracts on the wire</h3>
+    <p>Every /call validates against ajv. malformed-bot returned prose instead of issues — circuit-broken at 12:40:33.</p>
+    <div class="stat"><b>99.6%</b><span>of last 1h calls passed contracts</span></div>
+  </div>
+</section>
+</body>
+</html>

@@ -1,7 +1,6 @@
 import type { FastifyInstance } from 'fastify';
-import type { Db } from 'mongodb';
+import type { Storage, Embedder } from '../../types.js';
 import { discover, DEMO_AGENT_QUERY } from '../../services/discover.js';
-import { discoverHybrid } from '../../services/discoverHybrid.js';
 import { requireAuth } from '../auth.js';
 import { broadcast } from '../sse.js';
 
@@ -11,9 +10,13 @@ interface DiscoverQuery {
   mode?: 'vector' | 'hybrid';
 }
 
-export function registerDiscoverRoute(app: FastifyInstance, db: Db): void {
+export function registerDiscoverRoute(
+  app: FastifyInstance,
+  storage: Storage,
+  embedder: Embedder,
+): void {
   app.get<{ Querystring: DiscoverQuery }>('/discover', async (req, reply) => {
-    const ctx = await requireAuth(db, req, reply);
+    const ctx = await requireAuth(storage, req, reply);
     if (!ctx) return;
 
     const q = (req.query.q ?? '').trim();
@@ -22,15 +25,12 @@ export function registerDiscoverRoute(app: FastifyInstance, db: Db): void {
       return;
     }
     const top = req.query.top ? Math.max(1, Math.min(20, Number(req.query.top))) : 5;
-    const mode = req.query.mode === 'hybrid' ? 'hybrid' : 'vector';
+    // Mode is accepted for v1 wire-compat but v2 always runs hybrid (RRF).
+    const mode = req.query.mode === 'vector' ? 'vector' : 'hybrid';
 
     try {
-      const { results, meta } = mode === 'hybrid'
-        ? await discoverHybrid(db, q, top)
-        : await discover(db, q, top);
+      const { results, meta } = await discover(storage, embedder, q, top);
 
-      // Broadcast every discover so the dashboard's live ranking panel
-      // shows the most recent query (regardless of which prompt was used).
       broadcast('discover_ran', {
         query: q,
         results: results.map((r) => ({
@@ -38,19 +38,11 @@ export function registerDiscoverRoute(app: FastifyInstance, db: Db): void {
           reliability_score: r.reliability_score,
           vec_score: r.vec_score,
           rank_score: r.rank_score,
+          rrf_score: r.rrf_score,
         })),
         meta,
         ts: new Date().toISOString(),
       });
-      const pipelineJson = (meta as unknown as { pipeline_json?: string }).pipeline_json;
-      if (mode === 'hybrid' && pipelineJson) {
-        broadcast('pipeline_ran', {
-          query: q,
-          pipeline_json: pipelineJson,
-          search_ms: meta.search_ms,
-          ts: new Date().toISOString(),
-        });
-      }
 
       reply.code(200).send({ ok: true, mode, results, meta });
     } catch (err) {
@@ -59,3 +51,5 @@ export function registerDiscoverRoute(app: FastifyInstance, db: Db): void {
     }
   });
 }
+
+export { DEMO_AGENT_QUERY };

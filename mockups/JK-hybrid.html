@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>JK · 2chain · TUI on cream</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --paper:    #f3eee2;
+    --paper-2:  #ece6d4;
+    --paper-3:  #e2dcc8;
+    --ink:      #1a1a1a;
+    --ink-2:    #3d3a32;
+    --muted:    #8a8678;
+    --orange:    #ff5c1c;
+    --red:       #e3231a;
+    --yellow:    #ffd400;     /* used as a fill color (with ink text on top) */
+    --yellow-fg: #6e5300;     /* darker, used when yellow is the text color on cream — passes AA */
+    --green:     #2da94f;
+    --green-fg:  #1d7f3a;     /* darker, used as text color on cream */
+    --blue:      #1f5cff;
+    --magenta:   #d6258a;
+    --mono:     "JetBrains Mono", ui-monospace, "Cascadia Code", "SF Mono", "Consolas", monospace;
+    --sans:     "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; }
+  body { background: var(--paper); color: var(--ink);
+    font: 14px/1.35 var(--mono); letter-spacing: 0;
+  }
+  pre { margin: 0; }
+  .green   { color: var(--green-fg); }
+  .yellow  { color: var(--yellow-fg); }     /* AA-safe yellow text on cream paper */
+  .red     { color: var(--red); }
+  .blue    { color: var(--blue); }
+  .magenta { color: var(--magenta); }
+  .orange  { color: var(--orange); }
+  .muted   { color: var(--muted); }
+  .ink2    { color: var(--ink-2); }
+  .bright  { color: var(--ink); font-weight: 700; }
+
+  /* layout */
+  .tui { display: grid; grid-template-rows: auto 1fr auto; height: 100%; padding: 6px 8px; gap: 6px; }
+
+  /* TOP BAR — flat with ink border, orange brand block */
+  .top {
+    border: 2px solid var(--ink);
+    background: var(--paper-2);
+    padding: 3px 8px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .top .brand { background: var(--orange); color: var(--paper); padding: 1px 10px; font-weight: 800; letter-spacing: 0.5px;
+    border-right: 2px solid var(--ink); margin: -3px 8px -3px -8px; height: calc(100% + 6px); display: inline-flex; align-items: center; }
+  .top .nav .item { padding: 0 6px; }
+  .top .nav .active { background: var(--ink); color: var(--paper); padding: 1px 8px; font-weight: 700; }
+  .top .right { margin-left: auto; }
+  .top .pulse { color: var(--green); font-weight: 700; }
+
+  /* BODY: three panes, all ink-bordered, paper background */
+  .body {
+    display: grid; grid-template-columns: 280px 1fr 380px; gap: 6px; min-height: 0;
+  }
+  .pane {
+    border: 2px solid var(--ink);
+    background: var(--paper);
+    display: flex; flex-direction: column; min-height: 0;
+  }
+  .pane.focused {
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .pane-head {
+    padding: 3px 10px;
+    border-bottom: 2px solid var(--ink);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--paper-2);
+    font-size: 12px;
+  }
+  .pane.focused .pane-head { background: var(--yellow); }
+  .pane-head .lab { font-weight: 700; letter-spacing: 0.5px; }
+  .pane-head .right { font-size: 10.5px; color: var(--ink-2); }
+  .pane-body { padding: 8px 10px; overflow: auto; flex: 1; }
+
+  /* SIDEBAR */
+  .sb-row { padding: 1px 4px; cursor: default; }
+  .sb-row.active { background: var(--ink); color: var(--paper); }
+  .sb-row.active .muted { color: rgba(243,238,226,0.55); }
+  .sb-row .ico { display: inline-block; width: 14px; }
+  .sb-cat { color: var(--muted); margin-top: 8px; padding-left: 2px;
+    font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; }
+
+  .domain-pip {
+    display: inline-block; width: 8px; height: 8px; border: 1.5px solid var(--ink);
+    margin-right: 6px; vertical-align: middle;
+  }
+  .domain-pip.fin   { background: var(--orange); }
+  .domain-pip.cod   { background: var(--blue); }
+  .domain-pip.res   { background: var(--magenta); }
+  .domain-pip.doc   { background: var(--red); }
+  .domain-pip.geo   { background: var(--green); }
+  .domain-pip.dat   { background: var(--magenta); }
+  .domain-pip.com   { background: var(--yellow); }
+
+  /* MIDDLE PANE — domain tab strip below the head */
+  .tab-strip {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 10px;
+    border-bottom: 2px solid var(--ink);
+    background: var(--paper-2);
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+  .tab-strip .tab {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 2px 9px;
+    border: 2px solid var(--ink);
+    background: var(--paper);
+    font: 700 11.5px/1.3 var(--mono);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: var(--ink);
+    box-shadow: 2px 2px 0 var(--ink);
+    transition: transform 0.05s, box-shadow 0.05s;
+    flex-shrink: 0;
+  }
+  .tab-strip .tab .ct { font-weight: 600; opacity: 0.7; font-size: 10.5px; }
+  .tab-strip .tab:hover { background: var(--paper-3); }
+  .tab-strip .tab.active {
+    transform: translate(2px, 2px);
+    box-shadow: 0 0 0 var(--ink);
+  }
+  .tab-strip .tab.all.active     { background: var(--ink);    color: var(--paper); }
+  .tab-strip .tab.fin.active     { background: var(--orange); color: var(--paper); }
+  .tab-strip .tab.cod.active     { background: var(--blue);   color: var(--paper); }
+  .tab-strip .tab.res.active     { background: var(--magenta);color: var(--paper); }
+  .tab-strip .tab.doc.active     { background: var(--red);    color: var(--paper); }
+  .tab-strip .tab.geo.active     { background: var(--green);  color: var(--paper); }
+  .tab-strip .tab.dat.active     { background: var(--magenta);color: var(--paper); }
+  .tab-strip .tab.com.active     { background: var(--yellow); color: var(--ink);   }
+  .tab-strip .tab .pip {
+    display: inline-block; width: 8px; height: 8px;
+    border: 1.5px solid currentColor; vertical-align: middle;
+  }
+  .tab-strip .tab.fin .pip { background: var(--orange); }
+  .tab-strip .tab.cod .pip { background: var(--blue); }
+  .tab-strip .tab.res .pip { background: var(--magenta); }
+  .tab-strip .tab.doc .pip { background: var(--red); }
+  .tab-strip .tab.geo .pip { background: var(--green); }
+  .tab-strip .tab.dat .pip { background: var(--magenta); }
+  .tab-strip .tab.com .pip { background: var(--yellow); }
+  .tab-strip .tab.all .pip { background: transparent; border-style: dashed; }
+  .tab-strip .tab.active .pip { border-color: rgba(255,255,255,0.8); }
+  .tab-strip .spacer { flex: 1; }
+  .tab-strip .mode-hint {
+    font: 600 10.5px/1.3 var(--mono);
+    color: var(--ink-2);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding-right: 4px;
+  }
+
+  /* MIDDLE PANE — ranking + contract */
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; line-height: 1.4; }
+  th { text-align: left; color: var(--ink-2); padding: 0 8px 4px; font-weight: 700; letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--ink); background: var(--paper-2); font-size: 11px; text-transform: uppercase; }
+  td { padding: 2px 8px; border-bottom: 1px solid var(--paper-3); }
+  tr.t1 td { background: var(--yellow); color: var(--ink); font-weight: 700; }
+  tr.t1 td.first::before { content: "▶ "; color: var(--orange); font-weight: 800; }
+  td.num { text-align: right; }
+  td .domain-tag { display: inline-block; padding: 0 5px; border: 1.5px solid var(--ink);
+    font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; line-height: 1.4; }
+  .domain-tag.fin { background: var(--orange); color: var(--paper); }
+  .domain-tag.cod { background: var(--blue); color: var(--paper); }
+  .domain-tag.res { background: var(--magenta); color: var(--paper); }
+  .domain-tag.doc { background: var(--red); color: var(--paper); }
+  .domain-tag.geo { background: var(--green); color: var(--paper); }
+
+  /* boxes around contract / suggested call */
+  .ascii-box { color: var(--ink-2); }
+  .ascii-box .bar { color: var(--ink); }
+
+  /* RIGHT PANE — detail + feed
+     Mono for IDs, numbers, status, code. Inter for prose blurbs so the
+     capability description reads like text, not a log line. */
+  .detail { font-size: 13.5px; }
+  .detail h3 { margin: 0 0 4px; font-family: var(--mono);
+    font-size: 14.5px; font-weight: 800; letter-spacing: -0.3px; }
+  .detail .submeta { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+  .detail .blurb { font-family: var(--sans); color: var(--ink);
+    margin: 8px 0 12px; line-height: 1.5; font-size: 13.5px;
+    letter-spacing: -0.005em; }
+  .kv { display: grid; grid-template-columns: 90px 1fr; gap: 1px 8px; padding-bottom: 8px;
+    border-bottom: 2px solid var(--ink); margin-bottom: 8px; font-size: 13px;
+    font-family: var(--mono); }
+  .kv .k { color: var(--ink-2); }
+  .reliability-bar { display: inline-flex; align-items: center; gap: 6px; }
+  .reliability-bar .meter { display: inline-block; width: 80px; height: 8px;
+    background: var(--paper-3); border: 1.5px solid var(--ink); position: relative; vertical-align: middle; }
+  .reliability-bar .meter > i { display: block; height: 100%; background: var(--green); }
+
+  .feed-head { font-size: 11px; color: var(--ink-2); letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 6px 0; border-bottom: 2px solid var(--ink); margin-top: 4px; font-weight: 800; }
+  .feed-row { padding: 2px 0; line-height: 1.4; font-size: 13px; }
+  .feed-row.cb { background: rgba(227, 35, 26, 0.08); }
+  .feed-row.gate { background: rgba(255, 212, 0, 0.18); }
+
+  /* event-type chips */
+  .chip { display: inline-block; padding: 0 5px; font-size: 10px; font-weight: 800;
+    border: 1.5px solid var(--ink); text-transform: uppercase; letter-spacing: 1px;
+    line-height: 1.45; vertical-align: 1px; }
+  .chip.dscv { background: var(--blue); color: var(--paper); }
+  .chip.call { background: var(--green); color: var(--paper); }
+  .chip.cb   { background: var(--red); color: var(--paper); }
+  .chip.gate { background: var(--yellow); color: var(--ink); }
+  .chip.push { background: var(--magenta); color: var(--paper); }
+
+  /* STATUS BAR */
+  .status {
+    border: 2px solid var(--ink);
+    background: var(--paper-2);
+    padding: 3px 10px;
+    display: flex; align-items: center; gap: 14px; font-size: 12px;
+    flex-wrap: nowrap; white-space: nowrap;
+  }
+  .status .keypair { display: inline-flex; align-items: center; gap: 4px; }
+  .status .key {
+    display: inline-block; min-width: 18px; padding: 0 6px;
+    background: var(--paper-3); color: var(--ink); border: 1.5px solid var(--ink);
+    font-weight: 800; text-align: center;
+    box-shadow: 1.5px 1.5px 0 var(--ink);
+  }
+  .status .key.g  { background: var(--green); color: var(--paper); }
+  .status .key.b  { background: var(--blue); color: var(--paper); }
+  .status .key.r  { background: var(--red); color: var(--paper); }
+  .status .key.y  { background: var(--yellow); color: var(--ink); }
+  .status .key.m  { background: var(--magenta); color: var(--paper); }
+  .status .key.o  { background: var(--orange); color: var(--paper); }
+  .status .right  { margin-left: auto; color: var(--ink-2); font-size: 11px; }
+
+  /* small helpers */
+  .nameblock { display: inline-block; }
+  a { color: inherit; }
+</style>
+</head>
+<body>
+<div class="tui">
+
+  <!-- TOP BAR -->
+  <div class="top">
+    <span class="brand">2CHAIN v0.2</span>
+    <span class="nav">
+      <span class="item active">Overview</span>
+      <span class="item muted">Discover</span>
+      <span class="item muted">Tools</span>
+      <span class="item muted">Calls</span>
+      <span class="item muted">Evals</span>
+    </span>
+    <span class="muted">·</span>
+    <span><span class="muted">storage:</span> <span class="bright">sqlite-vec</span> <span class="muted">embed:</span> <span class="bright">nomic-768</span></span>
+    <span class="muted">·</span>
+    <span class="muted">418 tools · 77 mcp · <span class="red">7 violations</span></span>
+    <span class="right"><span class="pulse">●</span> live <span class="muted">12:41:08 LON</span></span>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- LEFT PANE -->
+    <div class="pane">
+      <div class="pane-head"><span class="lab">[1] NAV</span> <span class="right">jk to move</span></div>
+      <div class="pane-body">
+<pre><span class="muted">┌─ Workspace ─────────┐</span>
+<span class="sb-row"><span class="ico">▦</span> Overview</span>
+<span class="sb-row active"><span class="ico">⌘</span> Discover</span>
+<span class="sb-row"><span class="ico">↗</span> Tools <span class="muted">418</span></span>
+<span class="sb-row"><span class="ico">⚡</span> Calls <span class="muted">2.1k</span></span>
+<span class="sb-row"><span class="ico">⚠</span> Violations <span class="red">7</span></span>
+<span class="sb-row"><span class="ico">✓</span> Evals <span class="muted">418</span></span>
+
+<span class="sb-cat">Sources</span>
+<span class="sb-row"><span class="ico">●</span> MCP <span class="muted">20 srv / 77</span></span>
+<span class="sb-row"><span class="ico">●</span> Fixtures <span class="muted">199</span></span>
+<span class="sb-row"><span class="ico">●</span> Catalog <span class="muted">142</span></span>
+
+<span class="sb-cat">Domains</span>
+<span class="sb-row"><span class="domain-pip fin"></span>finance <span class="muted">158</span></span>
+<span class="sb-row"><span class="domain-pip cod"></span>code <span class="muted">92</span></span>
+<span class="sb-row"><span class="domain-pip res"></span>research <span class="muted">58</span></span>
+<span class="sb-row"><span class="domain-pip doc"></span>docs <span class="muted">42</span></span>
+<span class="sb-row"><span class="domain-pip geo"></span>geo <span class="muted">28</span></span>
+<span class="sb-row"><span class="domain-pip dat"></span>data <span class="muted">22</span></span>
+<span class="sb-row"><span class="domain-pip com"></span>comms <span class="muted">18</span></span>
+
+<span class="muted"># press / for fuzzy</span>
+</pre>
+      </div>
+    </div>
+
+    <!-- MIDDLE PANE -->
+    <div class="pane focused">
+      <div class="pane-head">
+        <span><span class="lab">[2] RANKING</span> <span class="muted">— "build a DCF model for NVIDIA from the latest 10-K"</span></span>
+        <span class="right">RRF · vec0.5 / txt0.5 · gate 0.80 · <span class="green bright">68ms</span></span>
+      </div>
+      <div class="tab-strip">
+        <span class="mode-hint">▌ Domain</span>
+        <button class="tab all active"><span class="pip"></span>ALL <span class="ct">· 418</span></button>
+        <button class="tab fin"><span class="pip"></span>FIN <span class="ct">· 158</span></button>
+        <button class="tab cod"><span class="pip"></span>COD <span class="ct">· 92</span></button>
+        <button class="tab res"><span class="pip"></span>RES <span class="ct">· 58</span></button>
+        <button class="tab doc"><span class="pip"></span>DOC <span class="ct">· 42</span></button>
+        <button class="tab geo"><span class="pip"></span>GEO <span class="ct">· 28</span></button>
+        <button class="tab dat"><span class="pip"></span>DAT <span class="ct">· 22</span></button>
+        <button class="tab com"><span class="pip"></span>COM <span class="ct">· 18</span></button>
+        <span class="spacer"></span>
+        <span class="mode-hint">⇄ &nbsp;1/2 to switch</span>
+      </div>
+      <div class="pane-body">
+
+<pre class="ascii-box"><span class="bar">┌────────────────────────────────────────────────────────────────────────────────────┐</span>
+<span class="bar">│</span>  <span class="muted">/discover ?q="build a DCF model for NVIDIA from the latest 10-K"</span>          <span class="bar">│</span>
+<span class="bar">│</span>  <span class="muted">└─ embed 23ms (cached)  └─ vec0 14ms  └─ fts5 8ms  └─ rrf 0ms  total 45ms</span>  <span class="bar">│</span>
+<span class="bar">└────────────────────────────────────────────────────────────────────────────────────┘</span>
+</pre>
+
+        <table>
+          <thead>
+            <tr><th>#</th><th>tool</th><th>ver</th><th>domain</th><th class="num">rrf</th><th class="num">rel</th><th class="num">vec</th><th class="num">p95</th><th class="num">$/call</th></tr>
+          </thead>
+          <tbody>
+            <tr class="t1"><td class="first">1</td><td><span class="bright">sec-edgar-financials</span></td><td class="muted">1.0</td><td><span class="domain-tag fin">FIN</span></td><td class="num">0.0164</td><td class="num green">1.00</td><td class="num">0.78</td><td class="num">1500</td><td class="num">0.0000</td></tr>
+            <tr><td>2</td><td>pdf-extractor</td><td class="muted">3.0</td><td><span class="domain-tag fin">FIN</span></td><td class="num">0.0162</td><td class="num">1.00</td><td class="num">0.76</td><td class="num">800</td><td class="num">0.0010</td></tr>
+            <tr><td>3</td><td>yahoo-finance-fund</td><td class="muted">1.0</td><td><span class="domain-tag fin">FIN</span></td><td class="num">0.0148</td><td class="num">0.92</td><td class="num">0.71</td><td class="num">1200</td><td class="num">0.0000</td></tr>
+            <tr><td>4</td><td>annual-report-extract</td><td class="muted">1.0</td><td><span class="domain-tag doc">DOC</span></td><td class="num">0.0138</td><td class="num">0.80</td><td class="num">0.69</td><td class="num">2000</td><td class="num">0.0050</td></tr>
+            <tr><td>5</td><td>mcp-github__get_file</td><td class="muted">1.0</td><td><span class="domain-tag cod">COD</span></td><td class="num">0.0114</td><td class="num">0.95</td><td class="num">0.61</td><td class="num">1500</td><td class="num">0.0000</td></tr>
+            <tr><td>6</td><td>sec-edgar-filings-list</td><td class="muted">1.0</td><td><span class="domain-tag fin">FIN</span></td><td class="num">0.0110</td><td class="num">0.92</td><td class="num">0.60</td><td class="num">1000</td><td class="num">0.0000</td></tr>
+            <tr><td>7</td><td>fred-series</td><td class="muted">1.0</td><td><span class="domain-tag fin">FIN</span></td><td class="num">0.0098</td><td class="num">0.92</td><td class="num">0.55</td><td class="num">700</td><td class="num">0.0000</td></tr>
+            <tr><td>8</td><td>polygon-aggregates</td><td class="muted">1.0</td><td><span class="domain-tag fin">FIN</span></td><td class="num">0.0091</td><td class="num">0.92</td><td class="num">0.54</td><td class="num">400</td><td class="num">0.0050</td></tr>
+            <tr><td>9</td><td>finnhub-earnings-cal</td><td class="muted">1.0</td><td><span class="domain-tag fin">FIN</span></td><td class="num">0.0083</td><td class="num">0.92</td><td class="num">0.52</td><td class="num">600</td><td class="num">0.0000</td></tr>
+            <tr><td>10</td><td>tiingo-eod</td><td class="muted">1.0</td><td><span class="domain-tag fin">FIN</span></td><td class="num">0.0077</td><td class="num">0.92</td><td class="num">0.50</td><td class="num">800</td><td class="num">0.0000</td></tr>
+          </tbody>
+        </table>
+
+<pre class="ascii-box" style="margin-top:14px;"><span class="bar">┌─ INPUT CONTRACT ───── sec-edgar-financials@1.0 ─────────────────────────────┐</span>
+<span class="bar">│</span> <span class="blue">{</span>                                                                            <span class="bar">│</span>
+<span class="bar">│</span>   <span class="green">"type"</span>: <span class="orange">"object"</span>,                                                          <span class="bar">│</span>
+<span class="bar">│</span>   <span class="green">"required"</span>: [<span class="orange">"ticker"</span>],                                                      <span class="bar">│</span>
+<span class="bar">│</span>   <span class="green">"properties"</span>: <span class="blue">{</span>                                                              <span class="bar">│</span>
+<span class="bar">│</span>     <span class="green">"ticker"</span>: <span class="blue">{</span> <span class="green">"type"</span>: <span class="orange">"string"</span>, <span class="green">"pattern"</span>: <span class="orange">"^[A-Z]{1,5}$"</span> <span class="blue">}</span>                  <span class="bar">│</span>
+<span class="bar">│</span>   <span class="blue">}</span>                                                                            <span class="bar">│</span>
+<span class="bar">│</span> <span class="blue">}</span>                                                                            <span class="bar">│</span>
+<span class="bar">└─────────────────────────────────────────────────────────────────────────────┘</span>
+
+<span class="bar">┌─ SUGGESTED CALL ────────────────────────────────────────────────────────────┐</span>
+<span class="bar">│</span> <span class="magenta">POST</span> /call                                                                  <span class="bar">│</span>
+<span class="bar">│</span> {                                                                            <span class="bar">│</span>
+<span class="bar">│</span>   <span class="green">"tool_name"</span>: <span class="orange">"sec-edgar-financials"</span>, <span class="green">"tool_version"</span>: <span class="orange">"1.0"</span>,              <span class="bar">│</span>
+<span class="bar">│</span>   <span class="green">"input"</span>: { <span class="green">"ticker"</span>: <span class="orange">"NVDA"</span> }                                              <span class="bar">│</span>
+<span class="bar">│</span> }                                                                            <span class="bar">│</span>
+<span class="bar">└─────────────────────────────────────────────────────────────────────────────┘</span></pre>
+      </div>
+    </div>
+
+    <!-- RIGHT PANE -->
+    <div class="pane">
+      <div class="pane-head"><span class="lab">[3] DETAIL & FEED</span> <span class="right">↑↓ scroll</span></div>
+      <div class="pane-body">
+        <div class="detail">
+          <h3 class="bright">sec-edgar-financials@1.0 <span class="domain-tag fin" style="font-size:9px;vertical-align:2px;">FIN</span></h3>
+          <div class="submeta">author hackathon-team · stub sec-edgar-financials-v1</div>
+          <p class="blurb">Fetches the latest annual 10-K income statement directly from SEC EDGAR for any US-listed company by ticker. Live data via the XBRL companyfacts API. Free, no key required, audit-friendly source URL returned alongside the parsed rows.</p>
+          <div class="kv">
+            <span class="k">reliability</span>
+            <span class="reliability-bar">
+              <span class="meter"><i style="width:100%"></i></span>
+              <span class="bright">1.000</span> <span class="muted">5/5</span>
+            </span>
+            <span class="k">p95 latency</span><span><span class="bright">1500</span> <span class="muted">ms</span></span>
+            <span class="k">cost / call</span><span>$0.0000 <span class="muted">(free SEC API)</span></span>
+            <span class="k">calls 24h</span><span><span class="bright">142</span> <span class="muted">·</span> <span class="green">99.30% ok</span></span>
+            <span class="k">circuit</span><span class="green bright">closed</span>
+            <span class="k">last call</span><span>12:41:04 <span class="green">ok</span> 1191ms</span>
+          </div>
+        </div>
+
+        <div class="feed-head">▌ LIVE FEED ▌ /events</div>
+        <div class="feed-row"><span class="muted">12:41:08</span> <span class="chip dscv">DSCV</span> "DCF NVIDIA" <span class="muted">→ 5 res 68ms</span></div>
+        <div class="feed-row"><span class="muted">12:41:04</span> <span class="chip call">CALL</span> sec-edgar-financials NVDA <span class="green bright">ok</span> <span class="muted">1191ms</span></div>
+        <div class="feed-row"><span class="muted">12:40:51</span> <span class="chip dscv">DSCV</span> "add ints" <span class="muted">→ mcp-everything__get-sum</span></div>
+        <div class="feed-row"><span class="muted">12:40:47</span> <span class="chip call">CALL</span> mcp-everything__get-sum 7+5=12 <span class="green bright">ok</span></div>
+        <div class="feed-row cb"><span class="muted">12:40:33</span> <span class="chip cb">CB!!</span> <span class="bright">malformed-bot</span> <span class="red">output_violation</span></div>
+        <div class="feed-row gate"><span class="muted">12:40:22</span> <span class="chip gate">GATE</span> flaky-extractor rel <span class="bright">0.40</span> &lt; 0.80</div>
+        <div class="feed-row"><span class="muted">12:40:11</span> <span class="chip dscv">DSCV</span> "extract VAT invoice" <span class="muted">5 res</span></div>
+        <div class="feed-row"><span class="muted">12:40:04</span> <span class="chip call">CALL</span> arxiv-paper-search Mamba <span class="green bright">ok</span></div>
+        <div class="feed-row"><span class="muted">12:39:58</span> <span class="chip dscv">DSCV</span> "python OWASP" <span class="muted">5 res</span></div>
+        <div class="feed-row"><span class="muted">12:39:51</span> <span class="chip call">CALL</span> security-scanner OWASP <span class="green bright">ok</span></div>
+        <div class="feed-row"><span class="muted">12:39:33</span> <span class="chip push">PUSH</span> mcp-everything imported <span class="muted">(13 tools)</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATUS BAR -->
+  <div class="status">
+    <span class="keypair"><span class="key g">/</span><span class="muted">search</span></span>
+    <span class="keypair"><span class="key">⏎</span><span class="muted">call</span></span>
+    <span class="keypair"><span class="key">j/k</span><span class="muted">move</span></span>
+    <span class="keypair"><span class="key m">tab</span><span class="muted">pane</span></span>
+    <span class="keypair"><span class="key o">1-9</span><span class="muted">domain</span></span>
+    <span class="keypair"><span class="key b">d</span><span class="muted">discover</span></span>
+    <span class="keypair"><span class="key o">p</span><span class="muted">push</span></span>
+    <span class="keypair"><span class="key y">e</span><span class="muted">eval</span></span>
+    <span class="keypair"><span class="key r">!</span><span class="muted">cb</span></span>
+    <span class="keypair"><span class="key">?</span><span class="muted">help</span></span>
+    <span class="keypair"><span class="key r">q</span><span class="muted">quit</span></span>
+    <span class="right">CPU 4%  MEM 89MB  WAL 1.2MB  pane 2/3</span>
+  </div>
+</div>
+</body>
+</html>

@@ -1,14 +1,43 @@
 # 2chain
 
-**A tool registry with continuous evals and reliability gating for AI agents.**
+**A self-hostable tool registry with hybrid retrieval, reliability gating, and JSON Schema contract enforcement for AI agents.**
 
-Built on MongoDB Atlas Vector Search + Atlas Search + `$rankFusion` + change streams + Voyage AI embeddings. Agents type a natural-language task; 2chain picks the right tool from 199 candidates, calls it, and validates the response on the wire. Bad tools are filtered from results before they're ever returned, broken tools circuit-break on contract violation, and the dashboard re-ranks live via Atlas change streams.
+Two ways to run:
 
-> MongoDB Agentic Evolution Hackathon, May 2026 — track: **Adaptive Retrieval**.
+- **Personal tier (v2)** — SQLite + sqlite-vec + FTS5 + Ollama (`nomic-embed-text`). Zero cloud dependencies. `npm run setup:personal && npm run seed:v2 && npm run dev:v2`. 341 tools (199 demo fixtures + 142 real-corpus catalog) embedded in ~2.6s on local Ollama.
+- **Hackathon demo (v1)** — MongoDB Atlas Vector Search + `$rankFusion` + Voyage AI. The original submission for the MongoDB Agentic Evolution Hackathon, May 2026.
+
+Both run the same agent-facing surface: `/discover` (hybrid retrieval), `/push` (eval + register), `/call` (contract-enforced invocation), MCP server, live SSE dashboard.
 
 🎬 **60-second demo video**: [youtu.be/puINYgtQXdM](https://youtu.be/puINYgtQXdM)
 
 📖 **3-min stage script**: [demo/SCRIPT.md](./demo/SCRIPT.md) · **demo prompts**: [demo/prompts.md](./demo/prompts.md)
+
+📊 **v1 -> v2 retrieval baseline**: [docs/perf/phase-1-baseline.md](./docs/perf/phase-1-baseline.md)
+
+---
+
+## Quick start (Personal tier, v2)
+
+```bash
+# 1. Install Ollama and pull the embedder
+curl -fsSL https://ollama.com/install.sh | sh   # or download from ollama.com
+ollama pull nomic-embed-text
+
+# 2. Install + preflight + seed + run
+npm install
+npm run setup:personal     # 5 hard checks: Ollama reachable, model present,
+                           # sqlite-vec loadable, ~/.2chain writable, warm probe
+npm run seed:v2            # 341 tools (199 demo + 142 real catalog), ~2.6s
+npm run dev:v2             # http://localhost:3030
+
+# 3. Verify the demo arc routes correctly
+npm run smoke:v2:demos     # 3/3 strict pass: DCF, arxiv, security
+```
+
+To grow the catalog: edit `src/fixtures/real-corpus.ts` (12 domains pre-seeded with named, real-world tool specs from MCP registry, public APIs, well-known SaaS) and re-run `npm run seed:v2`.
+
+To **disable** the catalog (just the 199 demo fixtures): `INCLUDE_REAL_CORPUS=false npm run seed:v2`.
 
 ---
 

@@ -1,7 +1,14 @@
-import { fetchIncomeStatement, knownTickers } from './secEdgar.js';
-import { searchArxiv } from './arxivSearch.js';
+import { fetchIncomeStatement, knownTickers } from '../tools/secEdgar.js';
+import { searchArxiv } from '../tools/arxivSearch.js';
 
-type StubFn = (input: Record<string, unknown>, caseId?: string) => unknown;
+// Stubs receive (input, caseId, ctx) where ctx exposes the calling tool's
+// name + version. Bridges (e.g. mcp-bridge) use ctx.tool_name to derive
+// per-tool routing without forcing callers to wrap args in an envelope.
+export interface StubContext {
+  tool_name: string;
+  tool_version: string;
+}
+type StubFn = (input: Record<string, unknown>, caseId?: string, ctx?: StubContext) => unknown;
 
 const REGISTRY = new Map<string, StubFn>();
 
@@ -13,11 +20,39 @@ export function getStub(name: string): StubFn | undefined {
   return REGISTRY.get(name);
 }
 
-export function callStub(name: string, input: Record<string, unknown>, caseId?: string): unknown {
+export function callStub(
+  name: string,
+  input: Record<string, unknown>,
+  caseId?: string,
+  ctx?: StubContext,
+): unknown {
   const fn = REGISTRY.get(name);
   if (!fn) throw new Error(`unknown stub: ${name}`);
-  return fn(input, caseId);
+  return fn(input, caseId, ctx);
 }
+
+// =====================================================================
+// catalog-only-stub — placeholder for tools imported from external
+// directories (MCP registry, public APIs list, etc.) that have a real
+// spec but no first-party stub yet.
+//
+// Per CLAUDE.md rule 12, v2 ships only first-party stubs. Imported tool
+// specs are SEARCHABLE so users can find them, but /call returns a clear
+// "spec only" error pointing at how to add a stub. This is the catalog
+// equivalent of a 501.
+// =====================================================================
+registerStub('catalog-only-stub', (_input, _caseId) => {
+  // Returns a structured payload that EVERY ajv contract will fail validation
+  // on (most contracts don't allow this exact shape), so /call ends up
+  // logging a violation. This is intentional — the catalog tool is a stub.
+  return {
+    __catalog_only: true,
+    message:
+      'This tool is a spec-only catalog entry. To make it callable, add a ' +
+      'first-party stub under src/tools/ and register it in stubs.ts. See ' +
+      'CLAUDE.md rule 12 for the trust-boundary rationale.',
+  };
+});
 
 // =====================================================================
 // sec-edgar-financials v1.0 — REAL fetch from SEC EDGAR XBRL API.

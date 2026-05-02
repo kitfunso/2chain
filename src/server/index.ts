@@ -1,44 +1,62 @@
 import Fastify from 'fastify';
 import type { FastifyInstance } from 'fastify';
-import { getDb } from '../db/client.js';
+import { createStorage } from '../storage/index.js';
+import { createEmbedder } from '../embeddings/index.js';
 import { registerDiscoverRoute } from './routes/discover.js';
 import { registerPushRoute } from './routes/push.js';
 import { registerCallRoute } from './routes/call.js';
 import { registerDashboardRoutes } from './routes/dashboard.js';
-import { startChangeStreams } from './streams.js';
-import { prewarmDemoEmbedding, discover as discoverFn, DEMO_AGENT_QUERY } from '../services/discover.js';
+import { discover, prewarmDiscover, DEMO_AGENT_QUERY } from '../services/discover.js';
 import { broadcast } from './sse.js';
+import type { Storage, Embedder } from '../types.js';
 // Side-effect: register all stubs in the in-process registry.
 import '../services/stubs.js';
+
+declare module 'fastify' {
+  interface FastifyInstance {
+    storage: Storage;
+    embedder: Embedder;
+  }
+}
 
 export async function buildServer(): Promise<FastifyInstance> {
   const app = Fastify({
     logger: { level: process.env.LOG_LEVEL || 'info' },
-    bodyLimit: 1_048_576,  // 1MB plenty for tool.json
+    bodyLimit: 1_048_576,
   });
 
-  const db = await getDb();
+  const storage = await createStorage();
+  await storage.init();
+  const embedder = await createEmbedder();
 
-  app.get('/health', async () => ({ ok: true, ts: new Date().toISOString() }));
+  app.decorate('storage', storage);
+  app.decorate('embedder', embedder);
 
-  registerDiscoverRoute(app, db);
-  registerPushRoute(app, db);
-  registerCallRoute(app, db);
-  registerDashboardRoutes(app, db);
+  app.get('/health', async () => ({
+    ok: true,
+    ts: new Date().toISOString(),
+    storage: (await storage.dbStats()).driver,
+    embedder: embedder.name(),
+  }));
 
-  startChangeStreams(db);
+  registerDiscoverRoute(app, storage, embedder);
+  registerPushRoute(app, storage, embedder);
+  registerCallRoute(app, storage);
+  registerDashboardRoutes(app, storage);
 
-  // Pre-warm the demo embed so Beat 1 cold call is sub-100ms.
-  prewarmDemoEmbedding()
-    .then(() => app.log.info('demo embedding pre-warmed'))
-    .catch((e) => app.log.warn({ err: e.message }, 'embedding pre-warm failed (non-fatal)'));
+  // Pre-warm prewarm queries so demo cold-call is sub-100ms.
+  prewarmDiscover(embedder)
+    .then(() => app.log.info({ count: 17 }, 'embedder prewarm complete'))
+    .catch((e) => app.log.warn({ err: (e as Error).message }, 'embedder prewarm failed (non-fatal)'));
 
-  // Tools change-stream side-effect: when a tool flips status/reliability,
-  // re-run the demo discover and broadcast the new ranking. This is what makes
-  // Beat 2 → Beat 3 visually pop on the dashboard without any user action.
-  db.collection('tools').watch([], { fullDocument: 'updateLookup' }).on('change', async () => {
+  // v1's MongoDB change-stream re-rank, expressed against the Storage interface.
+  // Fires on any change event the storage driver reports; we filter for tool
+  // mutations and rebroadcast a fresh ranking. Step 9 wires SqliteStorage's
+  // updateHook to actually fire these; for now this is a no-op subscription.
+  storage.watchChanges(async (event) => {
+    if (event.table !== 'tools') return;
     try {
-      const { results, meta } = await discoverFn(db, DEMO_AGENT_QUERY, 5);
+      const { results, meta } = await discover(storage, embedder, DEMO_AGENT_QUERY, 5);
       broadcast('discover_ran', {
         query: DEMO_AGENT_QUERY,
         results: results.map((r) => ({
@@ -46,14 +64,19 @@ export async function buildServer(): Promise<FastifyInstance> {
           reliability_score: r.reliability_score,
           vec_score: r.vec_score,
           rank_score: r.rank_score,
+          rrf_score: r.rrf_score,
         })),
         meta,
         ts: new Date().toISOString(),
-        trigger: 'tool_changed',
+        trigger: event.type,
       });
     } catch (e) {
       app.log.warn({ err: (e as Error).message }, 're-rank on tool change failed');
     }
+  });
+
+  app.addHook('onClose', async () => {
+    await storage.close();
   });
 
   return app;
