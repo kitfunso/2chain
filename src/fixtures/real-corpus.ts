@@ -324,10 +324,10 @@ const GAMING: ToolSpecV2[] = [
   t('gaming', 'discord-bot-messages', 'Discord Bot API. Send messages, manage channels, members, roles. Enterprise-style webhooks for community ops.'),
   t('gaming', 'riot-games-summoner', 'Riot Games API. League of Legends + Valorant + TFT match histories, summoner profiles, ranked tiers. Regional endpoints.'),
   t('gaming', 'battle-net-account', 'Battle.net OAuth2 API. World of Warcraft + Diablo + StarCraft 2 character profiles, achievements, season ladders.'),
-  t('gaming', 'gog-galaxy-store', 'GOG Galaxy public API. DRM-free game catalogue, prices, regional availability. Used by price-tracker tools.'),
+  t('gaming', 'rawg-games-database', 'RAWG.io API. 500k+ games metadata: ratings, screenshots, platforms, genres, developers, stores. Free tier for non-commercial use.'),
   t('gaming', 'itch-io-jam', 'itch.io API for indie games + game jams. Pulls jam entries, downloads, ratings. OAuth bearer token for owner data.'),
   t('gaming', 'opencritic-game', 'OpenCritic API. Aggregated review scores across 100+ outlets; tier classification (Mighty/Strong/Fair/Weak).'),
-  t('gaming', 'how-long-to-beat', 'HowLongToBeat community-reported game duration estimates. Main story / main + extras / completionist hours per title.'),
+  t('gaming', 'isthereanydeal-prices', 'IsThereAnyDeal API. Cross-store PC game price tracking + historical lows across 60+ stores (Steam, GOG, Epic, Humble). Free with key.'),
 ];
 
 const REAL_ESTATE: ToolSpecV2[] = [
