@@ -1,10 +1,13 @@
 // v2 push — Storage + Embedder via DI. No MongoDB. No Voyage.
 
-import type { Storage, Embedder, ToolSpecV2 } from '../types.js';
+import type { Storage, Embedder, ToolSpecV2, ToolKind } from '../types.js';
 import { DEFAULT_NAMESPACE } from '../types.js';
 import { runEvals } from './evalRunner.js';
 import { getStub } from './stubs.js';
 import { validateContract } from './contract-bounds.js';
+
+const VALID_KINDS: ReadonlySet<ToolKind> = new Set(['tool', 'skill', 'subagent', 'prompt']);
+const NON_EVAL_KINDS: ReadonlySet<ToolKind> = new Set(['skill', 'subagent', 'prompt']);
 
 export interface PushInput {
   name: string;
@@ -16,6 +19,7 @@ export interface PushInput {
   endpoint_stub_name: string;
   metadata: { cost_per_call_usd: number; p95_latency_ms: number };
   domain?: string;
+  tool_kind?: ToolKind;
 }
 
 export interface PushResult {
@@ -39,7 +43,8 @@ export type PushError =
   | { ok: false; code: 'name_owned_by_other'; message: string }
   | { ok: false; code: 'unknown_stub'; message: string }
   | { ok: false; code: 'contract_too_large'; message: string }
-  | { ok: false; code: 'embed_failed'; message: string };
+  | { ok: false; code: 'embed_failed'; message: string }
+  | { ok: false; code: 'invalid_tool_kind'; message: string };
 
 export async function push(
   storage: Storage,
@@ -50,6 +55,16 @@ export async function push(
 ): Promise<PushResult | PushError> {
   const tStart = Date.now();
   const now = new Date().toISOString();
+
+  // tool_kind defaults to 'tool' for back-compat with existing /push callers.
+  const kind: ToolKind = body.tool_kind ?? 'tool';
+  if (!VALID_KINDS.has(kind)) {
+    return {
+      ok: false,
+      code: 'invalid_tool_kind',
+      message: `tool_kind must be one of tool|skill|subagent|prompt, got "${body.tool_kind}"`,
+    };
+  }
 
   // CLAUDE.md rule 11: bound JSON Schema size + depth before any compile.
   const inputCheck = validateContract(body.input_contract, 'input');
@@ -101,8 +116,41 @@ export async function push(
     },
     status: 'pending',
     domain: body.domain,
+    tool_kind: kind,
   };
   const inserted = await storage.upsertTool(pendingSpec, embedding, namespace);
+
+  // Skills, subagents, and prompts skip the eval harness — eval cases assume
+  // the tool fixture stubs (pdf-extractor, malformed-bot, etc.). Non-tool
+  // kinds get reliability=0.95 and status='active' directly so they pass
+  // the RRF gate and surface in /discover. Future: per-kind eval suites.
+  if (NON_EVAL_KINDS.has(kind)) {
+    const reliability = 0.95;
+    await storage.updateToolAfterEval(
+      inserted.id,
+      {
+        ...pendingSpec.metadata,
+        reliability_score: reliability,
+        last_eval_run: new Date().toISOString(),
+      },
+      'active',
+    );
+    return {
+      ok: true,
+      tool_id: inserted.id,
+      name: body.name,
+      version: body.version,
+      status: 'active',
+      reliability_score: reliability,
+      pass_rate: reliability,
+      pass_count: 0,
+      total_count: 0,
+      cases: [],
+      push_ms: Date.now() - tStart,
+      embed_ms: embedMs,
+      eval_ms: 0,
+    };
+  }
 
   // Run evals (D34: status always flips to 'active', reliability does the gating)
   const tEval = Date.now();

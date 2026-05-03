@@ -55,6 +55,53 @@ registerStub('catalog-only-stub', (_input, _caseId) => {
 });
 
 // =====================================================================
+// prompt-template-stub — first-party stub for tool_kind='prompt' rows.
+// Looks up the template from the in-memory registry (populated by
+// importPrompts via setPromptTemplate) and substitutes {{var}}.
+// Lives in stubs.ts so it registers at module load — /push validates
+// the stub name independently of whether importPrompts has run yet.
+// =====================================================================
+const PROMPT_TEMPLATES = new Map<string, string>();
+
+export function setPromptTemplate(toolName: string, template: string): void {
+  PROMPT_TEMPLATES.set(toolName, template);
+}
+
+export function getPromptTemplate(toolName: string): string | undefined {
+  return PROMPT_TEMPLATES.get(toolName);
+}
+
+export function _resetPromptTemplatesForTests(): void {
+  PROMPT_TEMPLATES.clear();
+}
+
+registerStub('prompt-template-stub', (input, _caseId, ctx) => {
+  if (!ctx?.tool_name) {
+    throw new Error('prompt-template-stub: missing tool ctx (call.ts must pass it)');
+  }
+  const template = PROMPT_TEMPLATES.get(ctx.tool_name);
+  if (!template) {
+    throw new Error(
+      `prompt-template-stub: no template registered for "${ctx.tool_name}". Did the importer run?`,
+    );
+  }
+  const rawVars = (input as { vars?: unknown }).vars;
+  const vars: Record<string, unknown> =
+    rawVars && typeof rawVars === 'object' && !Array.isArray(rawVars)
+      ? (rawVars as Record<string, unknown>)
+      : {};
+  const rendered = template.replace(/\{\{(\w+)\}\}/g, (_, key: string) => {
+    if (!Object.prototype.hasOwnProperty.call(vars, key)) return `{{${key}}}`;
+    const v = vars[key];
+    // Only substitute strings. Non-string values render as the literal
+    // placeholder so callers see the type mismatch instead of a lossy
+    // String(value) coercion ("[object Object]", "null", etc.).
+    return typeof v === 'string' ? v : `{{${key}}}`;
+  });
+  return { rendered };
+});
+
+// =====================================================================
 // sec-edgar-financials v1.0 — REAL fetch from SEC EDGAR XBRL API.
 // No baked numbers. Hits data.sec.gov, parses companyfacts JSON,
 // returns the latest annual 10-K income statement. Latency ~500-1500ms.

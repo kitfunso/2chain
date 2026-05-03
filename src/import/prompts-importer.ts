@@ -4,7 +4,11 @@
 // `{ rendered: string }`. Substitution is `{{var}}` -> vars[var]; missing
 // vars render as the literal `{{var}}` so callers can chain rounds.
 
-import { registerStub, type StubContext } from '../services/stubs.js';
+import {
+  setPromptTemplate,
+  getPromptTemplate,
+  _resetPromptTemplatesForTests,
+} from '../services/stubs.js';
 import type { Embedder, Storage, ToolSpecV2 } from '../types.js';
 import { PROMPT_SEEDS, type PromptSeed } from './prompts-seed.js';
 
@@ -12,48 +16,13 @@ const NAMESPACE = 'default';
 const DEFAULT_AUTHOR = 'prompt-import';
 const PROMPT_STUB_NAME = 'prompt-template-stub';
 
-// Side registry of templates, keyed by 2chain tool name. Populated at import
-// time; the stub looks up by ctx.tool_name (same pattern as mcp-bridge).
-const PROMPT_TEMPLATES = new Map<string, string>();
-
-let stubRegistered = false;
-function ensurePromptStub(): void {
-  if (stubRegistered) return;
-  registerStub(PROMPT_STUB_NAME, (input: Record<string, unknown>, _caseId, ctx?: StubContext) => {
-    if (!ctx?.tool_name) {
-      throw new Error('prompt-template-stub: missing tool ctx (call.ts must pass it)');
-    }
-    const template = PROMPT_TEMPLATES.get(ctx.tool_name);
-    if (!template) {
-      throw new Error(
-        `prompt-template-stub: no template registered for "${ctx.tool_name}". Did the importer run?`,
-      );
-    }
-    const rawVars = (input as { vars?: unknown }).vars;
-    const vars: Record<string, unknown> =
-      rawVars && typeof rawVars === 'object' && !Array.isArray(rawVars)
-        ? (rawVars as Record<string, unknown>)
-        : {};
-    const rendered = template.replace(/\{\{(\w+)\}\}/g, (_, key: string) => {
-      if (!Object.prototype.hasOwnProperty.call(vars, key)) return `{{${key}}}`;
-      const v = vars[key];
-      // Only substitute strings. Non-string values render as the literal
-      // placeholder so callers see the type mismatch instead of a lossy
-      // String(value) coercion ("[object Object]", "null", etc.).
-      return typeof v === 'string' ? v : `{{${key}}}`;
-    });
-    return { rendered };
-  });
-  stubRegistered = true;
-}
-
 /** Test-only: clear the in-memory template registry. */
 export function _resetPromptRegistryForTests(): void {
-  PROMPT_TEMPLATES.clear();
+  _resetPromptTemplatesForTests();
 }
 
 export function getRegisteredPromptTemplate(name: string): string | undefined {
-  return PROMPT_TEMPLATES.get(name);
+  return getPromptTemplate(name);
 }
 
 function specFromPrompt(seed: PromptSeed): ToolSpecV2 {
@@ -118,7 +87,6 @@ export async function importPrompts(
   embedder: Embedder,
   opts: PromptImportOptions = {},
 ): Promise<PromptImportResult> {
-  ensurePromptStub();
   const t0 = Date.now();
   const seeds = (opts.seeds ?? PROMPT_SEEDS).filter((s) =>
     opts.only ? opts.only.includes(s.slug) : true,
@@ -147,7 +115,7 @@ export async function importPrompts(
   for (let i = 0; i < specs.length; i++) {
     try {
       await storage.upsertTool(specs[i], embeddings[i], NAMESPACE);
-      PROMPT_TEMPLATES.set(specs[i].name, seeds[i].template);
+      setPromptTemplate(specs[i].name, seeds[i].template);
       result.prompts_imported++;
     } catch (e) {
       result.errors.push({ slug: specs[i].name, error: (e as Error).message });
