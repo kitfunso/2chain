@@ -9,6 +9,7 @@ import {
   getPromptTemplate,
   _resetPromptTemplatesForTests,
 } from '../services/stubs.js';
+import { applyKindEval } from '../services/applyKindEval.js';
 import type { Embedder, Storage, ToolSpecV2 } from '../types.js';
 import { PROMPT_SEEDS, type PromptSeed } from './prompts-seed.js';
 
@@ -114,8 +115,11 @@ export async function importPrompts(
 
   for (let i = 0; i < specs.length; i++) {
     try {
-      await storage.upsertTool(specs[i], embeddings[i], NAMESPACE);
+      // Register the template BEFORE the eval — runPromptEval calls the
+      // stub to verify substitution, which needs the template registered.
       setPromptTemplate(specs[i].name, seeds[i].template);
+      const inserted = await storage.upsertTool(specs[i], embeddings[i], NAMESPACE);
+      await applyKindEval(storage, inserted);
       result.prompts_imported++;
     } catch (e) {
       result.errors.push({ slug: specs[i].name, error: (e as Error).message });

@@ -9,6 +9,7 @@ import { readdirSync, readFileSync, lstatSync } from 'node:fs';
 import { resolve, basename, extname } from 'node:path';
 import type { Embedder, Storage, ToolSpecV2 } from '../types.js';
 import { parseSkillFile, type ParsedSkill } from './skills-importer.js';
+import { applyKindEval } from '../services/applyKindEval.js';
 
 const NAMESPACE = 'default';
 const DEFAULT_AUTHOR = 'subagent-import';
@@ -137,7 +138,8 @@ export async function importSubagents(
 
   for (let i = 0; i < specs.length; i++) {
     try {
-      await storage.upsertTool(specs[i], embeddings[i], NAMESPACE);
+      const inserted = await storage.upsertTool(specs[i], embeddings[i], NAMESPACE);
+      await applyKindEval(storage, inserted);
       result.agents_imported++;
     } catch (e) {
       result.errors.push({

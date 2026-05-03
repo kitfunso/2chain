@@ -3,6 +3,7 @@
 import type { Storage, Embedder, ToolSpecV2, ToolKind } from '../types.js';
 import { DEFAULT_NAMESPACE } from '../types.js';
 import { runEvals } from './evalRunner.js';
+import { runKindEval } from './kindEvalRunner.js';
 import { getStub } from './stubs.js';
 import { validateContract } from './contract-bounds.js';
 
@@ -120,36 +121,53 @@ export async function push(
   };
   const inserted = await storage.upsertTool(pendingSpec, embedding, namespace);
 
-  // Skills, subagents, and prompts skip the eval harness — eval cases assume
-  // the tool fixture stubs (pdf-extractor, malformed-bot, etc.). Non-tool
-  // kinds get reliability=0.95 and status='active' directly so they pass
-  // the RRF gate and surface in /discover. Future: per-kind eval suites.
+  // Skills, subagents, and prompts run the per-kind rubric instead of the
+  // fixture eval harness. Pass-rate becomes reliability_score so the trust
+  // signal is honest (entries with sparse capability_text or missing
+  // metadata land below the 0.80 RRF gate and don't pollute discover).
   if (NON_EVAL_KINDS.has(kind)) {
-    const reliability = 0.95;
-    await storage.updateToolAfterEval(
-      inserted.id,
-      {
-        ...pendingSpec.metadata,
-        reliability_score: reliability,
-        last_eval_run: new Date().toISOString(),
-      },
-      'active',
-    );
-    return {
-      ok: true,
-      tool_id: inserted.id,
-      name: body.name,
-      version: body.version,
-      status: 'active',
-      reliability_score: reliability,
-      pass_rate: reliability,
-      pass_count: 0,
-      total_count: 0,
-      cases: [],
-      push_ms: Date.now() - tStart,
-      embed_ms: embedMs,
-      eval_ms: 0,
-    };
+    const tEval = Date.now();
+    const kindResult = runKindEval(inserted);
+    const evalMs = Date.now() - tEval;
+    if (kindResult) {
+      await storage.insertEvalRun({
+        tool_id: inserted.id,
+        tool_name: body.name,
+        tool_version: body.version,
+        namespace_id: namespace,
+        triggered_at: now,
+        triggered_by: 'push',
+        cases: kindResult.cases,
+        pass_count: kindResult.pass_count,
+        total_count: kindResult.total_count,
+        pass_rate: kindResult.pass_rate,
+        duration_ms: kindResult.duration_ms,
+      });
+      await storage.updateToolAfterEval(
+        inserted.id,
+        {
+          ...pendingSpec.metadata,
+          reliability_score: kindResult.pass_rate,
+          last_eval_run: new Date().toISOString(),
+        },
+        'active',
+      );
+      return {
+        ok: true,
+        tool_id: inserted.id,
+        name: body.name,
+        version: body.version,
+        status: 'active',
+        reliability_score: kindResult.pass_rate,
+        pass_rate: kindResult.pass_rate,
+        pass_count: kindResult.pass_count,
+        total_count: kindResult.total_count,
+        cases: kindResult.cases.map((c) => ({ case_id: c.case_id, pass: c.pass, error: c.error })),
+        push_ms: Date.now() - tStart,
+        embed_ms: embedMs,
+        eval_ms: evalMs,
+      };
+    }
   }
 
   // Run evals (D34: status always flips to 'active', reliability does the gating)
