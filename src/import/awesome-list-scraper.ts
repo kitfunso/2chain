@@ -49,6 +49,20 @@ export interface ScrapeAwesomeResult {
 // accepts the trailing `**` / spaces of bold-wrapped names.
 const BULLET = /^\s*[-*]\s+[^\[\n]*\[([^\]\n]+)\]\(([^)\s]+)\)[^-\n:]*[-:–—]+\s+(.+?)\s*$/;
 
+// Markdown table form, common in awesome-llmops / awesome-rag style lists:
+//   | [Name](url) | description | extra column...
+// We capture the FIRST link in the row + the FIRST description column.
+// Header rows ('| Project | ... |') and separator rows ('| --- |') don't
+// contain `[name](url)` so they fall through naturally.
+const TABLE = /^\|\s*\[([^\]\n]+)\]\(([^)\s]+)\)\s*\|\s*([^|\n]+?)\s*(?:\||$)/;
+
+// Description-less bullet form, used by some lists that just point at a
+// repo/page without inline copy:
+//   - [Name](url)
+// We synthesize the description from the name. Only accepts external URLs
+// (skips '#anchor' TOC entries) and drops single-word names.
+const BARE_BULLET = /^\s*[-*]\s+\[([^\]\n]{4,})\]\((https?:\/\/[^)\s]+)\)\s*$/;
+
 export function parseAwesomeMarkdown(md: string): { entries: AwesomeEntry[]; totalLines: number } {
   const lines = md.split(/\r?\n/);
   const entries: AwesomeEntry[] = [];
@@ -59,13 +73,43 @@ export function parseAwesomeMarkdown(md: string): { entries: AwesomeEntry[]; tot
       continue;
     }
     if (inCodeBlock) continue;
-    const m = BULLET.exec(raw);
-    if (!m) continue;
-    const name = m[1].trim().replace(/^\*+|\*+$/g, ''); // strip bold markers
-    const url = m[2].trim();
-    const description = m[3].trim().replace(/\.$/, '');
+
+    // Try bullet form first, then markdown-table, then bare-bullet form.
+    let name: string | undefined;
+    let url: string | undefined;
+    let description: string | undefined;
+    const bm = BULLET.exec(raw);
+    if (bm) {
+      name = bm[1];
+      url = bm[2];
+      description = bm[3];
+    } else {
+      const tm = TABLE.exec(raw);
+      if (tm) {
+        name = tm[1];
+        url = tm[2];
+        description = tm[3];
+      } else {
+        const bb = BARE_BULLET.exec(raw);
+        if (bb) {
+          name = bb[1];
+          url = bb[2];
+          // Synthesize a placeholder description from the name; downstream
+          // filter will keep entries whose name itself is descriptive (4+ chars).
+          description = `${bb[1]} — see ${bb[2]}`;
+        }
+      }
+    }
     if (!name || !url || !description) continue;
-    if (description.length < 5) continue; // skip near-empty descriptions
+
+    name = name.trim().replace(/^\*+|\*+$/g, ''); // strip bold markers
+    url = url.trim();
+    // Strip image-only descriptions (e.g. "![GitHub Badge](shields.io/...)").
+    description = description.trim()
+      .replace(/!\[[^\]]*\]\([^)]*\)/g, '')           // drop inline images
+      .replace(/\.$/, '')
+      .trim();
+    if (!description || description.length < 5) continue;
     entries.push({ name, url, description });
   }
   return { entries, totalLines: lines.length };

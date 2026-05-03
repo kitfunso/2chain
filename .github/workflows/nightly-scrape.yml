@@ -1,0 +1,65 @@
+name: nightly-scrape
+
+# Pulls fresh metadata from npm, awesome-* lists, PyPI, and Hugging Face Hub.
+# Commits the resulting snapshot + a stats markdown so contributors / forks
+# always have a recent picture of the live registry without running Ollama.
+#
+# The snapshot is metadata only — embeddings happen on `npm run import:snapshot`
+# locally where Ollama is available.
+
+on:
+  schedule:
+    - cron: '0 6 * * *'      # daily 06:00 UTC
+  workflow_dispatch:           # manual trigger
+    inputs:
+      reason:
+        description: 'Why are you running this manually?'
+        required: false
+
+permissions:
+  contents: write              # commits the snapshot + stats files
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Scrape all sources
+        id: scrape
+        run: npm run scrape:snapshot
+        env:
+          # Some upstream APIs throttle anonymous traffic; a UA header is
+          # already sent by the scrapers but a token unlocks higher caps.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Capture stats for commit body
+        id: stats
+        run: |
+          {
+            echo "summary<<EOF"
+            head -50 docs/registry-stats.md
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Commit snapshot if changed
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add data/registry-snapshot.json docs/registry-stats.md
+          if git diff --staged --quiet; then
+            echo "No changes — skipping commit."
+            exit 0
+          fi
+          git commit -m "chore(snapshot): nightly scrape $(date -u +%Y-%m-%d)
+
+          ${{ steps.stats.outputs.summary }}"
+          git push

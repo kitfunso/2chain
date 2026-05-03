@@ -37,6 +37,8 @@
     "scrape:awesome": "STORAGE_DRIVER=sqlite EMBEDDER=ollama tsx scripts/scrape-awesome.ts",
     "scrape:pypi": "STORAGE_DRIVER=sqlite EMBEDDER=ollama tsx scripts/scrape-pypi.ts",
     "scrape:hf": "STORAGE_DRIVER=sqlite EMBEDDER=ollama tsx scripts/scrape-hf.ts",
+    "scrape:snapshot": "tsx scripts/snapshot-scrape-all.ts",
+    "import:snapshot": "STORAGE_DRIVER=sqlite EMBEDDER=ollama tsx scripts/import-snapshot.ts",
     "test:integration": "tsx scripts/integration-test.ts",
     "demo:reset": "tsx scripts/seed-fixtures.ts",
     "reset:state": "tsx scripts/reset-demo-state.ts",
