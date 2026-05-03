@@ -1,10 +1,18 @@
 // v2 seed: SQLite + Ollama. Atomic reseed via .tmp + rename so a running
 // server doesn't get mid-write reads. Phase 1 plan Step 8.
 //
+// Defaults to REAL-ONLY: 14 hand-crafted demo fixtures + 142 real-corpus
+// tools (verifiable public products: SEC EDGAR, GitHub, Stripe, Polygon,
+// Mapbox, OpenFDA, Spotify, etc.). The ~185 generated.ts fixtures use
+// synthetic vendor names ("expensy-parser", "captable-pro", "1040-bot")
+// to demonstrate registry scale; they are NOT real products and are
+// off by default. Pass INCLUDE_GENERATED=true to opt in.
+//
 // Usage:
 //   STORAGE_DRIVER=sqlite EMBEDDER=ollama tsx scripts/seed-fixtures.ts
-//   TWOCHAIN_DB_PATH=/tmp/v2.db   # override
-//   INCLUDE_GENERATED=false       # 14 hand-crafted only
+//   TWOCHAIN_DB_PATH=/tmp/v2.db    # override
+//   INCLUDE_GENERATED=true         # opt in to ~185 synthetic fixtures
+//   INCLUDE_REAL_CORPUS=false      # exclude the 142 real-corpus catalog
 
 import 'dotenv/config';
 import { existsSync, renameSync, unlinkSync, mkdirSync } from 'node:fs';
@@ -19,7 +27,9 @@ import { generateFixtures } from '../src/fixtures/generated.js';
 import { REAL_CORPUS } from '../src/fixtures/real-corpus.js';
 import type { ToolSpecV2 } from '../src/types.js';
 
-const INCLUDE_GENERATED = process.env.INCLUDE_GENERATED !== 'false';
+// Default OFF — generated.ts contains ~185 synthetic vendor names that are
+// NOT real shipped products. Opt in via env if you want demo-arc scale.
+const INCLUDE_GENERATED = process.env.INCLUDE_GENERATED === 'true';
 const INCLUDE_REAL_CORPUS = process.env.INCLUDE_REAL_CORPUS !== 'false';
 const ALL_TOOLS: FixtureSpec[] = INCLUDE_GENERATED
   ? [...FIXTURE_TOOLS, ...generateFixtures()]
