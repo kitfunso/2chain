@@ -117,6 +117,23 @@ export const DASHBOARD_HTML = `<!doctype html>
   .tab-strip .tab.com .pip { background: var(--yellow); }
   .tab-strip .tab.all .pip { background: transparent; border-style: dashed; }
   .tab-strip .tab.active .pip { border-color: rgba(255,255,255,0.8); }
+  /* Kind pips & tabs (tool / skill / subagent / prompt) */
+  .tab-strip .tab.kt .pip { background: var(--ink); }
+  .tab-strip .tab.ks .pip { background: var(--yellow); }
+  .tab-strip .tab.ka .pip { background: var(--blue); }
+  .tab-strip .tab.kp .pip { background: var(--magenta); }
+  .tab-strip .tab.kt.active { background: var(--ink); color: var(--paper); }
+  .tab-strip .tab.ks.active { background: var(--yellow); color: var(--ink); }
+  .tab-strip .tab.ka.active { background: var(--blue); color: var(--paper); }
+  .tab-strip .tab.kp.active { background: var(--magenta); color: var(--paper); }
+  /* Kind chip in the tool name cell (compact 1-letter badge) */
+  .kind-chip { display: inline-block; width: 14px; height: 14px; line-height: 14px;
+    text-align: center; font: 700 9px/1 var(--mono); border-radius: 2px;
+    margin-right: 6px; vertical-align: 1px; color: var(--paper); }
+  .kind-chip.kt { background: var(--ink); }
+  .kind-chip.ks { background: var(--yellow); color: var(--ink); }
+  .kind-chip.ka { background: var(--blue); }
+  .kind-chip.kp { background: var(--magenta); }
   .tab-strip .spacer { flex: 1; }
   .tab-strip .mode-hint { font: 600 10.5px/1.3 var(--mono);
     color: var(--ink-2); letter-spacing: 1px; text-transform: uppercase; padding-right: 4px; }
@@ -259,6 +276,16 @@ export const DASHBOARD_HTML = `<!doctype html>
         <span><span class="lab">2 RANKING</span> <span class="muted" id="x-query">— (run /discover to populate)</span></span>
         <span class="right"><span class="muted">RRF · vec0.5 / txt0.5 · gate 0.80 · </span><span class="green bright" id="x-latency">—</span></span>
       </div>
+      <div class="tab-strip" id="kind-tabs">
+        <span class="mode-hint">▌ Kind</span>
+        <button class="tab all active" data-kind=""><span class="pip"></span>ALL <span class="ct" id="kt-all">· 0</span></button>
+        <button class="tab kt" data-kind="tool"><span class="pip"></span>TOOL <span class="ct" id="kt-tool">· 0</span></button>
+        <button class="tab ks" data-kind="skill"><span class="pip"></span>SKILL <span class="ct" id="kt-skill">· 0</span></button>
+        <button class="tab ka" data-kind="subagent"><span class="pip"></span>AGENT <span class="ct" id="kt-subagent">· 0</span></button>
+        <button class="tab kp" data-kind="prompt"><span class="pip"></span>PROMPT <span class="ct" id="kt-prompt">· 0</span></button>
+        <span class="spacer"></span>
+        <span class="mode-hint">⇄&nbsp; click to filter by kind</span>
+      </div>
       <div class="tab-strip" id="domain-tabs">
         <span class="mode-hint">▌ Domain</span>
         <button class="tab all active" data-domain=""><span class="pip"></span>ALL <span class="ct" id="dt-all">· 0</span></button>
@@ -270,7 +297,7 @@ export const DASHBOARD_HTML = `<!doctype html>
         <button class="tab dat" data-domain="data"><span class="pip"></span>DAT <span class="ct" id="dt-data">· 0</span></button>
         <button class="tab com" data-domain="comms"><span class="pip"></span>COM <span class="ct" id="dt-comms">· 0</span></button>
         <span class="spacer"></span>
-        <span class="mode-hint">⇄&nbsp; click to filter</span>
+        <span class="mode-hint">⇄&nbsp; click to filter by domain</span>
       </div>
       <div class="pane-body">
         <table id="rank-table">
@@ -338,6 +365,7 @@ export const DASHBOARD_HTML = `<!doctype html>
     violations: [],
     evals: [],
     activeDomain: '',
+    activeKind: '',
     selected: null,
     lastDiscover: null,   // { results, meta, query }
     feed: [],             // recent events, capped 20
@@ -374,6 +402,7 @@ export const DASHBOARD_HTML = `<!doctype html>
       state.evals = s.evalRuns || [];
       $('#x-embed').textContent = inferEmbed();
       computeDomainCounts();
+      computeKindCounts();
       computeSourceCounts();
       renderTable();
       // pick top reliability as a default selection until /discover happens
@@ -421,25 +450,54 @@ export const DASHBOARD_HTML = `<!doctype html>
     $('#dt-all').textContent = '· ' + fmt.num(state.tools.length);
   }
 
+  function computeKindCounts() {
+    const counts = { tool: 0, skill: 0, subagent: 0, prompt: 0 };
+    for (const t of state.tools) {
+      const k = (t.tool_kind || 'tool');
+      if (k in counts) counts[k]++;
+    }
+    $('#kt-tool').textContent     = '· ' + fmt.num(counts.tool);
+    $('#kt-skill').textContent    = '· ' + fmt.num(counts.skill);
+    $('#kt-subagent').textContent = '· ' + fmt.num(counts.subagent);
+    $('#kt-prompt').textContent   = '· ' + fmt.num(counts.prompt);
+    $('#kt-all').textContent      = '· ' + fmt.num(state.tools.length);
+  }
+
+  function kindAbbr(k) {
+    return k === 'skill' ? 'S' : k === 'subagent' ? 'A' : k === 'prompt' ? 'P' : 'T';
+  }
+  function kindClass(k) {
+    return k === 'skill' ? 'ks' : k === 'subagent' ? 'ka' : k === 'prompt' ? 'kp' : 'kt';
+  }
+
   // ---- ranking table -------------------------------------------------------
   function renderTable() {
     const tbody = $('#rank-table tbody');
     let rows;
     if (state.lastDiscover && state.lastDiscover.results.length) {
-      // /discover mode — show ranked candidates
-      rows = state.lastDiscover.results.map((r, i) => ({
-        rank: i + 1,
-        name: r.name, version: r.version,
-        domain: (state.tools.find((t) => t.name === r.name)?.domain) || 'unk',
-        rrf: r.rrf_score ?? r.rank_score ?? 0,
-        rel: r.reliability_score ?? 0,
-        vec: r.vec_score ?? 0,
-        p95: state.tools.find((t) => t.name === r.name)?.metadata?.p95_latency_ms ?? 0,
-        top1: i === 0,
-      }));
+      // /discover mode — show ranked candidates (kind/domain filters apply post-RRF)
+      rows = state.lastDiscover.results.map((r, i) => {
+        const tool = state.tools.find((t) => t.name === r.name);
+        return {
+          rank: i + 1,
+          name: r.name, version: r.version,
+          domain: (tool?.domain) || 'unk',
+          kind: r.tool_kind || tool?.tool_kind || 'tool',
+          rrf: r.rrf_score ?? r.rank_score ?? 0,
+          rel: r.reliability_score ?? 0,
+          vec: r.vec_score ?? 0,
+          p95: tool?.metadata?.p95_latency_ms ?? 0,
+          top1: i === 0,
+        };
+      });
+      if (state.activeKind) rows = rows.filter((r) => r.kind === state.activeKind);
+      if (state.activeDomain) rows = rows.filter((r) => (r.domain || '').toLowerCase() === state.activeDomain);
+      // re-rank visible rows so the # column stays sequential after filtering
+      rows = rows.map((r, i) => ({ ...r, rank: i + 1, top1: i === 0 && rows.length > 0 }));
     } else {
-      // browse mode — alphabetical, filtered by domain
+      // browse mode — alphabetical, filtered by kind + domain
       let pool = state.tools;
+      if (state.activeKind) pool = pool.filter((t) => (t.tool_kind || 'tool') === state.activeKind);
       if (state.activeDomain) pool = pool.filter((t) => (t.domain || '').toLowerCase() === state.activeDomain);
       rows = pool
         .slice()
@@ -448,6 +506,7 @@ export const DASHBOARD_HTML = `<!doctype html>
         .map((t, i) => ({
           rank: i + 1, name: t.name, version: t.version,
           domain: (t.domain || 'unk').toLowerCase(),
+          kind: t.tool_kind || 'tool',
           rrf: 0, rel: t.metadata?.reliability_score ?? 0,
           vec: 0, p95: t.metadata?.p95_latency_ms ?? 0, top1: false,
         }));
@@ -460,9 +519,10 @@ export const DASHBOARD_HTML = `<!doctype html>
       const tag = tagFor(r.domain);
       const sel = state.selected && state.selected.name === r.name && state.selected.version === r.version
         ? ' selected' : '';
+      const chip = '<span class="kind-chip ' + kindClass(r.kind) + '" title="' + r.kind + '">' + kindAbbr(r.kind) + '</span>';
       return '<tr class="' + (r.top1 ? 't1' : '') + sel + '" data-key="' + r.name + '@' + r.version + '">'
         + '<td' + (r.top1 ? ' class="first"' : '') + '>' + r.rank + '</td>'
-        + '<td>' + r.name + '</td>'
+        + '<td>' + chip + r.name + '</td>'
         + '<td class="muted">' + r.version + '</td>'
         + '<td><span class="domain-tag ' + tag + '">' + tagLabel(r.domain) + '</span></td>'
         + '<td class="num">' + (r.rrf ? fmt.rrf(r.rrf) : '—') + '</td>'
@@ -551,6 +611,7 @@ export const DASHBOARD_HTML = `<!doctype html>
       if (idx >= 0) state.tools[idx] = { ...state.tools[idx], ...t };
       else state.tools.push(t);
       computeDomainCounts();
+      computeKindCounts();
       computeSourceCounts();
       renderTable();
       pushFeed('<span class="chip push">PUSH</span> ' + t.name + '@' + t.version
@@ -575,16 +636,35 @@ export const DASHBOARD_HTML = `<!doctype html>
     });
   }
 
-  // ---- domain tab + sidebar interactivity ----------------------------------
+  // ---- domain + kind tab interactivity -------------------------------------
   document.getElementById('domain-tabs').addEventListener('click', (e) => {
     const btn = e.target.closest('button.tab');
     if (!btn) return;
     state.activeDomain = btn.dataset.domain || '';
     state.lastDiscover = null;   // tab switch exits discover mode
     document.querySelectorAll('#domain-tabs .tab').forEach((b) => b.classList.toggle('active', b === btn));
-    $('#x-query').textContent = state.activeDomain ? '— browsing ' + state.activeDomain : '— (run /discover to populate)';
+    updateBrowseLabel();
     renderTable();
   });
+
+  document.getElementById('kind-tabs').addEventListener('click', (e) => {
+    const btn = e.target.closest('button.tab');
+    if (!btn) return;
+    state.activeKind = btn.dataset.kind || '';
+    state.lastDiscover = null;
+    document.querySelectorAll('#kind-tabs .tab').forEach((b) => b.classList.toggle('active', b === btn));
+    updateBrowseLabel();
+    renderTable();
+  });
+
+  function updateBrowseLabel() {
+    const parts = [];
+    if (state.activeKind) parts.push(state.activeKind);
+    if (state.activeDomain) parts.push(state.activeDomain);
+    $('#x-query').textContent = parts.length
+      ? '— browsing ' + parts.join(' / ')
+      : '— (run /discover to populate)';
+  }
 
   document.querySelectorAll('.sb-row[data-dom]').forEach((row) => {
     row.addEventListener('click', () => {
