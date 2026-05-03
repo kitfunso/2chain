@@ -41,6 +41,19 @@ To **disable** the catalog (just the 199 demo fixtures): `INCLUDE_REAL_CORPUS=fa
 
 ---
 
+## Tool kinds
+
+The registry indexes four discriminated kinds of unit, all sharing the same retrieval pipeline (RRF over sqlite-vec + FTS5) and discovery surface (`/discover` returns `tool_kind` on every result):
+
+- **`tool`** — RPC-style endpoints with JSON Schema input/output contracts. Default. The original 2chain unit.
+- **`skill`** — Anthropic Claude Code skills (`~/.claude/skills/<slug>/SKILL.md`). Discovery-only; agents load matched skills into context rather than calling them. Imported via `npm run import:skills`.
+- **`subagent`** — Claude Code subagents (`~/.claude/agents/*.md`). Discovery-only; agents spawn matched subagents via the Task tool. Imported via `npm run import:subagents`.
+- **`prompt`** — Curated parameterised prompt templates with `{{var}}` substitution. Callable: `/call` returns `{ rendered: string }`. Seeded from `src/import/prompts-seed.ts` (12 templates: commit, PR, postmortem, grant impact, etc.). Imported via `npm run import:prompts`.
+
+Schema discriminator is `tools.tool_kind` (CHECK-constrained, default `'tool'`). Filter by kind: `storage.listTools({ kind: 'skill' })`. End-to-end smoke: `npm run smoke:v2:mixed`.
+
+---
+
 ## Why MongoDB Atlas
 
 Every layer of 2chain is an Atlas primitive. Nothing custom-built that Atlas does better.

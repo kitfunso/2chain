@@ -27,6 +27,7 @@
     "dev:v2": "STORAGE_DRIVER=sqlite EMBEDDER=ollama tsx scripts/dev-server.ts",
     "smoke:v2:demos": "tsx scripts/smoke/v2-demo-prompts.ts",
     "smoke:v2:regression": "tsx scripts/smoke/v2-golden-regression.ts",
+    "smoke:v2:mixed": "tsx scripts/smoke/v2-mixed-kind-discover.ts",
     "smoke:v2": "npm run smoke:v2:demos && npm run smoke:v2:regression",
     "import:mcp": "STORAGE_DRIVER=sqlite EMBEDDER=ollama tsx scripts/import-mcp-servers.ts",
     "import:skills": "STORAGE_DRIVER=sqlite EMBEDDER=ollama tsx scripts/import-skills.ts",
