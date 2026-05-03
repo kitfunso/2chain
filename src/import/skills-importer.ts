@@ -14,7 +14,7 @@
 // enforces the gate, so we ship skills with reliability_score=0.95 and
 // status='active' so they pass through.
 
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { readdirSync, readFileSync, lstatSync } from 'node:fs';
 import { resolve, basename } from 'node:path';
 import type { Embedder, Storage, ToolSpecV2 } from '../types.js';
 
@@ -91,19 +91,22 @@ export function findSkillFiles(root: string): Array<{ slug: string; path: string
     return out;
   }
 
-  // Multi-skill layout (the common case)
+  // Multi-skill layout (the common case). Use lstatSync so a symlink at
+  // <root>/<slug> doesn't escape the skills root.
   for (const entry of entries) {
     const sub = resolve(root, entry);
-    let st: ReturnType<typeof statSync>;
+    let lst: ReturnType<typeof lstatSync>;
     try {
-      st = statSync(sub);
+      lst = lstatSync(sub);
     } catch {
       continue;
     }
-    if (!st.isDirectory()) continue;
+    if (lst.isSymbolicLink()) continue;
+    if (!lst.isDirectory()) continue;
     const skillPath = resolve(sub, 'SKILL.md');
     try {
-      statSync(skillPath);
+      const skillLst = lstatSync(skillPath);
+      if (skillLst.isSymbolicLink()) continue;
     } catch {
       continue;
     }

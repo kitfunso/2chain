@@ -80,6 +80,26 @@ export async function call(
     return { ok: false, status: 503, error: { code: 'circuit_broken', message: `tool ${input.tool_name}@${input.tool_version} is circuit-broken` } };
   }
 
+  // Skills and subagents are discovery-only — agents load skills into context
+  // and spawn subagents via the Task tool, neither is a /call target. Refuse
+  // up front instead of returning the catalog-only-stub payload silently.
+  if (tool.tool_kind === 'skill' || tool.tool_kind === 'subagent') {
+    await logUsage(storage, tool, agentId, callId, 'gated', Date.now() - t0, namespace);
+    return {
+      ok: false,
+      status: 400,
+      error: {
+        code: 'kind_not_callable',
+        message:
+          `tool_kind="${tool.tool_kind}" is discovery-only and cannot be invoked via /call. ` +
+          (tool.tool_kind === 'skill'
+            ? 'Load the skill into agent context instead.'
+            : 'Spawn the subagent via the Task tool instead.'),
+        details: { tool_name: tool.name, tool_version: tool.version, tool_kind: tool.tool_kind },
+      },
+    };
+  }
+
   const score = tool.metadata.reliability_score ?? 0;
   if (score < RELIABILITY_GATE) {
     if (!(bypassGate && agentRole === 'admin')) {

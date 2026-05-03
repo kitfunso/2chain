@@ -5,7 +5,7 @@
 // Subagents are discovery-only like skills: agents spawn them via the Task
 // tool, the registry's job is to surface "which subagent fits this query".
 
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { readdirSync, readFileSync, lstatSync } from 'node:fs';
 import { resolve, basename, extname } from 'node:path';
 import type { Embedder, Storage, ToolSpecV2 } from '../types.js';
 import { parseSkillFile, type ParsedSkill } from './skills-importer.js';
@@ -13,7 +13,7 @@ import { parseSkillFile, type ParsedSkill } from './skills-importer.js';
 const NAMESPACE = 'default';
 const DEFAULT_AUTHOR = 'subagent-import';
 
-/** Discover *.md files at <root>. Skip hidden files and READMEs. */
+/** Discover *.md files at <root>. Skip hidden files, READMEs, and symlinks. */
 export function findSubagentFiles(root: string): Array<{ slug: string; path: string }> {
   const out: Array<{ slug: string; path: string }> = [];
   let entries: string[];
@@ -27,13 +27,16 @@ export function findSubagentFiles(root: string): Array<{ slug: string; path: str
     if (extname(entry).toLowerCase() !== '.md') continue;
     if (basename(entry, '.md').toLowerCase() === 'readme') continue;
     const full = resolve(root, entry);
-    let st: ReturnType<typeof statSync>;
+    let lst: ReturnType<typeof lstatSync>;
     try {
-      st = statSync(full);
+      lst = lstatSync(full);
     } catch {
       continue;
     }
-    if (!st.isFile()) continue;
+    // lstatSync doesn't follow symlinks; skip them so a malicious link in
+    // ~/.claude/agents/ can't slurp arbitrary files outside the agents root.
+    if (lst.isSymbolicLink()) continue;
+    if (!lst.isFile()) continue;
     out.push({ slug: basename(entry, '.md'), path: full });
   }
   return out;

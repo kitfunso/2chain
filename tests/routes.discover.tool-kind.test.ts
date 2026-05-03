@@ -145,3 +145,43 @@ test('plain-tool result still emits tool_kind="tool" (default backfill)', async 
   assert.ok(plain, 'plain-tool not in results');
   assert.equal(plain.tool_kind, 'tool');
 });
+
+test('GET /discover?kind=skill returns only skill rows', async () => {
+  const r = await app.inject({
+    method: 'GET',
+    url: '/discover?q=anything&top=10&kind=skill',
+    headers: { 'x-api-key': API_KEY },
+  });
+  assert.equal(r.statusCode, 200);
+  const body = r.json();
+  assert.ok(body.results.length > 0, 'should return at least one skill');
+  for (const result of body.results) {
+    assert.equal(result.tool_kind, 'skill', `expected skill, got ${result.tool_kind}`);
+  }
+});
+
+test('GET /discover?kind=prompt returns only prompt rows', async () => {
+  const r = await app.inject({
+    method: 'GET',
+    url: '/discover?q=anything&top=10&kind=prompt',
+    headers: { 'x-api-key': API_KEY },
+  });
+  assert.equal(r.statusCode, 200);
+  const body = r.json();
+  for (const result of body.results) {
+    assert.equal(result.tool_kind, 'prompt');
+  }
+});
+
+test('GET /discover?kind=BOGUS returns 400 bad_request', async () => {
+  const r = await app.inject({
+    method: 'GET',
+    url: '/discover?q=anything&kind=BOGUS',
+    headers: { 'x-api-key': API_KEY },
+  });
+  assert.equal(r.statusCode, 400);
+  const body = r.json();
+  assert.equal(body.ok, false);
+  assert.equal(body.error.code, 'bad_request');
+  assert.match(body.error.message, /tool\|skill\|subagent\|prompt/);
+});

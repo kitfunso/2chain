@@ -1,14 +1,18 @@
 import type { FastifyInstance } from 'fastify';
-import type { Storage, Embedder } from '../../types.js';
+import type { Storage, Embedder, ToolKind } from '../../types.js';
 import { discover, DEMO_AGENT_QUERY } from '../../services/discover.js';
 import { requireAuth } from '../auth.js';
 import { broadcast } from '../sse.js';
+import { DEFAULT_NAMESPACE } from '../../types.js';
 
 interface DiscoverQuery {
   q?: string;
   top?: string;
   mode?: 'vector' | 'hybrid';
+  kind?: string;
 }
+
+const VALID_KINDS: ReadonlySet<ToolKind> = new Set(['tool', 'skill', 'subagent', 'prompt']);
 
 export function registerDiscoverRoute(
   app: FastifyInstance,
@@ -28,8 +32,23 @@ export function registerDiscoverRoute(
     // Mode is accepted for v1 wire-compat but v2 always runs hybrid (RRF).
     const mode = req.query.mode === 'vector' ? 'vector' : 'hybrid';
 
+    let kind: ToolKind | undefined;
+    if (req.query.kind) {
+      if (!VALID_KINDS.has(req.query.kind as ToolKind)) {
+        reply.code(400).send({
+          ok: false,
+          error: {
+            code: 'bad_request',
+            message: `kind must be one of tool|skill|subagent|prompt, got "${req.query.kind}"`,
+          },
+        });
+        return;
+      }
+      kind = req.query.kind as ToolKind;
+    }
+
     try {
-      const { results, meta } = await discover(storage, embedder, q, top);
+      const { results, meta } = await discover(storage, embedder, q, top, DEFAULT_NAMESPACE, kind);
 
       broadcast('discover_ran', {
         query: q,

@@ -93,6 +93,16 @@ test('parseSkillFile returns null when frontmatter missing', () => {
   assert.equal(parsed, null);
 });
 
+test('parseSkillFile only reads single-line description (documents limitation)', () => {
+  // YAML block-scalar (description: |) is NOT supported. The first line is
+  // captured; subsequent lines fall back to body. If we ever support YAML
+  // block-scalars, change this test, do not silently start parsing them.
+  const text = `---\nname: x\ndescription: |\n  this is a multi\n  line description\n---\n\nbody`;
+  const parsed = parseSkillFile(text, 'x', '/x');
+  assert.ok(parsed);
+  assert.equal(parsed!.description, '|', 'block-scalar marker is captured literally');
+});
+
 test('findSkillFiles discovers SKILL.md in <root>/<slug>/SKILL.md layout', () => {
   const files = findSkillFiles(tmpRoot);
   const slugs = files.map((f) => f.slug).sort();

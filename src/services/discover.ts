@@ -77,6 +77,7 @@ export async function discover(
   query: string,
   top = 5,
   namespace: string = DEFAULT_NAMESPACE,
+  kind?: ToolKind,
 ): Promise<{ results: DiscoverResult[]; meta: DiscoverMeta }> {
   const tTotal = Date.now();
   const { vec: queryVec, ms: embedMs } = await embedder.cachedEmbed(query);
@@ -89,6 +90,7 @@ export async function discover(
     gate: RELIABILITY_GATE,
     weights: { vector: RRF_DEFAULT_VECTOR_WEIGHT, text: RRF_DEFAULT_TEXT_WEIGHT },
     namespace,
+    kind,
   });
   const searchMs = Date.now() - tSearch;
 

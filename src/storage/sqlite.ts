@@ -347,6 +347,7 @@ export class SqliteStorage implements Storage {
     gate: number;
     weights: { vector: number; text: number };
     namespace?: string;
+    kind?: ToolKind;
   }): Promise<RrfResult[]> {
     const namespace = opts.namespace ?? DEFAULT_NAMESPACE;
     const queryBuf = Buffer.from(
@@ -359,9 +360,13 @@ export class SqliteStorage implements Storage {
     // some terms not in capability_text.
     const ftsQuery = sanitizeFtsQuery(opts.queryText);
 
+    const kindClause = opts.kind ? ' AND t.tool_kind = ?' : '';
+
     // ---- Vector arm ----
+    const vecParams: Array<Buffer | number | string> = [queryBuf, 50, opts.gate, namespace];
+    if (opts.kind) vecParams.push(opts.kind);
     const vecRows = this.db
-      .prepare<[Buffer, number, number, string], { rowid: number; distance: number }>(
+      .prepare<typeof vecParams, { rowid: number; distance: number }>(
         `SELECT v.rowid AS rowid, v.distance AS distance
          FROM tools_vec v
          JOIN tools t ON t.rowid = v.rowid
@@ -369,27 +374,30 @@ export class SqliteStorage implements Storage {
            AND k = ?
            AND t.status = 'active'
            AND CAST(json_extract(t.metadata, '$.reliability_score') AS REAL) >= ?
-           AND t.namespace_id = ?
+           AND t.namespace_id = ?${kindClause}
          ORDER BY v.distance ASC`,
       )
-      .all(queryBuf, 50, opts.gate, namespace);
+      .all(...vecParams);
 
     // ---- Text arm ---- (FTS5 with bm25 ASC; lower-is-better)
     let txtRows: Array<{ rowid: number }> = [];
     if (ftsQuery.length > 0) {
+      const txtParams: Array<string | number> = [ftsQuery, namespace, opts.gate];
+      if (opts.kind) txtParams.push(opts.kind);
+      txtParams.push(50);
       txtRows = this.db
-        .prepare<[string, string, number, number], { rowid: number }>(
+        .prepare<typeof txtParams, { rowid: number }>(
           `SELECT f.rowid AS rowid
            FROM tools_fts f
            JOIN tools t ON t.rowid = f.rowid
            WHERE tools_fts MATCH ?
              AND t.namespace_id = ?
              AND t.status = 'active'
-             AND CAST(json_extract(t.metadata, '$.reliability_score') AS REAL) >= ?
+             AND CAST(json_extract(t.metadata, '$.reliability_score') AS REAL) >= ?${kindClause}
            ORDER BY bm25(tools_fts) ASC
            LIMIT ?`,
         )
-        .all(ftsQuery, namespace, opts.gate, 50) as Array<{ rowid: number }>;
+        .all(...txtParams) as Array<{ rowid: number }>;
     }
 
     // ---- RRF fusion (in JS — far simpler than the equivalent SQL CTE,

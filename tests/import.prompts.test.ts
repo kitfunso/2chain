@@ -109,3 +109,50 @@ test('getRegisteredPromptTemplate returns the seeded template', () => {
   assert.ok(tmpl, 'template missing for conventional-commit');
   assert.match(tmpl!, /Conventional Commit/);
 });
+
+test('prompt-template-stub leaves placeholders intact when vars omitted', async () => {
+  const out = await callStub(
+    'prompt-template-stub',
+    {},
+    undefined,
+    { tool_name: 'pr-description', tool_version: '1.0' },
+  );
+  const rendered = (out as { rendered: string }).rendered;
+  assert.match(rendered, /\{\{context\}\}/, 'context placeholder must stay literal');
+  assert.match(rendered, /\{\{commits\}\}/, 'commits placeholder must stay literal');
+});
+
+test('prompt-template-stub leaves placeholders intact when vars is null', async () => {
+  const out = await callStub(
+    'prompt-template-stub',
+    { vars: null as unknown as Record<string, string> },
+    undefined,
+    { tool_name: 'pr-description', tool_version: '1.0' },
+  );
+  const rendered = (out as { rendered: string }).rendered;
+  assert.match(rendered, /\{\{context\}\}/);
+});
+
+test('prompt-template-stub does not String-coerce non-string vars', async () => {
+  // {{x}} with x={a:1} must NOT render "[object Object]" — render literally instead.
+  const out = await callStub(
+    'prompt-template-stub',
+    {
+      vars: {
+        title: 'real title',
+        severity: 'P1',
+        steps: { a: 1 } as unknown as string,
+        expected: 5 as unknown as string,
+        actual: null as unknown as string,
+      },
+    },
+    undefined,
+    { tool_name: 'bug-report', tool_version: '1.0' },
+  );
+  const rendered = (out as { rendered: string }).rendered;
+  assert.match(rendered, /real title/);
+  assert.doesNotMatch(rendered, /\[object Object\]/, 'must not String-coerce objects');
+  assert.doesNotMatch(rendered, /^null$/m, 'must not render literal "null"');
+  assert.match(rendered, /\{\{steps\}\}/, 'non-string values stay as literal placeholders');
+  assert.match(rendered, /\{\{expected\}\}/);
+});

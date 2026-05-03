@@ -273,6 +273,7 @@ export interface Storage {
     gate: number;
     weights: { vector: number; text: number };
     namespace?: string;
+    kind?: ToolKind;
   }): Promise<RrfResult[]>;
 
   // Logging (write paths from /push, /call, /discover)

@@ -29,10 +29,19 @@ function ensurePromptStub(): void {
         `prompt-template-stub: no template registered for "${ctx.tool_name}". Did the importer run?`,
       );
     }
-    const vars = (input as { vars?: Record<string, string> }).vars ?? {};
-    const rendered = template.replace(/\{\{(\w+)\}\}/g, (_, key: string) =>
-      Object.prototype.hasOwnProperty.call(vars, key) ? String(vars[key]) : `{{${key}}}`,
-    );
+    const rawVars = (input as { vars?: unknown }).vars;
+    const vars: Record<string, unknown> =
+      rawVars && typeof rawVars === 'object' && !Array.isArray(rawVars)
+        ? (rawVars as Record<string, unknown>)
+        : {};
+    const rendered = template.replace(/\{\{(\w+)\}\}/g, (_, key: string) => {
+      if (!Object.prototype.hasOwnProperty.call(vars, key)) return `{{${key}}}`;
+      const v = vars[key];
+      // Only substitute strings. Non-string values render as the literal
+      // placeholder so callers see the type mismatch instead of a lossy
+      // String(value) coercion ("[object Object]", "null", etc.).
+      return typeof v === 'string' ? v : `{{${key}}}`;
+    });
     return { rendered };
   });
   stubRegistered = true;
