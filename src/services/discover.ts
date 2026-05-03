@@ -7,6 +7,7 @@ import type {
   Storage,
   Embedder,
   RrfResult,
+  ToolKind,
 } from '../types.js';
 import {
   RELIABILITY_GATE,
@@ -28,6 +29,7 @@ export interface DiscoverResult {
   rrf_score: number;
   cost_per_call_usd: number;
   p95_latency_ms: number;
+  tool_kind: ToolKind;
 }
 
 export interface DiscoverMeta {
@@ -106,6 +108,7 @@ export async function discover(
     rrf_score: r.rrf_score,
     cost_per_call_usd: r.metadata.cost_per_call_usd,
     p95_latency_ms: r.metadata.p95_latency_ms,
+    tool_kind: r.tool_kind,
   }));
 
   // Append-only ranking snapshot for the dashboard.

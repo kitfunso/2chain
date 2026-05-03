@@ -95,6 +95,8 @@ export interface Agent {
 
 export const DEFAULT_NAMESPACE = 'default';
 
+export type ToolKind = 'tool' | 'skill' | 'subagent' | 'prompt';
+
 export interface ToolSpecV2 {
   name: string;
   version: string;
@@ -115,12 +117,14 @@ export interface ToolSpecV2 {
   domain?: string;
   namespace_id?: string;
   source_registry_id?: string | null;
+  tool_kind?: ToolKind; // defaults to 'tool' on insert
 }
 
 export interface ToolV2 extends ToolSpecV2 {
   id: string;                 // uuid
   namespace_id: string;       // always set after upsert
   source_registry_id: string | null;
+  tool_kind: ToolKind;        // always set after upsert
   created_at: string;         // ISO
   updated_at: string;         // ISO
 }
@@ -225,6 +229,7 @@ export interface RrfResult {
   endpoint_stub_name: string;
   metadata: ToolSpecV2['metadata'];
   status: ToolStatus;
+  tool_kind: ToolKind;
   rrf_score: number;
   vec_score: number;
   text_rank?: number;
@@ -281,6 +286,7 @@ export interface Storage {
     status?: ToolStatus;
     limit?: number;
     namespace?: string;
+    kind?: ToolKind;
   }): Promise<ToolV2[]>;
   listViolations(limit: number, namespace?: string): Promise<ViolationRow[]>;
   listEvalRuns(limit: number, namespace?: string): Promise<EvalRunRow[]>;

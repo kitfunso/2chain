@@ -16,6 +16,7 @@ import type {
   ToolSpecV2,
   ToolV2,
   ToolStatus,
+  ToolKind,
   RrfResult,
   ViolationRow,
   UsageRow,
@@ -54,6 +55,7 @@ interface ToolRow {
   metadata: string;
   status: string;
   domain: string | null;
+  tool_kind: string;
   created_at: string;
   updated_at: string;
 }
@@ -92,6 +94,7 @@ function rowToTool(r: ToolRow): ToolV2 {
     metadata: JSON.parse(r.metadata),
     status: r.status as ToolStatus,
     domain: r.domain ?? undefined,
+    tool_kind: (r.tool_kind ?? 'tool') as ToolKind,
     created_at: r.created_at,
     updated_at: r.updated_at,
   };
@@ -144,7 +147,7 @@ export class SqliteStorage implements Storage {
           )`,
       )
       .run();
-    const files = ['001_init.sql']; // explicit list, in apply order
+    const files = ['001_init.sql', '002_tool_kind.sql']; // explicit list, in apply order
     for (const file of files) {
       const already = this.db
         .prepare('SELECT 1 FROM _migrations WHERE name = ?')
@@ -209,6 +212,8 @@ export class SqliteStorage implements Storage {
         )
         .get(namespace, spec.name, spec.version);
 
+      const kind: ToolKind = spec.tool_kind ?? 'tool';
+
       if (existing) {
         this.db
           .prepare(
@@ -223,6 +228,7 @@ export class SqliteStorage implements Storage {
                 status = ?,
                 domain = ?,
                 source_registry_id = ?,
+                tool_kind = ?,
                 updated_at = ?
               WHERE id = ?`,
           )
@@ -237,6 +243,7 @@ export class SqliteStorage implements Storage {
             spec.status,
             spec.domain ?? null,
             spec.source_registry_id ?? null,
+            kind,
             now,
             existing.id,
           );
@@ -252,9 +259,9 @@ export class SqliteStorage implements Storage {
               id, namespace_id, source_registry_id, name, version,
               author_agent_id, capability_text, capability_embedding,
               input_contract, output_contract, output_repair_strategy,
-              endpoint_stub_name, metadata, status, domain,
+              endpoint_stub_name, metadata, status, domain, tool_kind,
               created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         )
         .run(
           id,
@@ -272,6 +279,7 @@ export class SqliteStorage implements Storage {
           JSON.stringify(spec.metadata),
           spec.status,
           spec.domain ?? null,
+          kind,
           now,
           now,
         );
@@ -435,6 +443,7 @@ export class SqliteStorage implements Storage {
         endpoint_stub_name: tool.endpoint_stub_name,
         metadata: tool.metadata,
         status: tool.status,
+        tool_kind: tool.tool_kind,
         rrf_score: info.score,
         vec_score,
         vec_rank: info.vec_rank,
@@ -552,20 +561,23 @@ export class SqliteStorage implements Storage {
     status?: ToolStatus;
     limit?: number;
     namespace?: string;
+    kind?: ToolKind;
   }): Promise<ToolV2[]> {
     const namespace = opts.namespace ?? DEFAULT_NAMESPACE;
     const limit = opts.limit ?? 1000;
-    const rows = opts.status
-      ? this.db
-          .prepare<[string, string, number], ToolRow>(
-            `SELECT rowid, * FROM tools WHERE namespace_id = ? AND status = ? ORDER BY name LIMIT ?`,
-          )
-          .all(namespace, opts.status, limit)
-      : this.db
-          .prepare<[string, number], ToolRow>(
-            `SELECT rowid, * FROM tools WHERE namespace_id = ? ORDER BY name LIMIT ?`,
-          )
-          .all(namespace, limit);
+    const clauses: string[] = ['namespace_id = ?'];
+    const params: Array<string | number> = [namespace];
+    if (opts.status) {
+      clauses.push('status = ?');
+      params.push(opts.status);
+    }
+    if (opts.kind) {
+      clauses.push('tool_kind = ?');
+      params.push(opts.kind);
+    }
+    params.push(limit);
+    const sql = `SELECT rowid, * FROM tools WHERE ${clauses.join(' AND ')} ORDER BY name LIMIT ?`;
+    const rows = this.db.prepare<typeof params, ToolRow>(sql).all(...params);
     return rows.map(rowToTool);
   }
 
