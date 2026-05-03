@@ -33,6 +33,8 @@
     "import:skills": "STORAGE_DRIVER=sqlite EMBEDDER=ollama tsx scripts/import-skills.ts",
     "import:subagents": "STORAGE_DRIVER=sqlite EMBEDDER=ollama tsx scripts/import-subagents.ts",
     "import:prompts": "STORAGE_DRIVER=sqlite EMBEDDER=ollama tsx scripts/import-prompts.ts",
+    "scrape:npm": "STORAGE_DRIVER=sqlite EMBEDDER=ollama tsx scripts/scrape-npm.ts",
+    "scrape:awesome": "STORAGE_DRIVER=sqlite EMBEDDER=ollama tsx scripts/scrape-awesome.ts",
     "test:integration": "tsx scripts/integration-test.ts",
     "demo:reset": "tsx scripts/seed-fixtures.ts",
     "reset:state": "tsx scripts/reset-demo-state.ts",
