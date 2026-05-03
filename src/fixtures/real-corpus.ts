@@ -274,12 +274,128 @@ const MEDIA: ToolSpecV2[] = [
 ];
 
 // =============================================================================
+// EXPANSION: 7 underserved domains added 2026-05-03
+// All entries reference real, publicly-documented products / APIs.
+// =============================================================================
+
+const ACCOUNTING: ToolSpecV2[] = [
+  t('accounting', 'quickbooks-online-invoices', 'QuickBooks Online API: list, create, send, void invoices on a connected QBO account. OAuth2. Returns invoice ID, balance, doc number, customer ref.'),
+  t('accounting', 'xero-bank-transactions', 'Xero Accounting API bank-transactions endpoint. Reads spend/receive money items from a connected bank account, with reconciliation status.'),
+  t('accounting', 'freshbooks-expenses', 'FreshBooks expenses endpoint. Create, list, categorise expenses by client/project. Receipt attachment via base64 upload.'),
+  t('accounting', 'wave-accounting-customers', 'Wave Accounting GraphQL API. Customer + invoice CRUD for the free SMB accounting platform. Returns business + customer IDs.'),
+  t('accounting', 'sage-intacct-trial-balance', 'Sage Intacct trial balance report. Pulls account balances by period for ERP general-ledger reconciliation. SOAP / REST hybrid.'),
+  t('accounting', 'avalara-avatax-calculate', 'Avalara AvaTax sales-tax calculation. Resolves jurisdiction-specific sales tax for a line-item bundle. Returns nexus, rate, taxable amount per line.'),
+  t('accounting', 'netsuite-suiteql', 'Oracle NetSuite SuiteQL endpoint. Run SQL-like queries over the ERP data model: customers, transactions, items, employees.'),
+  t('accounting', 'zoho-books-bills', 'Zoho Books bills (vendor invoices) API. Create + match against POs, schedule payments, attach receipts.'),
+  t('accounting', 'pennylane-transactions', 'Pennylane Open Banking + accounting API (FR market). Reads bank transactions categorised against the chart of accounts. EU SMB focus.'),
+  t('accounting', 'tipalti-payee-payments', 'Tipalti accounts payable API. Mass payee onboarding, tax form (W-8/W-9) collection, payment runs across 196 countries.'),
+];
+
+const HR: ToolSpecV2[] = [
+  t('hr', 'greenhouse-candidates', 'Greenhouse ATS candidates API. List, create, add notes to candidates; move through stages; pull scorecards. Harvest API key.'),
+  t('hr', 'lever-postings', 'Lever ATS postings + opportunities API. Pull open jobs with locations, departments, requisitions; create candidate referrals.'),
+  t('hr', 'bamboohr-employees', 'BambooHR employees endpoint. Pull HR records: hire date, manager, department, comp, custom fields. Per-tenant API key.'),
+  t('hr', 'workday-staffing', 'Workday HCM Staffing web service. Hire, terminate, transfer workers; pull org chart and reporting structures. SOAP enterprise API.'),
+  t('hr', 'rippling-employees', 'Rippling HRIS API for the all-in-one HR + IT + payroll suite. Worker records, devices, app provisioning. Bearer token.'),
+  t('hr', 'gusto-payroll', 'Gusto payroll-runs endpoint. Pull historic and upcoming pay periods, gross pay by employee, tax filings. OAuth2.'),
+  t('hr', 'deel-contracts', 'Deel contractor management API. Create + amend international contracts, run payments to 150+ countries, pull compliance docs.'),
+  t('hr', 'personio-employees', 'Personio HR API (DACH market). Worker records, time-off balances, certifications; create + update employees programmatically.'),
+  t('hr', 'ashby-application-events', 'Ashby ATS webhook + REST API. Pulls candidate application events, interview feedback, scorecards. Used by recruiting analytics tools.'),
+  t('hr', 'smartrecruiters-jobs', 'SmartRecruiters Talent Acquisition API. Pulls jobs, candidates, hiring teams. Used by enterprise recruiting workflows.'),
+];
+
+const SECURITY: ToolSpecV2[] = [
+  t('security', 'nvd-cve-search', 'National Vulnerability Database CVE search. Query by CVE ID, product, severity, date range. Returns CVSS scores, CWE refs, affected configurations.'),
+  t('security', 'cve-search-circl', 'CVE-Search by CIRCL — open-source mirror of NVD with full-text search. Free public instance at cve.circl.lu.'),
+  t('security', 'have-i-been-pwned', 'HaveIBeenPwned API by Troy Hunt. Check whether an email or domain appears in known breaches. k-Anonymity password range API for password leak checks.'),
+  t('security', 'shodan-host-search', 'Shodan API. Search internet-exposed hosts by service banner, port, vulnerability. Returns IP, ASN, geo, open ports, last-seen banners.'),
+  t('security', 'virustotal-file-report', 'VirusTotal file-report endpoint. Submits SHA-256 hash, returns AV verdicts from 70+ engines plus sandbox behavioural analysis.'),
+  t('security', 'greynoise-context', 'GreyNoise IP context API. Tells you whether a given IP is benign internet noise (Shodan, security scanners) or a real threat actor.'),
+  t('security', 'abuseipdb-check', 'AbuseIPDB community-reported IP abuse database. Returns abuse confidence score, recent reports, ISP, country.'),
+  t('security', 'osv-dev-query', 'OSV.dev vulnerability database covering OSS ecosystems (npm, PyPI, Go, Maven, crates.io). Query by package + version, returns CVE refs.'),
+  t('security', 'owasp-zap-scan', 'OWASP ZAP automation API. Run active/passive web app security scans, return alerts by risk + confidence. Self-hosted Docker.'),
+  t('security', 'mitre-attack-techniques', 'MITRE ATT&CK STIX API. Pulls adversary technique catalogue (T1059 etc.) with tactics, mitigations, related groups + software.'),
+];
+
+const GAMING: ToolSpecV2[] = [
+  t('gaming', 'steam-web-api', 'Steam Web API. Player profiles, owned games, achievements, recently-played. Public for most endpoints, key required for some.'),
+  t('gaming', 'igdb-games', 'IGDB games database (Twitch-owned). Comprehensive metadata: ratings, screenshots, release dates, platforms, genres, developer.'),
+  t('gaming', 'twitch-helix-streams', 'Twitch Helix API. List live streams by game/category, channel info, follower counts, clips. OAuth2 client credentials.'),
+  t('gaming', 'discord-bot-messages', 'Discord Bot API. Send messages, manage channels, members, roles. Enterprise-style webhooks for community ops.'),
+  t('gaming', 'riot-games-summoner', 'Riot Games API. League of Legends + Valorant + TFT match histories, summoner profiles, ranked tiers. Regional endpoints.'),
+  t('gaming', 'battle-net-account', 'Battle.net OAuth2 API. World of Warcraft + Diablo + StarCraft 2 character profiles, achievements, season ladders.'),
+  t('gaming', 'gog-galaxy-store', 'GOG Galaxy public API. DRM-free game catalogue, prices, regional availability. Used by price-tracker tools.'),
+  t('gaming', 'itch-io-jam', 'itch.io API for indie games + game jams. Pulls jam entries, downloads, ratings. OAuth bearer token for owner data.'),
+  t('gaming', 'opencritic-game', 'OpenCritic API. Aggregated review scores across 100+ outlets; tier classification (Mighty/Strong/Fair/Weak).'),
+  t('gaming', 'how-long-to-beat', 'HowLongToBeat community-reported game duration estimates. Main story / main + extras / completionist hours per title.'),
+];
+
+const REAL_ESTATE: ToolSpecV2[] = [
+  t('real-estate', 'zillow-bridge-listings', 'Zillow Bridge Interactive API for MLS data (US). Listings, sale history, photos, agent contact, school ratings.'),
+  t('real-estate', 'rightmove-listings', 'Rightmove UK property API (via partner aggregators or scraping endpoint). Rentals + sales by postcode, property type, price range.'),
+  t('real-estate', 'redfin-property-detail', 'Redfin public property detail endpoint. Owner-occupied vs investment, last sale price, property tax history, walk score.'),
+  t('real-estate', 'realtor-com-listings', 'Realtor.com listings API (RDC). Active US listings with photos, virtual tours, agent contact, neighbourhood demographics.'),
+  t('real-estate', 'zoopla-properties', 'Zoopla UK property data API. Sale + rental listings, area-level price indices, agent details.'),
+  t('real-estate', 'propertydata-uk-postcode', 'PropertyData.co.uk postcode API. UK property valuation comparables, rental yields, demographic overlays.'),
+  t('real-estate', 'attomdata-property', 'ATTOM Data Solutions API. National US property records, AVM valuations, mortgage data, hazard risk overlays.'),
+];
+
+const DEVOPS: ToolSpecV2[] = [
+  t('devops', 'aws-s3-list-objects', 'AWS S3 ListObjectsV2. Lists keys in a bucket with prefix + delimiter; returns paginated continuation tokens. SigV4 auth.'),
+  t('devops', 'aws-lambda-invoke', 'AWS Lambda Invoke API. Synchronous (RequestResponse) or async (Event) function invocation. Returns payload + execution metadata.'),
+  t('devops', 'gcp-cloud-run-services', 'Google Cloud Run services API. Deploy + list managed serverless containers; per-revision traffic splits.'),
+  t('devops', 'cloudflare-zones', 'Cloudflare API zones endpoint. Manage DNS records, page rules, WAF settings per zone. Bearer token + zone ID.'),
+  t('devops', 'cloudflare-workers-deploy', 'Cloudflare Workers deploy endpoint. PUT a script + KV bindings + secret bindings. Returns deployment ID + tag.'),
+  t('devops', 'vercel-deployments', 'Vercel deployments API. Trigger + monitor builds, rollback to previous deployment, manage env vars per project + git ref.'),
+  t('devops', 'netlify-builds', 'Netlify builds + deploy hooks API. Trigger build, list deploys, configure functions + edge handlers.'),
+  t('devops', 'heroku-platform-apps', 'Heroku Platform API apps endpoint. CRUD apps, scale dynos, manage config vars, fetch release log.'),
+  t('devops', 'digitalocean-droplets', 'DigitalOcean Droplets API. Create/destroy/resize VMs, manage volumes + snapshots + floating IPs. Bearer token.'),
+  t('devops', 'kubernetes-api-pods', 'Kubernetes API pods endpoint. List/create/exec/log pods in a namespace. ServiceAccount or kubeconfig auth.'),
+  t('devops', 'terraform-cloud-runs', 'HashiCorp Terraform Cloud runs API. Trigger plan + apply on a workspace, fetch output JSON, manage state versions.'),
+  t('devops', 'github-actions-workflow-dispatch', 'GitHub Actions workflow_dispatch API. Trigger a workflow on demand with inputs, fetch run logs + artifacts.'),
+];
+
+const GOV: ToolSpecV2[] = [
+  t('gov', 'data-gov-search', 'Data.gov CKAN-based open-data search API. Federal + state US datasets across every agency. Free, no API key.'),
+  t('gov', 'gov-uk-content', 'gov.uk Content API. Pulls structured content from every UK government department: guidance, transactions, news.'),
+  t('gov', 'fcc-broadband-map', 'FCC National Broadband Map API. Returns broadband availability by address, speed tier, provider list. US.'),
+  t('gov', 'fec-candidates', 'Federal Election Commission API. Candidate filings, contributions, expenditures for US federal races. Bulk data via openFEC.'),
+  t('gov', 'us-census-acs', 'US Census Bureau American Community Survey 5-year API. Demographics, income, housing at tract/block-group level.'),
+  t('gov', 'ons-uk-statistics', 'UK Office for National Statistics API. GDP, CPI, unemployment, population estimates. Free public dataset.'),
+  t('gov', 'eu-open-data', 'EU Open Data Portal API. Cross-member-state datasets: COVID, agriculture, transport, energy. CKAN-based.'),
+  t('gov', 'world-bank-indicators', 'World Bank Open Data indicators API. GDP, poverty, health, education time series for 200+ economies. Free.'),
+  t('gov', 'usaspending-awards', 'USAspending.gov awards API. Federal contracts + grants searchable by recipient, agency, NAICS code, fiscal year.'),
+];
+
+const CLIMATE: ToolSpecV2[] = [
+  t('climate', 'noaa-climate-data-online', 'NOAA Climate Data Online API. Daily/hourly weather observations from 100k+ US + global stations. Free token.'),
+  t('climate', 'fao-stat-bulk', 'FAOSTAT bulk download API. Global agriculture, food security, forestry, fisheries time series from FAO.'),
+  t('climate', 'usda-nass-quickstats', 'USDA NASS Quick Stats API. US crop + livestock production by state/county. Free with key.'),
+  t('climate', 'openweather-agro', 'OpenWeather Agro API for satellite NDVI/EVI imagery + crop-specific weather forecasts on user-defined polygons.'),
+  t('climate', 'sentinel-hub-process', 'Sentinel Hub Process API. On-demand processing of Sentinel-1/2/3 satellite imagery + Landsat. Returns custom band-math GeoTIFFs.'),
+  t('climate', 'carbon-interface', 'Carbon Interface API. Estimate CO2e emissions for flights, vehicle trips, electricity, shipments. Used in B2B carbon accounting.'),
+  t('climate', 'open-meteo-historical', 'Open-Meteo historical weather API. 80 years of global hourly + daily reanalysis data. Free, no key.'),
+];
+
+const IOT: ToolSpecV2[] = [
+  t('iot', 'particle-devices', 'Particle.io IoT cloud API. Cellular + Wi-Fi MCU device management, OTA firmware updates, function calls, variable reads.'),
+  t('iot', 'adafruit-io-feeds', 'Adafruit IO REST + MQTT API. DIY IoT data feeds, dashboards, triggers. Free tier 30 data-points/min.'),
+  t('iot', 'tuya-cloud-devices', 'Tuya IoT Cloud API. Controls 100k+ branded smart-home devices (Smart Life, Jinvoo). OAuth2 + signed requests.'),
+  t('iot', 'home-assistant-states', 'Home Assistant REST API. Read + control entity states (lights, sensors, switches) on a self-hosted HA instance. Long-lived bearer token.'),
+  t('iot', 'helium-iot-devices', 'Helium IoT (LoRaWAN) Console API. Device + flow + integration management on the public Helium network.'),
+  t('iot', 'thingsboard-telemetry', 'ThingsBoard open-source IoT platform telemetry endpoint. Time-series sensor data + RPC to devices.'),
+];
+
+// =============================================================================
 // Combined catalog
 // =============================================================================
 export const REAL_CORPUS: ToolSpecV2[] = [
   ...FINANCE, ...RESEARCH, ...CODE, ...DATA, ...COMMS,
   ...DOCS, ...GEO, ...ECOMMERCE, ...LEGAL, ...HEALTH,
   ...EDU, ...MEDIA,
+  // 2026-05-03 expansion: underserved domains (all real, publicly-documented APIs)
+  ...ACCOUNTING, ...HR, ...SECURITY, ...GAMING, ...REAL_ESTATE,
+  ...DEVOPS, ...GOV, ...CLIMATE, ...IOT,
 ];
 
 export const REAL_CORPUS_BY_DOMAIN = {
@@ -295,4 +411,13 @@ export const REAL_CORPUS_BY_DOMAIN = {
   health: HEALTH,
   edu: EDU,
   media: MEDIA,
+  accounting: ACCOUNTING,
+  hr: HR,
+  security: SECURITY,
+  gaming: GAMING,
+  'real-estate': REAL_ESTATE,
+  devops: DEVOPS,
+  gov: GOV,
+  climate: CLIMATE,
+  iot: IOT,
 };
