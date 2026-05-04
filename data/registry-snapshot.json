@@ -1,61 +1,61 @@
 {
-  "generated_at": "2026-05-03T22:44:43.826Z",
+  "generated_at": "2026-05-04T06:55:17.545Z",
   "total_specs": 1200,
   "sources": [
     {
       "source": "npm:keywords:mcp",
       "count": 150,
-      "duration_ms": 109
+      "duration_ms": 344
     },
     {
       "source": "npm:keywords:openapi",
       "count": 50,
-      "duration_ms": 30
+      "duration_ms": 260
     },
     {
       "source": "npm:keywords:vector-database",
       "count": 27,
-      "duration_ms": 26
+      "duration_ms": 129
     },
     {
       "source": "awesome:awesome-mcp-servers",
       "count": 300,
-      "duration_ms": 57
+      "duration_ms": 224
     },
     {
       "source": "awesome:awesome-claude-prompts",
       "count": 1,
-      "duration_ms": 12
+      "duration_ms": 93
     },
     {
       "source": "awesome:awesome-langchain",
       "count": 199,
-      "duration_ms": 8
+      "duration_ms": 156
     },
     {
       "source": "awesome:awesome-rag",
       "count": 32,
-      "duration_ms": 8
+      "duration_ms": 225
     },
     {
       "source": "awesome:awesome-llmops",
       "count": 186,
-      "duration_ms": 11
+      "duration_ms": 94
     },
     {
       "source": "pypi:default",
       "count": 55,
-      "duration_ms": 996
+      "duration_ms": 1714
     },
     {
       "source": "hf:models",
       "count": 150,
-      "duration_ms": 280
+      "duration_ms": 278
     },
     {
       "source": "hf:datasets",
       "count": 50,
-      "duration_ms": 132
+      "duration_ms": 88
     }
   ],
   "specs": [
@@ -324,30 +324,6 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@muscular/robotmem",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "@muscular/robotmem  Thin npm wrapper for the robotmem Python CLI and MCP server.  Keywords: robot, memory, mcp, ai, robotics, experience-replay, python, mcp-server.  Source: git+https://github.com/vcanchik/robotmem.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "mcp",
-      "tool_kind": "tool"
-    },
-    {
       "name": "@azure/mcp",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
@@ -420,10 +396,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "add-mcp",
+      "name": "figma-developer-mcp",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "add-mcp  Add MCP servers to your favorite coding agents with a single command.  Keywords: cli, mcp, model-context-protocol, ai-agents, antigravity, cline, claude-code, claude-desktop, codex, cursor, github-copilot-cli, gemini-cli, goose, mcporter, opencode, vscode, zed.  Source: git+https://github.com/neondatabase/add-mcp.git.",
+      "capability_text": "figma-developer-mcp  Give your coding agent access to your Figma data. Implement designs in any framework in one-shot.  Keywords: figma, mcp, typescript.  Source: git+https://github.com/GLips/Figma-Context-MCP.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -492,34 +468,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "figma-developer-mcp",
+      "name": "add-mcp",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "figma-developer-mcp  Give your coding agent access to your Figma data. Implement designs in any framework in one-shot.  Keywords: figma, mcp, typescript.  Source: git+https://github.com/GLips/Figma-Context-MCP.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "mcp",
-      "tool_kind": "tool"
-    },
-    {
-      "name": "tavily-mcp",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "tavily-mcp  MCP server for advanced web search using Tavily  Keywords: tavily-mcp, tavily, mcp, crawl, model-context-protocol, websearch, claude, claude-desktop, search-api, web-search, ai-search, anthropic, real-time-search, search-tools, tavily-api, tavily-search, tavily-extract, web-extraction, data-extraction, search-integration.  Source: git+https://github.com/tavily-ai/tavily-mcp.git.",
+      "capability_text": "add-mcp  Add MCP servers to your favorite coding agents with a single command.  Keywords: cli, mcp, model-context-protocol, ai-agents, antigravity, cline, claude-code, claude-desktop, codex, cursor, github-copilot-cli, gemini-cli, goose, mcporter, opencode, vscode, zed.  Source: git+https://github.com/neondatabase/add-mcp.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -544,6 +496,30 @@
       "version": "1.0",
       "author_agent_id": "npm-scrape",
       "capability_text": "supergateway  Run MCP stdio servers over SSE, Streamable HTTP or visa versa  Keywords: mcp, stdio, sse, gateway, proxy, bridge.  Source: git+https://github.com/supercorp-ai/supergateway.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "mcp",
+      "tool_kind": "tool"
+    },
+    {
+      "name": "tavily-mcp",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "tavily-mcp  MCP server for advanced web search using Tavily  Keywords: tavily-mcp, tavily, mcp, crawl, model-context-protocol, websearch, claude, claude-desktop, search-api, web-search, ai-search, anthropic, real-time-search, search-tools, tavily-api, tavily-search, tavily-extract, web-extraction, data-extraction, search-integration.  Source: git+https://github.com/tavily-ai/tavily-mcp.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -732,6 +708,30 @@
       "tool_kind": "tool"
     },
     {
+      "name": "@avasis-ai/synthcode",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "@avasis-ai/synthcode  SynthCode - Synthesize any LLM into a production-grade AI agent. Battle-tested agentic patterns, model-agnostic, TypeScript-first.  Keywords: ai, agent, llm, agentic, claude, claude-code, gpt, tool-use, mcp, context-management, synthcode, typescript.  Source: git+https://github.com/avasis-ai/synthcode.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "mcp",
+      "tool_kind": "tool"
+    },
+    {
       "name": "@stripe/mcp",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
@@ -760,30 +760,6 @@
       "version": "1.0",
       "author_agent_id": "npm-scrape",
       "capability_text": "agentic-flow  Production-ready AI agent orchestration platform with 66 specialized agents, 213 MCP tools, ReasoningBank learning memory, and autonomous multi-agent swarms. Built by @ruvnet with Claude Agent SDK, neural networks, memory persistence, GitHub integration,   Keywords: ai, ai-agents, ai-orchestration, agentic, agents, agent-swarm, anthropic, anthropic-claude, automation, autonomous-agents, byzantine-consensus, claude, claude-agent-sdk, claude-code, reasoning-memory, reasoningbank, agent-learning, memory-system, consensus-protocols, coordination, crdt, devops, distributed-systems, docker, fastmcp, flow-nexus, github, github-integration, goal-planning, goap, hive-mind, huggingface, llm, llm-orchestration, machine-learning, mcp, mcp-server, mcp-tools, memory-persistence, mesh-network, multi-agent, multi-agent-systems, neural-networks, onnx, onnxruntime, orchestration, pagerank, parallel-processing, raft, ruv, ruvnet, sparc, sublinear-algorithms, swarm, swarm-intelligence, task-orchestration, typescript, workflow, workflow-automation.  Source: git+https://github.com/ruvnet/agentic-flow.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "mcp",
-      "tool_kind": "tool"
-    },
-    {
-      "name": "@avasis-ai/synthcode",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "@avasis-ai/synthcode  SynthCode - Synthesize any LLM into a production-grade AI agent. Battle-tested agentic patterns, model-agnostic, TypeScript-first.  Keywords: ai, agent, llm, agentic, claude, claude-code, gpt, tool-use, mcp, context-management, synthcode, typescript.  Source: git+https://github.com/avasis-ai/synthcode.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -876,10 +852,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "gitnexus",
+      "name": "extract-design-system",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "gitnexus  Graph-powered code intelligence for AI agents. Index any codebase, query via MCP or CLI.  Keywords: mcp, model-context-protocol, code-intelligence, knowledge-graph, cursor, claude, codex, ai-agent, gitnexus, static-analysis, codebase-indexing.  Source: git+https://github.com/abhigyanpatwari/GitNexus.git.",
+      "capability_text": "extract-design-system  Agent skill and bundled CLI for extracting design primitives from public websites into starter token files.  Keywords: design-system, design-system-extraction, design-tokens, token-generator, css-custom-properties, website-analysis, color-palette, typography, style-dictionary, tailwindcss, figma, agent-skill, skills.sh, skills, ai, llm, mcp, claude, anthropic, cli, cursor, codex, dembrandt.  Source: git+https://github.com/arvindrk/extract-design-system.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -900,10 +876,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@traceloop/instrumentation-mcp",
+      "name": "gitnexus",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "@traceloop/instrumentation-mcp  MCP (Model Context Protocol) Instrumentation  Keywords: opentelemetry, nodejs, tracing, mcp, model-context-protocol.  Source: git+https://github.com/traceloop/openllmetry-js.git.",
+      "capability_text": "gitnexus  Graph-powered code intelligence for AI agents. Index any codebase, query via MCP or CLI.  Keywords: mcp, model-context-protocol, code-intelligence, knowledge-graph, cursor, claude, codex, ai-agent, gitnexus, static-analysis, codebase-indexing.  Source: git+https://github.com/abhigyanpatwari/GitNexus.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -948,10 +924,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "extract-design-system",
+      "name": "@traceloop/instrumentation-mcp",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "extract-design-system  Agent skill and bundled CLI for extracting design primitives from public websites into starter token files.  Keywords: design-system, design-system-extraction, design-tokens, token-generator, css-custom-properties, website-analysis, color-palette, typography, style-dictionary, tailwindcss, figma, agent-skill, skills.sh, skills, ai, llm, mcp, claude, anthropic, cli, cursor, codex, dembrandt.  Source: git+https://github.com/arvindrk/extract-design-system.git.",
+      "capability_text": "@traceloop/instrumentation-mcp  MCP (Model Context Protocol) Instrumentation  Keywords: opentelemetry, nodejs, tracing, mcp, model-context-protocol.  Source: git+https://github.com/traceloop/openllmetry-js.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -1068,6 +1044,30 @@
       "tool_kind": "tool"
     },
     {
+      "name": "@azure/mcp-win32-x64",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "@azure/mcp-win32-x64  Azure MCP Server - Model Context Protocol implementation for Azure, for win32 on x64  Keywords: azure, mcp, model-context-protocol.  Source: git+https://github.com/microsoft/mcp.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "mcp",
+      "tool_kind": "tool"
+    },
+    {
       "name": "@softeria/ms-365-mcp-server",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
@@ -1116,10 +1116,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@azure/mcp-win32-x64",
+      "name": "@mcp-use/inspector",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "@azure/mcp-win32-x64  Azure MCP Server - Model Context Protocol implementation for Azure, for win32 on x64  Keywords: azure, mcp, model-context-protocol.  Source: git+https://github.com/microsoft/mcp.git.",
+      "capability_text": "@mcp-use/inspector  MCP Inspector - A tool for inspecting and debugging MCP servers  Keywords: mcp, inspector, debug, tools.  Source: git+https://github.com/mcp-use/mcp-use.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -1188,10 +1188,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@mcp-use/inspector",
+      "name": "@claude-flow/cli",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "@mcp-use/inspector  MCP Inspector - A tool for inspecting and debugging MCP servers  Keywords: mcp, inspector, debug, tools.  Source: git+https://github.com/mcp-use/mcp-use.git.",
+      "capability_text": "@claude-flow/cli  Ruflo CLI - Enterprise AI agent orchestration with 60+ specialized agents, swarm coordination, MCP server, self-learning hooks, and vector memory for Claude Code  Keywords: claude, claude-code, anthropic, ai-agents, multi-agent, swarm, mcp, model-context-protocol, llm, cli, orchestration, automation, developer-tools, coding-assistant, vector-database, embeddings, self-learning, enterprise.  Source: git+https://github.com/ruvnet/claude-flow.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -1236,82 +1236,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@claude-flow/cli",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "@claude-flow/cli  Ruflo CLI - Enterprise AI agent orchestration with 60+ specialized agents, swarm coordination, MCP server, self-learning hooks, and vector memory for Claude Code  Keywords: claude, claude-code, anthropic, ai-agents, multi-agent, swarm, mcp, model-context-protocol, llm, cli, orchestration, automation, developer-tools, coding-assistant, vector-database, embeddings, self-learning, enterprise.  Source: git+https://github.com/ruvnet/claude-flow.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "mcp",
-      "tool_kind": "tool"
-    },
-    {
-      "name": "openapi-mcp-generator",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "openapi-mcp-generator  Generates MCP server code from OpenAPI specifications  Keywords: openapi, mcp, model-context-protocol, generator, llm, ai, api.  Source: git+https://github.com/harsha-iiiv/openapi-mcp-generator.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "mcp",
-      "tool_kind": "tool"
-    },
-    {
       "name": "xcodebuildmcp",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
       "capability_text": "xcodebuildmcp  XcodeBuildMCP is a Model Context Protocol server that provides tools for Xcode project management, simulator management, and app utilities.  Keywords: xcodebuild, mcp, modelcontextprotocol, xcode, ios, macos, simulator.  Source: git+https://github.com/getsentry/XcodeBuildMCP.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "mcp",
-      "tool_kind": "tool"
-    },
-    {
-      "name": "mcp-auth",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "mcp-auth  Plug and play auth for Model Context Protocol (MCP) servers  Keywords: modelcontextprotocol, mcp, oauth, openid, connect, oidc.  Source: git+https://github.com/mcp-auth/js.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -1356,10 +1284,34 @@
       "tool_kind": "tool"
     },
     {
-      "name": "ruflo",
+      "name": "mcp-auth",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "ruflo  Ruflo - Enterprise AI agent orchestration platform. Deploy 60+ specialized agents in coordinated swarms with self-learning, fault-tolerant consensus, vector memory, and MCP integration  Keywords: ruflo, claude-flow, claude, claude-code, anthropic, ai, ai-agents, multi-agent, agent-orchestration, swarm-intelligence, swarm, mcp, model-context-protocol, cli, developer-tools, enterprise, self-learning.  Source: git+https://github.com/ruvnet/claude-flow.git.",
+      "capability_text": "mcp-auth  Plug and play auth for Model Context Protocol (MCP) servers  Keywords: modelcontextprotocol, mcp, oauth, openid, connect, oidc.  Source: git+https://github.com/mcp-auth/js.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "mcp",
+      "tool_kind": "tool"
+    },
+    {
+      "name": "openapi-mcp-generator",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "openapi-mcp-generator  Generates MCP server code from OpenAPI specifications  Keywords: openapi, mcp, model-context-protocol, generator, llm, ai, api.  Source: git+https://github.com/harsha-iiiv/openapi-mcp-generator.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -1404,10 +1356,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "hono-mcp-server-sse-transport",
+      "name": "ruflo",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "hono-mcp-server-sse-transport  Server-Sent Events transport for Hono and Model Context Protocol  Keywords: modelcontextprotocol, mcp, hono.  Source: git+https://github.com/NikaBuligini/hono-mcp-server-sse-transport.git.",
+      "capability_text": "ruflo  Ruflo - Enterprise AI agent orchestration platform. Deploy 60+ specialized agents in coordinated swarms with self-learning, fault-tolerant consensus, vector memory, and MCP integration  Keywords: ruflo, claude-flow, claude, claude-code, anthropic, ai, ai-agents, multi-agent, agent-orchestration, swarm-intelligence, swarm, mcp, model-context-protocol, cli, developer-tools, enterprise, self-learning.  Source: git+https://github.com/ruvnet/claude-flow.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -1476,10 +1428,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "task-master-ai",
+      "name": "hono-mcp-server-sse-transport",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "task-master-ai  A task management system for ambitious AI-driven development that doesn't overwhelm and confuse Cursor.  Keywords: claude, task, management, ai, development, cursor, anthropic, llm, mcp, context.  Source: git+https://github.com/eyaltoledano/claude-task-master.git.",
+      "capability_text": "hono-mcp-server-sse-transport  Server-Sent Events transport for Hono and Model Context Protocol  Keywords: modelcontextprotocol, mcp, hono.  Source: git+https://github.com/NikaBuligini/hono-mcp-server-sse-transport.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -1548,30 +1500,6 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@ui5/mcp-server",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "@ui5/mcp-server  MCP server for SAPUI5/OpenUI5 development  Keywords: openui5, sapui5, ui5, development, mcp.  Source: git+https://github.com/UI5/mcp-server.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "mcp",
-      "tool_kind": "tool"
-    },
-    {
       "name": "@github/mcp-registry",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
@@ -1596,10 +1524,34 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@z_ai/mcp-server",
+      "name": "@ui5/mcp-server",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "@z_ai/mcp-server  MCP Server for Z.AI - A Model Context Protocol server that provides AI capabilities  Keywords: zai, mcp, vision.",
+      "capability_text": "@ui5/mcp-server  MCP server for SAPUI5/OpenUI5 development  Keywords: openui5, sapui5, ui5, development, mcp.  Source: git+https://github.com/UI5/mcp-server.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "mcp",
+      "tool_kind": "tool"
+    },
+    {
+      "name": "@neriros/ralphy",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "@neriros/ralphy  An iterative AI task execution framework. Orchestrates multi-phase autonomous work using Claude or Codex engines.  Keywords: agent, ai, claude, cli, loop, mcp, ralph, task-runner.  Source: git+https://github.com/NeriRos/ralphy.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -1644,6 +1596,30 @@
       "tool_kind": "tool"
     },
     {
+      "name": "task-master-ai",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "task-master-ai  A task management system for ambitious AI-driven development that doesn't overwhelm and confuse Cursor.  Keywords: claude, task, management, ai, development, cursor, anthropic, llm, mcp, context.  Source: git+https://github.com/eyaltoledano/claude-task-master.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "mcp",
+      "tool_kind": "tool"
+    },
+    {
       "name": "slack-mcp-server",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
@@ -1668,10 +1644,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@neriros/ralphy",
+      "name": "@z_ai/mcp-server",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "@neriros/ralphy  An iterative AI task execution framework. Orchestrates multi-phase autonomous work using Claude or Codex engines.  Keywords: agent, ai, claude, cli, loop, mcp, ralph, task-runner.  Source: git+https://github.com/NeriRos/ralphy.git.",
+      "capability_text": "@z_ai/mcp-server  MCP Server for Z.AI - A Model Context Protocol server that provides AI capabilities  Keywords: zai, mcp, vision.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -1812,30 +1788,6 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@shopify/dev-mcp",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "@shopify/dev-mcp  A command line tool for setting up Shopify Dev MCP server  Keywords: mcp, modelcontextprotocol, shopify.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "mcp",
-      "tool_kind": "tool"
-    },
-    {
       "name": "@microsoft/github-copilot-app-modernization-mcp-server",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
@@ -1884,10 +1836,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@cocal/google-calendar-mcp",
+      "name": "@shopify/dev-mcp",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "@cocal/google-calendar-mcp  Google Calendar MCP Server with extensive support for calendar management  Keywords: mcp, model-context-protocol, claude, google-calendar, calendar, ai, llm, integration.  Source: git+https://github.com/nspady/google-calendar-mcp.git.",
+      "capability_text": "@shopify/dev-mcp  A command line tool for setting up Shopify Dev MCP server  Keywords: mcp, modelcontextprotocol, shopify.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -1932,10 +1884,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "mcpcat",
+      "name": "@cocal/google-calendar-mcp",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "mcpcat  Analytics tool for MCP (Model Context Protocol) servers - tracks tool usage patterns and provides insights  Keywords: ai, authentication, mcp, observability, ai-agents, ai-platform, ai-agent, mcps, aiagents, ai-agent-tools, mcp-servers, mcp-server, mcp-tools, agent-runtime, mcp-framework, mcp-analytics.  Source: git+https://github.com/MCPCat/mcpcat-typescript-sdk.git.",
+      "capability_text": "@cocal/google-calendar-mcp  Google Calendar MCP Server with extensive support for calendar management  Keywords: mcp, model-context-protocol, claude, google-calendar, calendar, ai, llm, integration.  Source: git+https://github.com/nspady/google-calendar-mcp.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -1956,10 +1908,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "exa-mcp-server",
+      "name": "mcpcat",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "exa-mcp-server  A Model Context Protocol server with Exa for web search and web crawling. Provides real-time web searches with configurable tool selection, allowing users to enable or disable specific search capabilities. Supports customizable result counts, live crawlin  Keywords: mcp, search mcp, model context protocol, exa, search, websearch, claude, ai, research, papers, people.  Source: git+https://github.com/exa-labs/exa-mcp-server.git.",
+      "capability_text": "mcpcat  Analytics tool for MCP (Model Context Protocol) servers - tracks tool usage patterns and provides insights  Keywords: ai, authentication, mcp, observability, ai-agents, ai-platform, ai-agent, mcps, aiagents, ai-agent-tools, mcp-servers, mcp-server, mcp-tools, agent-runtime, mcp-framework, mcp-analytics.  Source: git+https://github.com/MCPCat/mcpcat-typescript-sdk.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -2028,6 +1980,30 @@
       "tool_kind": "tool"
     },
     {
+      "name": "exa-mcp-server",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "exa-mcp-server  A Model Context Protocol server with Exa for web search and web crawling. Provides real-time web searches with configurable tool selection, allowing users to enable or disable specific search capabilities. Supports customizable result counts, live crawlin  Keywords: mcp, search mcp, model context protocol, exa, search, websearch, claude, ai, research, papers, people.  Source: git+https://github.com/exa-labs/exa-mcp-server.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "mcp",
+      "tool_kind": "tool"
+    },
+    {
       "name": "@larksuiteoapi/lark-mcp",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
@@ -2052,10 +2028,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "gm-codex",
+      "name": "@wonderwhy-er/desktop-commander",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "gm-codex  State machine agent with hooks, skills, and automated git enforcement  Keywords: codex, claude-code, wfgy, mcp, automation, gm.  Source: git+https://github.com/AnEntrypoint/gm-codex.git.",
+      "capability_text": "@wonderwhy-er/desktop-commander  MCP server for terminal operations and file editing  Keywords: mcp, model-context-protocol, terminal, claude, ai, command-line, process-management, file-editing, code-editing, diff, patch, block-editing, file-system, text-manipulation, code-modification, surgical-edits, file-operations.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -2076,10 +2052,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@wonderwhy-er/desktop-commander",
+      "name": "gm-codex",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "@wonderwhy-er/desktop-commander  MCP server for terminal operations and file editing  Keywords: mcp, model-context-protocol, terminal, claude, ai, command-line, process-management, file-editing, code-editing, diff, patch, block-editing, file-system, text-manipulation, code-modification, surgical-edits, file-operations.",
+      "capability_text": "gm-codex  State machine agent with hooks, skills, and automated git enforcement  Keywords: codex, claude-code, wfgy, mcp, automation, gm.  Source: git+https://github.com/AnEntrypoint/gm-codex.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -2196,30 +2172,6 @@
       "tool_kind": "tool"
     },
     {
-      "name": "gm-cc",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "gm-cc  State machine agent with hooks, skills, and automated git enforcement  Keywords: claude-code, agent, state-machine, mcp, automation, gm.  Source: git+https://github.com/AnEntrypoint/gm-cc.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "mcp",
-      "tool_kind": "tool"
-    },
-    {
       "name": "@claude-flow/mcp",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
@@ -2244,10 +2196,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@remotion/mcp",
+      "name": "gm-cc",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "@remotion/mcp  Remotion's Model Context Protocol  Keywords: remotion, mcp.  Source: https://github.com/remotion-dev/remotion/tree/main/packages/mcp.",
+      "capability_text": "gm-cc  State machine agent with hooks, skills, and automated git enforcement  Keywords: claude-code, agent, state-machine, mcp, automation, gm.  Source: git+https://github.com/AnEntrypoint/gm-cc.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -2292,10 +2244,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@gleanwork/mcp-config-schema",
+      "name": "@remotion/mcp",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "@gleanwork/mcp-config-schema  Type-safe schemas and builders for MCP client configurations  Keywords: mcp, model-context-protocol, glean, configuration, schema.  Source: git+ssh://git@github.com/gleanwork/mcp-config.git.",
+      "capability_text": "@remotion/mcp  Remotion's Model Context Protocol  Keywords: remotion, mcp.  Source: https://github.com/remotion-dev/remotion/tree/main/packages/mcp.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -2364,58 +2316,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@apify/actors-mcp-server",
+      "name": "@gleanwork/mcp-config-schema",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "@apify/actors-mcp-server  Apify MCP Server  Keywords: apify, mcp, server, actors, model context protocol.  Source: git+https://github.com/apify/apify-mcp-server.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "mcp",
-      "tool_kind": "tool"
-    },
-    {
-      "name": "@claude-flow/guidance",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "@claude-flow/guidance  Guidance Control Plane - Compiles, retrieves, enforces, and evolves guidance rules for Claude Code sessions  Keywords: claude-flow, claude-code, claude, anthropic, ai-agent, ai-governance, agent-governance, guidance, control-plane, policy-enforcement, enforcement-gates, proof-chain, trust-system, long-horizon, autonomous-agent, claude-md, CLAUDE.md, memory-governance, adversarial-defense, prompt-injection, wasm, ruvbot, ruv, ai-safety, agent-orchestration, multi-agent, code-generation, llm-governance, mcp, model-context-protocol.  Source: git+https://github.com/ruvnet/claude-flow.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "mcp",
-      "tool_kind": "tool"
-    },
-    {
-      "name": "@antv/mcp-server-chart",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "@antv/mcp-server-chart  A Model Context Protocol server for generating charts using AntV. This is a TypeScript-based MCP server that provides chart generation capabilities. It allows you to create various types of charts through MCP tools.  Keywords: antv, mcp, data-visualization, chart, graph, map.  Source: git+https://github.com/antvis/mcp-server-chart.git.",
+      "capability_text": "@gleanwork/mcp-config-schema  Type-safe schemas and builders for MCP client configurations  Keywords: mcp, model-context-protocol, glean, configuration, schema.  Source: git+ssh://git@github.com/gleanwork/mcp-config.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -2460,6 +2364,30 @@
       "tool_kind": "tool"
     },
     {
+      "name": "@apify/actors-mcp-server",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "@apify/actors-mcp-server  Apify MCP Server  Keywords: apify, mcp, server, actors, model context protocol.  Source: git+https://github.com/apify/apify-mcp-server.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "mcp",
+      "tool_kind": "tool"
+    },
+    {
       "name": "@odgrim/mcp-datetime",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
@@ -2484,10 +2412,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@testsprite/testsprite-mcp",
+      "name": "@antv/mcp-server-chart",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "@testsprite/testsprite-mcp  The TestSprite MCP plugin brings fully automated software testing into your coding workflow. It connects your IDE's AI assistant (like Cursor or Copilot) with TestSprite's intelligent testing engine to automatically generate, execute, and debug integratio  Keywords: testing, automation, ai, cursor, vscode, mcp, testsprite.",
+      "capability_text": "@antv/mcp-server-chart  A Model Context Protocol server for generating charts using AntV. This is a TypeScript-based MCP server that provides chart generation capabilities. It allows you to create various types of charts through MCP tools.  Keywords: antv, mcp, data-visualization, chart, graph, map.  Source: git+https://github.com/antvis/mcp-server-chart.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -2508,10 +2436,34 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@piotr-agier/google-drive-mcp",
+      "name": "@claude-flow/guidance",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "@piotr-agier/google-drive-mcp  Google Drive MCP Server - Model Context Protocol server providing secure access to Google Drive, Docs, Sheets, and Slides through MCP clients e.g. Claude Desktop  Keywords: mcp, model-context-protocol, claude, google-drive, google-docs, google-sheets, google-slides, google-workspace, ai, llm, integration, oauth2, file-management, document-automation.  Source: git+https://github.com/piotr-agier/google-drive-mcp.git.",
+      "capability_text": "@claude-flow/guidance  Guidance Control Plane - Compiles, retrieves, enforces, and evolves guidance rules for Claude Code sessions  Keywords: claude-flow, claude-code, claude, anthropic, ai-agent, ai-governance, agent-governance, guidance, control-plane, policy-enforcement, enforcement-gates, proof-chain, trust-system, long-horizon, autonomous-agent, claude-md, CLAUDE.md, memory-governance, adversarial-defense, prompt-injection, wasm, ruvbot, ruv, ai-safety, agent-orchestration, multi-agent, code-generation, llm-governance, mcp, model-context-protocol.  Source: git+https://github.com/ruvnet/claude-flow.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "mcp",
+      "tool_kind": "tool"
+    },
+    {
+      "name": "@testsprite/testsprite-mcp",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "@testsprite/testsprite-mcp  The TestSprite MCP plugin brings fully automated software testing into your coding workflow. It connects your IDE's AI assistant (like Cursor or Copilot) with TestSprite's intelligent testing engine to automatically generate, execute, and debug integratio  Keywords: testing, automation, ai, cursor, vscode, mcp, testsprite.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -2604,154 +2556,34 @@
       "tool_kind": "tool"
     },
     {
+      "name": "@piotr-agier/google-drive-mcp",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "@piotr-agier/google-drive-mcp  Google Drive MCP Server - Model Context Protocol server providing secure access to Google Drive, Docs, Sheets, and Slides through MCP clients e.g. Claude Desktop  Keywords: mcp, model-context-protocol, claude, google-drive, google-docs, google-sheets, google-slides, google-workspace, ai, llm, integration, oauth2, file-management, document-automation.  Source: git+https://github.com/piotr-agier/google-drive-mcp.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "mcp",
+      "tool_kind": "tool"
+    },
+    {
       "name": "claude-flow",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
       "capability_text": "claude-flow  Ruflo - Enterprise AI agent orchestration for Claude Code. Deploy 60+ specialized agents in coordinated swarms with self-learning, fault-tolerant consensus, vector memory, and MCP integration  Keywords: ruvflow, claude, claude-code, anthropic, ai, ai-agents, multi-agent, agent-orchestration, swarm-intelligence, swarm, mcp, model-context-protocol, llm, large-language-model, gpt, chatgpt, automation, workflow, orchestration, cli, developer-tools, devtools, coding-assistant, code-generation, enterprise, vector-database, embeddings, machine-learning, neural-network, hive-mind, distributed-systems, consensus, self-learning.  Source: git+https://github.com/ruvnet/claude-flow.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "mcp",
-      "tool_kind": "tool"
-    },
-    {
-      "name": "neo.mjs",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "neo.mjs  The Application Engine for the AI Era. A multi-threaded, AI-native runtime with a persistent Scene Graph, enabling AI agents to introspect and mutate the living application structure in real-time.  Keywords: agent-operating-system, agent-os, ai-agents, ai-code-execution, ai-code-review, ai-hot-patching, ai-interfaces, ai-native, application-engine, browser-email-client, browser-based-ide, code-execution-pattern, context-engineering, css, data-visualization, desktop-class-web-applications, desktop-like, developer-productivity, dynamic-imports, ecmascript, enterprise, esm-production, framework, frontend, gemini, genai, generative-ai, html-streaming-alternative, http3, javascript, json, json-blueprints, llm-ui-framework, low-code-ui, mcp, mcp-server, model-context-protocol, monaco-editor, multi-screen-ai-chat, multi-threaded, multi-window, multi-window-applications, multi-window-ide, multi-window-llm-interface, native-like, neo-mjs, neural-link, next-gen-ai-interfaces, no-bundling, no-jank, no-transpilation, object-permanence, offscreencanvas, omt-architecture, outlook-alternative-browser, performance, pwa, predictive-caching, progressive-web-app, quic, rag-knowledge-base, react-alternative, realtime, runtime-inspection, runtime-type-safety, scalability, scene-graph, security, self-healing-code, semantic-code-search, sharedworker, single-page-application, smooth-ui, spa, ssg-json, standalone-ai-sdk, trading-dashboard-framework, typescript-without-typescript, ui-responsiveness, virtual-dom, web-app, web-based-email-client, web-based-ide, web-engine, webworker, xss-resistant, zero-build-development.  Source: git+https://github.com/neomjs/neo.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "mcp",
-      "tool_kind": "tool"
-    },
-    {
-      "name": "storybook-addon-angular-manifest",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "storybook-addon-angular-manifest  Storybook addon for Angular component manifest generation with Compodoc integration  Keywords: storybook-addon, angular, compodoc, mcp, ai.  Source: git+https://github.com/ethriel3695/storybook-addon-manifest.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "mcp",
-      "tool_kind": "tool"
-    },
-    {
-      "name": "mcp-server-kubernetes",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "mcp-server-kubernetes  MCP server for interacting with Kubernetes clusters via kubectl  Keywords: mcp, kubernetes, claude, anthropic, kubectl.  Source: git+https://github.com/Flux159/mcp-server-kubernetes.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "mcp",
-      "tool_kind": "tool"
-    },
-    {
-      "name": "argocd-mcp",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "argocd-mcp  Argo CD MCP Server  Keywords: mcp, argocd, argocd-mcp, argocd-mcp-server, argo-cd, argo-cd-mcp, argo-cd-mcp-server, cicd, cicd-mcp, cicd-mcp-server, gitops, gitops-mcp, gitops-mcp-server, kubernetes, kubernetes-mcp, kubernetes-mcp-server.  Source: git+https://github.com/argoproj-labs/mcp-for-argocd.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "mcp",
-      "tool_kind": "tool"
-    },
-    {
-      "name": "@bangdao-ai/acw-tools",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "@bangdao-ai/acw-tools  MCP (Model Context Protocol) tools for ACW - download rules and initialize Common Admin projects  Keywords: mcp, model-context-protocol, acw, rules, template, common-admin, downloader, cursor, ai, automation.  Source: git+https://github.com/bangdao-ai/acw-tools.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "mcp",
-      "tool_kind": "tool"
-    },
-    {
-      "name": "figma-console-mcp",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "figma-console-mcp  MCP server for accessing Figma plugin console logs and screenshots via Cloudflare Workers or local mode  Keywords: mcp, figma, plugin, console, debugging, ai, anthropic, claude, cloudflare, workers.  Source: git+https://github.com/southleft/figma-console-mcp.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -2820,10 +2652,178 @@
       "tool_kind": "tool"
     },
     {
+      "name": "@bangdao-ai/acw-tools",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "@bangdao-ai/acw-tools  MCP (Model Context Protocol) tools for ACW - download rules and initialize Common Admin projects  Keywords: mcp, model-context-protocol, acw, rules, template, common-admin, downloader, cursor, ai, automation.  Source: git+https://github.com/bangdao-ai/acw-tools.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "mcp",
+      "tool_kind": "tool"
+    },
+    {
+      "name": "figma-console-mcp",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "figma-console-mcp  MCP server for accessing Figma plugin console logs and screenshots via Cloudflare Workers or local mode  Keywords: mcp, figma, plugin, console, debugging, ai, anthropic, claude, cloudflare, workers.  Source: git+https://github.com/southleft/figma-console-mcp.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "mcp",
+      "tool_kind": "tool"
+    },
+    {
+      "name": "neo.mjs",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "neo.mjs  The Application Engine for the AI Era. A multi-threaded, AI-native runtime with a persistent Scene Graph, enabling AI agents to introspect and mutate the living application structure in real-time.  Keywords: agent-operating-system, agent-os, ai-agents, ai-code-execution, ai-code-review, ai-hot-patching, ai-interfaces, ai-native, application-engine, browser-email-client, browser-based-ide, code-execution-pattern, context-engineering, css, data-visualization, desktop-class-web-applications, desktop-like, developer-productivity, dynamic-imports, ecmascript, enterprise, esm-production, framework, frontend, gemini, genai, generative-ai, html-streaming-alternative, http3, javascript, json, json-blueprints, llm-ui-framework, low-code-ui, mcp, mcp-server, model-context-protocol, monaco-editor, multi-screen-ai-chat, multi-threaded, multi-window, multi-window-applications, multi-window-ide, multi-window-llm-interface, native-like, neo-mjs, neural-link, next-gen-ai-interfaces, no-bundling, no-jank, no-transpilation, object-permanence, offscreencanvas, omt-architecture, outlook-alternative-browser, performance, pwa, predictive-caching, progressive-web-app, quic, rag-knowledge-base, react-alternative, realtime, runtime-inspection, runtime-type-safety, scalability, scene-graph, security, self-healing-code, semantic-code-search, sharedworker, single-page-application, smooth-ui, spa, ssg-json, standalone-ai-sdk, trading-dashboard-framework, typescript-without-typescript, ui-responsiveness, virtual-dom, web-app, web-based-email-client, web-based-ide, web-engine, webworker, xss-resistant, zero-build-development.  Source: git+https://github.com/neomjs/neo.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "mcp",
+      "tool_kind": "tool"
+    },
+    {
+      "name": "storybook-addon-angular-manifest",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "storybook-addon-angular-manifest  Storybook addon for Angular component manifest generation with Compodoc integration  Keywords: storybook-addon, angular, compodoc, mcp, ai.  Source: git+https://github.com/ethriel3695/storybook-addon-manifest.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "mcp",
+      "tool_kind": "tool"
+    },
+    {
+      "name": "argocd-mcp",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "argocd-mcp  Argo CD MCP Server  Keywords: mcp, argocd, argocd-mcp, argocd-mcp-server, argo-cd, argo-cd-mcp, argo-cd-mcp-server, cicd, cicd-mcp, cicd-mcp-server, gitops, gitops-mcp, gitops-mcp-server, kubernetes, kubernetes-mcp, kubernetes-mcp-server.  Source: git+https://github.com/argoproj-labs/mcp-for-argocd.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "mcp",
+      "tool_kind": "tool"
+    },
+    {
+      "name": "mcp-server-kubernetes",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "mcp-server-kubernetes  MCP server for interacting with Kubernetes clusters via kubectl  Keywords: mcp, kubernetes, claude, anthropic, kubectl.  Source: git+https://github.com/Flux159/mcp-server-kubernetes.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "mcp",
+      "tool_kind": "tool"
+    },
+    {
       "name": "xmcp",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
       "capability_text": "xmcp  The MCP framework  Keywords: mcp, modelcontextprotocol, http, stdio.  Source: git+https://github.com/basementstudio/xmcp.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "mcp",
+      "tool_kind": "tool"
+    },
+    {
+      "name": "pi-mcp-adapter",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "pi-mcp-adapter  MCP (Model Context Protocol) adapter extension for Pi coding agent  Keywords: pi-package, pi, mcp, model-context-protocol, ai, coding-agent, extension, claude, llm.  Source: git+https://github.com/nicobailon/pi-mcp-adapter.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -2872,30 +2872,6 @@
       "version": "1.0",
       "author_agent_id": "npm-scrape",
       "capability_text": "agnost  Analytics SDK for Model Context Protocol Servers  Keywords: analytics, mcp, model context protocol, ai, tools.  Source: git+https://github.com/agnostai/agnostai.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "mcp",
-      "tool_kind": "tool"
-    },
-    {
-      "name": "pi-mcp-adapter",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "pi-mcp-adapter  MCP (Model Context Protocol) adapter extension for Pi coding agent  Keywords: pi-package, pi, mcp, model-context-protocol, ai, coding-agent, extension, claude, llm.  Source: git+https://github.com/nicobailon/pi-mcp-adapter.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -3036,54 +3012,6 @@
       "tool_kind": "tool"
     },
     {
-      "name": "decocms",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "decocms  Deco CMS — Self-hostable MCP Gateway for managing AI connections and tools  Keywords: mcp, model-context-protocol, ai, gateway, self-hosted, mesh, tools.  Source: git+https://github.com/decocms/studio.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "mcp",
-      "tool_kind": "tool"
-    },
-    {
-      "name": "chrome-devtools-axi",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "chrome-devtools-axi  AXI-compliant chrome-devtools-mcp wrapper — combined operations, TOON output, contextual suggestions  Keywords: chrome, devtools, browser, cli, agent, axi, toon, mcp.  Source: git+https://github.com/kunchenguid/chrome-devtools-axi.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "mcp",
-      "tool_kind": "tool"
-    },
-    {
       "name": "igniteui-theming",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
@@ -3108,10 +3036,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@bike4mind/cli",
+      "name": "decocms",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "@bike4mind/cli  Interactive CLI tool for Bike4Mind with ReAct agents  Keywords: cli, ai, bike4mind, agent, mcp, react-agent.  Source: git+https://github.com/bike4mind/lumina5.git.",
+      "capability_text": "decocms  Deco CMS — Self-hostable MCP Gateway for managing AI connections and tools  Keywords: mcp, model-context-protocol, ai, gateway, self-hosted, mesh, tools.  Source: git+https://github.com/decocms/studio.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -3132,10 +3060,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "codingbuddy-rules",
+      "name": "unifi-network-mcp",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "codingbuddy-rules  AI coding rules for consistent practices across AI assistants  Keywords: ai, coding, rules, claude, cursor, codex, mcp.  Source: https://github.com/JeremyDev87/codingbuddy.",
+      "capability_text": "unifi-network-mcp  Read-only MCP server for UniFi Network controllers  Keywords: mcp, model-context-protocol, unifi, ubiquiti, network, ai, llm.  Source: git+https://github.com/ryanbehan/unifi-network-mcp.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -3156,34 +3084,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "kubernetes-mcp-server",
+      "name": "chrome-devtools-axi",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "kubernetes-mcp-server  Model Context Protocol (MCP) server for Kubernetes and OpenShift  Keywords: mcp, kubernetes, openshift, model context protocol, model, context, protocol.  Source: git+https://github.com/containers/kubernetes-mcp-server.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "mcp",
-      "tool_kind": "tool"
-    },
-    {
-      "name": "freee-mcp",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "freee-mcp  Model Context Protocol (MCP) server for freee API integration  Keywords: mcp, model-context-protocol, freee, api, accounting, claude.  Source: git+https://github.com/freee/freee-mcp.git.",
+      "capability_text": "chrome-devtools-axi  AXI-compliant chrome-devtools-mcp wrapper — combined operations, TOON output, contextual suggestions  Keywords: chrome, devtools, browser, cli, agent, axi, toon, mcp.  Source: git+https://github.com/kunchenguid/chrome-devtools-axi.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -3252,58 +3156,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@mcp-b/global",
+      "name": "kubernetes-mcp-server",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "@mcp-b/global  W3C Web Model Context API polyfill - Let AI agents like Claude, ChatGPT, and Gemini interact with your website via navigator.modelContext  Keywords: mcp, model-context-protocol, web-model-context, navigator-modelcontext, w3c, browser, polyfill, web-standard, ai-agents, ai-tools, llm, claude, chatgpt, openai, anthropic, cursor, copilot, gemini, webmcp, tool-registration, ai-integration, browser-ai, web-ai, ai-assistant, chromium, iife.  Source: git+https://github.com/WebMCP-org/npm-packages.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "mcp",
-      "tool_kind": "tool"
-    },
-    {
-      "name": "unifi-network-mcp",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "unifi-network-mcp  Read-only MCP server for UniFi Network controllers  Keywords: mcp, model-context-protocol, unifi, ubiquiti, network, ai, llm.  Source: git+https://github.com/ryanbehan/unifi-network-mcp.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "mcp",
-      "tool_kind": "tool"
-    },
-    {
-      "name": "@nexus2520/bitbucket-mcp-server",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "@nexus2520/bitbucket-mcp-server  MCP server for Bitbucket API integration - supports both Cloud and Server  Keywords: mcp, bitbucket, api, model-context-protocol, bitbucket-server, bitbucket-cloud, pull-request, code-review.  Source: git+https://github.com/pdogra1299/bitbucket-mcp-server.git.",
+      "capability_text": "kubernetes-mcp-server  Model Context Protocol (MCP) server for Kubernetes and OpenShift  Keywords: mcp, kubernetes, openshift, model context protocol, model, context, protocol.  Source: git+https://github.com/containers/kubernetes-mcp-server.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -3348,10 +3204,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "mcp-client-capabilities",
+      "name": "freee-mcp",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "mcp-client-capabilities  Index of all Model Context Protocol (MCP) clients and their capabilities  Keywords: mcp, model-context-protocol, capabilities, index.  Source: git+https://github.com/apify/mcp-client-capabilities.git.",
+      "capability_text": "freee-mcp  Model Context Protocol (MCP) server for freee API integration  Keywords: mcp, model-context-protocol, freee, api, accounting, claude.  Source: git+https://github.com/freee/freee-mcp.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -3396,10 +3252,106 @@
       "tool_kind": "tool"
     },
     {
+      "name": "skillfish",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "skillfish  All in one Skill manager for AI coding agents. Install, update, and sync Skills across Claude Code, Cursor, Copilot + more.  Keywords: cli, skills, agent-skills, ai-agent, ai-tools, mcp, claude, claude-code, cursor, windsurf, codex, copilot, github-copilot, gemini-cli, opencode, goose, amp, roo, kiro, trae, cline.  Source: git+https://github.com/knoxgraeme/skillfish.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "mcp",
+      "tool_kind": "tool"
+    },
+    {
+      "name": "mcp-client-capabilities",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "mcp-client-capabilities  Index of all Model Context Protocol (MCP) clients and their capabilities  Keywords: mcp, model-context-protocol, capabilities, index.  Source: git+https://github.com/apify/mcp-client-capabilities.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "mcp",
+      "tool_kind": "tool"
+    },
+    {
+      "name": "@nexus2520/bitbucket-mcp-server",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "@nexus2520/bitbucket-mcp-server  MCP server for Bitbucket API integration - supports both Cloud and Server  Keywords: mcp, bitbucket, api, model-context-protocol, bitbucket-server, bitbucket-cloud, pull-request, code-review.  Source: git+https://github.com/pdogra1299/bitbucket-mcp-server.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "mcp",
+      "tool_kind": "tool"
+    },
+    {
       "name": "@kimuson/modular-mcp",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
       "capability_text": "@kimuson/modular-mcp  Modular MCP - Modular tool access for reducing context overhead  Keywords: mcp, model-context-protocol, llm, claude, context-optimization.  Source: git+https://github.com/d-kimuson/modular-mcp.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "mcp",
+      "tool_kind": "tool"
+    },
+    {
+      "name": "@mcp-b/global",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "@mcp-b/global  W3C Web Model Context API polyfill - Let AI agents like Claude, ChatGPT, and Gemini interact with your website via navigator.modelContext  Keywords: mcp, model-context-protocol, web-model-context, navigator-modelcontext, w3c, browser, polyfill, web-standard, ai-agents, ai-tools, llm, claude, chatgpt, openai, anthropic, cursor, copilot, gemini, webmcp, tool-registration, ai-integration, browser-ai, web-ai, ai-assistant, chromium, iife.  Source: git+https://github.com/WebMCP-org/npm-packages.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -3444,10 +3396,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "skillfish",
+      "name": "@aashari/mcp-server-atlassian-jira",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "skillfish  All in one Skill manager for AI coding agents. Install, update, and sync Skills across Claude Code, Cursor, Copilot + more.  Keywords: cli, skills, agent-skills, ai-agent, ai-tools, mcp, claude, claude-code, cursor, windsurf, codex, copilot, github-copilot, gemini-cli, opencode, goose, amp, roo, kiro, trae, cline.  Source: git+https://github.com/knoxgraeme/skillfish.git.",
+      "capability_text": "@aashari/mcp-server-atlassian-jira  Node.js/TypeScript MCP server for Atlassian Jira. Equips AI systems (LLMs) with tools to list/get projects, search/get issues (using JQL/ID), and view dev info (commits, PRs). Connects AI capabilities directly into Jira project management and issue tracki  Keywords: mcp, typescript, claude, anthropic, ai, atlassian, jira, project-management, issue-tracking, server, model-context-protocol, tools, resources, tooling, ai-integration, mcp-server, llm, ai-connector, external-tools, cli, mcp-inspector.  Source: git+https://github.com/aashari/mcp-server-atlassian-jira.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -3468,10 +3420,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "frontmcp",
+      "name": "@bike4mind/cli",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "frontmcp  FrontMCP command line interface  Keywords: cli, mcp, agentfront, frontmcp, framework, typescript.  Source: git+https://github.com/agentfront/frontmcp.git.",
+      "capability_text": "@bike4mind/cli  Interactive CLI tool for Bike4Mind with ReAct agents  Keywords: cli, ai, bike4mind, agent, mcp, react-agent.  Source: git+https://github.com/bike4mind/lumina5.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -3516,10 +3468,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@aashari/mcp-server-atlassian-jira",
+      "name": "frontmcp",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "@aashari/mcp-server-atlassian-jira  Node.js/TypeScript MCP server for Atlassian Jira. Equips AI systems (LLMs) with tools to list/get projects, search/get issues (using JQL/ID), and view dev info (commits, PRs). Connects AI capabilities directly into Jira project management and issue tracki  Keywords: mcp, typescript, claude, anthropic, ai, atlassian, jira, project-management, issue-tracking, server, model-context-protocol, tools, resources, tooling, ai-integration, mcp-server, llm, ai-connector, external-tools, cli, mcp-inspector.  Source: git+https://github.com/aashari/mcp-server-atlassian-jira.git.",
+      "capability_text": "frontmcp  FrontMCP command line interface  Keywords: cli, mcp, agentfront, frontmcp, framework, typescript.  Source: git+https://github.com/agentfront/frontmcp.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -3544,6 +3496,30 @@
       "version": "1.0",
       "author_agent_id": "npm-scrape",
       "capability_text": "@railway/mcp-server  Official Railway MCP server  Keywords: railway, mcp, modelcontextprotocol, mcp-server.  Source: git+https://github.com/railwayapp/railway-mcp-server.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "mcp",
+      "tool_kind": "tool"
+    },
+    {
+      "name": "@google-cloud/cloud-run-mcp",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "@google-cloud/cloud-run-mcp  Cloud Run MCP deployment tool  Keywords: mcp, cloud-run, gcp.  Source: git+https://github.com/GoogleCloudPlatform/cloud-run-mcp.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -3612,10 +3588,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@google-cloud/cloud-run-mcp",
+      "name": "mcp-from-openapi",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "@google-cloud/cloud-run-mcp  Cloud Run MCP deployment tool  Keywords: mcp, cloud-run, gcp.  Source: git+https://github.com/GoogleCloudPlatform/cloud-run-mcp.git.",
+      "capability_text": "mcp-from-openapi  Production-ready library for converting OpenAPI specifications into MCP tool definitions  Keywords: mcp, model-context-protocol, openapi, swagger, api, rest, schema, json-schema, typescript, tool-generator, anthropic, claude.  Source: git+https://github.com/agentfront/mcp-from-openapi.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -3636,10 +3612,34 @@
       "tool_kind": "tool"
     },
     {
-      "name": "mcp-from-openapi",
+      "name": "mcp-searxng",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "mcp-from-openapi  Production-ready library for converting OpenAPI specifications into MCP tool definitions  Keywords: mcp, model-context-protocol, openapi, swagger, api, rest, schema, json-schema, typescript, tool-generator, anthropic, claude.  Source: git+https://github.com/agentfront/mcp-from-openapi.git.",
+      "capability_text": "mcp-searxng  MCP server for SearXNG integration  Keywords: mcp, modelcontextprotocol, searxng, search, web-search, claude, ai, pagination, smithery, url-reader.  Source: git+https://github.com/ihor-sokoliuk/mcp-searxng.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "mcp",
+      "tool_kind": "tool"
+    },
+    {
+      "name": "@smartbear/mcp",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "@smartbear/mcp  MCP server for interacting SmartBear Products  Keywords: smartbear, mcp, bugsnag, reflect, swagger, pactflow, zephyr.  Source: git+ssh://git@github.com/SmartBear/smartbear-mcp.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -3708,54 +3708,6 @@
       "tool_kind": "tool"
     },
     {
-      "name": "swagger2openapi",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "swagger2openapi  Convert Swagger 2.0 definitions to OpenApi 3.0 and validate  Keywords: swagger, openapi, openapi2, openapi3, converter, conversion, validator, validation, resolver, lint, linter.  Source: git+https://github.com/Mermade/oas-kit.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "devtools",
-      "tool_kind": "tool"
-    },
-    {
-      "name": "@apidevtools/openapi-schemas",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "@apidevtools/openapi-schemas  JSON Schemas for every version of the OpenAPI Specification  Keywords: openapi, open-api, swagger, oas, api, rest, json, specification, definition, schema.  Source: git+https://github.com/APIDevTools/openapi-schemas.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "devtools",
-      "tool_kind": "tool"
-    },
-    {
       "name": "@apidevtools/swagger-parser",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
@@ -3780,10 +3732,58 @@
       "tool_kind": "tool"
     },
     {
+      "name": "swagger2openapi",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "swagger2openapi  Convert Swagger 2.0 definitions to OpenApi 3.0 and validate  Keywords: swagger, openapi, openapi2, openapi3, converter, conversion, validator, validation, resolver, lint, linter.  Source: git+https://github.com/Mermade/oas-kit.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "devtools",
+      "tool_kind": "tool"
+    },
+    {
       "name": "oas-resolver",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
       "capability_text": "oas-resolver  Resolve external $refs in OpenAPI (swagger) 2.0 / 3.x definitions  Keywords: openapi, swagger, oas, resolver, resolution, ref, json-pointer, json-ref.  Source: git+https://github.com/Mermade/oas-kit.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "devtools",
+      "tool_kind": "tool"
+    },
+    {
+      "name": "@apidevtools/openapi-schemas",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "@apidevtools/openapi-schemas  JSON Schemas for every version of the OpenAPI Specification  Keywords: openapi, open-api, swagger, oas, api, rest, json, specification, definition, schema.  Source: git+https://github.com/APIDevTools/openapi-schemas.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -3852,10 +3852,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "openapi-fetch",
+      "name": "oas-validator",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "openapi-fetch  Fast, type-safe fetch client for your OpenAPI schema. Only 6 kb (min). Works with React, Vue, Svelte, or vanilla JS.  Keywords: openapi, swagger, rest, api, oapi_3, oapi_3_1, typescript, fetch, react, vue, svelte.  Source: git+https://github.com/openapi-ts/openapi-typescript.git.",
+      "capability_text": "oas-validator  Parser/validator for OpenAPI 3.x definitions  Keywords: openapi, oas, parser, validator, validation.  Source: git+https://github.com/Mermade/oas-kit.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -3876,10 +3876,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "oas-validator",
+      "name": "openapi-fetch",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "oas-validator  Parser/validator for OpenAPI 3.x definitions  Keywords: openapi, oas, parser, validator, validation.  Source: git+https://github.com/Mermade/oas-kit.git.",
+      "capability_text": "openapi-fetch  Fast, type-safe fetch client for your OpenAPI schema. Only 6 kb (min). Works with React, Vue, Svelte, or vanilla JS.  Keywords: openapi, swagger, rest, api, oapi_3, oapi_3_1, typescript, fetch, react, vue, svelte.  Source: git+https://github.com/openapi-ts/openapi-typescript.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -4068,10 +4068,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@fastify/swagger",
+      "name": "swagger-jsdoc",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "@fastify/swagger  Serve Swagger/OpenAPI documentation for Fastify, supporting dynamic generation  Keywords: fastify, swagger, openapi, serve, generate, static.  Source: git+https://github.com/fastify/fastify-swagger.git.",
+      "capability_text": "swagger-jsdoc  Generates swagger doc based on JSDoc  Keywords: swagger, openapi, jsdoc.  Source: git+https://github.com/Surnet/swagger-jsdoc.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -4092,10 +4092,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "swagger-jsdoc",
+      "name": "@fastify/swagger",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "swagger-jsdoc  Generates swagger doc based on JSDoc  Keywords: swagger, openapi, jsdoc.  Source: git+https://github.com/Surnet/swagger-jsdoc.git.",
+      "capability_text": "@fastify/swagger  Serve Swagger/OpenAPI documentation for Fastify, supporting dynamic generation  Keywords: fastify, swagger, openapi, serve, generate, static.  Source: git+https://github.com/fastify/fastify-swagger.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -4356,10 +4356,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "openapi-typescript-codegen",
+      "name": "@standard-community/standard-openapi",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "openapi-typescript-codegen  Library that generates Typescript clients based on the OpenAPI specification.  Keywords: openapi, swagger, generator, typescript, yaml, json, fetch, xhr, axios, angular, node.  Source: git+https://github.com/ferdikoomen/openapi-typescript-codegen.git.",
+      "capability_text": "@standard-community/standard-openapi  [![npm version](https://img.shields.io/npm/v/@standard-community/standard-openapi.svg)](https://npmjs.org/package/@standard-community/standard-openapi \"View this project on NPM\") [![npm downloads](https://img.shields.io/npm/dm/@standard-community/standard  Keywords: standard-schema, standard-community, standard-schema-community, openapi-schema, openapi, convertor.  Source: git+https://github.com/standard-community/standard-openapi.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -4404,10 +4404,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@standard-community/standard-openapi",
+      "name": "openapi-typescript-codegen",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "@standard-community/standard-openapi  [![npm version](https://img.shields.io/npm/v/@standard-community/standard-openapi.svg)](https://npmjs.org/package/@standard-community/standard-openapi \"View this project on NPM\") [![npm downloads](https://img.shields.io/npm/dm/@standard-community/standard  Keywords: standard-schema, standard-community, standard-schema-community, openapi-schema, openapi, convertor.  Source: git+https://github.com/standard-community/standard-openapi.git.",
+      "capability_text": "openapi-typescript-codegen  Library that generates Typescript clients based on the OpenAPI specification.  Keywords: openapi, swagger, generator, typescript, yaml, json, fetch, xhr, axios, angular, node.  Source: git+https://github.com/ferdikoomen/openapi-typescript-codegen.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -4644,30 +4644,6 @@
       "tool_kind": "tool"
     },
     {
-      "name": "oas-normalize",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "oas-normalize  Tooling for converting, validating, and parsing OpenAPI, Swagger, and Postman API definitions  Keywords: api, apidoc, apis, documentation, microservice, oai, oas, openapi, openapi document, openapi initiative, openapi spec, openapi specification, postman, swagger.  Source: git://github.com/readmeio/oas.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "devtools",
-      "tool_kind": "tool"
-    },
-    {
       "name": "@zodios/core",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
@@ -4692,10 +4668,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "tsoa",
+      "name": "oas-normalize",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "tsoa  Build swagger-compliant REST APIs using TypeScript and Node  Keywords: typescript, openapi, swagger, server, node, node.js, codegen, generation, express, hapi.js, koa.  Source: https://github.com/lukeautry/tsoa.git.",
+      "capability_text": "oas-normalize  Tooling for converting, validating, and parsing OpenAPI, Swagger, and Postman API definitions  Keywords: api, apidoc, apis, documentation, microservice, oai, oas, openapi, openapi document, openapi initiative, openapi spec, openapi specification, postman, swagger.  Source: git://github.com/readmeio/oas.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -4740,10 +4716,58 @@
       "tool_kind": "tool"
     },
     {
+      "name": "tsoa",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "tsoa  Build swagger-compliant REST APIs using TypeScript and Node  Keywords: typescript, openapi, swagger, server, node, node.js, codegen, generation, express, hapi.js, koa.  Source: https://github.com/lukeautry/tsoa.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "devtools",
+      "tool_kind": "tool"
+    },
+    {
       "name": "@asyncapi/openapi-schema-parser",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
       "capability_text": "@asyncapi/openapi-schema-parser  An AsyncAPI schema parser for OpenAPI 3.0.x and Swagger 2.x schemas.  Keywords: asyncapi, openapi, swagger, schema, parser.  Source: git+https://github.com/asyncapi/openapi-schema-parser.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "devtools",
+      "tool_kind": "tool"
+    },
+    {
+      "name": "@7nohe/openapi-react-query-codegen",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "@7nohe/openapi-react-query-codegen  OpenAPI React Query Codegen  Keywords: codegen, react-query, react, openapi, swagger, typescript, openapi-typescript-codegen, @hey-api/openapi-ts.  Source: git+https://github.com/7nohe/openapi-react-query-codegen.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -4812,30 +4836,6 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@7nohe/openapi-react-query-codegen",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "@7nohe/openapi-react-query-codegen  OpenAPI React Query Codegen  Keywords: codegen, react-query, react, openapi, swagger, typescript, openapi-typescript-codegen, @hey-api/openapi-ts.  Source: git+https://github.com/7nohe/openapi-react-query-codegen.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "devtools",
-      "tool_kind": "tool"
-    },
-    {
       "name": "@scalar/postman-to-openapi",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
@@ -4860,10 +4860,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@ruvector/graph-node",
+      "name": "agentdb",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "@ruvector/graph-node  Native Node.js bindings for RuVector Graph Database with hypergraph support, Cypher queries, and persistence - 10x faster than WASM  Keywords: graph-database, graph, hypergraph, cypher, neo4j, vector-database, graph-query, knowledge-graph, property-graph, native, napi, rust, fast, performance, zero-copy, ai, machine-learning, rag, ruv, ruvector.  Source: git+https://github.com/ruvnet/ruvector.git.",
+      "capability_text": "agentdb  AgentDB v3 - Intelligent agentic vector database with RVF native format, RuVector-powered graph DB, Cypher queries, ACID persistence. 150x faster than SQLite with self-learning GNN, 6 cognitive memory patterns, semantic routing, COW branching, sparse/part  Keywords: agentdb, vector-database, ai-agents, memory, causal-reasoning, reflexion, episodic-memory, skill-library, lifelong-learning, explainable-ai, provenance, hnsw, embeddings, sqlite, sql.js, wasm.  Source: git+https://github.com/ruvnet/agentic-flow.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -4884,10 +4884,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "agentdb",
+      "name": "@ruvector/graph-node",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "agentdb  AgentDB v3 - Intelligent agentic vector database with RVF native format, RuVector-powered graph DB, Cypher queries, ACID persistence. 150x faster than SQLite with self-learning GNN, 6 cognitive memory patterns, semantic routing, COW branching, sparse/part  Keywords: agentdb, vector-database, ai-agents, memory, causal-reasoning, reflexion, episodic-memory, skill-library, lifelong-learning, explainable-ai, provenance, hnsw, embeddings, sqlite, sql.js, wasm.  Source: git+https://github.com/ruvnet/agentic-flow.git.",
+      "capability_text": "@ruvector/graph-node  Native Node.js bindings for RuVector Graph Database with hypergraph support, Cypher queries, and persistence - 10x faster than WASM  Keywords: graph-database, graph, hypergraph, cypher, neo4j, vector-database, graph-query, knowledge-graph, property-graph, native, napi, rust, fast, performance, zero-copy, ai, machine-learning, rag, ruv, ruvector.  Source: git+https://github.com/ruvnet/ruvector.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -5076,10 +5076,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@pinecone-database/mcp",
+      "name": "@ruvector/ruvllm-win32-x64-msvc",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "@pinecone-database/mcp  Model Context Protocol server for Pinecone - enables AI assistants to interact with Pinecone indexes and documentation  Keywords: mcp, pinecone, vector-database, ai, model-context-protocol.  Source: git+https://github.com/pinecone-io/pinecone-mcp.git.",
+      "capability_text": "@ruvector/ruvllm-win32-x64-msvc  RuvLLM native SIMD acceleration - win32-x64-msvc (Windows) platform  Keywords: ruvllm, llm, simd, avx2, windows, vector-database, napi-rs.  Source: git+https://github.com/ruvnet/ruvector.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -5100,10 +5100,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@ruvector/ruvllm-win32-x64-msvc",
+      "name": "@pinecone-database/mcp",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "@ruvector/ruvllm-win32-x64-msvc  RuvLLM native SIMD acceleration - win32-x64-msvc (Windows) platform  Keywords: ruvllm, llm, simd, avx2, windows, vector-database, napi-rs.  Source: git+https://github.com/ruvnet/ruvector.git.",
+      "capability_text": "@pinecone-database/mcp  Model Context Protocol server for Pinecone - enables AI assistants to interact with Pinecone indexes and documentation  Keywords: mcp, pinecone, vector-database, ai, model-context-protocol.  Source: git+https://github.com/pinecone-io/pinecone-mcp.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -5196,6 +5196,30 @@
       "tool_kind": "tool"
     },
     {
+      "name": "socraticode",
+      "version": "1.0",
+      "author_agent_id": "npm-scrape",
+      "capability_text": "socraticode  SocratiCode — MCP server for local codebase indexing, semantic search, and code dependency graphs. All private, all local via Docker.  Keywords: mcp, socraticode, codebase, indexer, vector-database, qdrant, ollama, embeddings, code-graph.  Source: git+https://github.com/giancarloerra/socraticode.git.",
+      "input_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_contract": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "output_repair_strategy": "fail-fast",
+      "endpoint_stub_name": "catalog-only-stub",
+      "metadata": {
+        "cost_per_call_usd": 0,
+        "p95_latency_ms": 0,
+        "reliability_score": 0.92
+      },
+      "status": "active",
+      "domain": "data",
+      "tool_kind": "tool"
+    },
+    {
       "name": "@sqliteai/sqlite-vector",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
@@ -5244,10 +5268,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "socraticode",
+      "name": "@retrivora-ai/rag-engine",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "socraticode  SocratiCode — MCP server for local codebase indexing, semantic search, and code dependency graphs. All private, all local via Docker.  Keywords: mcp, socraticode, codebase, indexer, vector-database, qdrant, ollama, embeddings, code-graph.  Source: git+https://github.com/giancarloerra/socraticode.git.",
+      "capability_text": "@retrivora-ai/rag-engine  Retrivora AI is a plug-and-play AI engine for RAG chat experiences — generic vector DB + LLM provider, embeddable or standalone.  Keywords: rag, retrieval-augmented-generation, chatbot, vector-database, pinecone, pgvector, postgresql, milvus, qdrant, chromadb, redis, weaviate, mongodb, openai, anthropic, ollama, nextjs, react, ai, llm, embeddings.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -5272,30 +5296,6 @@
       "version": "1.0",
       "author_agent_id": "npm-scrape",
       "capability_text": "infiniloom-node  Node.js bindings for Infiniloom - AST-aware code context engine for RAG and vector databases. Tree-sitter parsing, PageRank ranking, BLAKE3 content-addressable chunks, 27+ tokenizers.  Keywords: infiniloom, llm, rag, retrieval-augmented-generation, vector-database, pinecone, weaviate, qdrant, embeddings, code-context, code-analysis, ast, tree-sitter, pagerank, content-addressable, blake3, claude, gpt4o, gpt5, gemini, llama, napi-rs, rust, ai-tools, tiktoken, code-chunking.  Source: git+https://github.com/Topos-Labs/infiniloom.git.",
-      "input_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_contract": {
-        "type": "object",
-        "additionalProperties": true
-      },
-      "output_repair_strategy": "fail-fast",
-      "endpoint_stub_name": "catalog-only-stub",
-      "metadata": {
-        "cost_per_call_usd": 0,
-        "p95_latency_ms": 0,
-        "reliability_score": 0.92
-      },
-      "status": "active",
-      "domain": "data",
-      "tool_kind": "tool"
-    },
-    {
-      "name": "@retrivora-ai/rag-engine",
-      "version": "1.0",
-      "author_agent_id": "npm-scrape",
-      "capability_text": "@retrivora-ai/rag-engine  Retrivora AI is a plug-and-play AI engine for RAG chat experiences — generic vector DB + LLM provider, embeddable or standalone.  Keywords: rag, retrieval-augmented-generation, chatbot, vector-database, pinecone, pgvector, postgresql, milvus, qdrant, chromadb, redis, weaviate, mongodb, openai, anthropic, ollama, nextjs, react, ai, llm, embeddings.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -5388,10 +5388,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@mempalace/core",
+      "name": "@umituz/web-cloudflare",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "@mempalace/core  Native TypeScript AI memory system and MCP server (Zero-LLM, LanceDB)  Keywords: typescript, mcp, mcp-server, model-context-protocol, memory, agentic-memory, llm-memory, rag, local-ai, zero-llm, vector-database, lancedb, knowledge-graph, transformers-js, claude, claude-code.  Source: git+https://github.com/adshaa/mempalacejs.git.",
+      "capability_text": "@umituz/web-cloudflare  Comprehensive Cloudflare Workers & Pages integration with config-based patterns, middleware, router, workflows, AI (with audio/music generation, TTS, ASR), React hooks, and multi-tenant support  Keywords: cloudflare, workers, wrangler, wrangler-cli, edge, kv, r2, d1, cloudflare-images, analytics, workflows, ai, ai-gateway, workers-ai, llm, embeddings, vectorize, rag, vector-database, semantic-search, pages, cloudflare-pages, static-site, deployment, router, middleware, config-patterns, web, edge-computing, idempotent, retryable, serverless, cdn, caching, rate-limiting, cors, security, compression, image-optimization, typescript, config-based, react, react-hooks, hooks, multi-tenant, tenant, isolation, session-management, file-upload, ai-chat, authentication, auth, anonymous-user, device-auth, device-id, jwt, token, credits, account-upgrade, audio-generation, music-generation, text-to-speech, speech-to-text, tts, asr, transcription, voice-cloning, voice, audio, audio-streaming, audio-processing, audio-format, audio-conversion, waveform, podcast, audiobook, melotts, whisper, deepgram, streaming, sse, server-sent-events, range-requests, hls, audio-project.  Source: git+https://github.com/umituz/web-cloudflare.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -5412,10 +5412,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@umituz/web-cloudflare",
+      "name": "@mempalace/core",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "@umituz/web-cloudflare  Comprehensive Cloudflare Workers & Pages integration with config-based patterns, middleware, router, workflows, AI (with audio/music generation, TTS, ASR), React hooks, and multi-tenant support  Keywords: cloudflare, workers, wrangler, wrangler-cli, edge, kv, r2, d1, cloudflare-images, analytics, workflows, ai, ai-gateway, workers-ai, llm, embeddings, vectorize, rag, vector-database, semantic-search, pages, cloudflare-pages, static-site, deployment, router, middleware, config-patterns, web, edge-computing, idempotent, retryable, serverless, cdn, caching, rate-limiting, cors, security, compression, image-optimization, typescript, config-based, react, react-hooks, hooks, multi-tenant, tenant, isolation, session-management, file-upload, ai-chat, authentication, auth, anonymous-user, device-auth, device-id, jwt, token, credits, account-upgrade, audio-generation, music-generation, text-to-speech, speech-to-text, tts, asr, transcription, voice-cloning, voice, audio, audio-streaming, audio-processing, audio-format, audio-conversion, waveform, podcast, audiobook, melotts, whisper, deepgram, streaming, sse, server-sent-events, range-requests, hls, audio-project.  Source: git+https://github.com/umituz/web-cloudflare.git.",
+      "capability_text": "@mempalace/core  Native TypeScript AI memory system and MCP server (Zero-LLM, LanceDB)  Keywords: typescript, mcp, mcp-server, model-context-protocol, memory, agentic-memory, llm-memory, rag, local-ai, zero-llm, vector-database, lancedb, knowledge-graph, transformers-js, claude, claude-code.  Source: git+https://github.com/adshaa/mempalacejs.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -5460,10 +5460,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "n8n-nodes-mem0-self",
+      "name": "@debian777/kairos-mcp",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "n8n-nodes-mem0-self  n8n community node for Mem0 Self-Hosted with LangChain-compliant AI memory  Keywords: n8n-community-node-package, n8n, mem0, memory, ai, llm, long-term-memory, semantic-search, vector-database, ai-agent, agent-id, langchain, self-hosted, n8n, mem0, memory, ai-agent, ai-memory, langchain, self-hosted.  Source: git+https://github.com/kallbuloso/n8n-nodes-mem0-self.git.",
+      "capability_text": "@debian777/kairos-mcp  MCP server for agent automation: persistent memory and deterministic workflow execution for AI agents and chats  Keywords: mcp, model-context-protocol, agent-automation, workflow-orchestration, ai-agents, ai-memory, knowledge-management, vector-database, qdrant, semantic-search, ai-infrastructure.  Source: git+https://github.com/debian777/kairos-mcp.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
@@ -5484,10 +5484,10 @@
       "tool_kind": "tool"
     },
     {
-      "name": "@soulcraft/brainy",
+      "name": "n8n-nodes-mem0-self",
       "version": "1.0",
       "author_agent_id": "npm-scrape",
-      "capability_text": "@soulcraft/brainy  Universal Knowledge Protocol™ - World's first Triple Intelligence database unifying vector, graph, and document search in one API. Stage 3 CANONICAL: 42 nouns × 127 verbs covering 96-97% of all human knowledge.  Keywords: ai-database, vector-database, graph-database, field-filtering, triple-intelligence, hnsw, embeddings, semantic-search, machine-learning, artificial-intelligence, data-storage, indexing, typescript.  Source: git+https://github.com/soulcraftlabs/brainy.git.",
+      "capability_text": "n8n-nodes-mem0-self  n8n community node for Mem0 Self-Hosted with LangChain-compliant AI memory  Keywords: n8n-community-node-package, n8n, mem0, memory, ai, llm, long-term-memory, semantic-search, vector-database, ai-agent, agent-id, langchain, self-hosted, n8n, mem0, memory, ai-agent, ai-memory, langchain, self-hosted.  Source: git+https://github.com/kallbuloso/n8n-nodes-mem0-self.git.",
       "input_contract": {
         "type": "object",
         "additionalProperties": true
