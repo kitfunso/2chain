@@ -34,10 +34,17 @@ try {
     author: SOURCE.author,
     kind: 'tool',
   });
-  // Override stub to mcp-bridge so the dashboard counts these in the MCP bucket.
+  // Catalog-only by design. The awesome-mcp-servers README is a directory of
+  // GitHub repos, not packaged servers — most entries lack a published npm
+  // package or stable spawn command, so we cannot register them on the
+  // runtime bridge. Marking them mcp-bridge would be false advertising:
+  // /discover returns them, /call fails with "unknown server".
+  // Curated servers in src/import/mcp-registry.ts (imported via
+  // `npm run import:mcp`) keep endpoint_stub_name=mcp-bridge because they
+  // have verified spawn config.
   const specs: ToolSpecV2[] = r.specs.slice(0, MAX).map((s) => ({
     ...s,
-    endpoint_stub_name: 'mcp-bridge',
+    endpoint_stub_name: 'catalog-only-stub',
   }));
   console.log(`  scraped ${specs.length} (${r.matched_lines} matched, capped at ${MAX})`);
 

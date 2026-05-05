@@ -11,6 +11,7 @@ import { broadcast } from './sse.js';
 import type { Storage, Embedder } from '../types.js';
 // Side-effect: register all stubs in the in-process registry.
 import '../services/stubs.js';
+import { registerAllMcpServers } from '../import/mcp-importer.js';
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -31,6 +32,14 @@ export async function buildServer(): Promise<FastifyInstance> {
 
   app.decorate('storage', storage);
   app.decorate('embedder', embedder);
+
+  // Wire the MCP runtime bridge so curated `endpoint_stub_name=mcp-bridge`
+  // catalog rows are callable even after a cold restart (no manual import
+  // required). The catalog-vs-runtime split was a real bug: scrapers wrote
+  // mcp-bridge specs but only `npm run import:mcp` ever called
+  // registerMcpServer, so /call returned "unknown server" until that ran.
+  const bridgeReg = registerAllMcpServers();
+  app.log.info({ servers: bridgeReg.registered }, 'mcp runtime bridge registered');
 
   app.get('/health', async () => ({
     ok: true,

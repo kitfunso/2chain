@@ -58,6 +58,12 @@ if [ ! -f /data/.mcp-imported-1500 ]; then
   ( setsid sh -c 'sleep 90 && cd /app && MAX_MCP=1500 npm run scrape:mcp >>/data/import-mcp.log 2>&1 && touch /data/.mcp-imported-1500' </dev/null >/dev/null 2>&1 ) &
 fi
 
+if [ ! -f /data/.mcp-curated-imported ]; then
+  echo "first-boot: importing curated MCP_SERVERS (real spawn configs)..."
+  npm run import:mcp 2>&1 | tee /data/import-mcp-curated.log | tail -3 || true
+  touch /data/.mcp-curated-imported
+fi
+
 if [ ! -f /data/.hn-imported ]; then
   echo "first-boot: scraping HackerNews Show HN posts..."
   npm run scrape:hn 2>&1 | tee /data/import-hn.log | tail -3 || true

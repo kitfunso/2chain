@@ -85,6 +85,35 @@ function specFromMcp(server: McpServerEntry, tool: { name: string; capabilityTex
   };
 }
 
+/**
+ * Register every curated MCP server's spawn config in the runtime bridge.
+ * Pure runtime — no DB writes, no embeddings, no I/O beyond Map.set().
+ *
+ * Called at server boot so /call can route to bridged tools without
+ * requiring a fresh `npm run import:mcp` after every restart. Idempotent:
+ * registerMcpServer just overwrites the entry by serverId.
+ *
+ * Also installs the `mcp-bridge` stub itself so /call resolves the
+ * endpoint_stub_name=mcp-bridge rows that already live in the catalog.
+ */
+export function registerAllMcpServers(): { registered: number } {
+  ensureBridgeStub();
+  for (const server of MCP_SERVERS) {
+    const runtime = server.runtime ?? 'npx';
+    const args = runtime === 'npx'
+      ? ['-y', server.npmPackage, ...(server.args ?? [])]
+      : [server.npmPackage, ...(server.args ?? [])];
+    registerMcpServer({
+      serverId: server.serverId,
+      name: server.name,
+      command: runtime,
+      args,
+      envPassthrough: server.envPassthrough,
+    });
+  }
+  return { registered: MCP_SERVERS.length };
+}
+
 export interface ImportOptions {
   /** When true, actually spawn each server and assert tools/list matches. Slower. */
   verify?: boolean;
