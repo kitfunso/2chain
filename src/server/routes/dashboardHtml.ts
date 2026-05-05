@@ -332,7 +332,12 @@ export const DASHBOARD_HTML = `<!doctype html>
   /* Phone: stripped-down single-column layout. */
   @media (max-width: 768px) {
     html, body { font-size: 13px; }
-    .tui { padding: 2px 3px; gap: 3px; }
+    /* Switch the root container from grid to flex-column so the mobile shell
+       (which uses flex:1) actually claims the remaining vertical space.
+       The grid template rows above only had 4 cells; auto-placed children
+       collapse to 0 height. */
+    .tui { padding: 0; gap: 0; display: flex; flex-direction: column;
+      height: 100vh; max-height: 100vh; }
 
     /* Top bar: brand + compact stats (tools/mcp) + clock + help link. */
     .top { padding: 2px 6px; gap: 6px; flex-wrap: wrap; }
