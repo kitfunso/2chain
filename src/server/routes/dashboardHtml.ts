@@ -57,11 +57,6 @@ export const DASHBOARD_HTML = `<!doctype html>
   .top > span:not(.brand):not(.right):not(.nav) {
     min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
-  /* Below 1100px (split-screen, tablet) hide the storage/embed/stats labels
-     so the clock and help link stay on-screen. */
-  @media (max-width: 1100px) {
-    .top > span:not(.brand):not(.right):not(.nav) { display: none; }
-  }
   .top .brand { background: var(--orange); color: var(--paper); padding: 1px 10px;
     font-weight: 800; letter-spacing: 0.5px; border-right: 2px solid var(--ink);
     margin: -3px 8px -3px -8px; height: calc(100% + 6px);
@@ -77,84 +72,6 @@ export const DASHBOARD_HTML = `<!doctype html>
 
   .body { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; gap: 6px; min-height: 0; min-width: 0; }
   .body > .pane:last-child { max-height: 280px; }
-  /* Phone: stripped-down single-column layout. */
-  @media (max-width: 768px) {
-    html, body { font-size: 13px; }
-    .tui { padding: 2px 3px; gap: 3px; }
-
-    /* Top bar: brand + compact stats (tools/mcp) + clock + help link. */
-    .top { padding: 2px 6px; gap: 6px; flex-wrap: wrap; }
-    .top .brand { padding: 1px 6px; font-size: 11px; margin: -2px 4px -2px -6px; }
-    .top .nav { display: none; }
-    /* Show only the compact stats span (tools · mcp · violations) — hide labels span. */
-    .top > span:not(.brand):not(.right):not(.compact-stats) { display: none; }
-    .top .right { font-size: 10px; gap: 4px; flex-shrink: 0; }
-    .top .right > #x-conn { display: none; }
-    .top .help-link { font-size: 11px; }
-
-    /* Help banner: tight on mobile + setupHelpBanner() adds .hidden by default
-       at this width so the empty yellow strip doesn't show. (?) help still
-       toggles it back on. */
-    .help-banner { padding: 3px 6px; font-size: 11px; }
-    .help-banner .head .blurb { display: none; }
-    .help-banner .head { gap: 6px; }
-    .help-banner .glossary { grid-template-columns: 1fr 1fr; font-size: 10px; gap: 1px 8px; }
-
-    /* Body: single column, detail collapses below */
-    .body { grid-template-columns: 1fr; grid-template-rows: 1fr auto; gap: 3px; }
-      .body > .pane:nth-child(3) { max-height: 32vh; }
-
-    /* Pane heads: tight */
-    .pane-head { padding: 1px 6px; font-size: 11px; min-height: 20px; }
-    .pane-head .right { font-size: 10px; }
-    .pane-head .lab { font-size: 11px; }
-
-    /* Tab strips: tighter, no per-tab counts on mobile */
-    .tab-strip { padding: 2px 4px; gap: 2px; }
-    .tab-strip .tab { padding: 3px 8px; font-size: 10px; box-shadow: 1px 1px 0 var(--ink);
-      min-height: 26px; }
-    .tab-strip .tab .ct { display: none; }
-    .tab-strip .mode-hint { display: none; }
-
-    /* Search: prominent, prevents iOS zoom */
-    .search-bar { padding: 4px 6px; }
-    .search-bar input { font-size: 16px; padding: 6px 8px; }
-    .search-bar button { padding: 6px 12px; font-size: 10px; }
-    .search-bar .hint { display: none; }
-
-    /* Table: hide low-priority columns + horizontal scroll affordance for the
-       remaining ones so users can see RRF/REL/GH instead of fully clipping.
-       Sticky # and tool columns stay visible while the rest scroll. */
-    .pane.focused .pane-body { overflow-x: auto; }
-    #rank-table { min-width: 560px; }
-    #rank-table th:nth-child(3),
-    #rank-table td:nth-child(3),
-    #rank-table th:nth-child(7),
-    #rank-table td:nth-child(7),
-    #rank-table th:nth-child(8),
-    #rank-table td:nth-child(8) { display: none; }
-    #rank-table th:nth-child(1),
-    #rank-table td:nth-child(1),
-    #rank-table th:nth-child(2),
-    #rank-table td:nth-child(2) { position: sticky; background: var(--paper); z-index: 1; }
-    #rank-table th:nth-child(1), #rank-table td:nth-child(1) { left: 0; }
-    #rank-table th:nth-child(2), #rank-table td:nth-child(2) { left: 32px; }
-    table { font-size: 12.5px; }
-    td { padding: 6px 8px; line-height: 1.3; }
-    th { padding: 4px 8px 3px; font-size: 10px; }
-
-    /* Detail */
-    .detail h3 { font-size: 13px; }
-    .detail .blurb { font-size: 12px; line-height: 1.4; margin: 6px 0 8px; }
-    .detail .submeta { font-size: 10.5px; }
-    .kv { grid-template-columns: 80px 1fr; font-size: 11.5px; }
-    .feed-row { font-size: 11px; }
-
-    /* Status bar: hide all keyboard shortcuts on mobile */
-    .status { padding: 2px 6px; font-size: 10px; gap: 6px; }
-    .status .keypair { display: none; }
-    .status .right { font-size: 10px; }
-  }
   .pane { border: 2px solid var(--ink); background: var(--paper);
     display: flex; flex-direction: column; min-height: 0; min-width: 0; }
   .pane.focused { box-shadow: 4px 4px 0 var(--ink); }
@@ -393,6 +310,105 @@ export const DASHBOARD_HTML = `<!doctype html>
   .search-bar button.clear { background: var(--paper); color: var(--ink); padding: 4px 10px; font-size: 14px; }
   .search-bar button#q-trending { background: var(--yellow); color: var(--ink); padding: 4px 10px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
   .search-bar .hint { font: 11px var(--mono); color: var(--muted); padding-left: 4px; }
+
+  /* =========================================================================
+   * Responsive overrides — placed AT THE END of the stylesheet on purpose.
+   *
+   * CSS cascade rule: when two selectors have equal specificity, the later
+   * one wins. Earlier in the file's life, both @media blocks lived directly
+   * after the .top and .body base rules. That meant any default rule defined
+   * BELOW them (.pane, .tab-strip, .search-bar, .status, .detail, etc.)
+   * silently overrode every same-specificity mobile/tablet declaration —
+   * roughly 70 mobile rules went dead even though they looked correct in the
+   * source. Putting the overrides last guarantees they actually apply.
+   * ========================================================================= */
+
+  /* Below 1100px (split-screen, tablet) hide the storage/embed/stats labels
+     so the clock and help link stay on-screen. */
+  @media (max-width: 1100px) {
+    .top > span:not(.brand):not(.right):not(.nav) { display: none; }
+  }
+
+  /* Phone: stripped-down single-column layout. */
+  @media (max-width: 768px) {
+    html, body { font-size: 13px; }
+    .tui { padding: 2px 3px; gap: 3px; }
+
+    /* Top bar: brand + compact stats (tools/mcp) + clock + help link. */
+    .top { padding: 2px 6px; gap: 6px; flex-wrap: wrap; }
+    .top .brand { padding: 1px 6px; font-size: 11px; margin: -2px 4px -2px -6px; }
+    .top .nav { display: none; }
+    /* Show only the compact stats span (tools · mcp · violations) — hide labels span. */
+    .top > span:not(.brand):not(.right):not(.compact-stats) { display: none; }
+    .top .right { font-size: 10px; gap: 4px; flex-shrink: 0; }
+    .top .right > #x-conn { display: none; }
+    .top .help-link { font-size: 11px; }
+
+    /* Help banner: tight on mobile + setupHelpBanner() adds .hidden by default
+       at this width so the empty yellow strip doesn't show. (?) help still
+       toggles it back on. */
+    .help-banner { padding: 3px 6px; font-size: 11px; }
+    .help-banner .head .blurb { display: none; }
+    .help-banner .head { gap: 6px; }
+    .help-banner .glossary { grid-template-columns: 1fr 1fr; font-size: 10px; gap: 1px 8px; }
+
+    /* Body: single column, detail collapses below */
+    .body { grid-template-columns: 1fr; grid-template-rows: 1fr auto; gap: 3px; }
+    .body > .pane:nth-child(3) { max-height: 32vh; }
+
+    /* Pane heads: tight */
+    .pane-head { padding: 1px 6px; font-size: 11px; min-height: 20px; }
+    .pane-head .right { font-size: 10px; }
+    .pane-head .lab { font-size: 11px; }
+
+    /* Tab strips: tighter, no per-tab counts on mobile */
+    .tab-strip { padding: 2px 4px; gap: 2px; }
+    .tab-strip .tab { padding: 3px 8px; font-size: 10px; box-shadow: 1px 1px 0 var(--ink);
+      min-height: 26px; }
+    .tab-strip .tab .ct { display: none; }
+    .tab-strip .mode-hint { display: none; }
+
+    /* Search bar: stack the action buttons under the input on narrow widths
+       instead of overflowing one row. The default flex row wraps cleanly
+       once the input is full-width. */
+    .search-bar { padding: 4px 6px; flex-wrap: wrap; gap: 6px; }
+    .search-bar input { font-size: 16px; padding: 6px 8px; flex: 1 1 100%; }
+    .search-bar button { padding: 6px 12px; font-size: 10px; }
+    .search-bar .hint { display: none; }
+
+    /* Table: hide low-priority columns + horizontal scroll for the rest.
+       Sticky # and tool columns stay visible while RRF/REL/GH scroll. */
+    .pane.focused .pane-body { overflow-x: auto; }
+    #rank-table { min-width: 560px; }
+    #rank-table th:nth-child(3),
+    #rank-table td:nth-child(3),
+    #rank-table th:nth-child(7),
+    #rank-table td:nth-child(7),
+    #rank-table th:nth-child(8),
+    #rank-table td:nth-child(8) { display: none; }
+    #rank-table th:nth-child(1),
+    #rank-table td:nth-child(1),
+    #rank-table th:nth-child(2),
+    #rank-table td:nth-child(2) { position: sticky; background: var(--paper); z-index: 1; }
+    #rank-table th:nth-child(1), #rank-table td:nth-child(1) { left: 0; }
+    #rank-table th:nth-child(2), #rank-table td:nth-child(2) { left: 32px; }
+    table { font-size: 12.5px; }
+    td { padding: 6px 8px; line-height: 1.3; }
+    th { padding: 4px 8px 3px; font-size: 10px; }
+
+    /* Detail */
+    .detail h3 { font-size: 13px; }
+    .detail .blurb { font-size: 12px; line-height: 1.4; margin: 6px 0 8px; }
+    .detail .submeta { font-size: 10.5px; }
+    .kv { grid-template-columns: 80px 1fr; font-size: 11.5px; }
+    .feed-row { font-size: 11px; }
+
+    /* Status bar: hide the keyboard-shortcut dock on touch devices —
+       it's a desktop affordance with no mobile equivalent. */
+    .status { padding: 2px 6px; font-size: 10px; gap: 6px; }
+    .status .keypair { display: none; }
+    .status .right { font-size: 10px; }
+  }
 
 </style>
 </head>
