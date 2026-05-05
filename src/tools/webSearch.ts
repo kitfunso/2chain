@@ -183,17 +183,27 @@ interface RedditResp {
   };
 }
 
+interface PullpushResp {
+  data?: Array<{
+    title: string;
+    score: number;
+    permalink: string;
+    subreddit: string;
+  }>;
+}
+
 export async function searchReddit(query: string, limit = 10): Promise<{ query: string; results: RedditHit[] }> {
   const cap = Math.min(Math.max(limit, 1), 25);
-  const url = `https://www.reddit.com/search.json?q=${encodeURIComponent(query)}&limit=${cap}&sort=relevance`;
-  // Reddit blocks blank User-Agent — set explicit per spec.
-  const j = await fetchJson<RedditResp>(url, { 'User-Agent': '2chain/0.1' });
-  const children = j.data?.children ?? [];
-  const results = children.map((c) => ({
-    title: c.data.title,
-    score: c.data.score,
-    permalink: `https://www.reddit.com${c.data.permalink}`,
-    subreddit: c.data.subreddit,
+  // www.reddit.com 403s every datacentre IP range now (Cloudfront/Fly/AWS/GCP all blocked).
+  // pullpush.io is the pushshift successor — public, no-auth, returns the same submission shape.
+  const url = `https://api.pullpush.io/reddit/submission/search?q=${encodeURIComponent(query)}&size=${cap}&sort=score&sort_type=score`;
+  const j = await fetchJson<PullpushResp>(url, { 'User-Agent': '2chain-registry/0.1 (by /u/kitfunso)' });
+  const items = j.data ?? [];
+  const results = items.map((c) => ({
+    title: c.title,
+    score: c.score,
+    permalink: `https://www.reddit.com${c.permalink}`,
+    subreddit: c.subreddit,
   }));
   return { query, results };
 }
