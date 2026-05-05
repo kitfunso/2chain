@@ -37,20 +37,20 @@ try {
   const tools = await storage.listTools({ limit: 10000 });
   console.log(`evaluating ${tools.length} tools`);
 
+  const writeRuns = process.env.WRITE_EVAL_RUNS === '1';
   const histogram: Record<string, number> = { '1.00': 0, '0.83': 0, '0.80': 0, '0.67': 0, '0.50': 0, 'below': 0 };
   let updated = 0;
   let gated = 0;
+  let runsWritten = 0;
 
   for (const t of tools) {
+    const startedAt = Date.now();
     let result: { pass_count: number; total_count: number; pass_rate: number };
     if (t.tool_kind === 'skill') result = runSkillEval(t);
     else if (t.tool_kind === 'subagent') result = runSubagentEval(t);
     else if (t.tool_kind === 'prompt') result = runPromptEval(t);
     else result = runToolEval(t);
 
-    // Permissive: domain-set check sometimes fails because reclassify mapped
-    // skills/subagents into FIN/COD/RES/... canonical buckets, but the rubric
-    // expects 'skills'/'subagents'. Don't punish that — it's an axis mismatch.
     const adjustedRate = result.pass_rate;
 
     const newReliability = Math.round(adjustedRate * 100) / 100;
@@ -64,6 +64,23 @@ try {
 
     if (newReliability < 0.80) gated++;
 
+    if (writeRuns) {
+      await storage.insertEvalRun({
+        tool_id: t.id,
+        tool_name: t.name,
+        tool_version: t.version,
+        namespace_id: t.namespace_id,
+        triggered_at: new Date().toISOString(),
+        triggered_by: 'scheduled',
+        cases: [{ case_id: 'structural', pass: newReliability >= 0.80, latency_ms: 0, cost_usd: 0 }],
+        pass_count: result.pass_count,
+        total_count: result.total_count,
+        pass_rate: result.pass_rate,
+        duration_ms: Date.now() - startedAt,
+      });
+      runsWritten++;
+    }
+
     if (Math.abs((t.metadata.reliability_score ?? 0) - newReliability) > 0.005) {
       const newMeta = { ...t.metadata, reliability_score: newReliability };
       const newStatus = newReliability < 0.80 ? 'circuit_broken' : 'active';
@@ -74,6 +91,7 @@ try {
 
   console.log(`updated ${updated} tools`);
   console.log(`gated (below 0.80): ${gated}`);
+  if (writeRuns) console.log(`eval_run rows written: ${runsWritten}`);
   console.log('reliability histogram:', histogram);
 } finally {
   await storage.close();

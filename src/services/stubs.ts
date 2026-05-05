@@ -1,6 +1,15 @@
 import { fetchIncomeStatement, knownTickers } from '../tools/secEdgar.js';
 import { searchArxiv } from '../tools/arxivSearch.js';
-import { searchGithubRepos, searchNpm, searchWikipedia } from '../tools/webSearch.js';
+import {
+  searchCratesIO,
+  searchGithubRepos,
+  searchHackerNews,
+  searchNpm,
+  searchPyPIPackage,
+  searchReddit,
+  searchStackOverflow,
+  searchWikipedia,
+} from '../tools/webSearch.js';
 
 // Stubs receive (input, caseId, ctx) where ctx exposes the calling tool's
 // name + version. Bridges (e.g. mcp-bridge) use ctx.tool_name to derive
@@ -165,6 +174,61 @@ registerStub('wikipedia-search-v1', async (input) => {
   const limit = Number((input as { limit?: number })?.limit ?? 10);
   if (!query) throw new Error('query is required');
   return await searchWikipedia(query, limit);
+});
+
+// =====================================================================
+// hackernews-search v1.0 — REAL search via hn.algolia.com/api/v1/search.
+// Returns top-N stories by relevance with title, points, url, story_id.
+// =====================================================================
+registerStub('hackernews-search-v1', async (input) => {
+  const query = String((input as { query?: string })?.query ?? '').trim();
+  const limit = Number((input as { limit?: number })?.limit ?? 10);
+  if (!query) throw new Error('query is required');
+  return await searchHackerNews(query, limit);
+});
+
+// =====================================================================
+// stackoverflow-search v1.0 — REAL search via api.stackexchange.com.
+// Returns top-N questions by relevance with title, score, link, is_answered.
+// =====================================================================
+registerStub('stackoverflow-search-v1', async (input) => {
+  const query = String((input as { query?: string })?.query ?? '').trim();
+  const limit = Number((input as { limit?: number })?.limit ?? 10);
+  if (!query) throw new Error('query is required');
+  return await searchStackOverflow(query, limit);
+});
+
+// =====================================================================
+// reddit-search v1.0 — REAL search via reddit.com/search.json.
+// Returns top-N posts by relevance with title, score, permalink, subreddit.
+// =====================================================================
+registerStub('reddit-search-v1', async (input) => {
+  const query = String((input as { query?: string })?.query ?? '').trim();
+  const limit = Number((input as { limit?: number })?.limit ?? 10);
+  if (!query) throw new Error('query is required');
+  return await searchReddit(query, limit);
+});
+
+// =====================================================================
+// pypi-search v1.0 — REAL exact-match lookup via pypi.org/pypi/{name}/json.
+// PyPI has no general search API; this returns metadata for the named package
+// or an empty results array on 404.
+// =====================================================================
+registerStub('pypi-search-v1', async (input) => {
+  const query = String((input as { query?: string })?.query ?? '').trim();
+  if (!query) throw new Error('query is required');
+  return await searchPyPIPackage(query);
+});
+
+// =====================================================================
+// crates-io-search v1.0 — REAL search via crates.io/api/v1/crates.
+// Returns top-N crates with name, max_version, description, downloads.
+// =====================================================================
+registerStub('crates-io-search-v1', async (input) => {
+  const query = String((input as { query?: string })?.query ?? '').trim();
+  const limit = Number((input as { limit?: number })?.limit ?? 10);
+  if (!query) throw new Error('query is required');
+  return await searchCratesIO(query, limit);
 });
 
 // =====================================================================

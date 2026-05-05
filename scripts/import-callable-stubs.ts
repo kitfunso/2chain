@@ -106,6 +106,136 @@ const SPECS: ToolSpecV2[] = [
     domain: 'research',
     tool_kind: 'tool',
   },
+  {
+    name: 'hackernews-search',
+    version: '1.0',
+    author_agent_id: 'first-party',
+    capability_text:
+      'Search Hacker News stories by keyword. Returns the top-N stories by relevance with title, points, URL, and story ID. Backed by hn.algolia.com/api/v1/search. Useful for tracking startup, AI, and developer-tool discussions and finding link-worthy primary sources. No API key needed.',
+    input_contract: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', minLength: 1, maxLength: 256 },
+        limit: { type: 'integer', minimum: 1, maximum: 25 },
+      },
+      required: ['query'],
+      additionalProperties: true,
+    },
+    output_contract: {
+      type: 'object',
+      additionalProperties: true,
+    },
+    output_repair_strategy: 'fail-fast',
+    endpoint_stub_name: 'hackernews-search-v1',
+    metadata: { cost_per_call_usd: 0, p95_latency_ms: 500, reliability_score: 0.95 },
+    status: 'active',
+    domain: 'research',
+    tool_kind: 'tool',
+  },
+  {
+    name: 'stackoverflow-search',
+    version: '1.0',
+    author_agent_id: 'first-party',
+    capability_text:
+      'Search Stack Overflow questions by keyword. Returns the top-N questions by relevance with title, score, link, and is_answered flag. Backed by api.stackexchange.com (Stack Exchange API v2.3). Useful for finding canonical answers to programming questions and surfacing community consensus on tooling.',
+    input_contract: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', minLength: 1, maxLength: 256 },
+        limit: { type: 'integer', minimum: 1, maximum: 25 },
+      },
+      required: ['query'],
+      additionalProperties: true,
+    },
+    output_contract: {
+      type: 'object',
+      additionalProperties: true,
+    },
+    output_repair_strategy: 'fail-fast',
+    endpoint_stub_name: 'stackoverflow-search-v1',
+    metadata: { cost_per_call_usd: 0, p95_latency_ms: 500, reliability_score: 0.95 },
+    status: 'active',
+    domain: 'research',
+    tool_kind: 'tool',
+  },
+  {
+    name: 'reddit-search',
+    version: '1.0',
+    author_agent_id: 'first-party',
+    capability_text:
+      'Search Reddit posts by keyword across all subreddits. Returns the top-N posts by relevance with title, score, permalink, and subreddit. Backed by reddit.com/search.json. Useful for surfacing user discussions, product reviews, and community sentiment. No API key needed.',
+    input_contract: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', minLength: 1, maxLength: 256 },
+        limit: { type: 'integer', minimum: 1, maximum: 25 },
+      },
+      required: ['query'],
+      additionalProperties: true,
+    },
+    output_contract: {
+      type: 'object',
+      additionalProperties: true,
+    },
+    output_repair_strategy: 'fail-fast',
+    endpoint_stub_name: 'reddit-search-v1',
+    metadata: { cost_per_call_usd: 0, p95_latency_ms: 700, reliability_score: 0.95 },
+    status: 'active',
+    domain: 'research',
+    tool_kind: 'tool',
+  },
+  {
+    name: 'pypi-search',
+    version: '1.0',
+    author_agent_id: 'first-party',
+    capability_text:
+      'Look up an exact Python package on PyPI by name. Returns the package name, version, summary, and project URLs. Backed by pypi.org/pypi/{name}/json. Returns empty results on 404 (unknown package). Note: PyPI has no general keyword search API; pass the exact distribution name as query.',
+    input_contract: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', minLength: 1, maxLength: 256 },
+        limit: { type: 'integer', minimum: 1, maximum: 25 },
+      },
+      required: ['query'],
+      additionalProperties: true,
+    },
+    output_contract: {
+      type: 'object',
+      additionalProperties: true,
+    },
+    output_repair_strategy: 'fail-fast',
+    endpoint_stub_name: 'pypi-search-v1',
+    metadata: { cost_per_call_usd: 0, p95_latency_ms: 400, reliability_score: 0.95 },
+    status: 'active',
+    domain: 'coding',
+    tool_kind: 'tool',
+  },
+  {
+    name: 'crates-io-search',
+    version: '1.0',
+    author_agent_id: 'first-party',
+    capability_text:
+      'Search the crates.io Rust package registry by keyword. Returns the top-N crates with name, max_version, description, and download count. Backed by crates.io/api/v1/crates. Useful for finding Rust libraries and gauging adoption. No API key needed.',
+    input_contract: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', minLength: 1, maxLength: 256 },
+        limit: { type: 'integer', minimum: 1, maximum: 25 },
+      },
+      required: ['query'],
+      additionalProperties: true,
+    },
+    output_contract: {
+      type: 'object',
+      additionalProperties: true,
+    },
+    output_repair_strategy: 'fail-fast',
+    endpoint_stub_name: 'crates-io-search-v1',
+    metadata: { cost_per_call_usd: 0, p95_latency_ms: 500, reliability_score: 0.95 },
+    status: 'active',
+    domain: 'coding',
+    tool_kind: 'tool',
+  },
 ];
 
 const dbPath = resolve(process.env.TWOCHAIN_DB_PATH ?? `${homedir()}/.2chain/db.sqlite`);
