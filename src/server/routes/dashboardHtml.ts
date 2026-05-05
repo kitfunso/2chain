@@ -312,7 +312,7 @@ export const DASHBOARD_HTML = `<!doctype html>
   .search-bar .hint { font: 11px var(--mono); color: var(--muted); padding-left: 4px; }
 
   /* === Responsive overrides moved to end of stylesheet ===
-   * See the @media blocks at the very bottom (just before </style>).
+   * See the @media blocks at the bottom (just before the close style tag).
    * MUST stay last: equal-specificity mobile rules are silently
    * clobbered by any default rule defined below them.
    * NEW DEFAULT RULES GO ABOVE THIS COMMENT, NOT BELOW THE @media. */
