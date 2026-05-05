@@ -1,5 +1,7 @@
 # 2chain
 
+**Live demo: [2chain.dev](http://2chain.dev)**
+
 **A self-hostable tool registry with hybrid retrieval, reliability gating, and JSON Schema contract enforcement for AI agents.**
 
 Two ways to run:
