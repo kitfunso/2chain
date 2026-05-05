@@ -27,6 +27,10 @@ export interface ScrapeAwesomeOptions {
   userAgent?: string;
   /** Author tag for resulting specs. */
   author?: string;
+  /** tool_kind override. Defaults to 'tool'. Use 'prompt' for prompt
+   *  collections, 'subagent' for agent/persona lists, 'skill' for
+   *  skill catalogs. */
+  kind?: 'tool' | 'skill' | 'subagent' | 'prompt';
 }
 
 export interface ScrapeAwesomeResult {
@@ -115,7 +119,7 @@ export function parseAwesomeMarkdown(md: string): { entries: AwesomeEntry[]; tot
   return { entries, totalLines: lines.length };
 }
 
-function entryToSpec(e: AwesomeEntry, domain: string, author: string): ToolSpecV2 {
+function entryToSpec(e: AwesomeEntry, domain: string, author: string, kind: 'tool' | 'skill' | 'subagent' | 'prompt' = 'tool'): ToolSpecV2 {
   const slug = e.name
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
@@ -138,7 +142,7 @@ function entryToSpec(e: AwesomeEntry, domain: string, author: string): ToolSpecV
     },
     status: 'active',
     domain,
-    tool_kind: 'tool',
+    tool_kind: kind,
   };
 }
 
@@ -148,6 +152,7 @@ export async function scrapeAwesomeList(opts: ScrapeAwesomeOptions): Promise<Scr
   const limit = opts.limit ?? 500;
   const domain = opts.domain ?? 'awesome-list';
   const author = opts.author ?? 'awesome-scrape';
+  const kind = opts.kind ?? 'tool';
   const userAgent = opts.userAgent ?? '2chain-scraper/1.0 (+https://github.com/kitfunso/2chain)';
 
   const r = await fetchImpl(opts.url, { headers: { 'user-agent': userAgent } });
@@ -163,7 +168,7 @@ export async function scrapeAwesomeList(opts: ScrapeAwesomeOptions): Promise<Scr
   const specs: ToolSpecV2[] = [];
   for (const e of entries) {
     if (specs.length >= limit) break;
-    const spec = entryToSpec(e, domain, author);
+    const spec = entryToSpec(e, domain, author, kind);
     if (seen.has(spec.name)) continue;
     seen.add(spec.name);
     specs.push(spec);

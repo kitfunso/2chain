@@ -295,6 +295,13 @@ export interface Storage {
     limit: number,
     namespace?: string,
   ): Promise<Record<string, number>>;
+  /** Tools that appeared most often in /discover top-K rankings within the
+   *  last `daysBack` days. Aggregated from the `rankings` snapshot table. */
+  getTrending(
+    daysBack: number,
+    limit: number,
+    namespace?: string,
+  ): Promise<Array<{ name: string; version: string; hits: number }>>;
   dbStats(): Promise<DbStats>;
 
   // Live updates (change-stream equivalent)

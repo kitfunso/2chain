@@ -1,5 +1,6 @@
 import { fetchIncomeStatement, knownTickers } from '../tools/secEdgar.js';
 import { searchArxiv } from '../tools/arxivSearch.js';
+import { searchGithubRepos, searchNpm, searchWikipedia } from '../tools/webSearch.js';
 
 // Stubs receive (input, caseId, ctx) where ctx exposes the calling tool's
 // name + version. Bridges (e.g. mcp-bridge) use ctx.tool_name to derive
@@ -130,6 +131,40 @@ registerStub('sec-edgar-financials-v1', async (input) => {
     // Surface a known-ticker hint so demos don't dead-end on a typo.
     throw new Error(`${msg}. Known tickers include: ${knownTickers().slice(0, 12).join(', ')}`);
   }
+});
+
+// =====================================================================
+// github-search v1.0 — REAL search via api.github.com/search/repositories.
+// Sorts by stars desc. Returns top-N matches with description, stars, repo URL.
+// Authed (GITHUB_TOKEN env) gets 5000 req/hr; unauth gets 60.
+// =====================================================================
+registerStub('github-search-v1', async (input) => {
+  const query = String((input as { query?: string })?.query ?? '').trim();
+  const limit = Number((input as { limit?: number })?.limit ?? 10);
+  if (!query) throw new Error('query is required');
+  return await searchGithubRepos(query, limit);
+});
+
+// =====================================================================
+// npm-search v1.0 — REAL search via registry.npmjs.org/-/v1/search.
+// Returns top-N packages by relevance with description and npm URL.
+// =====================================================================
+registerStub('npm-search-v1', async (input) => {
+  const query = String((input as { query?: string })?.query ?? '').trim();
+  const limit = Number((input as { limit?: number })?.limit ?? 10);
+  if (!query) throw new Error('query is required');
+  return await searchNpm(query, limit);
+});
+
+// =====================================================================
+// wikipedia-search v1.0 — REAL search via en.wikipedia.org opensearch API.
+// Returns top-N article titles + descriptions + URLs. No API key needed.
+// =====================================================================
+registerStub('wikipedia-search-v1', async (input) => {
+  const query = String((input as { query?: string })?.query ?? '').trim();
+  const limit = Number((input as { limit?: number })?.limit ?? 10);
+  if (!query) throw new Error('query is required');
+  return await searchWikipedia(query, limit);
 });
 
 // =====================================================================

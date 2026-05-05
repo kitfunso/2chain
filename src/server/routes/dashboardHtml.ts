@@ -25,6 +25,10 @@ export const DASHBOARD_HTML = `<!doctype html>
     --green-fg:  #1d7f3a;
     --blue:      #1f5cff;
     --magenta:   #d6258a;
+    --teal:      #0d9488;
+    --purple:    #7c3aed;
+    --lime:      #84cc16;
+    --crimson:   #9b1c2c;
     --mono:     "JetBrains Mono", ui-monospace, "Cascadia Code", "SF Mono", "Consolas", monospace;
     --sans:     "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   }
@@ -43,14 +47,27 @@ export const DASHBOARD_HTML = `<!doctype html>
   .ink2 { color: var(--ink-2); }
   .bright { color: var(--ink); font-weight: 700; }
 
-  .tui { display: grid; grid-template-rows: auto 1fr auto; height: 100%; padding: 6px 8px; gap: 6px; }
+  .tui { display: grid; grid-template-rows: auto auto 1fr auto; height: 100%; padding: 6px 8px; gap: 6px; max-width: 100vw; overflow: hidden; }
 
   .top { border: 2px solid var(--ink); background: var(--paper-2);
-    padding: 3px 8px; display: flex; align-items: center; gap: 14px; }
+    padding: 3px 8px; display: flex; align-items: center; gap: 14px;
+    min-width: 0; }
+  .top > .right { flex-shrink: 0; margin-left: auto; }
+  .top > .right > #x-clock { font-variant-numeric: tabular-nums; flex-shrink: 0; }
+  .top > span:not(.brand):not(.right):not(.nav) {
+    min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  /* Below 1100px (split-screen, tablet) hide the storage/embed/stats labels
+     so the clock and help link stay on-screen. */
+  @media (max-width: 1100px) {
+    .top > span:not(.brand):not(.right):not(.nav) { display: none; }
+  }
   .top .brand { background: var(--orange); color: var(--paper); padding: 1px 10px;
     font-weight: 800; letter-spacing: 0.5px; border-right: 2px solid var(--ink);
     margin: -3px 8px -3px -8px; height: calc(100% + 6px);
-    display: inline-flex; align-items: center; }
+    display: inline-flex; align-items: center; gap: 6px; }
+  .top .brand .brand-sub { font-weight: 600; font-size: 10px; opacity: 0.85;
+    letter-spacing: 0.3px; text-transform: lowercase; }
   .top .nav .item { padding: 0 6px; }
   .top .nav .active { background: var(--ink); color: var(--paper);
     padding: 1px 8px; font-weight: 700; }
@@ -58,22 +75,97 @@ export const DASHBOARD_HTML = `<!doctype html>
   .top .pulse { color: var(--green-fg); font-weight: 700; }
   .top .pulse.disc { color: var(--red); }
 
-  .body { display: grid; grid-template-columns: 280px 1fr 380px; gap: 6px; min-height: 0; }
+  .body { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; gap: 6px; min-height: 0; min-width: 0; }
+  .body > .pane:last-child { max-height: 280px; }
+  /* Phone: stripped-down single-column layout. */
+  @media (max-width: 768px) {
+    html, body { font-size: 13px; }
+    .tui { padding: 2px 3px; gap: 3px; }
+
+    /* Top bar: brand + compact stats (tools/mcp) + clock + help link. */
+    .top { padding: 2px 6px; gap: 6px; flex-wrap: wrap; }
+    .top .brand { padding: 1px 6px; font-size: 11px; margin: -2px 4px -2px -6px; }
+    .top .nav { display: none; }
+    /* Show only the compact stats span (tools · mcp · violations) — hide labels span. */
+    .top > span:not(.brand):not(.right):not(.compact-stats) { display: none; }
+    .top .right { font-size: 10px; gap: 4px; flex-shrink: 0; }
+    .top .right > #x-conn { display: none; }
+    .top .help-link { font-size: 11px; }
+
+    /* Help banner: tight on mobile + setupHelpBanner() adds .hidden by default
+       at this width so the empty yellow strip doesn't show. (?) help still
+       toggles it back on. */
+    .help-banner { padding: 3px 6px; font-size: 11px; }
+    .help-banner .head .blurb { display: none; }
+    .help-banner .head { gap: 6px; }
+    .help-banner .glossary { grid-template-columns: 1fr 1fr; font-size: 10px; gap: 1px 8px; }
+
+    /* Body: single column, detail collapses below */
+    .body { grid-template-columns: 1fr; grid-template-rows: 1fr auto; gap: 3px; }
+      .body > .pane:nth-child(3) { max-height: 32vh; }
+
+    /* Pane heads: tight */
+    .pane-head { padding: 1px 6px; font-size: 11px; min-height: 20px; }
+    .pane-head .right { font-size: 10px; }
+    .pane-head .lab { font-size: 11px; }
+
+    /* Tab strips: tighter, no per-tab counts on mobile */
+    .tab-strip { padding: 2px 4px; gap: 2px; }
+    .tab-strip .tab { padding: 3px 8px; font-size: 10px; box-shadow: 1px 1px 0 var(--ink);
+      min-height: 26px; }
+    .tab-strip .tab .ct { display: none; }
+    .tab-strip .mode-hint { display: none; }
+
+    /* Search: prominent, prevents iOS zoom */
+    .search-bar { padding: 4px 6px; }
+    .search-bar input { font-size: 16px; padding: 6px 8px; }
+    .search-bar button { padding: 6px 12px; font-size: 10px; }
+    .search-bar .hint { display: none; }
+
+    /* Table: hide low-priority columns + horizontal scroll affordance for the
+       remaining ones so users can see RRF/REL/GH instead of fully clipping.
+       Sticky # and tool columns stay visible while the rest scroll. */
+    .pane.focused .pane-body { overflow-x: auto; }
+    #rank-table { min-width: 560px; }
+    #rank-table th:nth-child(3),
+    #rank-table td:nth-child(3),
+    #rank-table th:nth-child(7),
+    #rank-table td:nth-child(7),
+    #rank-table th:nth-child(8),
+    #rank-table td:nth-child(8) { display: none; }
+    #rank-table th:nth-child(1),
+    #rank-table td:nth-child(1),
+    #rank-table th:nth-child(2),
+    #rank-table td:nth-child(2) { position: sticky; background: var(--paper); z-index: 1; }
+    #rank-table th:nth-child(1), #rank-table td:nth-child(1) { left: 0; }
+    #rank-table th:nth-child(2), #rank-table td:nth-child(2) { left: 32px; }
+    table { font-size: 12.5px; }
+    td { padding: 6px 8px; line-height: 1.3; }
+    th { padding: 4px 8px 3px; font-size: 10px; }
+
+    /* Detail */
+    .detail h3 { font-size: 13px; }
+    .detail .blurb { font-size: 12px; line-height: 1.4; margin: 6px 0 8px; }
+    .detail .submeta { font-size: 10.5px; }
+    .kv { grid-template-columns: 80px 1fr; font-size: 11.5px; }
+    .feed-row { font-size: 11px; }
+
+    /* Status bar: hide all keyboard shortcuts on mobile */
+    .status { padding: 2px 6px; font-size: 10px; gap: 6px; }
+    .status .keypair { display: none; }
+    .status .right { font-size: 10px; }
+  }
   .pane { border: 2px solid var(--ink); background: var(--paper);
-    display: flex; flex-direction: column; min-height: 0; }
+    display: flex; flex-direction: column; min-height: 0; min-width: 0; }
   .pane.focused { box-shadow: 4px 4px 0 var(--ink); }
-  .pane-head { padding: 3px 10px; border-bottom: 2px solid var(--ink);
+  .pane-head { padding: 2px 10px; border-bottom: 2px solid var(--ink);
     display: flex; align-items: center; justify-content: space-between;
-    background: var(--paper-2); font-size: 12px; }
+    background: var(--paper-2); font-size: 12px; min-height: 22px; }
   .pane.focused .pane-head { background: var(--yellow); }
   .pane-head .lab { font-weight: 700; letter-spacing: 0.5px; }
   .pane-head .right { font-size: 10.5px; color: var(--ink-2); }
   .pane-body { padding: 8px 10px; overflow: auto; flex: 1; }
 
-  .sb-row { padding: 1px 4px; cursor: pointer; }
-  .sb-row.active { background: var(--ink); color: var(--paper); }
-  .sb-row.active .muted { color: rgba(243,238,226,0.55); }
-  .sb-row .ico { display: inline-block; width: 14px; }
   .sb-cat { color: var(--muted); margin-top: 8px; padding-left: 2px;
     font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; }
 
@@ -87,9 +179,20 @@ export const DASHBOARD_HTML = `<!doctype html>
   .domain-pip.dat { background: var(--magenta); }
   .domain-pip.com { background: var(--yellow); }
 
-  .tab-strip { display: flex; align-items: center; gap: 6px;
-    padding: 6px 10px; border-bottom: 2px solid var(--ink);
+  .tab-strip { display: flex; align-items: center; gap: 4px;
+    padding: 3px 8px; border-bottom: 2px solid var(--ink);
     background: var(--paper-2); overflow-x: auto; flex-wrap: nowrap; white-space: nowrap; }
+  /* Domain strip wraps to multi-row instead of horizontal scroll. */
+  #domain-tabs { flex-wrap: wrap; overflow-x: visible; row-gap: 4px; }
+  .tab-strip .tab-label { font: 800 10px var(--mono); letter-spacing: 1.5px;
+    color: var(--ink-2); padding-right: 8px; min-width: 60px; flex-shrink: 0;
+    border-right: 2px solid var(--ink); margin-right: 6px; }
+  .tab-strip .tab.src-mcp .pip { background: var(--blue); }
+  .tab-strip .tab.src-fix .pip { background: var(--green); }
+  .tab-strip .tab.src-cat .pip { background: var(--orange); }
+  .tab-strip .tab.src-mcp.active { background: var(--blue); color: var(--paper); }
+  .tab-strip .tab.src-fix.active { background: var(--green); color: var(--paper); }
+  .tab-strip .tab.src-cat.active { background: var(--orange); color: var(--paper); }
   .tab-strip .tab { display: inline-flex; align-items: center; gap: 6px;
     padding: 2px 9px; border: 2px solid var(--ink); background: var(--paper);
     font: 700 11.5px/1.3 var(--mono); letter-spacing: 0.5px; text-transform: uppercase;
@@ -104,7 +207,7 @@ export const DASHBOARD_HTML = `<!doctype html>
   .tab-strip .tab.res.active { background: var(--magenta); color: var(--paper); }
   .tab-strip .tab.doc.active { background: var(--red); color: var(--paper); }
   .tab-strip .tab.geo.active { background: var(--green); color: var(--paper); }
-  .tab-strip .tab.dat.active { background: var(--magenta); color: var(--paper); }
+  /* dat color now defined below near new bucket colors */
   .tab-strip .tab.com.active { background: var(--yellow); color: var(--ink); }
   .tab-strip .tab .pip { display: inline-block; width: 8px; height: 8px;
     border: 1.5px solid currentColor; vertical-align: middle; }
@@ -113,8 +216,17 @@ export const DASHBOARD_HTML = `<!doctype html>
   .tab-strip .tab.res .pip { background: var(--magenta); }
   .tab-strip .tab.doc .pip { background: var(--red); }
   .tab-strip .tab.geo .pip { background: var(--green); }
-  .tab-strip .tab.dat .pip { background: var(--magenta); }
+  .tab-strip .tab.dat .pip { background: var(--teal); }
   .tab-strip .tab.com .pip { background: var(--yellow); }
+  .tab-strip .tab.dom-ai .pip    { background: var(--purple); }
+  .tab-strip .tab.dom-dev .pip   { background: var(--lime); }
+  .tab-strip .tab.dom-sec .pip   { background: var(--crimson); }
+  .tab-strip .tab.dom-media .pip { background: #ec4899; }
+  .tab-strip .tab.dom-ai.active    { background: var(--purple);  color: var(--paper); }
+  .tab-strip .tab.dom-dev.active   { background: var(--lime);    color: var(--ink); }
+  .tab-strip .tab.dom-sec.active   { background: var(--crimson); color: var(--paper); }
+  .tab-strip .tab.dom-media.active { background: #ec4899;        color: var(--paper); }
+  .tab-strip .tab.dat.active       { background: var(--teal);    color: var(--paper); }
   .tab-strip .tab.all .pip { background: transparent; border-style: dashed; }
   .tab-strip .tab.active .pip { border-color: rgba(255,255,255,0.8); }
   /* Kind pips & tabs (tool / skill / subagent / prompt) */
@@ -142,6 +254,20 @@ export const DASHBOARD_HTML = `<!doctype html>
   th { text-align: left; color: var(--ink-2); padding: 0 8px 4px; font-weight: 700;
     letter-spacing: 0.5px; border-bottom: 2px solid var(--ink);
     background: var(--paper-2); font-size: 11px; text-transform: uppercase; }
+  th.num { text-align: right; }
+  th.sort { cursor: pointer; user-select: none; }
+  th.sort:hover { background: var(--paper-3); }
+  th.sort .sort-ind { display: inline-block; margin-left: 4px; opacity: 0.6; }
+  th.sort.active .sort-ind { opacity: 1; color: var(--orange); }
+  th.tip { position: relative; cursor: help; border-bottom: 2px solid var(--ink); }
+  th.tip::after { content: attr(data-tip); position: absolute; top: 100%; right: 0;
+    background: var(--ink); color: var(--paper); padding: 6px 10px;
+    font: 600 10.5px/1.4 var(--mono); letter-spacing: 0.3px; text-transform: none;
+    white-space: normal; max-width: 280px; min-width: 180px; z-index: 100;
+    border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink);
+    opacity: 0; transform: translateY(-4px); pointer-events: none;
+    transition: opacity 0.1s, transform 0.1s; margin-top: 4px; }
+  th.tip:hover::after { opacity: 1; transform: translateY(0); }
   td { padding: 2px 8px; border-bottom: 1px solid var(--paper-3); cursor: pointer; }
   tr.t1 td { background: var(--yellow); color: var(--ink); font-weight: 700; }
   tr.t1 td.first::before { content: "▶ "; color: var(--orange); font-weight: 800; }
@@ -151,14 +277,18 @@ export const DASHBOARD_HTML = `<!doctype html>
   td.num { text-align: right; }
   td .domain-tag { display: inline-block; padding: 0 5px; border: 1.5px solid var(--ink);
     font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; line-height: 1.4; }
-  .domain-tag.fin { background: var(--orange); color: var(--paper); }
-  .domain-tag.cod { background: var(--blue); color: var(--paper); }
-  .domain-tag.res { background: var(--magenta); color: var(--paper); }
-  .domain-tag.doc { background: var(--red); color: var(--paper); }
-  .domain-tag.geo { background: var(--green); color: var(--paper); }
-  .domain-tag.dat { background: var(--magenta); color: var(--paper); }
-  .domain-tag.com { background: var(--yellow); color: var(--ink); }
-  .domain-tag.unk { background: var(--paper-3); color: var(--ink-2); }
+  .domain-tag.fin   { background: var(--orange);  color: var(--paper); }
+  .domain-tag.cod   { background: var(--blue);    color: var(--paper); }
+  .domain-tag.res   { background: var(--magenta); color: var(--paper); }
+  .domain-tag.doc   { background: var(--red);     color: var(--paper); }
+  .domain-tag.geo   { background: var(--green);   color: var(--paper); }
+  .domain-tag.dat   { background: var(--teal);    color: var(--paper); }
+  .domain-tag.com   { background: var(--yellow);  color: var(--ink); }
+  .domain-tag.ai    { background: var(--purple);  color: var(--paper); }
+  .domain-tag.dev   { background: var(--lime);    color: var(--ink); }
+  .domain-tag.sec   { background: var(--crimson); color: var(--paper); }
+  .domain-tag.media { background: #ec4899;        color: var(--paper); }
+  .domain-tag.unk   { background: var(--paper-3); color: var(--ink-2); }
   td .stat-pill { font-family: var(--mono); font-size: 10px; padding: 0 5px;
     border: 1.5px solid var(--ink); font-weight: 700; }
   .stat-pill.active { background: var(--green); color: var(--paper); }
@@ -218,99 +348,155 @@ export const DASHBOARD_HTML = `<!doctype html>
   .status .right { margin-left: auto; color: var(--ink-2); font-size: 11px; }
 
   .empty { padding: 16px 8px; color: var(--muted); font-style: italic; text-align: center; }
+
+  /* Help banner. Default collapsed to one slim line. Click (?) to expand. */
+  .help-banner { border: 2px solid var(--ink); background: var(--yellow);
+    color: var(--ink); padding: 4px 12px; font: 12.5px/1.4 var(--sans);
+    box-shadow: 2px 2px 0 var(--ink); }
+  .help-banner.hidden { display: none; }
+  .help-banner.collapsed .body { display: none; }
+  .help-banner .head { display: flex; align-items: center; gap: 12px; }
+  .help-banner .head .title { font: 700 12px var(--mono);
+    letter-spacing: 0.5px; text-transform: uppercase; }
+  .help-banner .head .blurb { color: var(--ink-2); font-size: 12px; }
+  .help-banner .body { margin-top: 6px; padding-top: 6px; border-top: 1.5px dashed var(--ink); }
+  .help-banner h4 { margin: 0 0 4px; font: 800 12px/1.3 var(--mono);
+    letter-spacing: 0.5px; text-transform: uppercase; }
+  .help-banner p { margin: 2px 0; font-size: 12.5px; }
+  .help-banner .glossary { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2px 16px; margin-top: 4px; font-size: 11.5px; }
+  .help-banner .g-term { font: 700 11px var(--mono); display: inline; }
+  .help-banner .dismiss, .help-banner .toggle-body { font: 700 10px var(--mono);
+    border: 1.5px solid var(--ink); background: var(--paper); padding: 0 6px;
+    cursor: pointer; box-shadow: 1.5px 1.5px 0 var(--ink); margin-left: auto; }
+  .help-banner .dismiss:hover, .help-banner .toggle-body:hover { background: var(--paper-3); }
+  .top .help-link { cursor: pointer; text-decoration: underline; color: var(--blue);
+    font-weight: 700; }
+  .top .help-link:hover { color: var(--orange); }
+
+  /* Show help cursor only on inline-text things explaining their abbreviation,
+     not on every interactive element. Buttons/tabs/cells get their own cursor. */
+  .tab-strip .tab-label { cursor: help; }
+
+  /* Search bar above the ranking table. */
+  .search-bar { display: flex; gap: 4px; padding: 4px 8px; border-bottom: 2px solid var(--ink);
+    background: var(--paper-3); align-items: center; }
+  .search-bar input { flex: 1; min-width: 100px; border: 2px solid var(--ink); padding: 3px 8px;
+    font: 13px var(--mono); background: var(--paper); color: var(--ink);
+    box-shadow: inset 1px 1px 0 rgba(0,0,0,0.05); }
+  .search-bar input:focus { outline: none; background: var(--paper-2); }
+  .search-bar button { border: 2px solid var(--ink); background: var(--orange);
+    color: var(--paper); font: 700 11.5px var(--mono); letter-spacing: 0.5px;
+    text-transform: uppercase; padding: 4px 14px; cursor: pointer;
+    box-shadow: 2px 2px 0 var(--ink); }
+  .search-bar button:hover { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--ink); }
+  .search-bar button.clear { background: var(--paper); color: var(--ink); padding: 4px 10px; font-size: 14px; }
+  .search-bar button#q-trending { background: var(--yellow); color: var(--ink); padding: 4px 10px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
+  .search-bar .hint { font: 11px var(--mono); color: var(--muted); padding-left: 4px; }
+
 </style>
 </head>
 <body>
 <div class="tui">
 
   <div class="top">
-    <span class="brand">2CHAIN v0.2</span>
-    <span class="nav">
-      <span class="item active">Overview</span>
-      <span class="item muted">Discover</span>
-      <span class="item muted">Tools</span>
-      <span class="item muted">Calls</span>
-      <span class="item muted">Evals</span>
+    <span class="brand" title="2chain (tool-chain): AI tool registry. Search, rank, and validate tools agents can call.">2CHAIN <span class="brand-sub">(tool-chain)</span></span>
+    <span title="Backend storage driver and embedding model. Both swappable via env vars."><span class="muted">storage:</span> <span class="bright" id="x-driver">…</span> <span class="muted">embed:</span> <span class="bright" id="x-embed">…</span></span>
+    <span class="muted">·</span>
+    <span class="muted compact-stats"><span id="x-tools" title="Total tools in the registry">…</span> tools · <span id="x-mcp" title="Tools sourced from MCP servers (Model Context Protocol)">…</span> mcp · <span class="red"><span id="x-vio" title="Contract violations: tools whose output failed JSON Schema validation in the last call">0</span> violations</span></span>
+    <span class="right">
+      <span class="help-link" id="help-toggle" title="Toggle the plain-English help banner">(?) help</span>
+      <span class="muted">·</span>
+      <span class="pulse" id="x-pulse" title="Server status: green = connected, red = offline">●</span> <span id="x-conn">connecting…</span> <span class="muted" id="x-clock"></span>
     </span>
-    <span class="muted">·</span>
-    <span><span class="muted">storage:</span> <span class="bright" id="x-driver">…</span> <span class="muted">embed:</span> <span class="bright" id="x-embed">…</span></span>
-    <span class="muted">·</span>
-    <span class="muted"><span id="x-tools">…</span> tools · <span id="x-mcp">…</span> mcp · <span class="red"><span id="x-vio">0</span> violations</span></span>
-    <span class="right"><span class="pulse" id="x-pulse">●</span> <span id="x-conn">connecting…</span> <span class="muted" id="x-clock"></span></span>
+  </div>
+
+  <div class="help-banner collapsed" id="help-banner">
+    <div class="head">
+      <span class="title">2chain</span>
+      <span class="blurb">A search engine for AI tools. Type a query above. Click any name to open its source repo.</span>
+      <button class="toggle-body" id="help-expand" title="Show the glossary">show glossary</button>
+      <button class="dismiss" id="help-dismiss" title="Hide this banner. (?) help in the top bar brings it back.">x</button>
+    </div>
+    <div class="body">
+      <div class="glossary">
+        <div><span class="g-term">KIND</span>: tool, skill, subagent, prompt</div>
+        <div><span class="g-term">DOMAIN</span>: finance, code, research, docs, geo, data, comms</div>
+        <div><span class="g-term">RRF</span>: combined search score. Higher = better match.</div>
+        <div><span class="g-term">REL</span>: reliability 0-1. Below 0.80 = gated out.</div>
+        <div><span class="g-term">VEC</span>: semantic similarity (cosine).</div>
+        <div><span class="g-term">P95</span>: 95th-percentile response time (ms).</div>
+      </div>
+    </div>
   </div>
 
   <div class="body">
 
-    <div class="pane">
-      <div class="pane-head"><span class="lab">1 NAV</span> <span class="right">click to filter</span></div>
-      <div class="pane-body">
-<pre><span class="muted">┌─ Workspace ─────────┐</span>
-<span class="sb-row"><span class="ico">▦</span> Overview</span>
-<span class="sb-row active"><span class="ico">⌘</span> Discover</span>
-<span class="sb-row"><span class="ico">↗</span> Tools <span class="muted" id="n-tools">0</span></span>
-<span class="sb-row"><span class="ico">⚡</span> Calls <span class="muted" id="n-calls">0</span></span>
-<span class="sb-row"><span class="ico">⚠</span> Violations <span class="red" id="n-vio">0</span></span>
-<span class="sb-row"><span class="ico">✓</span> Evals <span class="muted" id="n-evals">0</span></span>
-
-<span class="sb-cat">Sources</span>
-<span class="sb-row"><span class="ico">●</span> MCP <span class="muted" id="n-mcp">0</span></span>
-<span class="sb-row"><span class="ico">●</span> Fixtures <span class="muted" id="n-fix">0</span></span>
-<span class="sb-row"><span class="ico">●</span> Catalog <span class="muted" id="n-cat">0</span></span>
-
-<span class="sb-cat">Domains</span>
-<span class="sb-row" data-dom="finance"><span class="domain-pip fin"></span>finance <span class="muted" id="d-finance">0</span></span>
-<span class="sb-row" data-dom="code"><span class="domain-pip cod"></span>code <span class="muted" id="d-code">0</span></span>
-<span class="sb-row" data-dom="research"><span class="domain-pip res"></span>research <span class="muted" id="d-research">0</span></span>
-<span class="sb-row" data-dom="docs"><span class="domain-pip doc"></span>docs <span class="muted" id="d-docs">0</span></span>
-<span class="sb-row" data-dom="geo"><span class="domain-pip geo"></span>geo <span class="muted" id="d-geo">0</span></span>
-<span class="sb-row" data-dom="data"><span class="domain-pip dat"></span>data <span class="muted" id="d-data">0</span></span>
-<span class="sb-row" data-dom="comms"><span class="domain-pip com"></span>comms <span class="muted" id="d-comms">0</span></span>
-
-<span class="muted"># press / for fuzzy</span>
-</pre>
-      </div>
-    </div>
-
     <div class="pane focused">
       <div class="pane-head">
-        <span><span class="lab">2 RANKING</span> <span class="muted" id="x-query">— (run /discover to populate)</span></span>
-        <span class="right"><span class="muted">RRF · vec0.5 / txt0.5 · gate 0.80 · </span><span class="green bright" id="x-latency">—</span></span>
+        <span><span class="lab" title="Hybrid retrieval ranking: top tools matching your search, or filtered browse view if no query.">2 RANKING</span> <span class="muted" id="x-query">— (type a query in the search bar to rank by relevance)</span></span>
+        <span class="right"><span class="muted" title="Ranking method: Reciprocal Rank Fusion of vector and lexical results, 50/50 weight, with reliability >= 0.80 enforced inside the SQL query.">RRF · vec0.5 / txt0.5 · gate 0.80 · </span><span class="green bright" id="x-latency" title="Total time to run the last query, including embedding the query and SQL execution.">—</span></span>
       </div>
-      <div class="tab-strip" id="kind-tabs">
-        <span class="mode-hint">▌ Kind</span>
+      <div class="search-bar">
+        <input id="q-input" type="search" autocomplete="off" spellcheck="false"
+          placeholder="Search the registry. e.g. 'extract tables from a pdf', 'send a slack message', 'fetch arxiv papers'" />
+        <button id="q-go" title="Run the query">Search</button>
+        <button id="q-trending" class="clear" title="Show top tools by /discover hits in the last 7 days">📈 trending</button>
+        <button id="q-clear" class="clear" title="Clear search and go back to browse mode">x</button>
+        <span class="hint" id="q-hint">Press Enter</span>
+      </div>
+      <div class="tab-strip" id="source-tabs" title="Click a tab to filter rows by source">
+        <span class="tab-label" title="Where the entry comes from">SOURCE</span>
+        <button class="tab all active" data-source=""><span class="pip"></span>ALL <span class="ct" id="st-all">· 0</span></button>
+        <button class="tab src-mcp" data-source="mcp" title="MCP server bridges (calls forwarded to a remote MCP server)"><span class="pip"></span>MCP <span class="ct" id="n-mcp">· 0</span></button>
+        <button class="tab src-fix" data-source="fixture" title="First-party callable stubs (e.g. prompt-template-stub, arxiv-search, sec-edgar)"><span class="pip"></span>CALLABLE <span class="ct" id="n-fix">· 0</span></button>
+        <button class="tab src-cat" data-source="catalog" title="Catalog-only specs (discovery, no callable stub yet)"><span class="pip"></span>CATALOG <span class="ct" id="n-cat">· 0</span></button>
+      </div>
+      <div class="tab-strip" id="kind-tabs" title="Click a tab to filter rows by kind">
+        <span class="tab-label" title="Type of unit: tool/skill/subagent/prompt">KIND</span>
         <button class="tab all active" data-kind=""><span class="pip"></span>ALL <span class="ct" id="kt-all">· 0</span></button>
-        <button class="tab kt" data-kind="tool"><span class="pip"></span>TOOL <span class="ct" id="kt-tool">· 0</span></button>
-        <button class="tab ks" data-kind="skill"><span class="pip"></span>SKILL <span class="ct" id="kt-skill">· 0</span></button>
-        <button class="tab ka" data-kind="subagent"><span class="pip"></span>AGENT <span class="ct" id="kt-subagent">· 0</span></button>
-        <button class="tab kp" data-kind="prompt"><span class="pip"></span>PROMPT <span class="ct" id="kt-prompt">· 0</span></button>
-        <span class="spacer"></span>
-        <span class="mode-hint">⇄&nbsp; click to filter by kind</span>
+        <button class="tab kt" data-kind="tool" title="Tool: callable. Has input/output JSON Schema and an HTTP stub."><span class="pip"></span>TOOL <span class="ct" id="kt-tool">· 0</span></button>
+        <button class="tab ks" data-kind="skill" title="Claude Code skill. Discovery only."><span class="pip"></span>SKILL <span class="ct" id="kt-skill">· 0</span></button>
+        <button class="tab ka" data-kind="subagent" title="Specialist agent profile. Discovery only."><span class="pip"></span>AGENT <span class="ct" id="kt-subagent">· 0</span></button>
+        <button class="tab kp" data-kind="prompt" title="Parameterized prompt template. Callable."><span class="pip"></span>PROMPT <span class="ct" id="kt-prompt">· 0</span></button>
       </div>
-      <div class="tab-strip" id="domain-tabs">
-        <span class="mode-hint">▌ Domain</span>
-        <button class="tab all active" data-domain=""><span class="pip"></span>ALL <span class="ct" id="dt-all">· 0</span></button>
-        <button class="tab fin" data-domain="finance"><span class="pip"></span>FIN <span class="ct" id="dt-finance">· 0</span></button>
-        <button class="tab cod" data-domain="code"><span class="pip"></span>COD <span class="ct" id="dt-code">· 0</span></button>
-        <button class="tab res" data-domain="research"><span class="pip"></span>RES <span class="ct" id="dt-research">· 0</span></button>
-        <button class="tab doc" data-domain="docs"><span class="pip"></span>DOC <span class="ct" id="dt-docs">· 0</span></button>
-        <button class="tab geo" data-domain="geo"><span class="pip"></span>GEO <span class="ct" id="dt-geo">· 0</span></button>
-        <button class="tab dat" data-domain="data"><span class="pip"></span>DAT <span class="ct" id="dt-data">· 0</span></button>
-        <button class="tab com" data-domain="comms"><span class="pip"></span>COM <span class="ct" id="dt-comms">· 0</span></button>
-        <span class="spacer"></span>
-        <span class="mode-hint">⇄&nbsp; click to filter by domain</span>
+      <div class="tab-strip" id="domain-tabs" title="Click a tab to filter rows by subject area">
+        <span class="tab-label" title="Subject area">DOMAIN</span>
+        <button class="tab all active" data-domain="" title="Show all domains"><span class="pip"></span>All <span class="ct" id="dt-all">· 0</span></button>
+        <button class="tab fin" data-domain="finance" title="Finance: SEC EDGAR, prices, accounting, payments, Stripe, crypto exchanges"><span class="pip"></span>Finance <span class="ct" id="dt-finance">· 0</span></button>
+        <button class="tab cod" data-domain="code" title="Code: GitHub, GitLab, code review, linters, sandboxes, SDKs"><span class="pip"></span>Code <span class="ct" id="dt-code">· 0</span></button>
+        <button class="tab res" data-domain="research" title="Research: arxiv, PubMed, Semantic Scholar, Wikipedia, academic search"><span class="pip"></span>Research <span class="ct" id="dt-research">· 0</span></button>
+        <button class="tab doc" data-domain="docs" title="Docs: PDF / Word / Excel extraction, OCR, document Q&A, Notion, Confluence"><span class="pip"></span>Docs <span class="ct" id="dt-docs">· 0</span></button>
+        <button class="tab geo" data-domain="geo" title="Geo: maps, geocoding, OpenStreetMap, weather, navigation, timezones"><span class="pip"></span>Geo <span class="ct" id="dt-geo">· 0</span></button>
+        <button class="tab dat" data-domain="data" title="Data: vector DBs, SQL, ETL, scrapers, dataframes, BigQuery, Snowflake"><span class="pip"></span>Data <span class="ct" id="dt-data">· 0</span></button>
+        <button class="tab com" data-domain="comms" title="Communications: Slack, Discord, email, Twilio, calendar, Teams, Zoom"><span class="pip"></span>Comms <span class="ct" id="dt-comms">· 0</span></button>
+        <button class="tab dom-ai" data-domain="ai" title="AI / ML: LLMs, agents, RAG, embeddings, vector search, fine-tuning"><span class="pip"></span>AI <span class="ct" id="dt-ai">· 0</span></button>
+        <button class="tab dom-dev" data-domain="devops" title="DevOps: CI/CD, Docker, Kubernetes, Terraform, monitoring, deployment"><span class="pip"></span>DevOps <span class="ct" id="dt-devops">· 0</span></button>
+        <button class="tab dom-sec" data-domain="security" title="Security: auth, OAuth, encryption, vuln scanning, audits, secrets management"><span class="pip"></span>Security <span class="ct" id="dt-security">· 0</span></button>
+        <button class="tab dom-media" data-domain="media" title="Media: image / audio / video, generation, editing, OCR, transcription"><span class="pip"></span>Media <span class="ct" id="dt-media">· 0</span></button>
       </div>
       <div class="pane-body">
         <table id="rank-table">
           <thead>
-            <tr><th>#</th><th>tool</th><th>ver</th><th>domain</th><th class="num">rrf</th><th class="num">rel</th><th class="num">vec</th><th class="num">p95</th></tr>
+            <tr>
+              <th title="Rank: position in the result list. Top 1 is the best match.">#</th>
+              <th title="Tool name. Click to open the source repo or homepage in a new tab.">tool</th>
+              <th title="Version of this tool spec">ver</th>
+              <th title="Subject area">domain</th>
+              <th class="num tip" data-tip="RRF (Reciprocal Rank Fusion): combined search score that fuses semantic + keyword rankings 50/50. Higher = better match. Only set when you ran a query.">rrf</th>
+              <th class="num tip" data-tip="REL (reliability): rolling pass-rate from continuous rubric evals, 0-1. Tools below 0.80 are auto-gated out of /discover results.">rel</th>
+              <th class="num tip" data-tip="VEC (vector similarity): cosine similarity between query embedding and tool embedding, 0-1. Only set during a search.">vec</th>
+              <th class="num tip" data-tip="P95 latency: 95th percentile call duration in milliseconds. The slowest 5% of calls take longer than this.">p95</th>
+              <th class="num tip sort" id="sort-gh" data-tip="GH: GitHub stars · days since last commit. Updated weekly from api.github.com. Click to sort by stars (browse mode only).">gh<span class="sort-ind" id="sort-gh-ind"></span></th>
+            </tr>
           </thead>
-          <tbody><tr><td colspan="8" class="empty">loading…</td></tr></tbody>
+          <tbody><tr><td colspan="9" class="empty">loading…</td></tr></tbody>
         </table>
       </div>
     </div>
 
     <div class="pane">
-      <div class="pane-head"><span class="lab">3 DETAIL & FEED</span> <span class="right" id="x-feed-count">0 events</span></div>
+      <div class="pane-head"><span class="lab" title="Top: details on the selected tool. Bottom: live feed of /discover, /call, /push, eval, and violation events as they happen.">3 DETAIL & FEED</span> <span class="right" id="x-feed-count">0 events</span></div>
       <div class="pane-body">
         <div class="detail" id="detail-view">
           <h3 class="bright" id="d-name">select a tool</h3>
@@ -326,17 +512,17 @@ export const DASHBOARD_HTML = `<!doctype html>
     </div>
   </div>
 
-  <div class="status">
-    <span class="keypair"><span class="key g">/</span><span class="muted">search</span></span>
-    <span class="keypair"><span class="key">⏎</span><span class="muted">call</span></span>
-    <span class="keypair"><span class="key">j/k</span><span class="muted">move</span></span>
-    <span class="keypair"><span class="key m">tab</span><span class="muted">pane</span></span>
-    <span class="keypair"><span class="key o">1-9</span><span class="muted">domain</span></span>
-    <span class="keypair"><span class="key b">d</span><span class="muted">discover</span></span>
-    <span class="keypair"><span class="key o">p</span><span class="muted">push</span></span>
-    <span class="keypair"><span class="key y">e</span><span class="muted">eval</span></span>
-    <span class="keypair"><span class="key r">!</span><span class="muted">cb</span></span>
-    <span class="keypair"><span class="key">?</span><span class="muted">help</span></span>
+  <div class="status" title="Keyboard shortcuts (vim-style). Most are placeholders pending wire-up; the (?) help link in the top bar is the working entry point.">
+    <span class="keypair" title="/  open search (placeholder)"><span class="key g">/</span><span class="muted">search</span></span>
+    <span class="keypair" title="Enter: call selected tool (placeholder)"><span class="key">⏎</span><span class="muted">call</span></span>
+    <span class="keypair" title="j/k: move selection up/down (placeholder)"><span class="key">j/k</span><span class="muted">move</span></span>
+    <span class="keypair" title="Tab: cycle focused pane (placeholder)"><span class="key m">tab</span><span class="muted">pane</span></span>
+    <span class="keypair" title="1-9: jump to domain tab (placeholder)"><span class="key o">1-9</span><span class="muted">domain</span></span>
+    <span class="keypair" title="d: open /discover (placeholder)"><span class="key b">d</span><span class="muted">discover</span></span>
+    <span class="keypair" title="p: open /push form (placeholder)"><span class="key o">p</span><span class="muted">push</span></span>
+    <span class="keypair" title="e: re-run eval on selected tool (placeholder)"><span class="key y">e</span><span class="muted">eval</span></span>
+    <span class="keypair" title="!: simulate circuit-breaker (placeholder)"><span class="key r">!</span><span class="muted">cb</span></span>
+    <span class="keypair" title="?: toggle help banner. Click (?) help in the top bar to use this now."><span class="key">?</span><span class="muted">help</span></span>
     <span class="right" id="x-foot">SSE — · queue 0 · pane 2/3</span>
   </div>
 
@@ -352,10 +538,11 @@ export const DASHBOARD_HTML = `<!doctype html>
     ms:  (n) => Number(n ?? 0).toFixed(0),
     time: (d) => d ? new Date(d).toLocaleTimeString('en-GB', { hour12: false }) : '',
   };
-  const DOMAINS = ['finance','code','research','docs','geo','data','comms'];
+  const DOMAINS = ['finance','code','research','docs','geo','data','comms','ai','devops','security','media'];
   const DOMAIN_TAG = {
     finance: 'fin', code: 'cod', research: 'res',
     docs: 'doc', geo: 'geo', data: 'dat', comms: 'com',
+    ai: 'ai', devops: 'dev', security: 'sec', media: 'media',
   };
   function tagFor(d) { return DOMAIN_TAG[d] || 'unk'; }
   function tagLabel(d) { const m = tagFor(d); return m === 'unk' ? '—' : m.toUpperCase(); }
@@ -366,27 +553,44 @@ export const DASHBOARD_HTML = `<!doctype html>
     evals: [],
     activeDomain: '',
     activeKind: '',
+    activeSource: '',
+    fuzzyQuery: '',       // live client-side substring filter
     selected: null,
-    lastDiscover: null,   // { results, meta, query }
-    feed: [],             // recent events, capped 20
+    lastDiscover: null,
+    feed: [],
+    sortBy: '',           // '' = name (default), 'gh' = github stars desc
+    violationsCount: 0,
   };
+  function sourceBucket(t) {
+    const s = t.endpoint_stub_name || '';
+    if (s === 'mcp-bridge') return 'mcp';
+    if (s === 'catalog-only-stub') return 'catalog';
+    return 'fixture';
+  }
 
   // ---- /atlas-stats : storage driver + collection counts -------------------
+  function setText(sel, val) {
+    const el = document.querySelector(sel);
+    if (el) el.textContent = val;
+  }
   async function loadStats() {
     try {
       const r = await fetch('/atlas-stats');
       if (!r.ok) throw new Error('atlas-stats ' + r.status);
       const s = await r.json();
       const driver = (s.mongo?.modules || ['unknown'])[0];
-      $('#x-driver').textContent = driver === 'sqlite' ? 'sqlite-vec' : driver;
+      setText('#x-driver', driver === 'sqlite' ? 'sqlite-vec' : driver);
       const counts = s.collection_doc_counts || {};
-      $('#x-tools').textContent = fmt.num(counts.tools);
-      $('#x-vio').textContent = fmt.num(counts.violations);
-      $('#x-mcp').textContent = '?'; // we'd need a /sources endpoint to know real MCP count
-      $('#n-tools').textContent = fmt.num(counts.tools);
-      $('#n-calls').textContent = fmt.num(counts.usage);
-      $('#n-vio').textContent = fmt.num(counts.violations);
-      $('#n-evals').textContent = fmt.num(counts.eval_runs);
+      setText('#x-tools', fmt.num(counts.tools));
+      // Cold-start race: if SSE has already pushed in-flight increments before
+      // /atlas-stats resolved, do NOT clobber. Use server count as the floor
+      // (it already includes events the SSE delivered) — keep the higher value.
+      const serverViol = counts.violations ?? 0;
+      state.violationsCount = Math.max(serverViol, state.violationsCount || 0);
+      setText('#x-vio', fmt.num(state.violationsCount));
+      // #x-mcp is computed client-side from state.tools by computeSourceCounts;
+      // do NOT write a '?' placeholder here or it flashes every 15s when this
+      // interval fires. Same reason we skipped writing to #n-tools (removed).
     } catch (e) {
       console.warn('stats load failed', e);
     }
@@ -401,9 +605,7 @@ export const DASHBOARD_HTML = `<!doctype html>
       state.violations = s.violations || [];
       state.evals = s.evalRuns || [];
       $('#x-embed').textContent = inferEmbed();
-      computeDomainCounts();
-      computeKindCounts();
-      computeSourceCounts();
+      recomputeAllCounts();
       renderTable();
       // pick top reliability as a default selection until /discover happens
       const top = [...state.tools]
@@ -424,50 +626,138 @@ export const DASHBOARD_HTML = `<!doctype html>
     return dim === 1024 ? 'mxbai-1024' : 'nomic-' + dim;
   }
 
-  function computeSourceCounts() {
-    let mcp = 0, fix = 0, cat = 0;
-    for (const t of state.tools) {
-      if (t.endpoint_stub_name === 'mcp-bridge') mcp++;
-      else if (t.endpoint_stub_name === 'catalog-only-stub') cat++;
-      else fix++;
+  // Faceted counts: each dimension's counts respect the OTHER active filters
+  // (and the fuzzy query), but ignore its own filter so users can see what's
+  // available in each bucket of THIS dimension under the current context.
+  function passesAllExcept(t, except) {
+    if (except !== 'source' && state.activeSource && sourceBucket(t) !== state.activeSource) return false;
+    if (except !== 'kind' && state.activeKind && (t.tool_kind || 'tool') !== state.activeKind) return false;
+    if (except !== 'domain' && state.activeDomain && (t.domain || '').toLowerCase() !== state.activeDomain) return false;
+    if (state.fuzzyQuery) {
+      const q = state.fuzzyQuery;
+      if (!(t.name || '').toLowerCase().includes(q) && !(t.capability_text || '').toLowerCase().includes(q)) return false;
     }
-    $('#n-mcp').textContent = fmt.num(mcp);
-    $('#n-fix').textContent = fmt.num(fix);
-    $('#n-cat').textContent = fmt.num(cat);
-    $('#x-mcp').textContent = fmt.num(mcp);
+    return true;
   }
 
-  function computeDomainCounts() {
-    const counts = Object.fromEntries(DOMAINS.map((d) => [d, 0]));
+  // Single-pass facet counts. Each dimension's count ignores its OWN active
+  // filter (so users see what's available in each bucket of the dimension
+  // they're choosing from) but respects the OTHER dimensions + fuzzy.
+  // Replaces three separate iterations over state.tools.
+  function recomputeAllCounts() {
+    const src = { mcp: 0, fix: 0, cat: 0, total: 0 };
+    const dom = Object.fromEntries(DOMAINS.map((d) => [d, 0]));
+    let domTotal = 0;
+    const kind = { tool: 0, skill: 0, subagent: 0, prompt: 0, total: 0 };
+    let totalMcp = 0;
+    const aSrc  = state.activeSource;
+    const aKind = state.activeKind;
+    const aDom  = state.activeDomain;
+    const fz    = state.fuzzyQuery;
+
     for (const t of state.tools) {
-      const d = (t.domain || '').toLowerCase();
-      if (d in counts) counts[d]++;
+      const sb = sourceBucket(t);
+      const tk = t.tool_kind || 'tool';
+      const td = (t.domain || '').toLowerCase();
+      if (sb === 'mcp') totalMcp++;
+
+      const passSrc  = !aSrc  || sb === aSrc;
+      const passKind = !aKind || tk === aKind;
+      const passDom  = !aDom  || td === aDom;
+      const passFz   = !fz || (t.name || '').toLowerCase().includes(fz)
+                            || (t.capability_text || '').toLowerCase().includes(fz);
+
+      // Source dim ignores aSrc.
+      if (passKind && passDom && passFz) {
+        src.total++;
+        if (t.endpoint_stub_name === 'mcp-bridge') src.mcp++;
+        else if (t.endpoint_stub_name === 'catalog-only-stub') src.cat++;
+        else src.fix++;
+      }
+      // Kind dim ignores aKind.
+      if (passSrc && passDom && passFz) {
+        kind.total++;
+        if (tk in kind) kind[tk]++;
+      }
+      // Domain dim ignores aDom.
+      if (passSrc && passKind && passFz) {
+        domTotal++;
+        if (td in dom) dom[td]++;
+      }
     }
+
+    setText('#n-mcp', '· ' + fmt.num(src.mcp));
+    setText('#n-fix', '· ' + fmt.num(src.fix));
+    setText('#n-cat', '· ' + fmt.num(src.cat));
+    setText('#st-all', '· ' + fmt.num(src.total));
+    setText('#x-mcp', fmt.num(totalMcp));
+    $('#kt-tool').textContent     = '· ' + fmt.num(kind.tool);
+    $('#kt-skill').textContent    = '· ' + fmt.num(kind.skill);
+    $('#kt-subagent').textContent = '· ' + fmt.num(kind.subagent);
+    $('#kt-prompt').textContent   = '· ' + fmt.num(kind.prompt);
+    $('#kt-all').textContent      = '· ' + fmt.num(kind.total);
     for (const d of DOMAINS) {
-      const el = $('#d-' + d); if (el) el.textContent = fmt.num(counts[d]);
-      const ct = $('#dt-' + d); if (ct) ct.textContent = '· ' + fmt.num(counts[d]);
+      const ct = $('#dt-' + d); if (ct) ct.textContent = '· ' + fmt.num(dom[d]);
     }
-    $('#dt-all').textContent = '· ' + fmt.num(state.tools.length);
+    $('#dt-all').textContent = '· ' + fmt.num(domTotal);
   }
-
-  function computeKindCounts() {
-    const counts = { tool: 0, skill: 0, subagent: 0, prompt: 0 };
-    for (const t of state.tools) {
-      const k = (t.tool_kind || 'tool');
-      if (k in counts) counts[k]++;
-    }
-    $('#kt-tool').textContent     = '· ' + fmt.num(counts.tool);
-    $('#kt-skill').textContent    = '· ' + fmt.num(counts.skill);
-    $('#kt-subagent').textContent = '· ' + fmt.num(counts.subagent);
-    $('#kt-prompt').textContent   = '· ' + fmt.num(counts.prompt);
-    $('#kt-all').textContent      = '· ' + fmt.num(state.tools.length);
-  }
+  // (Aliases for the old per-dimension functions removed — call sites now
+  // call recomputeAllCounts() directly. Old triple-call did 3x identical work.)
 
   function kindAbbr(k) {
     return k === 'skill' ? 'S' : k === 'subagent' ? 'A' : k === 'prompt' ? 'P' : 'T';
   }
   function kindClass(k) {
     return k === 'skill' ? 'ks' : k === 'subagent' ? 'ka' : k === 'prompt' ? 'kp' : 'kt';
+  }
+
+  // Hoisted regex constants — avoid rebuilding on every row render.
+  // Earlier code used new RegExp(string-form) with template-literal escapes
+  // that double-escaped the backslashes, silently breaking the Source: match.
+  // Regex literals don't suffer from template-literal escape rules.
+  const RE_SOURCE  = /Source:\\s*(https?:\\/\\/[^\\s)\\]]+)/i;
+  const RE_ANY_URL = /https?:\\/\\/[^\\s)\\]"]+/;
+  const RE_TRAIL   = /[.,;]+$/;
+  const RE_NPM     = /^npm:/i;
+
+  // Pull the canonical source URL out of a tool's capability_text. All scrapers
+  // emit "Source: <url>" so we look for that first; real-corpus entries have
+  // the URL inline in the description text.
+  function sourceUrlOf(t) {
+    if (!t) return null;
+    const text = t.capability_text || '';
+    const mSrc = text.match(RE_SOURCE);
+    if (mSrc) return mSrc[1].replace(RE_TRAIL, '');
+    const mAny = text.match(RE_ANY_URL);
+    if (mAny) return mAny[0].replace(RE_TRAIL, '');
+    if (t.author_agent_id === 'npm-scrape' || RE_NPM.test(t.author_agent_id || '')) {
+      return 'https://www.npmjs.com/package/' + t.name;
+    }
+    if ((t.name || '').startsWith('py:')) {
+      return 'https://pypi.org/project/' + t.name.slice(3) + '/';
+    }
+    if ((t.name || '').startsWith('hf:')) {
+      return 'https://huggingface.co/' + t.name.slice(3).replace(/-/g, '/');
+    }
+    // No reliable URL found. Return null so the name renders without a link
+    // rather than sending users to a 404 or a noisy GitHub search.
+    return null;
+  }
+  function findTool(name, version) {
+    return state.tools.find((t) => t.name === name && t.version === version);
+  }
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+  }
+  function nameCellHtml(name, version, kind, url) {
+    const chip = '<span class="kind-chip ' + kindClass(kind) + '" title="' + kind + '">' + kindAbbr(kind) + '</span>';
+    const safeName = escapeHtml(name);
+    if (url) {
+      return chip + '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener" '
+        + 'onclick="event.stopPropagation()" title="Open source: ' + escapeHtml(url) + '">'
+        + safeName + '</a>';
+    }
+    return chip + safeName;
   }
 
   // ---- ranking table -------------------------------------------------------
@@ -495,13 +785,22 @@ export const DASHBOARD_HTML = `<!doctype html>
       // re-rank visible rows so the # column stays sequential after filtering
       rows = rows.map((r, i) => ({ ...r, rank: i + 1, top1: i === 0 && rows.length > 0 }));
     } else {
-      // browse mode — alphabetical, filtered by kind + domain
+      // browse mode — alphabetical, filtered by kind + domain + source
       let pool = state.tools;
       if (state.activeKind) pool = pool.filter((t) => (t.tool_kind || 'tool') === state.activeKind);
       if (state.activeDomain) pool = pool.filter((t) => (t.domain || '').toLowerCase() === state.activeDomain);
+      if (state.activeSource) pool = pool.filter((t) => sourceBucket(t) === state.activeSource);
+      if (state.fuzzyQuery) {
+        const q = state.fuzzyQuery;
+        pool = pool.filter((t) => (t.name || '').toLowerCase().includes(q)
+          || (t.capability_text || '').toLowerCase().includes(q));
+      }
+      const sorter = state.sortBy === 'gh'
+        ? (a, b) => (b.metadata?.github_stars ?? -1) - (a.metadata?.github_stars ?? -1)
+        : (a, b) => a.name.localeCompare(b.name);
       rows = pool
         .slice()
-        .sort((a, b) => a.name.localeCompare(b.name))
+        .sort(sorter)
         .slice(0, 50)
         .map((t, i) => ({
           rank: i + 1, name: t.name, version: t.version,
@@ -512,23 +811,44 @@ export const DASHBOARD_HTML = `<!doctype html>
         }));
     }
     if (!rows.length) {
-      tbody.innerHTML = '<tr><td colspan="8" class="empty">no tools match this filter</td></tr>';
+      const parts = [];
+      if (state.activeSource) parts.push('source=' + state.activeSource);
+      if (state.activeKind) parts.push('kind=' + state.activeKind);
+      if (state.activeDomain) parts.push('domain=' + state.activeDomain);
+      if (state.fuzzyQuery) parts.push('fuzzy="' + state.fuzzyQuery + '"');
+      const filterDesc = parts.length ? parts.join(' ∩ ') : 'this filter';
+      tbody.innerHTML = '<tr><td colspan="9" class="empty">no tools match ' + filterDesc + '. Try widening one of the filters.</td></tr>';
       return;
     }
     tbody.innerHTML = rows.map((r) => {
       const tag = tagFor(r.domain);
       const sel = state.selected && state.selected.name === r.name && state.selected.version === r.version
         ? ' selected' : '';
-      const chip = '<span class="kind-chip ' + kindClass(r.kind) + '" title="' + r.kind + '">' + kindAbbr(r.kind) + '</span>';
-      return '<tr class="' + (r.top1 ? 't1' : '') + sel + '" data-key="' + r.name + '@' + r.version + '">'
+      const tool = findTool(r.name, r.version);
+      const url = sourceUrlOf(tool);
+      const stars = tool?.metadata?.github_stars;
+      const lastCommit = tool?.metadata?.github_last_commit_at;
+      let ghCell = '—';
+      if (typeof stars === 'number') {
+        const starStr = stars >= 1000 ? (stars / 1000).toFixed(1) + 'k' : String(stars);
+        let ageStr = '';
+        if (lastCommit) {
+          const days = Math.floor((Date.now() - new Date(lastCommit).getTime()) / 86400000);
+          ageStr = days < 30 ? days + 'd' : days < 365 ? Math.floor(days / 30) + 'mo' : Math.floor(days / 365) + 'y';
+        }
+        const fresh = lastCommit && (Date.now() - new Date(lastCommit).getTime()) < 30 * 86400000;
+        ghCell = '<span title="' + escapeHtml(stars + ' stars · last commit ' + (lastCommit || 'unknown')) + '">★' + starStr + (ageStr ? '<span class="' + (fresh ? 'green' : 'muted') + '"> ·' + ageStr + '</span>' : '') + '</span>';
+      }
+      return '<tr class="' + (r.top1 ? 't1' : '') + sel + '" data-key="' + escapeHtml(r.name + '@' + r.version) + '">'
         + '<td' + (r.top1 ? ' class="first"' : '') + '>' + r.rank + '</td>'
-        + '<td>' + chip + r.name + '</td>'
+        + '<td>' + nameCellHtml(r.name, r.version, r.kind, url) + '</td>'
         + '<td class="muted">' + r.version + '</td>'
         + '<td><span class="domain-tag ' + tag + '">' + tagLabel(r.domain) + '</span></td>'
         + '<td class="num">' + (r.rrf ? fmt.rrf(r.rrf) : '—') + '</td>'
         + '<td class="num ' + (r.rel >= 1 ? 'green' : '') + '">' + fmt.rel(r.rel) + '</td>'
         + '<td class="num">' + (r.vec ? fmt.vec(r.vec) : '—') + '</td>'
         + '<td class="num">' + fmt.ms(r.p95) + '</td>'
+        + '<td class="num">' + ghCell + '</td>'
         + '</tr>';
     }).join('');
   }
@@ -538,7 +858,11 @@ export const DASHBOARD_HTML = `<!doctype html>
     if (!tool) return;
     state.selected = tool;
     const tag = tagFor((tool.domain || '').toLowerCase());
-    $('#d-name').innerHTML = tool.name + '@' + tool.version
+    const url = sourceUrlOf(tool);
+    const nameHtml = url
+      ? '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener" title="Open source in new tab">' + escapeHtml(tool.name) + '</a>'
+      : escapeHtml(tool.name);
+    $('#d-name').innerHTML = nameHtml + '@' + escapeHtml(tool.version)
       + ' <span class="domain-tag ' + tag + '" style="font-size:9px;vertical-align:2px;">' + tagLabel(tool.domain) + '</span>';
     $('#d-submeta').textContent = (tool.author_agent_id ? 'author ' + tool.author_agent_id + ' · ' : '')
       + (tool.endpoint_stub_name ? 'stub ' + tool.endpoint_stub_name : '');
@@ -547,24 +871,32 @@ export const DASHBOARD_HTML = `<!doctype html>
     const rel = meta.reliability_score ?? 0;
     const gated = rel < 0.80;
     const pct = Math.max(0, Math.min(100, rel * 100));
+    const sourceRow = url
+      ? '<span class="k" title="Authoritative homepage for this tool">source</span>'
+        + '<span><a href="' + escapeHtml(url) + '" target="_blank" rel="noopener">' + escapeHtml(url.replace(new RegExp('^https?://'), '')) + '</a></span>'
+      : '';
     $('#d-kv').innerHTML =
-        '<span class="k">reliability</span><span><span class="reliability-bar"><span class="meter"><i class="' + (gated ? 'gated' : '') + '" style="width:' + pct.toFixed(0) + '%"></i></span><span class="bright">' + fmt.rel(rel) + '</span></span></span>'
-      + '<span class="k">p95 latency</span><span><span class="bright">' + fmt.ms(meta.p95_latency_ms) + '</span> <span class="muted">ms</span></span>'
-      + '<span class="k">cost / call</span><span>$' + Number(meta.cost_per_call_usd ?? 0).toFixed(4) + '</span>'
-      + '<span class="k">status</span><span class="' + (tool.status === 'active' ? 'green bright' : tool.status === 'circuit_broken' ? 'red bright' : 'yellow bright') + '">' + (tool.status || 'unknown') + '</span>'
-      + '<span class="k">stub</span><span>' + (tool.endpoint_stub_name || '—') + '</span>'
-      + '<span class="k">last eval</span><span>' + fmt.time(meta.last_eval_run) + '</span>';
+        '<span class="k" title="Reliability score 0-1 from continuous evals. >= 0.80 to appear in /discover.">reliability</span><span><span class="reliability-bar"><span class="meter"><i class="' + (gated ? 'gated' : '') + '" style="width:' + pct.toFixed(0) + '%"></i></span><span class="bright">' + fmt.rel(rel) + '</span></span></span>'
+      + '<span class="k" title="95th-percentile latency in milliseconds.">p95 latency</span><span><span class="bright">' + fmt.ms(meta.p95_latency_ms) + '</span> <span class="muted">ms</span></span>'
+      + '<span class="k" title="Cost per call in USD (when available).">cost / call</span><span>$' + Number(meta.cost_per_call_usd ?? 0).toFixed(4) + '</span>'
+      + '<span class="k" title="Lifecycle state: active = callable, circuit_broken = auto-disabled after failures, deprecated = author flagged as obsolete.">status</span><span class="' + (tool.status === 'active' ? 'green bright' : tool.status === 'circuit_broken' ? 'red bright' : 'yellow bright') + '">' + (tool.status || 'unknown') + '</span>'
+      + '<span class="k" title="Endpoint stub: which built-in handler implements /call for this tool. catalog-only-stub = discovery only, not callable.">stub</span><span>' + (tool.endpoint_stub_name || '—') + '</span>'
+      + '<span class="k" title="Time of last continuous eval run.">last eval</span><span>' + fmt.time(meta.last_eval_run) + '</span>'
+      + sourceRow;
     // refresh row outline
     renderTable();
   }
 
   // ---- live feed -----------------------------------------------------------
+  // Klass is interpolated into a class attribute so it MUST be escaped — even
+  // though every current caller passes a hardcoded enum, defense-in-depth
+  // against a future caller forwarding user data.
   function pushFeed(html, klass) {
     state.feed.unshift({ html, klass: klass || '', t: Date.now() });
     if (state.feed.length > 20) state.feed.length = 20;
     $('#x-feed-count').textContent = state.feed.length + ' event' + (state.feed.length === 1 ? '' : 's');
     $('#feed').innerHTML = state.feed.map((f) =>
-      '<div class="feed-row ' + f.klass + '"><span class="muted">'
+      '<div class="feed-row ' + escapeHtml(f.klass) + '"><span class="muted">'
       + new Date(f.t).toLocaleTimeString('en-GB', { hour12: false })
       + '</span> ' + f.html + '</div>').join('');
   }
@@ -594,12 +926,13 @@ export const DASHBOARD_HTML = `<!doctype html>
     es.addEventListener('tool_invoked', (e) => {
       const d = JSON.parse(e.data);
       const cls = d.outcome === 'ok' ? '' : (d.outcome === 'circuit_broken' ? 'cb' : (d.outcome === 'gated' ? 'gate' : ''));
-      pushFeed('<span class="chip call">CALL</span> ' + d.tool_name + '@' + d.tool_version + ' '
-        + '<span class="' + (d.outcome === 'ok' ? 'green bright' : 'red') + '">' + d.outcome + '</span> '
-        + (d.latency_ms != null ? '<span class="muted">' + d.latency_ms + 'ms</span>' : ''),
+      pushFeed('<span class="chip call">CALL</span> ' + escapeHtml(d.tool_name + '@' + d.tool_version) + ' '
+        + '<span class="' + (d.outcome === 'ok' ? 'green bright' : 'red') + '">' + escapeHtml(d.outcome) + '</span> '
+        + (d.latency_ms != null ? '<span class="muted">' + escapeHtml(String(d.latency_ms)) + 'ms</span>' : ''),
         cls);
-      // flash the row in the table
-      const row = document.querySelector('tr[data-key="' + d.tool_name + '@' + d.tool_version + '"]');
+      // flash the row in the table — CSS.escape so an attacker name with "]" can't break the selector
+      const key = d.tool_name + '@' + d.tool_version;
+      const row = document.querySelector('tr[data-key="' + CSS.escape(key) + '"]');
       if (row) { row.classList.remove('flash'); void row.offsetWidth; row.classList.add('flash'); }
     });
 
@@ -610,29 +943,27 @@ export const DASHBOARD_HTML = `<!doctype html>
       const idx = state.tools.findIndex((x) => x.name === t.name && x.version === t.version);
       if (idx >= 0) state.tools[idx] = { ...state.tools[idx], ...t };
       else state.tools.push(t);
-      computeDomainCounts();
-      computeKindCounts();
-      computeSourceCounts();
+      recomputeAllCounts();
       renderTable();
-      pushFeed('<span class="chip push">PUSH</span> ' + t.name + '@' + t.version
-        + ' <span class="muted">' + (t.status || '?') + '</span>');
+      pushFeed('<span class="chip push">PUSH</span> ' + escapeHtml(t.name + '@' + t.version)
+        + ' <span class="muted">' + escapeHtml(t.status || '?') + '</span>');
     });
 
     es.addEventListener('violation_logged', onViolation);
     es.addEventListener('violation_added', onViolation);
     function onViolation(e) {
       const v = JSON.parse(e.data);
-      pushFeed('<span class="chip cb">CB!!</span> <span class="bright">' + v.tool_name + '</span> '
-        + '<span class="red">' + (v.stage || 'output') + '_violation</span>', 'cb');
-      const cur = parseInt($('#n-vio').textContent || '0', 10);
-      $('#n-vio').textContent = String(cur + 1);
-      $('#x-vio').textContent = String(cur + 1);
+      pushFeed('<span class="chip cb">CB!!</span> <span class="bright">' + escapeHtml(v.tool_name || '?') + '</span> '
+        + '<span class="red">' + escapeHtml((v.stage || 'output') + '_violation') + '</span>', 'cb');
+      // Use state.violationsCount instead of reading from a removed sidebar element.
+      state.violationsCount = (state.violationsCount || 0) + 1;
+      $('#x-vio').textContent = String(state.violationsCount);
     }
 
     es.addEventListener('eval_completed', (e) => {
       const d = JSON.parse(e.data);
-      pushFeed('<span class="chip eval">EVAL</span> ' + (d.tool_name || '?') + '@' + (d.tool_version || '?')
-        + ' <span class="muted">' + (d.pass_count || 0) + '/' + (d.total_count || 0) + '</span>');
+      pushFeed('<span class="chip eval">EVAL</span> ' + escapeHtml((d.tool_name || '?') + '@' + (d.tool_version || '?'))
+        + ' <span class="muted">' + escapeHtml((d.pass_count || 0) + '/' + (d.total_count || 0)) + '</span>');
     });
   }
 
@@ -644,6 +975,7 @@ export const DASHBOARD_HTML = `<!doctype html>
     state.lastDiscover = null;   // tab switch exits discover mode
     document.querySelectorAll('#domain-tabs .tab').forEach((b) => b.classList.toggle('active', b === btn));
     updateBrowseLabel();
+    recomputeAllCounts();
     renderTable();
   });
 
@@ -654,30 +986,149 @@ export const DASHBOARD_HTML = `<!doctype html>
     state.lastDiscover = null;
     document.querySelectorAll('#kind-tabs .tab').forEach((b) => b.classList.toggle('active', b === btn));
     updateBrowseLabel();
+    recomputeAllCounts();
+    renderTable();
+  });
+
+  document.getElementById('source-tabs').addEventListener('click', (e) => {
+    const btn = e.target.closest('button.tab');
+    if (!btn) return;
+    state.activeSource = btn.dataset.source || '';
+    state.lastDiscover = null;
+    document.querySelectorAll('#source-tabs .tab').forEach((b) => b.classList.toggle('active', b === btn));
+    updateBrowseLabel();
+    recomputeAllCounts();
     renderTable();
   });
 
   function updateBrowseLabel() {
     const parts = [];
+    if (state.fuzzyQuery) parts.push('fuzzy "' + state.fuzzyQuery + '"');
     if (state.activeKind) parts.push(state.activeKind);
     if (state.activeDomain) parts.push(state.activeDomain);
+    if (state.activeSource) parts.push(state.activeSource);
     $('#x-query').textContent = parts.length
-      ? '— browsing ' + parts.join(' / ')
-      : '— (run /discover to populate)';
+      ? '— ' + parts.join(' / ')
+      : '— (type to fuzzy-filter, Enter for semantic search)';
   }
 
-  document.querySelectorAll('.sb-row[data-dom]').forEach((row) => {
-    row.addEventListener('click', () => {
-      const d = row.dataset.dom;
-      const btn = document.querySelector('#domain-tabs .tab[data-domain="' + d + '"]');
-      if (btn) btn.click();
-    });
+  // (Dead nav-pane sb-row handlers removed: the sidebar was deleted earlier in
+  // favor of horizontal SOURCE/KIND/DOMAIN tab strips. The handlers referenced
+  // .sb-row[data-dom], .sb-row[data-action], .sb-row[data-source] which no
+  // longer exist in the DOM. Plus the orphaned resetAllFilters(). All gone.)
+
+  // ---- search bar ---------------------------------------------------------
+  const PUBLIC_KEY = 'sk_public_caller_09e45ffbb6781f2f';
+  async function runSearch(q) {
+    q = (q || '').trim();
+    if (!q) {
+      state.lastDiscover = null;
+      $('#q-hint').textContent = 'Press Enter';
+      $('#x-latency').textContent = '—';
+      updateBrowseLabel();
+      renderTable();
+      return;
+    }
+    $('#q-hint').textContent = 'searching...';
+    try {
+      const r = await fetch('/discover?q=' + encodeURIComponent(q) + '&limit=20', {
+        headers: { 'x-api-key': PUBLIC_KEY },
+      });
+      const j = await r.json();
+      if (!r.ok || !j.ok) {
+        $('#q-hint').textContent = 'error: ' + (j.error?.message || r.status);
+        return;
+      }
+      state.lastDiscover = { results: j.results || [], meta: j.meta || {}, query: q };
+      // Clear fuzzy filter once a semantic result lands. Otherwise the typed
+      // multi-word query stays as a substring filter on the facet counts and
+      // strangles them to 0. The text in the input box stays — only the
+      // client-side filter resets.
+      state.fuzzyQuery = '';
+      $('#x-query').textContent = '— "' + q + '" → ' + (j.results || []).length + ' results';
+      $('#x-latency').textContent = (j.meta?.total_ms || j.meta?.search_ms || 0) + 'ms';
+      $('#q-hint').textContent = (j.results || []).length + ' results';
+      const top = (j.results || [])[0];
+      if (top) {
+        const t = findTool(top.name, top.version);
+        if (t) renderDetail(t);
+      }
+      recomputeAllCounts();
+      renderTable();
+    } catch (e) {
+      $('#q-hint').textContent = 'fetch failed';
+    }
+  }
+  $('#sort-gh').addEventListener('click', () => {
+    state.sortBy = state.sortBy === 'gh' ? '' : 'gh';
+    state.lastDiscover = null;  // sort applies in browse mode only
+    document.getElementById('sort-gh').classList.toggle('active', state.sortBy === 'gh');
+    document.getElementById('sort-gh-ind').textContent = state.sortBy === 'gh' ? '↓' : '';
+    renderTable();
+  });
+  $('#q-go').addEventListener('click', () => runSearch($('#q-input').value));
+  $('#q-clear').addEventListener('click', () => { $('#q-input').value = ''; state.fuzzyQuery = ''; runSearch(''); $('#q-input').focus(); });
+  $('#q-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') runSearch(e.target.value); });
+  $('#q-trending').addEventListener('click', async () => {
+    $('#q-hint').textContent = 'loading trending...';
+    try {
+      const r = await fetch('/trending?days=7&limit=20');
+      const j = await r.json();
+      const results = (j.results || []).map((t) => ({
+        name: t.name, version: t.version, tool_kind: t.tool_kind || 'tool',
+        capability_text: t.capability_text, endpoint_stub_name: t.endpoint_stub_name,
+        rrf_score: t.hits, vec_score: 0,
+        reliability_score: t.metadata?.reliability_score ?? 0,
+        cost_per_call_usd: t.metadata?.cost_per_call_usd ?? 0,
+        p95_latency_ms: t.metadata?.p95_latency_ms ?? 0,
+      }));
+      state.lastDiscover = { results, meta: { total_ms: 0 }, query: 'trending (last ' + j.window_days + 'd)' };
+      state.fuzzyQuery = '';  // see runSearch comment — same reasoning
+      $('#x-query').textContent = '— trending: top ' + results.length + ' tools by /discover hits in the last ' + j.window_days + 'd' + (results.length === 0 ? ' (no data yet — run some searches to populate)' : '');
+      $('#x-latency').textContent = '—';
+      $('#q-hint').textContent = results.length ? results.length + ' trending' : 'no trending data yet';
+      // Sync DETAIL pane to top-1 trending entry so the right pane reflects
+      // what the user is now looking at, matching runSearch behavior.
+      const topTrending = results[0];
+      if (topTrending) {
+        const t = findTool(topTrending.name, topTrending.version);
+        if (t) renderDetail(t);
+      }
+      recomputeAllCounts();
+      renderTable();
+    } catch (e) {
+      $('#q-hint').textContent = 'fetch failed';
+    }
   });
 
+  // Live fuzzy filter on every keystroke (client-side substring match,
+  // instant). Enter still fires the full semantic /discover. The fuzzy
+  // path filters state.tools by name + capability_text containing the query.
+  $('#q-input').addEventListener('input', (e) => {
+    state.fuzzyQuery = (e.target.value || '').trim().toLowerCase();
+    if (!state.fuzzyQuery) {
+      $('#q-hint').textContent = 'Press Enter for semantic search';
+    } else {
+      $('#q-hint').textContent = 'fuzzy: ' + state.fuzzyQuery;
+    }
+    state.lastDiscover = null;   // exit semantic mode while typing
+    recomputeAllCounts();
+    renderTable();
+  });
+
+  // (Dead setupNavToggle IIFE removed: #nav-toggle button no longer exists.)
+
+  function parseRowKey(key) {
+    // data-key is "<name>@<version>" but names can start with "@" (npm scopes
+    // like @scope/pkg) so split on the LAST "@" only.
+    const lastAt = key.lastIndexOf('@');
+    if (lastAt <= 0) return { name: key, version: '1.0' };
+    return { name: key.slice(0, lastAt), version: key.slice(lastAt + 1) };
+  }
   $('#rank-table').addEventListener('click', (e) => {
     const tr = e.target.closest('tr[data-key]');
     if (!tr) return;
-    const [name, version] = tr.dataset.key.split('@');
+    const { name, version } = parseRowKey(tr.dataset.key);
     const t = state.tools.find((x) => x.name === name && x.version === version);
     if (t) renderDetail(t);
   });
@@ -687,6 +1138,40 @@ export const DASHBOARD_HTML = `<!doctype html>
     $('#x-clock').textContent = new Date().toLocaleTimeString('en-GB', { hour12: false });
   }
   setInterval(tickClock, 1000); tickClock();
+
+  // ---- help banner toggle (persisted in localStorage) ----------------------
+  (function setupHelpBanner() {
+    const banner = document.getElementById('help-banner');
+    const toggle = document.getElementById('help-toggle');
+    const dismiss = document.getElementById('help-dismiss');
+    const expand = document.getElementById('help-expand');
+    if (!banner || !toggle || !dismiss) return;
+    const HID_KEY = '2chain.help.dismissed';
+    const EXP_KEY = '2chain.help.expanded';
+    // Default-hidden on phones to avoid the empty-yellow-strip QA finding.
+    // User can still tap (?) help to show it. localStorage decision wins so
+    // a returning user who explicitly opened it stays opened.
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    const stored = localStorage.getItem(HID_KEY);
+    if (stored === '1' || (isMobile && stored === null)) banner.classList.add('hidden');
+    if (localStorage.getItem(EXP_KEY) === '1') {
+      banner.classList.remove('collapsed');
+      if (expand) expand.textContent = 'hide glossary';
+    }
+    toggle.addEventListener('click', () => {
+      const isHidden = banner.classList.toggle('hidden');
+      localStorage.setItem(HID_KEY, isHidden ? '1' : '0');
+    });
+    dismiss.addEventListener('click', () => {
+      banner.classList.add('hidden');
+      localStorage.setItem(HID_KEY, '1');
+    });
+    if (expand) expand.addEventListener('click', () => {
+      const isCollapsed = banner.classList.toggle('collapsed');
+      expand.textContent = isCollapsed ? 'show glossary' : 'hide glossary';
+      localStorage.setItem(EXP_KEY, isCollapsed ? '0' : '1');
+    });
+  })();
 
   // ---- boot ----------------------------------------------------------------
   loadStats().then(() => loadState()).then(() => connect());

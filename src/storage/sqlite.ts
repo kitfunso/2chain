@@ -663,6 +663,35 @@ export class SqliteStorage implements Storage {
     return out;
   }
 
+  async getTrending(
+    daysBack: number,
+    limit: number,
+    namespace = DEFAULT_NAMESPACE,
+  ): Promise<Array<{ name: string; version: string; hits: number }>> {
+    // Expand each ranking's results JSON array, count distinct (name,version)
+    // appearances within the cutoff window, return the top N. SQLite json_each
+    // makes this a single query with no app-side parsing.
+    const cutoffMs = Date.now() - daysBack * 86400_000;
+    const cutoff = new Date(cutoffMs).toISOString();
+    return this.db
+      .prepare<
+        [string, string, number],
+        { name: string; version: string; hits: number }
+      >(
+        `SELECT
+            json_extract(je.value, '$.name')    AS name,
+            json_extract(je.value, '$.version') AS version,
+            COUNT(*)                            AS hits
+         FROM rankings, json_each(rankings.results) AS je
+         WHERE rankings.namespace_id = ?
+           AND rankings.occurred_at  > ?
+         GROUP BY name, version
+         ORDER BY hits DESC
+         LIMIT ?`,
+      )
+      .all(namespace, cutoff, limit);
+  }
+
   async dbStats(): Promise<DbStats> {
     const versionRow = this.db.prepare('SELECT sqlite_version() AS v').get() as { v: string };
     const vecVersion = this.db.prepare('SELECT vec_version() AS v').get() as { v: string };

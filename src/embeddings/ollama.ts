@@ -66,8 +66,8 @@ export class OllamaEmbedder implements Embedder {
     this.host = opts.host ?? process.env.OLLAMA_HOST ?? 'http://localhost:11434';
     this.model = opts.model ?? process.env.OLLAMA_EMBED_MODEL ?? 'nomic-embed-text';
     this._dim = opts.dim ?? KNOWN_DIMS[this.model] ?? NOMIC_EMBED_DIM;
-    this.timeoutMs = opts.timeoutMs ?? 10_000;
-    this.concurrency = Math.max(1, opts.concurrency ?? 4);
+    this.timeoutMs = opts.timeoutMs ?? Number(process.env.OLLAMA_TIMEOUT_MS ?? 10_000);
+    this.concurrency = Math.max(1, opts.concurrency ?? Number(process.env.OLLAMA_CONCURRENCY ?? 4));
     this.cache = new LruEmbeddingCache(opts.cacheCapacity ?? 256);
     if (opts.warmupOnInit ?? process.env.OLLAMA_WARMUP === 'true') {
       // fire-and-forget; ignore failures so constructor is always safe.

@@ -2,6 +2,7 @@
 // Dedupes against existing rows so re-running doesn't churn embeddings.
 
 import type { Embedder, Storage, ToolSpecV2 } from '../types.js';
+import { resolveDomain } from './domain-classifier.js';
 
 const NAMESPACE = 'default';
 
@@ -35,10 +36,24 @@ export async function importScrapedSpecs(
     duration_ms: 0,
   };
 
+  // Resolve the canonical domain inline before dedup/embed/upsert. This is the
+  // ONLY place imports flow through, so doing it here means every imported row
+  // lands in one of the 11 canonical buckets without a separate cleanup pass.
+  // Curated authors keep the hand-picked domain they passed in.
+  const normalized: ToolSpecV2[] = specs.map((s) => ({
+    ...s,
+    domain: resolveDomain({
+      author_agent_id: s.author_agent_id,
+      domain: s.domain,
+      capability_text: s.capability_text,
+      name: s.name,
+    }),
+  }));
+
   // Filter out specs that already exist at the same version (dedupe).
   const fresh: ToolSpecV2[] = [];
   if (opts.skipExisting !== false) {
-    for (const s of specs) {
+    for (const s of normalized) {
       const existing = await storage.getToolByNameVersion(s.name, s.version, NAMESPACE);
       if (existing) {
         result.skipped_existing++;
@@ -47,7 +62,7 @@ export async function importScrapedSpecs(
       }
     }
   } else {
-    fresh.push(...specs);
+    fresh.push(...normalized);
   }
 
   if (fresh.length === 0) {

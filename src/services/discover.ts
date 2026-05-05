@@ -48,23 +48,48 @@ export const DEMO_AGENT_QUERY = 'Extract tables from this financial report PDF';
 // (kept to maintain golden-query coverage), minus the rate-limit dance —
 // Ollama is local, so cost-of-prewarm is just CPU/VRAM seconds.
 export const PREWARM_QUERIES: string[] = [
+  // finance / accounting
   DEMO_AGENT_QUERY,
   'extract income statement from 10-K for DCF model',
-  'extract financial statement line items SEC filing',
-  'I am building a DCF for NVIDIA pull the income statement',
   'fetch latest 10-K income statement for NVDA',
-  'get income statement for ticker from SEC EDGAR',
-  'review javascript code for bugs',
-  'lint javascript for style issues',
-  'audit python code for security vulnerabilities OWASP',
-  'find security issues in python source code',
-  'I am doing a literature review fetch the latest papers on Mamba state-space models from arxiv',
-  'search arxiv for papers on a topic',
-  'fetch latest papers on state space models',
-  'summarise arxiv paper abstract',
-  'summarise article into one paragraph',
   'parse UK supplier invoice for accounts payable',
-  'extract VAT line items from invoice',
+  // code / dev
+  'review javascript code for bugs',
+  'audit python code for security vulnerabilities OWASP',
+  'search npm registry for a package',
+  'find a typescript library on github',
+  // research / academic
+  'search arxiv for papers on state space models',
+  'summarise an academic paper abstract',
+  'find research papers on transformer architectures',
+  // ai / agents / memory
+  'find an MCP server for postgres',
+  'long-term memory for an AI agent',
+  'claude code skill for refactoring',
+  'agent framework with tool calling',
+  // data / etl
+  'sync data from postgres to bigquery',
+  'web scraper for product pricing',
+  // comms / messaging
+  'send a slack message to a channel',
+  'translate english to japanese',
+  'schedule a meeting in google calendar',
+  // docs / writing
+  'extract tables from a pdf',
+  'convert a docx to markdown',
+  // geo / weather
+  'geocode an address to lat-lon',
+  'fetch current weather for london',
+  // media / creative
+  'transcribe an audio file with whisper',
+  'generate an image from a prompt',
+  'compose a poem about the ocean',
+  // devops / infra
+  'deploy a docker container to fly.io',
+  'monitor a kubernetes cluster',
+  // security / compliance
+  'scan a python repo for hardcoded secrets',
+  'check a domain for known CVEs',
 ];
 
 export async function prewarmDiscover(embedder: Embedder): Promise<void> {

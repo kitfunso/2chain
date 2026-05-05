@@ -6,7 +6,20 @@ import { DASHBOARD_HTML } from './dashboardHtml.js';
 
 export function registerDashboardRoutes(app: FastifyInstance, storage: Storage): void {
   app.get('/', async (_req, reply) => {
-    reply.type('text/html').send(DASHBOARD_HTML);
+    // CSP layer: blocks remote script loads, eval, base-uri hijack, framing.
+    // Does NOT defang inline-script XSS — 'unsafe-inline' permits any injected
+    // <script>. The actual XSS defense is escapeHtml() on every interpolation.
+    // CSP is defense-in-depth, not the primary control. To strengthen later,
+    // move to a per-response nonce ('nonce-...') and drop 'unsafe-inline'.
+    reply
+      .header(
+        'content-security-policy',
+        "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'self'; frame-ancestors 'none'",
+      )
+      .header('x-content-type-options', 'nosniff')
+      .header('referrer-policy', 'no-referrer')
+      .type('text/html')
+      .send(DASHBOARD_HTML);
   });
 
   app.get('/events', async (_req, reply) => {
@@ -22,7 +35,7 @@ export function registerDashboardRoutes(app: FastifyInstance, storage: Storage):
 
   // Snapshot endpoint for initial render
   app.get('/state', async (_req, reply) => {
-    const tools = await storage.listTools({ limit: 1000 });
+    const tools = await storage.listTools({ limit: 5000 });
     const violations = await storage.listViolations(20);
     const evalRuns = await storage.listEvalRuns(20);
     const usageCounts = await storage.usageOutcomeCounts(50);
@@ -31,6 +44,31 @@ export function registerDashboardRoutes(app: FastifyInstance, storage: Storage):
       count,
     }));
     reply.send({ tools, violations, evalRuns, usageStats });
+  });
+
+  app.get('/trending', async (req, reply) => {
+    const q = (req.query as Record<string, string>) ?? {};
+    const days = Math.max(1, Math.min(90, Number(q.days ?? 7)));
+    const limit = Math.max(1, Math.min(100, Number(q.limit ?? 20)));
+    // Trending aggregates over a 7-day window from rankings; safe to cache for
+    // a minute. Browsers + Fly's edge will dedupe repeated dashboard hits.
+    reply.header('cache-control', 'public, max-age=60');
+    const trending = await storage.getTrending(days, limit);
+    if (trending.length === 0) {
+      reply.send({ window_days: days, results: [] });
+      return;
+    }
+    // Hydrate with full tool metadata so the dashboard can render rows
+    // without a second round-trip.
+    const all = await storage.listTools({ limit: 5000 });
+    const idx = new Map(all.map((t) => [t.name + '@' + t.version, t]));
+    const results = trending
+      .map((t) => {
+        const tool = idx.get(t.name + '@' + t.version);
+        return tool ? { ...tool, hits: t.hits } : null;
+      })
+      .filter((x): x is NonNullable<typeof x> => x !== null);
+    reply.send({ window_days: days, results });
   });
 
   // v1 endpoint name kept for dashboard wire-compat. Reports the current

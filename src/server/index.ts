@@ -6,7 +6,7 @@ import { registerDiscoverRoute } from './routes/discover.js';
 import { registerPushRoute } from './routes/push.js';
 import { registerCallRoute } from './routes/call.js';
 import { registerDashboardRoutes } from './routes/dashboard.js';
-import { discover, prewarmDiscover, DEMO_AGENT_QUERY } from '../services/discover.js';
+import { discover, prewarmDiscover, DEMO_AGENT_QUERY, PREWARM_QUERIES } from '../services/discover.js';
 import { broadcast } from './sse.js';
 import type { Storage, Embedder } from '../types.js';
 // Side-effect: register all stubs in the in-process registry.
@@ -48,6 +48,27 @@ export async function buildServer(): Promise<FastifyInstance> {
   prewarmDiscover(embedder)
     .then(() => app.log.info({ count: 17 }, 'embedder prewarm complete'))
     .catch((e) => app.log.warn({ err: (e as Error).message }, 'embedder prewarm failed (non-fatal)'));
+
+  // Seed the rankings table by firing each prewarm query through real /discover
+  // so the /trending endpoint has data on day one. Cold-only: gate on count===0
+  // not <length, so a crash mid-seed doesn't double-count on next boot. The
+  // seed runs once per database lifetime — re-seed by deleting from rankings.
+  (async () => {
+    try {
+      const stats = await storage.dbStats();
+      const rankingCount = stats.collection_counts.rankings ?? 0;
+      if (rankingCount === 0) {
+        app.log.info({ queries: PREWARM_QUERIES.length }, 'seeding trending via real /discover (cold start)');
+        for (const q of PREWARM_QUERIES) {
+          try { await discover(storage, embedder, q, 10); } catch { /* tolerate per-query failures */ }
+        }
+        const after = await storage.dbStats();
+        app.log.info({ rankings: after.collection_counts.rankings }, 'trending seed complete');
+      }
+    } catch (e) {
+      app.log.warn({ err: (e as Error).message }, 'trending seed failed (non-fatal)');
+    }
+  })();
 
   // v1's MongoDB change-stream re-rank, expressed against the Storage interface.
   // Fires on any change event the storage driver reports; we filter for tool
