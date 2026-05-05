@@ -408,7 +408,134 @@ export const DASHBOARD_HTML = `<!doctype html>
     .status { padding: 2px 6px; font-size: 10px; gap: 6px; }
     .status .keypair { display: none; }
     .status .right { font-size: 10px; }
+
+    /* ----- mobile shell takeover -------------------------------- */
+    /* Hide the desktop dashboard frame entirely. The mobile shell
+       below replaces the .body + .status panes with a search-first
+       card layout. Keep .top + .help-banner so the brand stays
+       visible and (?) help still works. */
+    .body { display: none !important; }
+    .status { display: none !important; }
+    .help-banner { display: none !important; }
+    .mobile-shell { display: flex; }
   }
+
+  /* ===== mobile shell ============================================ */
+  /* Hidden on desktop, shown only inside @media (max-width: 768px). */
+  .mobile-shell { display: none; flex-direction: column; flex: 1;
+    min-height: 0; min-width: 0; gap: 0; }
+  .mobile-header { position: sticky; top: 0; z-index: 5;
+    background: var(--paper); border: 2px solid var(--ink);
+    box-shadow: 2px 2px 0 var(--ink); padding: 8px 8px 6px;
+    display: flex; flex-direction: column; gap: 6px; }
+  .mobile-search-row { display: flex; align-items: stretch; gap: 6px;
+    border: 2px solid var(--ink); background: var(--paper); padding: 0; }
+  .mobile-search-row input { flex: 1; min-width: 0; border: 0;
+    padding: 8px 10px; font: 16px var(--mono); background: transparent;
+    color: var(--ink); outline: none; }
+  .mobile-search-row input::placeholder { color: var(--muted); }
+  .mobile-search-row .m-icon-btn { border: 0; border-left: 2px solid var(--ink);
+    background: var(--paper); cursor: pointer; padding: 0 14px;
+    font: 700 16px var(--mono); color: var(--ink); }
+  .mobile-action-row { display: flex; gap: 6px; }
+  .m-btn { flex: 1; border: 2px solid var(--ink); background: var(--paper);
+    font: 700 12px var(--mono); letter-spacing: 0.5px; text-transform: uppercase;
+    padding: 9px 10px; cursor: pointer; color: var(--ink);
+    box-shadow: 2px 2px 0 var(--ink); transition: transform 0.05s, box-shadow 0.05s; }
+  .m-btn:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--ink); }
+  .m-btn-filter { background: var(--ink); color: var(--paper); }
+  .m-btn-trending { background: var(--yellow); color: var(--ink); }
+  .m-btn-primary { background: var(--orange); color: var(--paper); flex: 2; }
+  .m-fc { display: none; padding: 0 6px; margin-left: 4px; background: var(--orange);
+    color: var(--paper); border-radius: 999px; font-size: 11px; }
+  .m-fc.active { display: inline-block; }
+
+  .mobile-results { flex: 1; overflow-y: auto; list-style: none; padding: 8px;
+    margin: 0; display: flex; flex-direction: column; gap: 6px;
+    -webkit-overflow-scrolling: touch; }
+  .m-card { border: 2px solid var(--ink); background: var(--paper);
+    box-shadow: 2px 2px 0 var(--ink); padding: 10px 12px; cursor: pointer;
+    display: flex; flex-direction: column; gap: 6px;
+    transition: transform 0.05s, box-shadow 0.05s; }
+  .m-card:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--ink); }
+  .m-card-name { font: 700 14px var(--mono); color: var(--ink);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .m-card-blurb { font: 12px/1.4 var(--mono); color: var(--ink-2);
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden; }
+  .m-card-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    font: 11px var(--mono); }
+  .m-card-meta .domain-tag { font-size: 10px; padding: 1px 6px; }
+  .m-kind { color: var(--muted); text-transform: lowercase; }
+  .m-callable { background: var(--green); color: var(--paper); padding: 1px 6px;
+    font: 700 10px var(--mono); letter-spacing: 0.5px; }
+  .m-rel { display: inline-flex; align-items: center; gap: 4px;
+    color: var(--ink-2); margin-left: auto; }
+  .m-bar { display: inline-block; width: 40px; height: 6px;
+    border: 1px solid var(--ink); background: var(--paper-3); position: relative; }
+  .m-bar i { display: block; height: 100%; background: var(--green-fg); }
+  .m-empty { padding: 20px; text-align: center; color: var(--muted);
+    font: 12px var(--mono); list-style: none; }
+
+  /* ----- bottom sheet ----- */
+  .mobile-sheet { display: none; position: fixed; inset: 0; z-index: 100; }
+  .mobile-sheet[aria-hidden="false"] { display: block; }
+  .mobile-sheet-backdrop { position: absolute; inset: 0;
+    background: rgba(0, 0, 0, 0.4); }
+  .mobile-sheet-panel { position: absolute; left: 0; right: 0; bottom: 0;
+    max-height: 80vh; background: var(--paper); border-top: 3px solid var(--ink);
+    box-shadow: 0 -6px 0 rgba(0, 0, 0, 0.1);
+    display: flex; flex-direction: column; }
+  .mobile-sheet-head { display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; border-bottom: 2px solid var(--ink); background: var(--paper-2); }
+  .mobile-sheet-head h2 { margin: 0; font: 800 14px var(--mono);
+    letter-spacing: 1px; text-transform: uppercase; }
+  .mobile-sheet-head .m-icon-btn { border: 2px solid var(--ink); background: var(--paper);
+    width: 32px; height: 32px; padding: 0; font: 700 18px var(--mono); cursor: pointer; }
+  .mobile-sheet-body { padding: 12px 16px; overflow-y: auto; flex: 1;
+    -webkit-overflow-scrolling: touch; }
+  .m-fgroup { margin-bottom: 16px; }
+  .m-fgroup h3 { margin: 0 0 6px; font: 700 11px var(--mono);
+    letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-2); }
+  .m-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .m-chip { border: 2px solid var(--ink); background: var(--paper);
+    font: 700 12px var(--mono); padding: 5px 10px; cursor: pointer;
+    color: var(--ink); display: inline-flex; align-items: center; gap: 4px;
+    box-shadow: 1px 1px 0 var(--ink); }
+  .m-chip:active { transform: translate(1px, 1px); box-shadow: 0 0 0 var(--ink); }
+  .m-chip.active { background: var(--ink); color: var(--paper);
+    box-shadow: 0 0 0 var(--ink); transform: translate(1px, 1px); }
+  .m-chip .pip { display: inline-block; width: 8px; height: 8px;
+    border: 1px solid currentColor; }
+  .mobile-sheet-foot { display: flex; gap: 8px; padding: 12px 16px;
+    border-top: 2px solid var(--ink); background: var(--paper-2); }
+
+  /* ----- detail overlay ----- */
+  .mobile-detail { display: none; position: fixed; inset: 0; z-index: 110;
+    background: var(--paper); flex-direction: column; }
+  .mobile-detail[aria-hidden="false"] { display: flex; }
+  .mobile-detail-head { display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-bottom: 2px solid var(--ink);
+    background: var(--paper-2); position: sticky; top: 0; z-index: 1; }
+  .mobile-detail-head .m-icon-btn { border: 2px solid var(--ink);
+    background: var(--paper); width: 36px; height: 36px; padding: 0;
+    font: 700 18px var(--mono); cursor: pointer; flex-shrink: 0; }
+  .m-detail-name { font: 700 13px var(--mono); color: var(--ink);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    flex: 1; min-width: 0; }
+  .mobile-detail-body { flex: 1; overflow-y: auto; padding: 14px 14px 32px;
+    -webkit-overflow-scrolling: touch; }
+  .m-detail-meta { display: flex; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 12px; align-items: center; font: 11px var(--mono); }
+  .m-detail-blurb { font: 13px/1.5 var(--mono); color: var(--ink-2);
+    margin: 0 0 18px; }
+  .m-detail-kv { display: grid; grid-template-columns: 110px 1fr;
+    gap: 6px 10px; margin: 0; font: 12px var(--mono); }
+  .m-detail-kv dt { color: var(--ink-2); margin: 0; }
+  .m-detail-kv dd { margin: 0; color: var(--ink); word-break: break-word;
+    display: flex; align-items: center; gap: 6px; }
+  .m-detail-kv dd.green { color: var(--green-fg); font-weight: 700; }
+  .m-detail-kv dd.red { color: var(--red); font-weight: 700; }
 
 </style>
 </head>
@@ -527,6 +654,70 @@ export const DASHBOARD_HTML = `<!doctype html>
       </div>
     </div>
   </div>
+
+  <!-- ===========================================================
+       Mobile shell — hidden on desktop via CSS. Reuses the same JS
+       state machine as the desktop layout. Filters live in a bottom
+       sheet, results render as cards, detail opens as a full-screen
+       push. The desktop frame above stays in the DOM but is hidden
+       on phones.
+       =========================================================== -->
+  <section class="mobile-shell" id="mobile-shell">
+    <header class="mobile-header">
+      <div class="mobile-search-row">
+        <input id="m-q-input" type="search" autocomplete="off" spellcheck="false"
+          placeholder="Search the registry" />
+        <button class="m-icon-btn" id="m-q-clear" aria-label="Clear search" type="button">x</button>
+      </div>
+      <div class="mobile-action-row">
+        <button class="m-btn m-btn-filter" id="m-filter-open" type="button">
+          Filter <span class="m-fc" id="m-filter-count"></span>
+        </button>
+        <button class="m-btn m-btn-trending" id="m-q-trending-mobile" type="button">Trending</button>
+      </div>
+    </header>
+    <ul class="mobile-results" id="mobile-results">
+      <li class="m-empty">loading...</li>
+    </ul>
+  </section>
+
+  <!-- Filter bottom sheet -->
+  <aside class="mobile-sheet" id="m-filter-sheet" aria-hidden="true">
+    <div class="mobile-sheet-backdrop" data-close></div>
+    <div class="mobile-sheet-panel">
+      <header class="mobile-sheet-head">
+        <h2>Filter</h2>
+        <button class="m-icon-btn" data-close aria-label="Close">x</button>
+      </header>
+      <div class="mobile-sheet-body">
+        <div class="m-fgroup">
+          <h3>Source</h3>
+          <div class="m-chips" id="m-source-tabs"></div>
+        </div>
+        <div class="m-fgroup">
+          <h3>Kind</h3>
+          <div class="m-chips" id="m-kind-tabs"></div>
+        </div>
+        <div class="m-fgroup">
+          <h3>Domain</h3>
+          <div class="m-chips" id="m-domain-tabs"></div>
+        </div>
+      </div>
+      <footer class="mobile-sheet-foot">
+        <button class="m-btn" id="m-filter-clear" type="button">Clear</button>
+        <button class="m-btn m-btn-primary" id="m-filter-apply" type="button">Done</button>
+      </footer>
+    </div>
+  </aside>
+
+  <!-- Detail full-screen overlay -->
+  <aside class="mobile-detail" id="m-detail" aria-hidden="true">
+    <header class="mobile-detail-head">
+      <button class="m-icon-btn" id="m-detail-back" type="button" aria-label="Back">&larr;</button>
+      <span class="m-detail-name" id="m-detail-name"></span>
+    </header>
+    <div class="mobile-detail-body" id="m-detail-body"></div>
+  </aside>
 
   <div class="status" title="Keyboard shortcuts (vim-style). Most are placeholders pending wire-up; the (?) help link in the top bar is the working entry point.">
     <span class="keypair" title="/  open search (placeholder)"><span class="key g">/</span><span class="muted">search</span></span>
@@ -867,6 +1058,38 @@ export const DASHBOARD_HTML = `<!doctype html>
         + '<td class="num">' + ghCell + '</td>'
         + '</tr>';
     }).join('');
+
+    // Mobile mirror: same rows, card layout. Runs unconditionally; CSS hides
+    // the mobile shell on desktop so this is cheap layout, no visible cost.
+    renderMobileCards(rows);
+  }
+
+  // ---- mobile cards (mirror of the ranking table) -------------------------
+  function renderMobileCards(rows) {
+    const ul = document.getElementById('mobile-results');
+    if (!ul) return;
+    if (!rows || !rows.length) {
+      ul.innerHTML = '<li class="m-empty">no results match the current filters</li>';
+      return;
+    }
+    ul.innerHTML = rows.map((r) => {
+      const tag = tagFor(r.domain);
+      const tool = findTool(r.name, r.version);
+      const cap = (tool?.capability_text || '').replace(/\\s+/g, ' ').trim();
+      const stub = tool?.endpoint_stub_name || '';
+      const callable = stub && stub !== 'catalog-only-stub';
+      const pct = Math.max(0, Math.min(100, (r.rel || 0) * 100));
+      return '<li class="m-card" data-key="' + escapeHtml(r.name + '@' + r.version) + '">'
+        + '<div class="m-card-name">' + escapeHtml(r.name) + '</div>'
+        + (cap ? '<div class="m-card-blurb">' + escapeHtml(cap) + '</div>' : '')
+        + '<div class="m-card-meta">'
+        +   '<span class="domain-tag ' + tag + '">' + tagLabel(r.domain) + '</span>'
+        +   '<span class="m-kind">' + escapeHtml(r.kind || 'tool') + '</span>'
+        +   (callable ? '<span class="m-callable">callable</span>' : '')
+        +   '<span class="m-rel"><span class="m-bar"><i style="width:' + pct.toFixed(0) + '%"></i></span>' + fmt.rel(r.rel) + '</span>'
+        + '</div>'
+        + '</li>';
+    }).join('');
   }
 
   // ---- right pane detail ---------------------------------------------------
@@ -990,6 +1213,7 @@ export const DASHBOARD_HTML = `<!doctype html>
     state.activeDomain = btn.dataset.domain || '';
     state.lastDiscover = null;   // tab switch exits discover mode
     document.querySelectorAll('#domain-tabs .tab').forEach((b) => b.classList.toggle('active', b === btn));
+    syncMobileChips();
     updateBrowseLabel();
     recomputeAllCounts();
     renderTable();
@@ -1001,6 +1225,7 @@ export const DASHBOARD_HTML = `<!doctype html>
     state.activeKind = btn.dataset.kind || '';
     state.lastDiscover = null;
     document.querySelectorAll('#kind-tabs .tab').forEach((b) => b.classList.toggle('active', b === btn));
+    syncMobileChips();
     updateBrowseLabel();
     recomputeAllCounts();
     renderTable();
@@ -1012,10 +1237,209 @@ export const DASHBOARD_HTML = `<!doctype html>
     state.activeSource = btn.dataset.source || '';
     state.lastDiscover = null;
     document.querySelectorAll('#source-tabs .tab').forEach((b) => b.classList.toggle('active', b === btn));
+    syncMobileChips();
     updateBrowseLabel();
     recomputeAllCounts();
     renderTable();
   });
+
+  // ====================================================================
+  // Mobile shell wiring — chips, filter sheet, detail overlay, search
+  // mirror. The mobile UI shares the same state machine as the desktop
+  // dashboard so /discover, filters, and trending all stay in sync.
+  // ====================================================================
+
+  // Build a chip <button> that mirrors a desktop tab's data attributes +
+  // visible label. We snapshot the desktop tabs at init time so the chip
+  // text and "data-{source,kind,domain}" stay consistent.
+  function buildMobileChips() {
+    const groups = [
+      { src: '#source-tabs', dst: '#m-source-tabs', attr: 'source' },
+      { src: '#kind-tabs',   dst: '#m-kind-tabs',   attr: 'kind' },
+      { src: '#domain-tabs', dst: '#m-domain-tabs', attr: 'domain' },
+    ];
+    for (const g of groups) {
+      const dst = document.querySelector(g.dst);
+      if (!dst) continue;
+      const tabs = document.querySelectorAll(g.src + ' button.tab');
+      const html = Array.from(tabs).map((tab) => {
+        const value = tab.dataset[g.attr] || '';
+        const label = (tab.textContent || '').replace(/[\\.·]+\\s*\\d*\\s*$/, '').trim();
+        const active = !value || tab.classList.contains('active');
+        return '<button class="m-chip ' + (active && !value ? 'active' : '') + '" '
+          + 'data-' + g.attr + '="' + escapeHtml(value) + '" type="button">'
+          + escapeHtml(label) + '</button>';
+      }).join('');
+      dst.innerHTML = html;
+    }
+  }
+
+  // Apply current state.active* to the mobile chips so they reflect the
+  // same selection as the desktop tabs after either side toggles.
+  function syncMobileChips() {
+    const apply = (sel, attr, val) => {
+      document.querySelectorAll(sel + ' .m-chip').forEach((c) => {
+        c.classList.toggle('active', (c.dataset[attr] || '') === (val || ''));
+      });
+    };
+    apply('#m-source-tabs', 'source', state.activeSource);
+    apply('#m-kind-tabs',   'kind',   state.activeKind);
+    apply('#m-domain-tabs', 'domain', state.activeDomain);
+    // Active filter count on the Filter button.
+    const n = (state.activeSource ? 1 : 0) + (state.activeKind ? 1 : 0) + (state.activeDomain ? 1 : 0);
+    const fc = document.getElementById('m-filter-count');
+    if (fc) {
+      fc.textContent = n ? n : '';
+      fc.classList.toggle('active', n > 0);
+    }
+  }
+
+  // Click a mobile chip -> set state, mirror desktop tab class, re-render.
+  function wireMobileChipGroup(sel, attr, stateKey, desktopSel) {
+    const root = document.querySelector(sel);
+    if (!root) return;
+    root.addEventListener('click', (e) => {
+      const btn = e.target.closest('.m-chip');
+      if (!btn) return;
+      const val = btn.dataset[attr] || '';
+      state[stateKey] = val;
+      state.lastDiscover = null;
+      // Mirror the desktop tab state so a later renderTable + recomputeAllCounts
+      // sees a consistent active class on both surfaces.
+      document.querySelectorAll(desktopSel + ' button.tab').forEach((d) => {
+        d.classList.toggle('active', (d.dataset[attr] || '') === val);
+      });
+      syncMobileChips();
+      updateBrowseLabel();
+      recomputeAllCounts();
+      renderTable();
+    });
+  }
+
+  // Filter sheet open/close.
+  function openSheet(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeSheet(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  // Render mobile detail body from a tool object — separate DOM from the
+  // desktop right pane so we don't have to fight visibility on overlays.
+  function renderMobileDetail(tool) {
+    if (!tool) return;
+    const body = document.getElementById('m-detail-body');
+    const nameEl = document.getElementById('m-detail-name');
+    if (!body || !nameEl) return;
+    nameEl.textContent = tool.name + '@' + tool.version;
+    const tag = tagFor((tool.domain || '').toLowerCase());
+    const url = sourceUrlOf(tool);
+    const meta = tool.metadata || {};
+    const rel = meta.reliability_score ?? 0;
+    const pct = Math.max(0, Math.min(100, rel * 100));
+    const stub = tool.endpoint_stub_name || '';
+    const callable = stub && stub !== 'catalog-only-stub';
+    body.innerHTML =
+      '<div class="m-detail-meta">'
+      +   '<span class="domain-tag ' + tag + '">' + tagLabel(tool.domain) + '</span>'
+      +   '<span class="m-kind">' + escapeHtml(tool.tool_kind || 'tool') + '</span>'
+      +   (callable ? '<span class="m-callable">callable</span>' : '')
+      + '</div>'
+      + '<p class="m-detail-blurb">' + escapeHtml(tool.capability_text || '') + '</p>'
+      + '<dl class="m-detail-kv">'
+      +   '<dt>reliability</dt><dd><span class="m-bar"><i style="width:' + pct.toFixed(0) + '%"></i></span> ' + fmt.rel(rel) + '</dd>'
+      +   '<dt>p95 latency</dt><dd>' + fmt.ms(meta.p95_latency_ms) + ' ms</dd>'
+      +   '<dt>cost / call</dt><dd>$' + Number(meta.cost_per_call_usd ?? 0).toFixed(4) + '</dd>'
+      +   '<dt>status</dt><dd class="' + (tool.status === 'active' ? 'green' : tool.status === 'circuit_broken' ? 'red' : '') + '">' + escapeHtml(tool.status || 'unknown') + '</dd>'
+      +   '<dt>stub</dt><dd>' + escapeHtml(stub || '—') + '</dd>'
+      +   '<dt>author</dt><dd>' + escapeHtml(tool.author_agent_id || '—') + '</dd>'
+      +   (url ? '<dt>source</dt><dd><a href="' + escapeHtml(url) + '" target="_blank" rel="noopener">' + escapeHtml(url.replace(/^https?:\\/\\//, '')) + '</a></dd>' : '')
+      + '</dl>';
+  }
+
+  // Initialize the mobile shell after first data load so the chips can
+  // mirror the desktop tabs (which include per-domain pip colors etc).
+  function initMobileShell() {
+    if (document.body.dataset.mobileInit === '1') return;
+    document.body.dataset.mobileInit = '1';
+
+    buildMobileChips();
+    wireMobileChipGroup('#m-source-tabs', 'source', 'activeSource', '#source-tabs');
+    wireMobileChipGroup('#m-kind-tabs',   'kind',   'activeKind',   '#kind-tabs');
+    wireMobileChipGroup('#m-domain-tabs', 'domain', 'activeDomain', '#domain-tabs');
+    syncMobileChips();
+
+    // Search mirror — keystroke and submit.
+    const mq = document.getElementById('m-q-input');
+    const dq = document.getElementById('q-input');
+    if (mq && dq) {
+      mq.addEventListener('input', (e) => { dq.value = e.target.value; dq.dispatchEvent(new Event('input')); });
+      mq.addEventListener('keydown', (e) => { if (e.key === 'Enter') runSearch(e.target.value); });
+    }
+    const mClear = document.getElementById('m-q-clear');
+    if (mClear) mClear.addEventListener('click', () => {
+      if (mq) mq.value = '';
+      if (dq) { dq.value = ''; dq.dispatchEvent(new Event('input')); }
+      state.fuzzyQuery = '';
+      runSearch('');
+    });
+
+    // Trending button (mobile) -> reuse desktop click handler.
+    const mt = document.getElementById('m-q-trending-mobile');
+    if (mt) mt.addEventListener('click', () => {
+      const dt = document.getElementById('q-trending');
+      if (dt) dt.click();
+    });
+
+    // Filter sheet open/close.
+    const fopen = document.getElementById('m-filter-open');
+    if (fopen) fopen.addEventListener('click', () => openSheet('m-filter-sheet'));
+    document.querySelectorAll('#m-filter-sheet [data-close]').forEach((el) => {
+      el.addEventListener('click', () => closeSheet('m-filter-sheet'));
+    });
+    const fapply = document.getElementById('m-filter-apply');
+    if (fapply) fapply.addEventListener('click', () => closeSheet('m-filter-sheet'));
+    const fclear = document.getElementById('m-filter-clear');
+    if (fclear) fclear.addEventListener('click', () => {
+      state.activeSource = '';
+      state.activeKind = '';
+      state.activeDomain = '';
+      state.lastDiscover = null;
+      document.querySelectorAll('#source-tabs .tab, #kind-tabs .tab, #domain-tabs .tab').forEach((t) => {
+        t.classList.toggle('active', !t.dataset.source && !t.dataset.kind && !t.dataset.domain);
+      });
+      syncMobileChips();
+      updateBrowseLabel();
+      recomputeAllCounts();
+      renderTable();
+    });
+
+    // Card tap -> open detail overlay.
+    const results = document.getElementById('mobile-results');
+    if (results) results.addEventListener('click', (e) => {
+      const card = e.target.closest('.m-card');
+      if (!card) return;
+      const key = card.dataset.key || '';
+      const at = key.lastIndexOf('@');
+      if (at < 0) return;
+      const name = key.slice(0, at);
+      const version = key.slice(at + 1);
+      const tool = findTool(name, version);
+      if (!tool) return;
+      renderDetail(tool);          // also populates desktop pane (cheap)
+      renderMobileDetail(tool);
+      openSheet('m-detail');
+    });
+
+    const mback = document.getElementById('m-detail-back');
+    if (mback) mback.addEventListener('click', () => closeSheet('m-detail'));
+  }
 
   function updateBrowseLabel() {
     const parts = [];
@@ -1190,6 +1614,7 @@ export const DASHBOARD_HTML = `<!doctype html>
   })();
 
   // ---- boot ----------------------------------------------------------------
+  initMobileShell();
   loadStats().then(() => loadState()).then(() => connect());
   setInterval(loadStats, 15000);
 })();
