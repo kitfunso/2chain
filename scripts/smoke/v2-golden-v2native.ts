@@ -35,6 +35,7 @@ interface GoldenQuery {
   expected_top1?: string;
   expected_top1_in?: string[];
   expected_top3: string[];
+  expected_kind?: 'tool' | 'skill' | 'subagent';
   relevance: Record<string, number>;
 }
 interface Golden {
@@ -68,6 +69,14 @@ const baselineOut = (() => {
 })();
 
 const skipHashCheck = process.argv.includes('--skip-hash-check');
+
+// Per-query kind targeting (Episode follow-up to A2): opt-in. Defaults off
+// so the baseline numbers in v2-baseline-native.json (A1's CI gate) remain
+// reproducible. Pass --per-query-kind to use each query's expected_kind
+// field as the filter. See docs/perf/10k-benchmark.md "per-query kind
+// targeting" section — infrastructure ships but NDCG drops on both corpora
+// because A1's relevance maps include cross-kind incidental grades.
+const perQueryKind = process.argv.includes('--per-query-kind');
 
 const golden = JSON.parse(readFileSync(goldenPath, 'utf-8')) as Golden;
 
@@ -139,7 +148,8 @@ async function runOnce(): Promise<{ ndcg3: number; mrr: number; recall3: number;
 
   for (const q of golden.queries) {
     const t0 = Date.now();
-    const out = await discover(storage, embedder, q.q, 10);
+    const kindFilter = perQueryKind ? q.expected_kind : undefined;
+    const out = await discover(storage, embedder, q.q, 10, undefined, kindFilter);
     latencies.push(Date.now() - t0);
     const ranked = out.results.map((r) => ({ name: r.name, version: r.version, score: r.rrf_score }));
     sumN += ndcgAtK(ranked, q.relevance, 3);

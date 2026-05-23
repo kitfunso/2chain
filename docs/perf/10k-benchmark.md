@@ -103,6 +103,26 @@ vec0's brute-force scan over 10k 768-d vectors is well under 100ms per query. Ph
 2. **Rerank scoring with `reliability_score`** as a third arm or post-filter.
 3. **Phase 2 D (Postgres + pgvector)** picks up the retrieval restructuring with real HNSW tuning capability.
 
+## Follow-up: per-query kind targeting (2026-05-23, infrastructure shipped, NDCG still drops)
+
+**Implemented:** `expected_kind` field added to every `v2-golden.json` query (90 `tool`, 4 `skill`, 3 `subagent`, 3 no-kind for adversarial). Schema enum extended. Runner passes `q.expected_kind` to `discover()`.
+
+**Result: per-query targeting beats global kind filter but still drops both baselines.**
+
+| Approach | 434 NDCG@3 | 10k NDCG@3 |
+|---|---|---|
+| No kind filter (A1/A2 baselines) | **0.7296** | **0.3139** |
+| Global `kind=tool` | 0.6765 | 0.2472 |
+| Per-query kind targeting | 0.7062 | 0.2844 |
+
+**Why it still drops:** A1's relevance maps were constructed without kind awareness. Some queries' relevance maps include skills/subagents at rel=1 or rel=2 (judges graded cross-kind candidates as "related" or "acceptable"). Any kind filter excludes those incidental hits and loses NDCG points.
+
+**Net effect of this episode:** the infrastructure is correct and ships (schema field, runner support); it just doesn't recover NDCG by itself. To make per-query kind targeting a positive remediation, the relevance maps must be re-graded with kind-restricted candidate pools — each query's relevance map should only contain entries of `expected_kind`. That's a separate, larger episode (re-running the judge ensemble with kind-aware candidate sourcing).
+
+**Alternative paths preserved:**
+- **Reliability-score post-filter or third RRF arm** (open item #2 from A2). Independent of kind question; addresses the synthetic-tool dilution half. Likely the cheaper next experiment.
+- Phase 2 D (Postgres + pgvector) with proper HNSW + filter-pushdown.
+
 ## Follow-up investigation (2026-05-23, post-merge)
 
 **Hypothesis tested:** A2's open item #1 — passing `kind: 'tool'` from the eval runner would filter out skill/subagent contamination and recover NDCG@3 at scale.

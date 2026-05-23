@@ -31,6 +31,11 @@
             "type": "array",
             "items": { "type": "string" }
           },
+          "expected_kind": {
+            "type": "string",
+            "enum": ["tool", "skill", "subagent"],
+            "description": "Optional. If present, the eval runner passes this as the kind filter to runRRF so retrieval is constrained to entries of the same kind. Omit for adversarial queries that should accept any kind."
+          },
           "expected_top3": {
             "type": "array",
             "items": { "type": "string" }
