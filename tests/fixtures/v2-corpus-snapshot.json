@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "generated_at": "2026-05-23T15:39:21.092Z",
-  "count": 317,
-  "corpus_sha256": "16a1dea6a5d8fa961159f794bdf0740ef55fc601e74c73ca608a9482c5262f15",
+  "generated_at": "2026-05-23T15:41:42.137Z",
+  "count": 434,
+  "corpus_sha256": "a9400aebb7f7128d68cdfa336234a96b8efb8607563da406be1cd5e89528e54f",
   "entries": [
     {
       "name": "abuseipdb-check",
@@ -29,6 +29,14 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "algorithmic-art",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "53ee1126a68f21d548bf87107173b5c900e9808578452b791c436305d8a7b000",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "alpha-vantage-quote",
       "version": "1.0",
       "namespace": "default",
@@ -43,6 +51,14 @@
       "kind": "tool",
       "capability_text_sha256": "2ab67622a0a9e1b47d542926abe0d705e1a6ae717a3ba493ca88c5b05f2329db",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "artifacts-builder",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "e13b304c2ed36179259d2039dd44e4260e46849b13b308137c0c343e57e246da",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "arxiv-paper-pdf",
@@ -83,6 +99,22 @@
       "kind": "tool",
       "capability_text_sha256": "e3e265657295563d9d698fc5f31e247cf9a547c4e077955790774f7b51471d88",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "autonomous-loops",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "903f26b269f40e50c3ec82b7b9c8b1290d655b5ea9a8b5ee62bc40afeb39e447",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "autoplan",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "7ebf76ee3f47e594cf0ae80e08e56560155e54582ee0a6cbd99f8f6780464cc0",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "avalara-avatax-calculate",
@@ -149,6 +181,22 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "benchmark",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "68d97fae11b25d7545715043e68c8abcbe4084bd4184f85d8a51c2bc9d95ef4c",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "benchmark-models",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "2a37feb32a0d277f10f0d5b3772321a458c7fb49bb81a53f83acebd1df7777d4",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "binance-klines",
       "version": "1.0",
       "namespace": "default",
@@ -157,12 +205,76 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "brainstorming",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "5af4815c27d86eec5799bc5ad7d301aebefe939592f7d4b0e9af5ba331406c33",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "brand-guidelines",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "53efc835f81b6f9fe832f655398cb39b5df499483b02bf2a589826ae41d45f24",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "browse",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "e6daae039df2096d0aad8e72db458130bb67eb9c9c4fc902beb23b6d44b558b9",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "build-release",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "9c562f7b4aa757e8f27e678ca507614cd3019c950a6b2e9018a3256c750c6b01",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "canary",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "8a4acee7b53256bb5361708ceab922f7f570f432be86462664bbbe4d0e705cda",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "canvas-design",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "954c22f02d34d6933f10f6bc69ec5b9c77c5747c16ccf67202916ff1621d707f",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "carbon-interface",
       "version": "1.0",
       "namespace": "default",
       "kind": "tool",
       "capability_text_sha256": "d259e5a4b96e48cffeb965d26862f48cbf1d465d5bb0b50e72bb0f71e3c5ff1c",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "careful",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "2c68646c1146b6f796c26a502cef454079e8676989b19f01f28a4c64da248ffc",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "claude-code-realtime",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "a47577970c151d7bfd99a20113d49edcf18f322d85ed45d5c11e3909a56d0e42",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "clinical-trials-gov",
@@ -197,12 +309,28 @@
       "schema_summary_sha256": "5df60e3652a47eb2cce81ec06428476d467981ac02d595aa9553b7281fb93741"
     },
     {
+      "name": "codex",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "dab419a1b89d33baf8e642d90465897820e942668ee2edd4529edb2db38145f6",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "coingecko-coin-price",
       "version": "1.0",
       "namespace": "default",
       "kind": "tool",
       "capability_text_sha256": "6c3e86d17d35b3b5dbd12af45878d6aa012a576ceb80fef3f150f619feee02cb",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "commodity-backtest",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "30cef6b5580fada2c356991160edbc1b07ccefc87e0aac608445eeda6d051c21",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "companies-house-filings",
@@ -219,6 +347,38 @@
       "kind": "tool",
       "capability_text_sha256": "c796b713fd14d76feb7c74871dcd27c1f047fc8d1b10f7b850dfa9472abab909",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "connect-chrome",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "08f1ba38ff74a7ce2d8ad7ed2e2ab4bd942ccb1daaefba917869d67f1674afd8",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "content-hash-cache",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "a69ed8fa4ca9a4e2832ea0b733eedbff72f116acd383c824304f7285bd0780a1",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "context-restore",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "c1fe99dd621f456fc6096585d12fdb41e996b452b31d22d550afd53eb2916959",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "context-save",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "a7f7860949405ac00d4d3dc3b962afdb61282160abee49407e3c6a87165de005",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "core-fulltext-search",
@@ -245,12 +405,28 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "creator-style-mimic",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "8aa9ace2c19359dae0499f651364d495808b9e8604e1bbe8065ce38d690d96f5",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "crossref-doi-lookup",
       "version": "1.0",
       "namespace": "default",
       "kind": "tool",
       "capability_text_sha256": "0245c434b807f60f635f7b0b1fd495d4e29f6e864b44a52c50c24bea8c7287fd",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "cso",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "aa270d46512f224cde68861daf02d75c9b114ecc0daf1fe4ce1dc5e23761e9c1",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "csv-parse",
@@ -277,6 +453,22 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "data-auditor",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "0d93f26fc826c742731827029595ff6a5c8f142e8b378f13ddce3791672b5aa7",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "data-engineer",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "6ec19d5786a5a400da8e4334ba68c158d97cde0f84007150c6de8d8237ad7f77",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "data-gov-search",
       "version": "1.0",
       "namespace": "default",
@@ -285,12 +477,92 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "database-optimizer",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "ccb783966ce2e1a69b2f1fd8cccdd5cd32ccc05892f2230b20cd84262fe974e7",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "de-sloppify",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "41f51daa54e112766f57405d08ea7278218e454430e0d7d2701671185f35171a",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "debugger",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "48a98018bb06242c65ebdf67696efb3829067540d6997237c48823a483868817",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "deel-contracts",
       "version": "1.0",
       "namespace": "default",
       "kind": "tool",
       "capability_text_sha256": "327abf83c4d4e5553a53c43077e2829ae10c809b05122fbe924dc7f38c103446",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "design-consultation",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "74be68edd34f59cebf797d1fab00bd6f40729b648e2e133b7466e33e38ded748",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "design-html",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "17b7995028fcaaf8a79ec94cc16854e3b66fbfacf19c7e36efec7587b5403264",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "design-review",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "15a8735a1329ab34fb8b2f468f276ee436a68fe771421c8264b3d4f8b120974c",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "design-shotgun",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "21856ae55c6ad5301537f6078e441f4a496d59ad00b5378f856456ea4d0ceaa5",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "dev-framework",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "1e8e8ddfe7b556e10f660245939dcdabe66cf5e3fd5376f498706e183eee8ca1",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "dev-framework-rl",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "8806bafcbbca05d8d0e790e7723300769fafccc78a480b2484937109c15fba0c",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "devex-review",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "7111a4c2f39c5713bb6c2229e7b8db1a4124f880b98b7f7b8552eb91e1b8ad88",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "devto-articles",
@@ -325,12 +597,28 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "dispatching-parallel-agents",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "07ac908a2f619a2270ef22871d3f3bc4e24dd952f68f0c8f8e2c3553603a6099",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "distance-haversine",
       "version": "1.0",
       "namespace": "default",
       "kind": "tool",
       "capability_text_sha256": "0ff12c85b463c1ae716ab26d1eca5d0180dc72f5f8a776deb921d688bc1858e5",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "doc-coauthoring",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "6a86d7c5caa33131a3a92b7e82aed3c81308514d2959ba537403d7656a237c59",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "docker-hub-tags",
@@ -347,6 +635,22 @@
       "kind": "tool",
       "capability_text_sha256": "ed133c11cb9ac8f344b09a35a2b4f59f4eef7381d07e59969091f692a2c7449a",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "document-release",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "4dd35106e3e68626f0b9190b7b07ef5fb439fb3ae0e114da7862f8cc2c5769f0",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "docx",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "e09d7fd91faf654c374eccb10c8cc4d55c0335d61f43d429751372917c03c14e",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "docx-extract-text",
@@ -429,12 +733,36 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "eval-driven-dev",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "3479a0c54aacc717014ed3c18205b8bb2bd6a68a703bc784cf75311d25089719",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "executing-plans",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "55191cff329350d988e16655f57ee13ff3dd788dbb778a7cbac61778ba8c2f28",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "fao-stat-bulk",
       "version": "1.0",
       "namespace": "default",
       "kind": "tool",
       "capability_text_sha256": "91abff9125ff6391811baa1aeccd6e3828523b9f88dd08503bd9bd02d2ef40fe",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "fastapi-pro",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "1cce5ef45086d08871924d75a39ce6fe7d4e4dc356b41a800b606a702002b5c0",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "fcc-broadband-map",
@@ -461,6 +789,14 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "finishing-a-development-branch",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "ee54769b621e2cf4d1d675c176e3d3cc86a51ffc6f792201633ed5851bc90cab",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "finnhub-earnings-calendar",
       "version": "1.0",
       "namespace": "default",
@@ -477,6 +813,14 @@
       "schema_summary_sha256": "286f82bcf6696de82b1ea104c23b73ed0547d11449eb2b0cb5c0f6edc7c11ba3"
     },
     {
+      "name": "framework-content-mixer",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "19de7e5d0e8ae0fa51ceecf2483f34fbc1cc67cb977a8ed8cc350a46654f963b",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "fred-series",
       "version": "1.0",
       "namespace": "default",
@@ -485,12 +829,52 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "freeze",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "50f240d8e21b58772981885f279f1bb4ee78342e08060f46a6219a50d44695f4",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "freshbooks-expenses",
       "version": "1.0",
       "namespace": "default",
       "kind": "tool",
       "capability_text_sha256": "94b65c84d40189af32099a0d3cc53a49b3b621d4a204ba5d7dc21edc94047a4d",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "frontend-design",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "9a8a233f7ea6d23beac6dc5161a0fcb5498dd5520cbd527091883aadfad7b739",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "frontend-developer",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "66abfcca96b7fba827a758b83e393fdcfed0ddd78fa3bb5674e66d0fb857e8ad",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "frontend-slides",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "29f94ab6341b1abcbf326416608cf3cc0e6e3832d900e4a7ad0743611703a000",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "full-power",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "0151ca78fdcc4f0e8697d91ffa8916cedca49337e5ae4f669c4ed8cec6bb2c0e",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "gcal-create-event",
@@ -523,6 +907,14 @@
       "kind": "tool",
       "capability_text_sha256": "8383c703644a26a0fb07a3cdecc18629dac29c285bd28a07587538d34c344011",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "git-commit-helper",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "33a3d616b9e8d711ee70a020859f8b6a8527bae1db09c26583f199be5c6d1018",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "github-actions-marketplace",
@@ -661,12 +1053,36 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "gstack",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "92fc08d1f241078cc738bff7a475c7c16ef1b54cd8e72e6d422f93774426623d",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "gstack-upgrade",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "d9215c9bea1de9a0dddcea7fbb0942bd57bd071693b7985a9a61f9d109f72b31",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "gtfs-public-transit",
       "version": "1.0",
       "namespace": "default",
       "kind": "tool",
       "capability_text_sha256": "9c6fa8fec1daf753ce65fc7e29a130fdb78ee752b41dd7d50a0cd17fbe66ab4f",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "guard",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "78d6072aa5cb309776e2882e27ec855131926ca5cae816d10d816c1409f971a9",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "gusto-payroll",
@@ -691,6 +1107,14 @@
       "kind": "tool",
       "capability_text_sha256": "e53efed82398e7b592cb2e2b4d707b34b47dbcdfd720df5ea3da4c64d903504e",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "health",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "4d774c1467b32772d4d19a921b7233c9044823b829155c4e255de7eae8718e88",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "helium-iot-devices",
@@ -765,6 +1189,22 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "internal-comms",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "0bc28ae1987d898425ab0b89c9a8389406310ebf8bd6963c5c77fdedcf59612c",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "investigate",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "74ddade77592014d7d9b7bd318ab8b6d445c76c357daddb40b06b0496b99af02",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "invoice-grok",
       "version": "1.2",
       "namespace": "default",
@@ -837,6 +1277,14 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "land-and-deploy",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "b5293860d7dd0a7a0071630ae0af6cb66f127e3127d1ae1956508bdc26b3e2ca",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "last-fm-track-info",
       "version": "1.0",
       "namespace": "default",
@@ -845,12 +1293,36 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "learn",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "a3626dadf324d6db026556e2fc7a9c1a164cc51fbae9f663d5ec88ff457b76b7",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "lever-postings",
       "version": "1.0",
       "namespace": "default",
       "kind": "tool",
       "capability_text_sha256": "44d2e7fc3a3416030a9f4ce13e3d0eb4256276bab718e00506d251591845d89b",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "linkedin-thought-leader",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "a2385e8b7c06297b7b2806d49d69e33dbc45745b492fe21a3a7b678aa85730c8",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "make-pdf",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "40a549c5057e570e860fae2069c50fbf08595243e447a41dadd2662e0c6864ff",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "malformed-bot",
@@ -906,6 +1378,14 @@
       "namespace": "default",
       "kind": "tool",
       "capability_text_sha256": "ec1694c00ec24c1302376c2295ffd60ce7f3db5400d4d92d2d5f8c634a26d36b",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-builder",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "790851079815f28a07c6a391a77bf4616b19b844cd81341711b1dd898c7a01a5",
       "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
@@ -1517,6 +1997,22 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "model-diff",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "4d13c95aea4b647bb038d73945b1d8068d8c95cfc28f7754ff7ff44a11de5fdf",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "model-improve",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "d2f21de398b06fcb0c96ba6c135391e217f4997299f03353135334c068811369",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "netlify-builds",
       "version": "1.0",
       "namespace": "default",
@@ -1581,6 +2077,14 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "office-hours",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "4fc9bfd55a8a23fe7f1190b5368ea2794c9ad66a5e6defb5615cc0ce497bb961",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "ons-uk-statistics",
       "version": "1.0",
       "namespace": "default",
@@ -1595,6 +2099,14 @@
       "kind": "tool",
       "capability_text_sha256": "d07fd8f48ad37eadb86229d9e85b7cf64aa557dc305375db3b7644c223f43226",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "open-gstack-browser",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "08f1ba38ff74a7ce2d8ad7ed2e2ab4bd942ccb1daaefba917869d67f1674afd8",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "open-meteo-forecast",
@@ -1717,6 +2229,14 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "pair-agent",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "58bafbb2e7153703ec08e87bfb19e19c1c05c70d453e7009df16cbcf227182f1",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "pandas-dataframe-op",
       "version": "1.0",
       "namespace": "default",
@@ -1755,6 +2275,14 @@
       "kind": "tool",
       "capability_text_sha256": "1b37d064f277f41c5b6c64428121438ff9858537950d57a66690df77a6f8f74f",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "pdf",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "2daa06841347115c97277d0ababbf442dfbfbc46769c95b46c0780d5b040ad2e",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "pdf-extract-tables",
@@ -1821,12 +2349,68 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "plan-ceo-review",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "3b589bf1138f2b519cc38e89808a57053e19afdabb3957bbb7460ffc2dcff6f7",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "plan-design-review",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "f5dcf0808ae7e16d64de97e267f7021132d7c8a0e120b96f883ccdb8dfaa781f",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "plan-devex-review",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "391c5839b636363eb10addbcf031c2b89c61cd3e79b08a412c225f33d3b790e3",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "plan-eng-review",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "54ada9feaf59491986c0a365cd2b0cfcec1c4f0f7d3548f896acc9b0fcd82af4",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "plan-tune",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "f80906df7acaf4609398924d43048907ad1ecbbf877146f57d31b55e5a1202af",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "platform-voice-adapter",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "e8c72b2e13f350775393d2ab85575680cea10808743d11c777444bfbbb2316f5",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "polygon-aggregates",
       "version": "1.0",
       "namespace": "default",
       "kind": "tool",
       "capability_text_sha256": "bbfbafd9bfe2caa734f625a12b1a513228b6f725230768ab7095868031393497",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "pptx",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "ca268f01711abe8cf1e59a1bfc31a7a541f76fbd1c41f349ea9a40b510262688",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "pptx-extract-slides",
@@ -1837,12 +2421,28 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "project-scaffold",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "8f9ceca79d3c1ddd9a2c551fc522a4aa70e8798e2cc279257824dde2f44bfd66",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "propertydata-uk-postcode",
       "version": "1.0",
       "namespace": "default",
       "kind": "tool",
       "capability_text_sha256": "c903b3aea415d08402bc05f8ec002730daad23bd25f8e632475e217c2afd8d68",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "publish-repo",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "a2b960f3ea1206a10012f83f3e19dfab74dbf5465898cbe472f521f0a36cf2b9",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "pubmed-clinical-search",
@@ -1885,6 +2485,46 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "python-backend-engineer",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "10347c98c9e35a107fb8d6ee5e6fd85ae7d7854f58bccdc3b16a628cf39d638b",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "qa",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "6fc8c3ea3d4bcf5496216a1856ccb6f6b6b9fc5f0a19dd311747f4279f5c18e6",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "qa-only",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "2074855ec93488489c4fc15f123e83fbb873ffcdc85fc47907bd2bfe84db0209",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "quant-analyst",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "200949f9061d6e6170460b6707752b001f670143f87122272791d092f354fb90",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "quant-report",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "81efc12c89cd2213bb5c3c7d6f3926c040708fae9f3174ea66edcebdc87dd3ea",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "quickbooks-online-invoices",
       "version": "1.0",
       "namespace": "default",
@@ -1909,6 +2549,14 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "receiving-code-review",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "3bf8e8fda529d77c640d2b4d03f25f0f02f01c966a4b68928fa04a63163cae54",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "redfin-property-detail",
       "version": "1.0",
       "namespace": "default",
@@ -1923,6 +2571,30 @@
       "kind": "tool",
       "capability_text_sha256": "daa36c927bc666b7cac15543beffa4df0619bcb8f195598813b89fbb487f7241",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "requesting-code-review",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "a8a5f8e4aad41b4cc8dca128a198d35776f0acf490e5c59e3769a26a88690d71",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "retro",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "4702a3a3d5359888898ce5c2bde73d4970e923ecbaddbe28116b9cbaeb10c146",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "review",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "579e5bc9369ef64a0db98ac933634bd13fe93ec29b801915c3f7e35b6127f92f",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "rightmove-listings",
@@ -1947,6 +2619,14 @@
       "kind": "tool",
       "capability_text_sha256": "09258953df4f0d6b31a4ec9a60d3eea80dfee481852b9b088219564d2a6492f3",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "roll-check",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "8d9e9fb241286802930189ce116da07b2575ce0d30aec97ffabf132435800c86",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "rubygems-search",
@@ -1979,6 +2659,14 @@
       "kind": "tool",
       "capability_text_sha256": "bbc1c4a6b53f35e437fcb85ec1542b38a40fd31d93b193e3c8dca83e869439b6",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "search-first",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "d5393f3a4de5f0322dae74e242a603b8b190d2f857c366974444ce3996446b21",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "sec-edgar-companyfacts",
@@ -2021,6 +2709,14 @@
       "schema_summary_sha256": "5df60e3652a47eb2cce81ec06428476d467981ac02d595aa9553b7281fb93741"
     },
     {
+      "name": "self-review",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "a8e00f95051bf76d8c93937c739be21fc8dd2155c79b4ee83356a7797a7a6061",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "semantic-scholar-paper",
       "version": "1.0",
       "namespace": "default",
@@ -2037,6 +2733,14 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "senior-code-reviewer",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "4d8899b16e6d5a624147708312233b4bdb58da8b8739740e7feb631a7fa172f9",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "sentinel-hub-process",
       "version": "1.0",
       "namespace": "default",
@@ -2045,12 +2749,36 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "setup-browser-cookies",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "0241591089eba90fecb515a5c10ed7e5b9d2e666fe6503fc7002357702e64ba2",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "setup-deploy",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "290075a9dc85c02dd7e092f6dc61e2a231a59ecea53385971656e17ea48d1106",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "shellcheck-bash",
       "version": "1.0",
       "namespace": "default",
       "kind": "tool",
       "capability_text_sha256": "5dfda31cda7f80d7e51142e573e11a16f676062c389a5b42f4eb731c39994bd4",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "ship",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "37d4e285ee2b0ed1c695eaef2ea147b50c1ce7031e4a1c31b55c4785cea32b77",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "shodan-host-search",
@@ -2075,6 +2803,30 @@
       "kind": "tool",
       "capability_text_sha256": "0e15c04709ebd5b9708786912ea9a1f909845d2f78455a1e3c7336fd63f1ac63",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "signal-validator",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "03a1890be61fb05d7655eabd974f58d19074233428e1c3310869a4be15e19ca3",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "skill-creator",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "c46444a95ca35d577efbaf22e89f84a7dfe2fbcc97f3165f3efcd786e4d605e7",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "slack-gif-creator",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "92eb662bbd402c3c5bfc3a27a4dcc26e2c2634b74a84bec1fd739baba88e142f",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "slack-list-channels",
@@ -2109,6 +2861,22 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "smoke-test",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "29fda287dcebf4e929a867e089450b5f30b6b6fcbf54786ffbb77d59255c4354",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "smoke-test-frontend",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "493c2f6586a8182fb04f316d806a1a2e78422defe4e3e608cc2bda0c1306cc1c",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "snomed-ct-search",
       "version": "1.0",
       "namespace": "default",
@@ -2123,6 +2891,14 @@
       "kind": "tool",
       "capability_text_sha256": "7acfad4081dc612c48e642dc61cbbd2d6ec800f4619b9f11da905394232b572c",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "social-brand",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "2872ed71d6824523d0658ac5f4dd56d628514901fc5624445735f1849c5e862a",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "sonarqube-quality-gate",
@@ -2181,6 +2957,14 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "standards-check",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "956967d4ec72e33dc1f98c82a68eee8e959f05c88cbaa26355f660e45dd069c7",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "staticcheck-go",
       "version": "1.0",
       "namespace": "default",
@@ -2195,6 +2979,14 @@
       "kind": "tool",
       "capability_text_sha256": "76267988fa22876d8955eb0c58222af1f242e2926df14b0052d97c81c3a6a23b",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "strategic-compact",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "12c3e8b4d95c121821207eeef367e332794ac66bf73d66ed44749d95bcd1575c",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "string-diff",
@@ -2213,12 +3005,36 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "subagent-driven-development",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "63c3693d0d1d7c420ae71a9733307a05ad77893ba31eaec56c2303c229847af6",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "summariser-mini",
       "version": "1.0",
       "namespace": "default",
       "kind": "tool",
       "capability_text_sha256": "ae6c1b319044a970e8e575af5d1e20cdb3bce4ad93a2e41e9f252afc1c597623",
       "schema_summary_sha256": "3c04f35e36af66c4e69dd6ca53605b9bd6b1814fee35fcc85ff1f49bc307b663"
+    },
+    {
+      "name": "systematic-debugging",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "c0eeeb8d6f77a66492e1484fa2ace2bf75e227be567251377ba79edc900a5036",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "template-skill",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "e2d8d93025d8caf0a96bb59b598a0e0f0ec3a0de03f79be9a419cd9212cd72e1",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "terraform-cloud-runs",
@@ -2243,6 +3059,22 @@
       "kind": "tool",
       "capability_text_sha256": "81ee4c303107fac8593cc7e9464b468c78470d92873e629a502895fa12ef0b3b",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "test-driven-development",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "7855e29dfde52f000ae3485b7f87a24ff613c5064f8915c815e0085462fc2ce1",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "theme-factory",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "81056c43a38a2518a479c37d397048937a196c1a9a4e69b0968cc2e06b034cb8",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "thingsboard-telemetry",
@@ -2325,6 +3157,30 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "twitter-thread-builder",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "193ce2e7846562ce031da807fbed68cb9520c35353680917e8662be031bade88",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "typescript-pro",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "0437c69b83ba6d37410a452eff6914247abcba62d4b2aaaf4d24336b8b2823a4",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "unfreeze",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "25c85f579a2001e4ba4cf89c0207649736a5d35e49297bee059931d1b0957909",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "unsplash-photo-search",
       "version": "1.0",
       "namespace": "default",
@@ -2357,6 +3213,22 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "using-git-worktrees",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "3d82d324b87a8423d58e02b138a469d559601178bd4a34fd1a947c77eca449cf",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "using-superpowers",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "3a80363cae58aec8f5e2f313d8ab1530bd074bbc380b88d4ad3ef4c004638078",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "uspto-patents-search",
       "version": "1.0",
       "namespace": "default",
@@ -2371,6 +3243,22 @@
       "kind": "tool",
       "capability_text_sha256": "5d366876e28c7115eefa9d1ef56da6a695ce61e5c230107924308cec7f036129",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "verification-before-completion",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "99e494e5bc1e228d007254723ba9fed0bb4d3a308a95ec9459f0a515b2fb3f68",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "viral-hook-generator",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "a02c0ce12e9a90872d913a97fa2a8ee95c3cfda82fbc77cd82cec9769cf24766",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "virustotal-file-report",
@@ -2395,6 +3283,22 @@
       "kind": "tool",
       "capability_text_sha256": "f01ad2166d93936252a0278df6fc4865b578a7001cab1c88cf661af7aefc18ad",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "web-artifacts-builder",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "ced2ba735fb60650d671c9e983fa0c1f093ede28573bb781cbd8f347e2d46eb8",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "webapp-testing",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "ae724298f1a5a54f679fa3a46db63690d7ffc928aff6583f4f3b0b907869a54e",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "whisper-audio-transcribe",
@@ -2469,12 +3373,36 @@
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
     },
     {
+      "name": "writing-plans",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "3c04a38908fb6800638eaa0f17f42eb4b3bcc31907a6c9c8f0c9701d9fe26e15",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "writing-skills",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "f0e31ae1a24fbe103719ef70fb02034935c1b4aace9ef9be3830311651f2b0b4",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
       "name": "xero-bank-transactions",
       "version": "1.0",
       "namespace": "default",
       "kind": "tool",
       "capability_text_sha256": "2f2afa927573d739ab0556b6c721793ed0416ed3017f5cb08aa738ba103442d3",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "xlsx",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "525a942a193b4c0668b6e631a7804de7121f72c75d27782fec8c6625f09a6e0d",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "xlsx-read-sheet",
@@ -2507,6 +3435,14 @@
       "kind": "tool",
       "capability_text_sha256": "3116329ce7b8f69f10e0fdf0a9e9afc787063dd4762531a51ece34dca9a4421d",
       "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "youtube-title-optimizer",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "118697d2eb52d61f9d1e99307f49c2c5b46ed419a6cb48f8cf76bbd60eb1f55d",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
     },
     {
       "name": "youtube-transcript",

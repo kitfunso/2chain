@@ -1,0 +1,1326 @@
+{
+  "version": 2,
+  "_doc": "Hand-drafted v2-native golden ranking set. 100 queries \u00c3\u2014 7 strata. relevance maps {} at draft time; populated by Steps 3+4 (candidate pool + ensemble grading + adjudication). See docs/plans/2026-05-23-episode-a1-v2-native-golden-set.md.",
+  "generated_at": "2026-05-23",
+  "corpus_sha256": "a9400aebb7f7128d68cdfa336234a96b8efb8607563da406be1cd5e89528e54f",
+  "prewarm_sha256": "0085cd3f339ac4309b81487cf3ce995be8bd0ff7535902a9a63e5e1db4cde117",
+  "ndcg_formula": "exp_gain_log2_rank1",
+  "queries": [
+    {
+      "id": "prewarm-01",
+      "stratum": "prewarm",
+      "q": "Extract tables from this financial report PDF",
+      "expected_top1": "pdf-extract-tables",
+      "expected_top3": [
+        "pdf-extract-tables",
+        "pdf-extractor",
+        "aws-textract-document"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-02",
+      "stratum": "prewarm",
+      "q": "extract income statement from 10-K for DCF model",
+      "expected_top1": "sec-edgar-financials",
+      "expected_top3": [
+        "sec-edgar-financials",
+        "sec-edgar-companyfacts",
+        "pdf-extractor"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-03",
+      "stratum": "prewarm",
+      "q": "fetch latest 10-K income statement for NVDA",
+      "expected_top1": "sec-edgar-financials",
+      "expected_top3": [
+        "sec-edgar-financials",
+        "sec-edgar-filings-list",
+        "yahoo-finance-fundamentals"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-04",
+      "stratum": "prewarm",
+      "q": "parse UK supplier invoice for accounts payable",
+      "expected_top1_in": [
+        "aws-textract-document",
+        "pdf-extract-text",
+        "azure-doc-intelligence"
+      ],
+      "expected_top3": [
+        "aws-textract-document",
+        "pdf-extract-text",
+        "azure-doc-intelligence"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-05",
+      "stratum": "prewarm",
+      "q": "review javascript code for bugs",
+      "expected_top1_in": [
+        "eslint-snitch",
+        "eslint-stylecheck",
+        "code-review-mini"
+      ],
+      "expected_top3": [
+        "eslint-snitch",
+        "eslint-stylecheck",
+        "code-review-mini"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-06",
+      "stratum": "prewarm",
+      "q": "audit python code for security vulnerabilities OWASP",
+      "expected_top1": "security-scanner",
+      "expected_top3": [
+        "security-scanner",
+        "pylint-pro",
+        "code-review-mini"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-07",
+      "stratum": "prewarm",
+      "q": "search npm registry for a package",
+      "expected_top1": "npm-search",
+      "expected_top3": [
+        "npm-search",
+        "npm-registry-package",
+        "npm-package-downloads"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-08",
+      "stratum": "prewarm",
+      "q": "find a typescript library on github",
+      "expected_top1": "github-search",
+      "expected_top3": [
+        "github-search",
+        "npm-search",
+        "github-repo-info"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-09",
+      "stratum": "prewarm",
+      "q": "search arxiv for papers on state space models",
+      "expected_top1_in": [
+        "arxiv-paper-search",
+        "arxiv-search-papers"
+      ],
+      "expected_top3": [
+        "arxiv-paper-search",
+        "arxiv-search-papers",
+        "arxiv-paper-pdf"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-10",
+      "stratum": "prewarm",
+      "q": "summarise an academic paper abstract",
+      "expected_top1_in": [
+        "arxiv-paper-pdf",
+        "crossref-doi-lookup"
+      ],
+      "expected_top3": [
+        "arxiv-paper-pdf",
+        "crossref-doi-lookup"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-11",
+      "stratum": "prewarm",
+      "q": "find research papers on transformer architectures",
+      "expected_top1_in": [
+        "arxiv-paper-search",
+        "arxiv-search-papers",
+        "core-fulltext-search"
+      ],
+      "expected_top3": [
+        "arxiv-paper-search",
+        "arxiv-search-papers",
+        "core-fulltext-search"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-12",
+      "stratum": "prewarm",
+      "q": "find an MCP server for postgres",
+      "expected_top1": "mcp-postgres__query",
+      "expected_top3": [
+        "mcp-postgres__query",
+        "sql-query-postgres",
+        "mcp-sqlite__read_query"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-13",
+      "stratum": "prewarm",
+      "q": "long-term memory for an AI agent",
+      "expected_top1_in": [
+        "mcp-memory__create_entities",
+        "mcp-memory__open_nodes",
+        "mcp-memory__search_nodes"
+      ],
+      "expected_top3": [
+        "mcp-memory__create_entities",
+        "mcp-memory__open_nodes",
+        "mcp-memory__search_nodes"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-14",
+      "stratum": "prewarm",
+      "q": "claude code skill for refactoring",
+      "expected_top1_in": [
+        "de-sloppify",
+        "test-driven-development"
+      ],
+      "expected_top3": [
+        "de-sloppify",
+        "test-driven-development"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-15",
+      "stratum": "prewarm",
+      "q": "agent framework with tool calling",
+      "expected_top1_in": [
+        "mcp-everything__sample_llm",
+        "claude-code-realtime",
+        "autonomous-loops"
+      ],
+      "expected_top3": [
+        "mcp-everything__sample_llm",
+        "claude-code-realtime",
+        "autonomous-loops"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-16",
+      "stratum": "prewarm",
+      "q": "sync data from postgres to bigquery",
+      "expected_top1_in": [
+        "sql-query-postgres",
+        "duckdb-analytics-query"
+      ],
+      "expected_top3": [
+        "sql-query-postgres",
+        "duckdb-analytics-query"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-17",
+      "stratum": "prewarm",
+      "q": "web scraper for product pricing",
+      "expected_top1_in": [
+        "amazon-product-search",
+        "algolia-product-search",
+        "ebay-finding"
+      ],
+      "expected_top3": [
+        "amazon-product-search",
+        "algolia-product-search",
+        "ebay-finding"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-18",
+      "stratum": "prewarm",
+      "q": "send a slack message to a channel",
+      "expected_top1_in": [
+        "slack-post-message",
+        "mcp-slack__slack_post_message"
+      ],
+      "expected_top3": [
+        "slack-post-message",
+        "mcp-slack__slack_post_message",
+        "slack-list-channels"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-19",
+      "stratum": "prewarm",
+      "q": "translate english to japanese",
+      "expected_top1_in": [],
+      "expected_top3": [],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-20",
+      "stratum": "prewarm",
+      "q": "schedule a meeting in google calendar",
+      "expected_top1": "gcal-create-event",
+      "expected_top3": [
+        "gcal-create-event",
+        "gcal-list-events"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-21",
+      "stratum": "prewarm",
+      "q": "extract tables from a pdf",
+      "expected_top1": "pdf-extract-tables",
+      "expected_top3": [
+        "pdf-extract-tables",
+        "pdf-extractor",
+        "aws-textract-document"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-22",
+      "stratum": "prewarm",
+      "q": "convert a docx to markdown",
+      "expected_top1": "docx-extract-text",
+      "expected_top3": [
+        "docx-extract-text",
+        "pdf-extract-text"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-23",
+      "stratum": "prewarm",
+      "q": "geocode an address to lat-lon",
+      "expected_top1_in": [
+        "google-maps-geocode",
+        "mapbox-geocoding",
+        "osm-nominatim"
+      ],
+      "expected_top3": [
+        "google-maps-geocode",
+        "mapbox-geocoding",
+        "osm-nominatim"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-24",
+      "stratum": "prewarm",
+      "q": "fetch current weather for london",
+      "expected_top1_in": [
+        "openweather-current",
+        "open-meteo-forecast",
+        "noaa-weather-forecast"
+      ],
+      "expected_top3": [
+        "openweather-current",
+        "open-meteo-forecast",
+        "noaa-weather-forecast"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-25",
+      "stratum": "prewarm",
+      "q": "transcribe an audio file with whisper",
+      "expected_top1": "whisper-audio-transcribe",
+      "expected_top3": [
+        "whisper-audio-transcribe",
+        "eleven-labs-tts",
+        "youtube-transcript"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-26",
+      "stratum": "prewarm",
+      "q": "generate an image from a prompt",
+      "expected_top1_in": [
+        "openai-dalle-image",
+        "stability-sd-image",
+        "mcp-everart__generate_image"
+      ],
+      "expected_top3": [
+        "openai-dalle-image",
+        "stability-sd-image",
+        "mcp-everart__generate_image"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-27",
+      "stratum": "prewarm",
+      "q": "compose a poem about the ocean",
+      "expected_top1_in": [
+        "mcp-everything__sample_llm"
+      ],
+      "expected_top3": [
+        "mcp-everything__sample_llm"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-28",
+      "stratum": "prewarm",
+      "q": "deploy a docker container to fly.io",
+      "expected_top1_in": [
+        "digitalocean-droplets",
+        "cloudflare-workers-deploy",
+        "kubernetes-api-pods"
+      ],
+      "expected_top3": [
+        "digitalocean-droplets",
+        "cloudflare-workers-deploy",
+        "kubernetes-api-pods"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-29",
+      "stratum": "prewarm",
+      "q": "monitor a kubernetes cluster",
+      "expected_top1": "kubernetes-api-pods",
+      "expected_top3": [
+        "kubernetes-api-pods",
+        "docker-image-scan",
+        "terraform-cloud-runs"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-30",
+      "stratum": "prewarm",
+      "q": "scan a python repo for hardcoded secrets",
+      "expected_top1": "security-scanner",
+      "expected_top3": [
+        "security-scanner",
+        "pylint-pro",
+        "docker-image-scan"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "prewarm-31",
+      "stratum": "prewarm",
+      "q": "check a domain for known CVEs",
+      "expected_top1": "cve-search-circl",
+      "expected_top3": [
+        "cve-search-circl",
+        "abuseipdb-check",
+        "security-scanner"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "single-01",
+      "stratum": "single-tool",
+      "q": "geocode 1600 Pennsylvania Avenue Washington DC into lat-lon coordinates",
+      "expected_top1_in": [
+        "google-maps-geocode",
+        "mapbox-geocoding",
+        "osm-nominatim"
+      ],
+      "expected_top3": [
+        "google-maps-geocode",
+        "mapbox-geocoding",
+        "osm-nominatim"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "single-02",
+      "stratum": "single-tool",
+      "q": "list all open issues in a specific github repo",
+      "expected_top1": "github-issues-list",
+      "expected_top3": [
+        "github-issues-list",
+        "github-pulls-list",
+        "github-repo-info"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "single-03",
+      "stratum": "single-tool",
+      "q": "search wikipedia for an article matching a query",
+      "expected_top1_in": [
+        "wikipedia-search",
+        "wikipedia-fulltext"
+      ],
+      "expected_top3": [
+        "wikipedia-search",
+        "wikipedia-fulltext",
+        "wikipedia-summary"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "single-04",
+      "stratum": "single-tool",
+      "q": "fetch the latest Form 4 insider transactions filed with the SEC",
+      "expected_top1": "sec-edgar-form4",
+      "expected_top3": [
+        "sec-edgar-form4",
+        "sec-edgar-filings-list",
+        "sec-edgar-financials"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "single-05",
+      "stratum": "single-tool",
+      "q": "send a transactional SMS via twilio",
+      "expected_top1": "twilio-send-sms",
+      "expected_top3": [
+        "twilio-send-sms",
+        "twilio-make-call",
+        "email-send-smtp"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "single-06",
+      "stratum": "single-tool",
+      "q": "get current bitcoin price from coingecko",
+      "expected_top1": "coingecko-coin-price",
+      "expected_top3": [
+        "coingecko-coin-price",
+        "binance-klines",
+        "alpha-vantage-quote"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "single-07",
+      "stratum": "single-tool",
+      "q": "list documents in an S3 bucket on AWS",
+      "expected_top1": "aws-s3-list-objects",
+      "expected_top3": [
+        "aws-s3-list-objects",
+        "aws-lambda-invoke",
+        "azure-doc-intelligence"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "single-08",
+      "stratum": "single-tool",
+      "q": "search arxiv for the latest preprints on a topic",
+      "expected_top1_in": [
+        "arxiv-paper-search",
+        "arxiv-search-papers"
+      ],
+      "expected_top3": [
+        "arxiv-paper-search",
+        "arxiv-search-papers",
+        "arxiv-paper-pdf"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "single-09",
+      "stratum": "single-tool",
+      "q": "lookup a DOI to get the article metadata",
+      "expected_top1": "crossref-doi-lookup",
+      "expected_top3": [
+        "crossref-doi-lookup",
+        "arxiv-paper-search",
+        "pubmed-search"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "single-10",
+      "stratum": "single-tool",
+      "q": "search clinical trials registered with the US government",
+      "expected_top1": "clinical-trials-gov",
+      "expected_top3": [
+        "clinical-trials-gov",
+        "pubmed-clinical-search",
+        "pubmed-search"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "single-11",
+      "stratum": "single-tool",
+      "q": "get audio features for a spotify track",
+      "expected_top1": "spotify-audio-features",
+      "expected_top3": [
+        "spotify-audio-features",
+        "spotify-track-search",
+        "youtube-search"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "single-12",
+      "stratum": "single-tool",
+      "q": "look up a UK company's filings at Companies House",
+      "expected_top1": "companies-house-filings",
+      "expected_top3": [
+        "companies-house-filings",
+        "companies-house-search",
+        "sec-edgar-filings-list"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "single-13",
+      "stratum": "single-tool",
+      "q": "convert a CSV file to JSON",
+      "expected_top1": "csv-to-json",
+      "expected_top3": [
+        "csv-to-json",
+        "csv-parse",
+        "duckdb-analytics-query"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "single-14",
+      "stratum": "single-tool",
+      "q": "resize an image to specific dimensions",
+      "expected_top1": "image-resize",
+      "expected_top3": [
+        "image-resize",
+        "image-convert-format",
+        "aws-textract-document"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "single-15",
+      "stratum": "single-tool",
+      "q": "search the EPO database for European patents",
+      "expected_top1": "epo-patent-search",
+      "expected_top3": [
+        "epo-patent-search",
+        "core-fulltext-search",
+        "wikipedia-search"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "single-16",
+      "stratum": "single-tool",
+      "q": "fetch the cast list for a movie from IMDB",
+      "expected_top1_in": [],
+      "expected_top3": [
+        "wikipedia-summary"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "single-17",
+      "stratum": "single-tool",
+      "q": "look up CVE records by package name",
+      "expected_top1": "cve-search-circl",
+      "expected_top3": [
+        "cve-search-circl",
+        "abuseipdb-check",
+        "security-scanner"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "single-18",
+      "stratum": "single-tool",
+      "q": "calculate haversine distance between two points",
+      "expected_top1": "distance-haversine",
+      "expected_top3": [
+        "distance-haversine",
+        "mapbox-directions",
+        "google-maps-geocode"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "nearmiss-01",
+      "stratum": "near-miss",
+      "q": "get a list of all the 10-K and 10-Q filings a company submitted to the SEC last quarter",
+      "expected_top1": "sec-edgar-filings-list",
+      "expected_top3": [
+        "sec-edgar-filings-list",
+        "sec-edgar-financials",
+        "sec-edgar-companyfacts"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "nearmiss-02",
+      "stratum": "near-miss",
+      "q": "pull the JSON for the income statement, balance sheet, and cash flow from a company's most recent 10-K",
+      "expected_top1": "sec-edgar-financials",
+      "expected_top3": [
+        "sec-edgar-financials",
+        "sec-edgar-companyfacts",
+        "yahoo-finance-fundamentals"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "nearmiss-03",
+      "stratum": "near-miss",
+      "q": "I have a paper's arxiv id, fetch the PDF binary",
+      "expected_top1": "arxiv-paper-pdf",
+      "expected_top3": [
+        "arxiv-paper-pdf",
+        "arxiv-paper-search",
+        "arxiv-search-papers"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "nearmiss-04",
+      "stratum": "near-miss",
+      "q": "extract structured text from a scanned PDF of an invoice (OCR)",
+      "expected_top1_in": [
+        "aws-textract-document",
+        "azure-doc-intelligence",
+        "pdf-extractor"
+      ],
+      "expected_top3": [
+        "aws-textract-document",
+        "azure-doc-intelligence",
+        "pdf-extractor"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "nearmiss-05",
+      "stratum": "near-miss",
+      "q": "extract plain text from a born-digital PDF (no OCR needed)",
+      "expected_top1": "pdf-extract-text",
+      "expected_top3": [
+        "pdf-extract-text",
+        "pdf-extractor",
+        "pdftools-pro"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "nearmiss-06",
+      "stratum": "near-miss",
+      "q": "find an npm package and see its weekly download count",
+      "expected_top1": "npm-package-downloads",
+      "expected_top3": [
+        "npm-package-downloads",
+        "npm-registry-package",
+        "npm-search"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "nearmiss-07",
+      "stratum": "near-miss",
+      "q": "search npm by keyword and get a ranked list of packages",
+      "expected_top1": "npm-search",
+      "expected_top3": [
+        "npm-search",
+        "npm-registry-package",
+        "github-search"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "nearmiss-08",
+      "stratum": "near-miss",
+      "q": "find a python static analyser for code quality issues like unused imports",
+      "expected_top1": "pylint-lint",
+      "expected_top3": [
+        "pylint-lint",
+        "pylint-pro",
+        "code-review-mini"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "nearmiss-09",
+      "stratum": "near-miss",
+      "q": "python security audit that reports OWASP-aligned vulnerabilities with structured findings",
+      "expected_top1": "security-scanner",
+      "expected_top3": [
+        "security-scanner",
+        "pylint-pro",
+        "pylint-lint"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "nearmiss-10",
+      "stratum": "near-miss",
+      "q": "look up the lat-lon of a postcode using mapbox",
+      "expected_top1": "mapbox-geocoding",
+      "expected_top3": [
+        "mapbox-geocoding",
+        "google-maps-geocode",
+        "osm-nominatim"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "nearmiss-11",
+      "stratum": "near-miss",
+      "q": "compute the driving route between two coordinate pairs",
+      "expected_top1": "mapbox-directions",
+      "expected_top3": [
+        "mapbox-directions",
+        "google-maps-geocode",
+        "distance-haversine"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "nearmiss-12",
+      "stratum": "near-miss",
+      "q": "post a message to a slack channel from an agent (not via MCP)",
+      "expected_top1": "slack-post-message",
+      "expected_top3": [
+        "slack-post-message",
+        "slack-list-channels",
+        "mcp-slack__slack_post_message"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "nearmiss-13",
+      "stratum": "near-miss",
+      "q": "list the channels in a slack workspace",
+      "expected_top1": "slack-list-channels",
+      "expected_top3": [
+        "slack-list-channels",
+        "slack-post-message",
+        "mcp-slack__slack_list_channels"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "nearmiss-14",
+      "stratum": "near-miss",
+      "q": "search PubMed clinical trials for an oncology drug",
+      "expected_top1": "pubmed-clinical-search",
+      "expected_top3": [
+        "pubmed-clinical-search",
+        "pubmed-search",
+        "clinical-trials-gov"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "nearmiss-15",
+      "stratum": "near-miss",
+      "q": "search PubMed for biomedical research papers on a topic",
+      "expected_top1": "pubmed-search",
+      "expected_top3": [
+        "pubmed-search",
+        "pubmed-clinical-search",
+        "crossref-doi-lookup"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "nearmiss-16",
+      "stratum": "near-miss",
+      "q": "get GitHub Actions workflow runs for a repository",
+      "expected_top1": "github-actions-runs",
+      "expected_top3": [
+        "github-actions-runs",
+        "github-actions-workflow-dispatch",
+        "github-repo-info"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "nearmiss-17",
+      "stratum": "near-miss",
+      "q": "find a docker image's tags on Docker Hub",
+      "expected_top1": "docker-hub-tags",
+      "expected_top3": [
+        "docker-hub-tags",
+        "docker-image-scan",
+        "github-actions-marketplace"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "nearmiss-18",
+      "stratum": "near-miss",
+      "q": "scan a docker image for CVEs and security issues",
+      "expected_top1": "docker-image-scan",
+      "expected_top3": [
+        "docker-image-scan",
+        "cve-search-circl",
+        "security-scanner"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "nearmiss-19",
+      "stratum": "near-miss",
+      "q": "get historical hourly weather data for a location going back several years",
+      "expected_top1_in": [
+        "open-meteo-historical",
+        "noaa-climate-data-online"
+      ],
+      "expected_top3": [
+        "open-meteo-historical",
+        "noaa-climate-data-online",
+        "openweather-current"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "ambig-01",
+      "stratum": "ambiguous",
+      "q": "find an ESLint scanner that returns structured violations as JSON",
+      "expected_top1_in": [
+        "eslint-snitch",
+        "eslint-stylecheck",
+        "code-review-mini"
+      ],
+      "expected_top3": [
+        "eslint-snitch",
+        "eslint-stylecheck",
+        "code-review-mini"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "ambig-02",
+      "stratum": "ambiguous",
+      "q": "search arxiv for papers",
+      "expected_top1_in": [
+        "arxiv-paper-search",
+        "arxiv-search-papers"
+      ],
+      "expected_top3": [
+        "arxiv-paper-search",
+        "arxiv-search-papers",
+        "arxiv-paper-pdf"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "ambig-03",
+      "stratum": "ambiguous",
+      "q": "get a quote for a US-listed stock",
+      "expected_top1_in": [
+        "alpha-vantage-quote",
+        "yahoo-finance-quote"
+      ],
+      "expected_top3": [
+        "alpha-vantage-quote",
+        "yahoo-finance-quote",
+        "yahoo-finance-fundamentals"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "ambig-04",
+      "stratum": "ambiguous",
+      "q": "convert audio to text",
+      "expected_top1_in": [
+        "whisper-audio-transcribe",
+        "youtube-transcript"
+      ],
+      "expected_top3": [
+        "whisper-audio-transcribe",
+        "youtube-transcript",
+        "eleven-labs-tts"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "ambig-05",
+      "stratum": "ambiguous",
+      "q": "generate an image",
+      "expected_top1_in": [
+        "openai-dalle-image",
+        "stability-sd-image",
+        "mcp-everart__generate_image"
+      ],
+      "expected_top3": [
+        "openai-dalle-image",
+        "stability-sd-image",
+        "mcp-everart__generate_image"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "ambig-06",
+      "stratum": "ambiguous",
+      "q": "read a query from a postgres database",
+      "expected_top1_in": [
+        "sql-query-postgres",
+        "mcp-postgres__query"
+      ],
+      "expected_top3": [
+        "sql-query-postgres",
+        "mcp-postgres__query",
+        "sql-query-sqlite"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "ambig-07",
+      "stratum": "ambiguous",
+      "q": "find the latest news about a topic",
+      "expected_top1_in": [
+        "mcp-brave-search__brave_web_search",
+        "wikipedia-search"
+      ],
+      "expected_top3": [
+        "mcp-brave-search__brave_web_search",
+        "wikipedia-search"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "ambig-08",
+      "stratum": "ambiguous",
+      "q": "list pull requests in a github repo",
+      "expected_top1_in": [
+        "github-pulls-list"
+      ],
+      "expected_top3": [
+        "github-pulls-list",
+        "github-issues-list"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "ambig-09",
+      "stratum": "ambiguous",
+      "q": "look up a wikipedia page summary",
+      "expected_top1_in": [
+        "wikipedia-summary",
+        "wikipedia-search",
+        "wikipedia-fulltext"
+      ],
+      "expected_top3": [
+        "wikipedia-summary",
+        "wikipedia-search",
+        "wikipedia-fulltext"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "ambig-10",
+      "stratum": "ambiguous",
+      "q": "find an MCP server for searching the web",
+      "expected_top1_in": [
+        "mcp-brave-search__brave_web_search",
+        "mcp-brave-search__brave_local_search"
+      ],
+      "expected_top3": [
+        "mcp-brave-search__brave_web_search",
+        "mcp-brave-search__brave_local_search",
+        "mcp-everything__echo"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "ambig-11",
+      "stratum": "ambiguous",
+      "q": "find a python linter",
+      "expected_top1_in": [
+        "pylint-lint",
+        "pylint-pro"
+      ],
+      "expected_top3": [
+        "pylint-lint",
+        "pylint-pro",
+        "code-review-mini"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "ambig-12",
+      "stratum": "ambiguous",
+      "q": "search GitHub for code",
+      "expected_top1_in": [
+        "github-search",
+        "mcp-github__search_code",
+        "mcp-github__search_repositories"
+      ],
+      "expected_top3": [
+        "github-search",
+        "mcp-github__search_code",
+        "mcp-github__search_repositories"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "ambig-13",
+      "stratum": "ambiguous",
+      "q": "weather forecast for the next 7 days",
+      "expected_top1_in": [
+        "openweather-current",
+        "open-meteo-forecast",
+        "noaa-weather-forecast"
+      ],
+      "expected_top3": [
+        "openweather-current",
+        "open-meteo-forecast",
+        "noaa-weather-forecast"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "ambig-14",
+      "stratum": "ambiguous",
+      "q": "review my code",
+      "expected_top1_in": [
+        "code-review-mini",
+        "eslint-snitch",
+        "pylint-pro"
+      ],
+      "expected_top3": [
+        "code-review-mini",
+        "eslint-snitch",
+        "pylint-pro"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "multi-01",
+      "stratum": "multi-tool",
+      "q": "extract all tables from a PDF then convert them to JSON",
+      "expected_top1": "pdf-extract-tables",
+      "expected_top3": [
+        "pdf-extract-tables",
+        "csv-to-json",
+        "pdf-extractor"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "multi-02",
+      "stratum": "multi-tool",
+      "q": "geocode a list of addresses then compute distances between them",
+      "expected_top1_in": [
+        "google-maps-geocode",
+        "mapbox-geocoding"
+      ],
+      "expected_top3": [
+        "google-maps-geocode",
+        "distance-haversine",
+        "mapbox-directions"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "multi-03",
+      "stratum": "multi-tool",
+      "q": "fetch a company's SEC filings then extract financial data from the latest one",
+      "expected_top1": "sec-edgar-filings-list",
+      "expected_top3": [
+        "sec-edgar-filings-list",
+        "sec-edgar-financials",
+        "sec-edgar-companyfacts"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "multi-04",
+      "stratum": "multi-tool",
+      "q": "search arxiv for papers, fetch each PDF, and extract the abstract",
+      "expected_top1_in": [
+        "arxiv-paper-search",
+        "arxiv-search-papers"
+      ],
+      "expected_top3": [
+        "arxiv-paper-search",
+        "arxiv-paper-pdf",
+        "pdf-extract-text"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "multi-05",
+      "stratum": "multi-tool",
+      "q": "transcribe a YouTube video and find related papers on the topic",
+      "expected_top1": "youtube-transcript",
+      "expected_top3": [
+        "youtube-transcript",
+        "arxiv-paper-search",
+        "whisper-audio-transcribe"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "multi-06",
+      "stratum": "multi-tool",
+      "q": "post a message to slack with weather forecast for london",
+      "expected_top1_in": [
+        "open-meteo-forecast",
+        "openweather-current",
+        "slack-post-message"
+      ],
+      "expected_top3": [
+        "open-meteo-forecast",
+        "slack-post-message",
+        "openweather-current"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "multi-07",
+      "stratum": "multi-tool",
+      "q": "list pull requests for a repo then check the actions runs for each",
+      "expected_top1": "github-pulls-list",
+      "expected_top3": [
+        "github-pulls-list",
+        "github-actions-runs",
+        "github-commits-list"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "multi-08",
+      "stratum": "multi-tool",
+      "q": "list S3 objects and invoke a Lambda to process each one",
+      "expected_top1": "aws-s3-list-objects",
+      "expected_top3": [
+        "aws-s3-list-objects",
+        "aws-lambda-invoke",
+        "aws-textract-document"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "multi-09",
+      "stratum": "multi-tool",
+      "q": "look up a UK company at Companies House and pull their latest filings",
+      "expected_top1": "companies-house-search",
+      "expected_top3": [
+        "companies-house-search",
+        "companies-house-filings",
+        "sec-edgar-filings-list"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "multi-10",
+      "stratum": "multi-tool",
+      "q": "search pubmed for a drug, then fetch matching clinical trials",
+      "expected_top1": "pubmed-search",
+      "expected_top3": [
+        "pubmed-search",
+        "pubmed-clinical-search",
+        "clinical-trials-gov"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "skill-01",
+      "stratum": "skill-subagent-boundary",
+      "q": "claude code skill to delete dead code from a python repo",
+      "expected_top1": "de-sloppify",
+      "expected_top3": [
+        "de-sloppify",
+        "test-driven-development"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "skill-02",
+      "stratum": "skill-subagent-boundary",
+      "q": "a skill for brainstorming new product ideas with a structured framework",
+      "expected_top1_in": [
+        "brainstorming",
+        "office-hours"
+      ],
+      "expected_top3": [
+        "brainstorming",
+        "office-hours",
+        "framework-content-mixer"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "skill-03",
+      "stratum": "skill-subagent-boundary",
+      "q": "subagent for senior-level fullstack code review",
+      "expected_top1": "senior-code-reviewer",
+      "expected_top3": [
+        "senior-code-reviewer",
+        "code-review-mini",
+        "debugger"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "skill-04",
+      "stratum": "skill-subagent-boundary",
+      "q": "a Python backend engineer subagent for FastAPI work",
+      "expected_top1_in": [
+        "python-backend-engineer",
+        "fastapi-pro"
+      ],
+      "expected_top3": [
+        "python-backend-engineer",
+        "fastapi-pro",
+        "data-engineer"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "skill-05",
+      "stratum": "skill-subagent-boundary",
+      "q": "subagent that runs commodity model backtests",
+      "expected_top1": "commodity-backtest",
+      "expected_top3": [
+        "commodity-backtest",
+        "quant-analyst",
+        "signal-validator"
+      ],
+      "relevance": {}
+    },
+    {
+      "id": "advers-01",
+      "stratum": "adversarial",
+      "q": "best toppings for a pizza on a Tuesday",
+      "expected_top1_in": [],
+      "expected_top3": [],
+      "relevance": {}
+    },
+    {
+      "id": "advers-02",
+      "stratum": "adversarial",
+      "q": "how do I parse my friend's facial expressions",
+      "expected_top1_in": [],
+      "expected_top3": [],
+      "relevance": {}
+    },
+    {
+      "id": "advers-03",
+      "stratum": "adversarial",
+      "q": "what year did the romans build the colosseum",
+      "expected_top1_in": [
+        "wikipedia-summary",
+        "wikipedia-search"
+      ],
+      "expected_top3": [
+        "wikipedia-summary",
+        "wikipedia-search",
+        "wikipedia-fulltext"
+      ],
+      "relevance": {}
+    }
+  ]
+}
