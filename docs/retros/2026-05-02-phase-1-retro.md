@@ -75,9 +75,11 @@ Reading the diff queries: mxbai picks reasonable-but-different alternatives. `"b
 
 ## What's queued for Phase 1.5 / 2
 
+> **Update (2026-05-23):** Item 1 below has shipped — see Episode A1 (`docs/plans/2026-05-23-episode-a1-v2-native-golden-set.md`). The new gate is NDCG@3 against `tests/fixtures/v2-baseline-native.json` (mean 0.7296, stddev 0.0000 across N=5 deterministic runs). The v1 calibration in this retro now refers to `tests/fixtures/legacy/v1-baseline.json`.
+
 In priority order:
 
-1. **Hand-graded v2 golden set.** 100 queries × top-3 expected, graded by domain expert against the actual seeded corpus. Removes the v1 bias from embedder evaluation.
+1. ~~**Hand-graded v2 golden set.**~~ Shipped 2026-05-23 (Episode A1). 100 queries × top-3 expected, graded by domain expert against the actual seeded corpus. Removes the v1 bias from embedder evaluation.
 2. **10k synthetic perf benchmark** (Step 6.5). Lock FTS5 k1/b + vec HNSW params. Generates a 10k-corpus, 50-query benchmark, measures p50/p95/p99 and Recall@5 against a hand-graded relevance set.
 3. **Frontend rebuild.** The current dashboard is a static HTML string; the user wants "mind-blowing". Per the workflow rule: 2–4 visual references locked first, then implement section by section against the chosen direction.
 4. **More MCP servers in the registry.** Awesome-mcp-servers has hundreds. The current 20 are the official Anthropic + best-known community. A scheduled crawler that pulls new entries from `awesome-mcp-servers` and re-runs `--verify` against each is the natural next ingestion source.

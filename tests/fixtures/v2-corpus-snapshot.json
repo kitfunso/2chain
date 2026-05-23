@@ -1,0 +1,3480 @@
+{
+  "version": 2,
+  "generated_at": "2026-05-23T15:41:42.137Z",
+  "count": 434,
+  "corpus_sha256": "a9400aebb7f7128d68cdfa336234a96b8efb8607563da406be1cd5e89528e54f",
+  "entries": [
+    {
+      "name": "abuseipdb-check",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "0fe4c696ff19226622aed9fd733e73a36045180f10e0d80fdf2a3f64948a0ff4",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "adafruit-io-feeds",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "310934068a90da6496e6b8ebbafa77898e9e0b16d2d0fa8bb45bfbaa0dbc23bd",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "algolia-product-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "3e2267fb55ad769e5814e6dc6332e3e0b72e98cdc8be52109b4640005241df2f",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "algorithmic-art",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "53ee1126a68f21d548bf87107173b5c900e9808578452b791c436305d8a7b000",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "alpha-vantage-quote",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "fbbb07969f508e67fc63653958f723bb685ccff4c84ca1ad4c5ea0d23d93beea",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "amazon-product-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "2ab67622a0a9e1b47d542926abe0d705e1a6ae717a3ba493ca88c5b05f2329db",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "artifacts-builder",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "e13b304c2ed36179259d2039dd44e4260e46849b13b308137c0c343e57e246da",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "arxiv-paper-pdf",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "a6891c2a23fcf5d9c6d3545b0db5523d534e8e9f044b40e9cc697e0d31f40dd5",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "arxiv-paper-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "3ab13cc8909a15e4e0baf92d77f71eed432549ce3164cbf68e6d91b63818f0a3",
+      "schema_summary_sha256": "006ecd7938c08eaf3c92fa9fb1a7280c549aaef6f4c3d002c5837ab3e7a664ba"
+    },
+    {
+      "name": "arxiv-search-papers",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "cd6f07c25fb2f47860b82ce9bcf15815e5250620ea908d4a5b6faef5a229ca4b",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "ashby-application-events",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "20354dde2af80751903b1a84d291c2b061629506ac66ef8fa96fad5ead8297d0",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "attomdata-property",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "e3e265657295563d9d698fc5f31e247cf9a547c4e077955790774f7b51471d88",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "autonomous-loops",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "903f26b269f40e50c3ec82b7b9c8b1290d655b5ea9a8b5ee62bc40afeb39e447",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "autoplan",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "7ebf76ee3f47e594cf0ae80e08e56560155e54582ee0a6cbd99f8f6780464cc0",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "avalara-avatax-calculate",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "3e376c0c7e7c704da347822cea38f23816c41f2b72100c8992e671bf919fefec",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "avro-reader",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "e9593a5ee298c298506b97c327ba56e448a2644237118672f50ae40810f2366a",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "aws-lambda-invoke",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "771ebc3b6280e116032fb17c917b076528c32e2656f9f3668fe73dd46df15014",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "aws-s3-list-objects",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "75c29d9fc451ab94b12f7b1b13af98cd7794c93a8ff2eb5a009c02a37152ac12",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "aws-textract-document",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "1d9a436d32ecb89953fa37f04eb2fd369270078b417fea9f743adbc097dfe232",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "azure-doc-intelligence",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "c89a53db0634a88426956d924b5dfba428b4dc36e0337b1797154d92e1d98517",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "bamboohr-employees",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "b26e1a343ec6590d00e815a081728496d5f18bc15f35747c059700807a703ebc",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "battle-net-account",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "0f6784b727f11c379dcdcaa28057d2e289e31b8aa62d30e2345d45920aed99a0",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "benchmark",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "68d97fae11b25d7545715043e68c8abcbe4084bd4184f85d8a51c2bc9d95ef4c",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "benchmark-models",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "2a37feb32a0d277f10f0d5b3772321a458c7fb49bb81a53f83acebd1df7777d4",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "binance-klines",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "4b3228cafaaa69df514f479ae6953862c99c3d1d6d78069a93bbb45e482f64a8",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "brainstorming",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "5af4815c27d86eec5799bc5ad7d301aebefe939592f7d4b0e9af5ba331406c33",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "brand-guidelines",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "53efc835f81b6f9fe832f655398cb39b5df499483b02bf2a589826ae41d45f24",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "browse",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "e6daae039df2096d0aad8e72db458130bb67eb9c9c4fc902beb23b6d44b558b9",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "build-release",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "9c562f7b4aa757e8f27e678ca507614cd3019c950a6b2e9018a3256c750c6b01",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "canary",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "8a4acee7b53256bb5361708ceab922f7f570f432be86462664bbbe4d0e705cda",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "canvas-design",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "954c22f02d34d6933f10f6bc69ec5b9c77c5747c16ccf67202916ff1621d707f",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "carbon-interface",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "d259e5a4b96e48cffeb965d26862f48cbf1d465d5bb0b50e72bb0f71e3c5ff1c",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "careful",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "2c68646c1146b6f796c26a502cef454079e8676989b19f01f28a4c64da248ffc",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "claude-code-realtime",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "a47577970c151d7bfd99a20113d49edcf18f322d85ed45d5c11e3909a56d0e42",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "clinical-trials-gov",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "bfd73cc50933235f6ac937245800a6d1aeac55a05fce7d2941bef38f6d3d4cf1",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "cloudflare-workers-deploy",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "c64091e02624a6f99963e30ca7b473288d604c808fba599e33ba66ed364b71aa",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "cloudflare-zones",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "b909bd79e5bf199ba284210092f85cf0ba1490e54821f5cd0ef4b2ebb5517aec",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "code-review-mini",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "bb84f1ed0340a505fa0d14ac25074158879114437ee7d865113c0decfc1f6dee",
+      "schema_summary_sha256": "5df60e3652a47eb2cce81ec06428476d467981ac02d595aa9553b7281fb93741"
+    },
+    {
+      "name": "codex",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "dab419a1b89d33baf8e642d90465897820e942668ee2edd4529edb2db38145f6",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "coingecko-coin-price",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "6c3e86d17d35b3b5dbd12af45878d6aa012a576ceb80fef3f150f619feee02cb",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "commodity-backtest",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "30cef6b5580fada2c356991160edbc1b07ccefc87e0aac608445eeda6d051c21",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "companies-house-filings",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "bc3fc663dacec4810d6cfedcc36be92e2290b040a68f4468a78b6eb01b7a6db5",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "companies-house-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "c796b713fd14d76feb7c74871dcd27c1f047fc8d1b10f7b850dfa9472abab909",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "connect-chrome",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "08f1ba38ff74a7ce2d8ad7ed2e2ab4bd942ccb1daaefba917869d67f1674afd8",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "content-hash-cache",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "a69ed8fa4ca9a4e2832ea0b733eedbff72f116acd383c824304f7285bd0780a1",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "context-restore",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "c1fe99dd621f456fc6096585d12fdb41e996b452b31d22d550afd53eb2916959",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "context-save",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "a7f7860949405ac00d4d3dc3b962afdb61282160abee49407e3c6a87165de005",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "core-fulltext-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "6ce451f024887424de169708ac240a2891226970cf47bc03728d783642039acd",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "court-listener-decisions",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "af1080f2b4075aecbecebfe3970674fa36c5ff7756de1dbdb336f8d5d5b6ab7b",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "cratesio-package",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "1e54ab4de9ff1cbdf348bc42c42d977bfcfef111daefdd7fe087c5c859f35d4b",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "creator-style-mimic",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "8aa9ace2c19359dae0499f651364d495808b9e8604e1bbe8065ce38d690d96f5",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "crossref-doi-lookup",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "0245c434b807f60f635f7b0b1fd495d4e29f6e864b44a52c50c24bea8c7287fd",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "cso",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "aa270d46512f224cde68861daf02d75c9b114ecc0daf1fe4ce1dc5e23761e9c1",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "csv-parse",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "ab77a6ec6bca8873937c94ebeb330148169844c4125125f49b7eccfa65e5ded8",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "csv-to-json",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "96d462b211f883ef51c703a20668a6bb75354f5ebc10832d7217feb2710a39e3",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "cve-search-circl",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "8a0d416c44e9be90bb99e97328f753d9e83709705b691b03405e684c434fc486",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "data-auditor",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "0d93f26fc826c742731827029595ff6a5c8f142e8b378f13ddce3791672b5aa7",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "data-engineer",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "6ec19d5786a5a400da8e4334ba68c158d97cde0f84007150c6de8d8237ad7f77",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "data-gov-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "59a3d5eed9797fc60966eb51f2721a5863595494c1c50b80999424ca529b41ff",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "database-optimizer",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "ccb783966ce2e1a69b2f1fd8cccdd5cd32ccc05892f2230b20cd84262fe974e7",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "de-sloppify",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "41f51daa54e112766f57405d08ea7278218e454430e0d7d2701671185f35171a",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "debugger",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "48a98018bb06242c65ebdf67696efb3829067540d6997237c48823a483868817",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "deel-contracts",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "327abf83c4d4e5553a53c43077e2829ae10c809b05122fbe924dc7f38c103446",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "design-consultation",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "74be68edd34f59cebf797d1fab00bd6f40729b648e2e133b7466e33e38ded748",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "design-html",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "17b7995028fcaaf8a79ec94cc16854e3b66fbfacf19c7e36efec7587b5403264",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "design-review",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "15a8735a1329ab34fb8b2f468f276ee436a68fe771421c8264b3d4f8b120974c",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "design-shotgun",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "21856ae55c6ad5301537f6078e441f4a496d59ad00b5378f856456ea4d0ceaa5",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "dev-framework",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "1e8e8ddfe7b556e10f660245939dcdabe66cf5e3fd5376f498706e183eee8ca1",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "dev-framework-rl",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "8806bafcbbca05d8d0e790e7723300769fafccc78a480b2484937109c15fba0c",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "devex-review",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "7111a4c2f39c5713bb6c2229e7b8db1a4124f880b98b7f7b8552eb91e1b8ad88",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "devto-articles",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "68d5bcd4168397789b310de990653a2c4c42d688519385437eee1d721ff15346",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "digitalocean-droplets",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "215c62fc3c2020aa0b3e791d35d1d2160d6eda112779ee823335bdedbbad9774",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "discord-bot-messages",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "7e2897c322102e73a93f7e0d2eeb2753f9e47808051499fe17f02c5916b59e52",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "discord-send-message",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "92dcf4c676353679a37bcb0cb55a5f09299c12f81e2177f0da555f62032d24b2",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "dispatching-parallel-agents",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "07ac908a2f619a2270ef22871d3f3bc4e24dd952f68f0c8f8e2c3553603a6099",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "distance-haversine",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "0ff12c85b463c1ae716ab26d1eca5d0180dc72f5f8a776deb921d688bc1858e5",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "doc-coauthoring",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "6a86d7c5caa33131a3a92b7e82aed3c81308514d2959ba537403d7656a237c59",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "docker-hub-tags",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "01dc43a0d2c293ddc4cac41522b789dbd37c7c72b7c3b21a780f69f6fc9b6535",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "docker-image-scan",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "ed133c11cb9ac8f344b09a35a2b4f59f4eef7381d07e59969091f692a2c7449a",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "document-release",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "4dd35106e3e68626f0b9190b7b07ef5fb439fb3ae0e114da7862f8cc2c5769f0",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "docx",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "e09d7fd91faf654c374eccb10c8cc4d55c0335d61f43d429751372917c03c14e",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "docx-extract-text",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "2ce8182880c382559e96f669dd86b30cc46fd7becb3bb97a27fceb7fa41ff9ae",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "duckdb-analytics-query",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "fbee356adee9b54548a7e8504bac5f1a447c9a96f54bed67213aff83135ef8ad",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "ebay-finding",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "1c01875ac35c7d64eb927ed6a2e774b85740f585e01aa7f9acd3a1af80e52df1",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "eleven-labs-tts",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "55b2df1e229c790524ed16da3640cb9df1d6f1c09d9b678756892e5b07d16cc0",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "email-send-smtp",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "f601ae0e613b7178b631584f80add7292e490cf7faf0b974107597514303148e",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "epo-patent-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "100bfce0f554b27113f065ed00ded82d6bbdb82aabe5260ffbffab1a2ad1a690",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "eslint-snitch",
+      "version": "7.5",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "f197773d81845c238826fe836bf997ba8bd92a4a545d65e4346c31aca5700e45",
+      "schema_summary_sha256": "5df60e3652a47eb2cce81ec06428476d467981ac02d595aa9553b7281fb93741"
+    },
+    {
+      "name": "eslint-stylecheck",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "7a17204123f6ea78874f516cbacd2ffbf43e2aef954475b9825996eeedb5d3d8",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "eu-court-curia-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "d49906b8cfac2d86aead537e86826e8bd8310f13eee5409b14a654aa9a4c36d0",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "eu-open-data",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "932f32b1b2051ff1c5b55216c7e496e7be7b02aef7fdbd6dfa223d255d08d5cc",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "eval-driven-dev",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "3479a0c54aacc717014ed3c18205b8bb2bd6a68a703bc784cf75311d25089719",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "executing-plans",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "55191cff329350d988e16655f57ee13ff3dd788dbb778a7cbac61778ba8c2f28",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "fao-stat-bulk",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "91abff9125ff6391811baa1aeccd6e3828523b9f88dd08503bd9bd02d2ef40fe",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "fastapi-pro",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "1cce5ef45086d08871924d75a39ce6fe7d4e4dc356b41a800b606a702002b5c0",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "fcc-broadband-map",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "b31a575a8e7c5d669a6c66af7b9bda824397c9f062eca12f0b839031e65d6f76",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "fec-candidates",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "26c8bfa0c74ff80f30e717c518c1761d85baba5d4d441429a67b55e64ff4a0f3",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "ffmpeg-trim-video",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "46488db9316c66d8f038e2613ce32b4d0c11d52a18ebea85cc5c951950b5c955",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "finishing-a-development-branch",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "ee54769b621e2cf4d1d675c176e3d3cc86a51ffc6f792201633ed5851bc90cab",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "finnhub-earnings-calendar",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "7f067e635d818e0e6da948053a4b3fbd656213b5e8c88f4e70de2db952a09237",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "flaky-extractor",
+      "version": "0.5",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "bab4e21343b533f4d57a804ccc0e43d14df724d8efd102487f106fac0930ba98",
+      "schema_summary_sha256": "286f82bcf6696de82b1ea104c23b73ed0547d11449eb2b0cb5c0f6edc7c11ba3"
+    },
+    {
+      "name": "framework-content-mixer",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "19de7e5d0e8ae0fa51ceecf2483f34fbc1cc67cb977a8ed8cc350a46654f963b",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "fred-series",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "5bf6014b81a5f31ccd82965ee0b576e7ad122277307e385dfca033d54799e66e",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "freeze",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "50f240d8e21b58772981885f279f1bb4ee78342e08060f46a6219a50d44695f4",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "freshbooks-expenses",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "94b65c84d40189af32099a0d3cc53a49b3b621d4a204ba5d7dc21edc94047a4d",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "frontend-design",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "9a8a233f7ea6d23beac6dc5161a0fcb5498dd5520cbd527091883aadfad7b739",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "frontend-developer",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "66abfcca96b7fba827a758b83e393fdcfed0ddd78fa3bb5674e66d0fb857e8ad",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "frontend-slides",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "29f94ab6341b1abcbf326416608cf3cc0e6e3832d900e4a7ad0743611703a000",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "full-power",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "0151ca78fdcc4f0e8697d91ffa8916cedca49337e5ae4f669c4ed8cec6bb2c0e",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "gcal-create-event",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "4f5da327183766d772c38e5eff6767852fb18b1ffd478c51c86055c7cb922a8a",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "gcal-list-events",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "28f9800700d8755d3f0d390538e366e0cdb235cc48134ac81694a42a5a86c7dd",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "gcp-cloud-run-services",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "e1238f601e83205a9ac9e9440c529eaa05da6d22f7306a375c844585c2c3ba5d",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "gdpr-cookie-categorize",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "8383c703644a26a0fb07a3cdecc18629dac29c285bd28a07587538d34c344011",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "git-commit-helper",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "33a3d616b9e8d711ee70a020859f8b6a8527bae1db09c26583f199be5c6d1018",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "github-actions-marketplace",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "86cde022d73c36f9cdb991e448c2a65e36f6442c6c0408079c42bfedd56cbd9e",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "github-actions-runs",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "42c4fc1aca0a611abc64835a22b34ae8a0f1ccf832c18dc644ae6d06dab7b626",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "github-actions-workflow-dispatch",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "ec09fa88c0b8161563b17a2421264829cd31683727d799a97f1d6f98db890236",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "github-commits-list",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "e2481ed49e425011e8fa1a74de6c86ff26f92d3b06767a6235dbac3724111d52",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "github-issues-list",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "80c9d3261f429e3e9c4a38d5782b5e50d86de5d3f9b6c9be1171439c7b0a8938",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "github-pulls-list",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "bd3702924168c7b0948ee344ad288d6ffdb4cd99b4fe1f1734d5395974ec2117",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "github-repo-info",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "126b3c207d521f2c27c0f4115af98fd4badaf89b7b04810c5ab6bfaa32d51dc9",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "github-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "c9df7275d89bd7dd596b397a18ca7265a53c498bdc8adf9da8d1cbe608f430bc",
+      "schema_summary_sha256": "8c6b9169a602f9ffaee8932be8bc2f9896f82f37f5966509eb22ec01e56ddc4c"
+    },
+    {
+      "name": "github-search-code",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "5cecbfc05de404e20e7c8e8ae62508f2fb0f1a613c5c9ae4b8449bdeab4ad0ac",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "gitlab-projects",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "e638c8aea895f4ff23e0c4aaa5d49b665d743d9b542e3dfa190d54caabf3e855",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "gmail-list-messages",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "b4bb8db2931a5a51523c9896aceef9a17b222e9bcff6cbc7993acff656d22ef8",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "go-pkg-info",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "68d7368ff34be59cc73e56d10fd82f824d998ed02aea97ec815641850c1812a6",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "google-maps-geocode",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "8fba5fa95a80669cb23f38970890de258addd71456ee77997ae0f28e32515732",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "google-vision-ocr",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "2ce6fa8ed069aa3e470b15cce97b0c06618ce85cff088f9e1011776c54544ef4",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "gov-uk-content",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "d6ee979cad6fdfa22ada4741cc77b1517669949508407cab56cd7bf57b80fa7c",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "greenhouse-candidates",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "bb87db562f8eaed54f4a161d8d61bd5f39c60b9e8a0208f72fca5b9cd81652ab",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "greynoise-context",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "f54de6f209733894479d5643ada527c21ed826193b3c18057c1ee1fdd0976e02",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "gstack",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "92fc08d1f241078cc738bff7a475c7c16ef1b54cd8e72e6d422f93774426623d",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "gstack-upgrade",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "d9215c9bea1de9a0dddcea7fbb0942bd57bd071693b7985a9a61f9d109f72b31",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "gtfs-public-transit",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "9c6fa8fec1daf753ce65fc7e29a130fdb78ee752b41dd7d50a0cd17fbe66ab4f",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "guard",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "78d6072aa5cb309776e2882e27ec855131926ca5cae816d10d816c1409f971a9",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "gusto-payroll",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "eda205d12e77df0657fbe7711d7095451d14fa1afe0b27737e4da05c500126e8",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "hackernews-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "3b68151244b2472e0fe455202003237ee7dac1ff2a2009199409fef97ccc770d",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "have-i-been-pwned",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "e53efed82398e7b592cb2e2b4d707b34b47dbcdfd720df5ea3da4c64d903504e",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "health",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "4d774c1467b32772d4d19a921b7233c9044823b829155c4e255de7eae8718e88",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "helium-iot-devices",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "1b292e5d55f9ed7f1c868d5ecb97c96a26908a57f927d496b284accf73eb7a24",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "heroku-platform-apps",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "68febda082fae4d407156bf3a022577599e2652efd1524f70dd76ab2dee0613b",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "home-assistant-states",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "8d5afea365e70617b7ab0d201d58530ac970809f1290ac314bb79e5e330fd887",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "html-to-markdown",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "b7e6e5ee3be26b52930df1e895f784ac65538df0ef04fcff63a87a9e6c2f8fb5",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "icd10-code-lookup",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "5cf61c2521e31206920ea2d50ac4919ef4e0327c18b798dc4b5bbeea0c1f19ab",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "iex-cloud-stats",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "359cf720c543a52db7fd2b3c53427c92aef29d55dafbf786fb671317047bdf6e",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "igdb-games",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "5763fb995ac97f42327073c1f012f128cbc4d33d7790de01665a2d1f10aa00a8",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "image-convert-format",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "25d440fb4970af1279c153863c7bd6e4f77fce2a63049a7a8e5a950d64fbf140",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "image-resize",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "92d006e8bbe2b72982078ebe1040315d991f6888eea126cb2146dcf6776189ea",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "internal-comms",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "0bc28ae1987d898425ab0b89c9a8389406310ebf8bd6963c5c77fdedcf59612c",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "investigate",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "74ddade77592014d7d9b7bd318ab8b6d445c76c357daddb40b06b0496b99af02",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "invoice-grok",
+      "version": "1.2",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "d395ec9d9fed03c64d4c66a861a81f20ea60ae9a43329c2957b18adb913dbaea",
+      "schema_summary_sha256": "286f82bcf6696de82b1ea104c23b73ed0547d11449eb2b0cb5c0f6edc7c11ba3"
+    },
+    {
+      "name": "isbn-lookup",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "f18d60540ecd06e29b316dada07fb56237b88dcc4788191817cecf235fd6be97",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "iss-current-position",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "f7d67e4bde9aa5f0381b4efcaba368ab556adf613422562450897deda587e287",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "isthereanydeal-prices",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "55677ee948efc970bc02832aa9dc00ca4f249650801d88324b0ce0a8d34b87f4",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "itch-io-jam",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "be8ec0c308985bc2cd73e49dc61a09be8478fc0ef7f469d2fa5f2d1c8ef1af1b",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "jq-jsonpath-query",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "a53dc048093dc51cf8df73c9076253d5e1579559978fbb225659cac8ba2369d0",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "json-validate-schema",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "237808c6f6071c7e9cd2fbfb3481200cee3b81ad951048615f64f73c16bed24d",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "klarna-checkout",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "802ad9e7c0c64746a954c9d3e9a00787f729291395ba4fa47790158606b70ed0",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "kubernetes-api-pods",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "69e68ab27cddb760ef5fb69195c9d8edd96485214fefbce468dfd90634a3ac0b",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "land-and-deploy",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "b5293860d7dd0a7a0071630ae0af6cb66f127e3127d1ae1956508bdc26b3e2ca",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "last-fm-track-info",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "ab3322afa0f67938be15848ef854ba2797924b82ecc09507805e5d110ac291df",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "learn",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "a3626dadf324d6db026556e2fc7a9c1a164cc51fbae9f663d5ec88ff457b76b7",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "lever-postings",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "44d2e7fc3a3416030a9f4ce13e3d0eb4256276bab718e00506d251591845d89b",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "linkedin-thought-leader",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "a2385e8b7c06297b7b2806d49d69e33dbc45745b492fe21a3a7b678aa85730c8",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "make-pdf",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "40a549c5057e570e860fae2069c50fbf08595243e447a41dadd2662e0c6864ff",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "malformed-bot",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "639d205c01ea7548e1f69369ff7033fc3efdc4474e53d9167cc126c19188727f",
+      "schema_summary_sha256": "5df60e3652a47eb2cce81ec06428476d467981ac02d595aa9553b7281fb93741"
+    },
+    {
+      "name": "mapbox-directions",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "4ec60330adac3d146ee4e10da0231d2aff9f7df1b495f70b15c5aec6e52736b7",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "mapbox-geocoding",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "2c3ec56a5e31307c6d57ba2fdde9f6c4437b2d2058c57f8cd4fbffd394061da6",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "markdown-to-html",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "c70041f98270cb018b0efdc5c086156417738d318b263315fbdc6e62627ecb1c",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "mcp-aws-kb-retrieval__retrieve_from_aws_kb",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "af84f3e3065acc9f30af639fc9177679b74e8a6092ada052e6657befa3b4f72d",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-brave-search__brave_local_search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "d22ff068436c45d9f69f8a9c4792942a641cccf261ff05167bf51e0604974d1a",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-brave-search__brave_web_search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "ec1694c00ec24c1302376c2295ffd60ce7f3db5400d4d92d2d5f8c634a26d36b",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-builder",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "790851079815f28a07c6a391a77bf4616b19b844cd81341711b1dd898c7a01a5",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-everart__generate_image",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "94b707e2ad7c75879856f48df5b932a5a972206cccb97ea7c3fcff1b3915eb4c",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-everything__add",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "f844d0bd0819be0d5c1207d717f87e442749db4eb6e34b160a0510d4f0871bb9",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-everything__echo",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "98c8344f7b1888895fdc2db427887da55151a900e41cc981a915d3dca4c8b7a0",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-everything__long_running_operation",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "35aade1d1c1c5d0e2086d50335725fc6f72c8292599100c707e4e9704a9c407a",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-everything__sample_llm",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "e743185510f2622115c8b631b5d43801d436efa632712d2acc4a9a64ea2534f7",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-fetch__fetch",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "390d0da67dc689e281b531a78ed672cf9907f53b153a6c9a027e31ddbf5a8f38",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-filesystem__directory_tree",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "d6c89824f4f75a76971090ee70eb7c92b3595fa3042452493c2c89a15e50660e",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-filesystem__get_file_info",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "7b63c6b7bbc7c192cf5c4732b303a19c3cdbc656cac4cf7781797659b391f25e",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-filesystem__list_directory",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "8d4ab3e73ea4b2413f5162ff0bacdb1b125f59633905cbd5504a755bdb423045",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-filesystem__move_file",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "a339c686b2dbe42f2c781d350bde9a5ec891c8f9bc2c161f6be23a4ddf5068d5",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-filesystem__read_text_file",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "bcbe70598c2609ed03adf47a76758d5d756faa9838a142027e27106ed0e8082b",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-filesystem__search_files",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "947df8e41527a960d181981f30e2f5769b20c0c74fe7b519a6409bcfad1196ed",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-filesystem__write_file",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "19dbb3e13b44d92af99aac0599e693ef91c6f62193cc96283ff905568a9f6344",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-git__git_blame",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "d312f62643f180c9f0c2bbf281e46959f574af6c58d3bb4990ba94f893e0a14d",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-git__git_branch",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "4ae3b9b6d331d8ce0098eb6489f1fffa055212e833d2a69be96376312586f4cb",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-git__git_diff",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "cfa38bbe8fac0310526accbf313d9d4f5ff562eccbc88b86dea8a1af41d79687",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-git__git_log",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "4207af842f068baec462591ca5b951e7b8aa369cd0ae8f40366a674becc15b1a",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-git__git_show",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "7dabd0dd579361577256471f62324f7f132e789120ecb75f33d9b549cf87b1c7",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-git__git_status",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "a1967087f10a2c065b56f9f2fe851b7e65e0faf4f0d177fa30e3fb23caa0b596",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-github__add_issue_comment",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "83e5b3f4ae3d99ab1ecd7a9b13295b62291c4ae89decbbc142799f0733f00864",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-github__create_branch",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "4eab0c821dcbbe500d442d0b7cb35d8c36a857860fda14b72e409c8beb2a901d",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-github__create_issue",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "8dc83bdf7a72e9cdc50982c753ceb12b545306fdefafd2cca9c065f7198030d4",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-github__create_or_update_file",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "4038a878a24e5483be1e3fd19fcdf142361f57606fefc9b819bff99cf77e8bf4",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-github__create_pull_request",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "d9cc904f2deea4daa6a397608d57e584ccfe6c1c4090e2cf54cbfda69eb5b6eb",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-github__fork_repository",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "a1c3e5304aab1477757ba10f8ce730cf62e5f13cb06c2751acd80f41683c1db7",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-github__get_file_contents",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "27998e0194e5ee8557ee2284faf2d47b085cf49b227039f7a769fafbd81fe253",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-github__list_commits",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "982875443781cf38b951c67c0a928afc28620d778221a285d0125dee9ae82a72",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-github__list_issues",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "4f3e3163a0bbaceed7b2ca35104be0bba2054e29d125908ef4a53cc5dd841b54",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-github__search_code",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "21ebcec98b29378fe14d8c09771d3b294cde9a408ba682109446a34002be3baa",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-github__search_issues",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "466d022151ee0c0cf7a60de052e9ecdf8cba462138c48f99b8a48caacfdd8166",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-github__search_repositories",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "c2b8ee3ca0444b5cf2dfa0310a1738e864e535706164fc38243dda9e9d4a0c2d",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-gitlab__create_issue",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "eb910e0665ecf9dd42b61d6f16ac0e9078ae9d07752aeebdd7de111811210b6e",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-gitlab__create_merge_request",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "2875f4a3e1c19c30cc4b67092215cac8bf9f2110e6bef70522b5f30274a0b3da",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-gitlab__create_or_update_file",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "8a219f18c5bcd34e4b876a8ba565d6f97441289123439896a64680bf865536da",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-gitlab__get_file_contents",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "27e025e44c01bd084e3da7b38bef61f8efb0411b24d22ad743369c957ea5b410",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-gitlab__search_repositories",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "ce6e47c0c007ae03ac77e0658ee0859784f4ce62f30917c1adceb0034d238db7",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-google-drive__gdrive_read_file",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "55a9a97a5e55d25318ad2b38cd4da6282bc3d278448d0456db528a0c98fbe86a",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-google-drive__gdrive_search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "b06b2e2648c02e603fe57b713a54b7a2131dfbadaa91d0f81cd44e0280b8e6f1",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-google-maps__maps_directions",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "7f56b7db8f77558c59103e74d553317f51ee56cbe1b08b2403744aad0167ab3b",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-google-maps__maps_distance_matrix",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "35cec447f3d53601a17451566479fca5fe9722b2fbe8343b73f90bb8679ed064",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-google-maps__maps_geocode",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "6e79d6df97f3071a02e963992e4eac9d0b7257bbe82367fcb307f580acb6b92f",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-google-maps__maps_place_details",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "f5fbbddee5cf41f0ea7a71c870473305ad1cedfe88e3e8610f82c4d94f47751d",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-google-maps__maps_reverse_geocode",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "3a0495a2c17cf8dc60e02b337b90521d69743b6aa5bdaff1cc1300dc62a6c452",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-google-maps__maps_search_places",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "0f46ee3a60377d0b3f075b0b09260e33d009d5b2286eb0a36492b2ff4866668e",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-memory__add_observations",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "aa5becebcb894fb32a6ce11b5bfa09b93fbe22963602e284f5ebb53857d7961b",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-memory__create_entities",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "0fccc15fdf7ddd0fe53ab6974fe54411d604cc8c95a7f66493151915c8b644db",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-memory__create_relations",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "284bd8a8282ec8c9f740f50acdbfcef3a86cea5c4e55e1efd9b5e422f7f9b90c",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-memory__open_nodes",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "6ddd491aed90e91fd69659298a4fd38e79ebe330d34fa70b5f8c2af386624baa",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-memory__read_graph",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "ae621afcdd3a1191933ff0c3228a7c7d5ac9ca3e5ee479ecc45b0db58fc68af0",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-memory__search_nodes",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "38029acb3397f9ae46091108a1a55e5ef7e88baf07df14234f1d01ba8b4b84de",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-postgres__query",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "f0b2ab97141844bde34c7e3622f259745f538930333f00ab62c12575142670ab",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-puppeteer__puppeteer_click",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "9324eda68e0c75345883963d8e819dea53d784c83c5c8e63d60f6625fd66966c",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-puppeteer__puppeteer_evaluate",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "b38a201d1282932721d932bffa9c7a8767fc6c2ecdf9787471f7177cb9c156e6",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-puppeteer__puppeteer_fill",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "1d7a73ce4493f53a26e193d2f306629a7859e0339736104856891566c1dafbc1",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-puppeteer__puppeteer_navigate",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "edf9061249b9c2350921ab49733d10f9e081779f2fff16f1b67cea4f01e6788b",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-puppeteer__puppeteer_screenshot",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "f1f4cc83d8302dc25a66d95463d47ee8603fac061b005619cc85f99ab119f4b8",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-redis__delete",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "612fc060c1831cd14e6a3a36e2a7eecb7fe002b117b322e828d8c907e36bedca",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-redis__get",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "a1eb4ebdadc69b853f654c7ddc7911a99a842e2d6007bca314c5a1163f3b63e5",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-redis__list",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "91539aa2da7445852ea481002683d188785d846db0a264a439a590fcd48c1121",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-redis__set",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "54cde1aa51c673c2103efb0e9144ea1d112e0b3c97f2085c2bea55ae90d71e59",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-sentry__get_sentry_issue",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "93cc4dc167a1ba03739e05c35ceaebc97f9750e1756abe5cc189d80f8f5e3d5e",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-sequentialthinking__sequentialthinking",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "299aea6b660416105d38b65dd3b1b6d57114c0f693450d6eafa68537d6074933",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-slack__slack_add_reaction",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "aae71c9c5f5463179858f7e72865e4a366097caa412da7c6d5d7904bba3bd43b",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-slack__slack_get_channel_history",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "2585cc8971b51c7f7a2584e6d7141d06d8518860594bb661c1e1c098228807a2",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-slack__slack_list_channels",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "773e0015e240e3e295b409944a2de799dcb462bfb7144a8b2e8a3831852abbb8",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-slack__slack_post_message",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "d7f773cca0a874abe49ddc562ef44295f1633e7b6b2d155a4eda31f9c26aa0ec",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-slack__slack_reply_to_thread",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "67fb51c0ce294223bdd97be9b5f6b13616ef8aad18746e29a4d7cd06e72c8f85",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-sqlite__create_table",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "aaa569fc690e2c8778ed5d277282cbe0b1710ab7707a06ffdaeecee50d776e29",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-sqlite__describe_table",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "a86a0a7de3fb3c187789b440afa8261ea371e9c09926a4518aca3699226e3ecf",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-sqlite__list_tables",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "c50c3bfd92cf31e1b5db794e4df4df3cc2c1898086566b41363755cb7bfefdd3",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-sqlite__read_query",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "dce752f29b54ed78506629c180b51b524b9a440041ab7935bce090b633f8b510",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-sqlite__write_query",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "00dcad685fb2bd0dd03c978b55a7df358bc54cfb03fdc145daca7e9db01b7a90",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-time__convert_time",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "c2f0e4a3bf4363ea5836937794e2b69926b9c14a2aa20d879ed42654130abb01",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mcp-time__get_current_time",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "efaab46e200b91ed9a65c1131b8c348b9ee1b5a7e39b02a97c8f5160f5d2ba0f",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "mdn-docs-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "079978e3020a440a77036c68ef2018a5a76fe24cc6c8b96eba6c0a443be90760",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "mitre-attack-techniques",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "239d2d5db288b4ea89d204e16931256d8f8fc817ba369bc1b7f47d45b13db789",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "model-diff",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "4d13c95aea4b647bb038d73945b1d8068d8c95cfc28f7754ff7ff44a11de5fdf",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "model-improve",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "d2f21de398b06fcb0c96ba6c135391e217f4997299f03353135334c068811369",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "netlify-builds",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "88abe1a0b2d13b58a66961d3eaf3a65dec3932a9ceefcf9e5abff582f94d742f",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "netsuite-suiteql",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "e422fc130f6f2ff2bf5091ad04b2a955aed0b3367806be83bce46b18ee90dc53",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "noaa-climate-data-online",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "933f79b4465ddf953b1648d6b5fba7e8f8a149aeb48d902abcdbcf361fbfb320",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "noaa-weather-forecast",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "741d2f891398830b52163b69bdfcd39131da29a0d2c2bebd00f24242d3a6f6ac",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "npm-package-downloads",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "828ffb90fa99b82fd6a92fc4de36aeb092d9c5a82f1a0ed3445279e381f61ac3",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "npm-registry-package",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "adf302592694cede776365e2dba9a055353c6d8b93522a1622d8af728b3f6890",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "npm-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "7dd18961f00a3d556deebb74886b2f89b46e47c04069f8ff6e07a1a393a2ca40",
+      "schema_summary_sha256": "c888ecf5df924991338ff511cb8fbb5dd4d45bc6e1c6dd08cca707eecc7fcf35"
+    },
+    {
+      "name": "nvd-cve-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "eb86b032fab5231383062625e9b2ac482c6be6f7ad2a49de6740d4bb6914e77b",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "office-hours",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "4fc9bfd55a8a23fe7f1190b5368ea2794c9ad66a5e6defb5615cc0ce497bb961",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "ons-uk-statistics",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "8167093268b4c362926ae37ba90d9f51a08ddce11825eeec09bcb8fa634d7236",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "open-exchange-rates",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "d07fd8f48ad37eadb86229d9e85b7cf64aa557dc305375db3b7644c223f43226",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "open-gstack-browser",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "08f1ba38ff74a7ce2d8ad7ed2e2ab4bd942ccb1daaefba917869d67f1674afd8",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "open-meteo-forecast",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "428d7e5663ed6a289e65212860ae4cae2a23cb27dba37e9b8be0e456b7971829",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "open-meteo-historical",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "f34fd7436a9437255d4773ccede48b8432ad64568e903d04872196733fd2e885",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "openai-dalle-image",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "18bf6f271f9f9216475b8d888f5a589e46f243ae0f50a23ba36c01d94ae97405",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "openalex-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "e0a13cf9611376504c1fda820cb700152f343355b143dce9c00ea1a57aae3648",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "opencritic-game",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "e4e944edd9067ae27b63d344c4c51994da9305c58a36403615d2c20e249f2279",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "openfda-drug-label",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "be3407523f3a2d8ae62845fed0535fba1177eacec82c47ba5c62fbdff740b184",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "openreview-papers",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "4505c3c021582bef0656cb1f39b54fca9ed13c1e2c6983e008e0723c2fad221e",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "openweather-agro",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "6a62a4d24c3720bd737322c774295daf37f1f5fe2904f76f4f9bcc8e264a8b8d",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "openweather-current",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "3f188bfe5591fcee511a922e95b5ab8652d597bc58c3c72598380f38ca3f9dd1",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "osm-nominatim",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "6cdae0b82b6d04c51e6286411570ac0cf8ecc5fde2e27a1179ceecdce3f5a4bd",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "osm-overpass-query",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "04c1d09c9b99bfe3a24bdb6e8a733034afdd09432a56357aa2938dd944a3856f",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "osrm-route",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "0fddd7d1398d0df8486e3800d5542d0de4d02665818b5ad00544c2201681cfe6",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "osv-dev-query",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "be7a99925ce0f3c26cf3766c4222fda609a382de0a8095d3f21b94381570f7ae",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "outlook-list-messages",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "a4983f90aa1a96367d98705b210ad32123cb1e9beea45857cccd3c06b3a71dec",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "owasp-zap-scan",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "6e49b6f994f22711bb6c8184606583493cb806d883f60472145392163c229c04",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "pair-agent",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "58bafbb2e7153703ec08e87bfb19e19c1c05c70d453e7009df16cbcf227182f1",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "pandas-dataframe-op",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "88ec5fee6b4e0f4e3e65940fbccf0dba67dac8730ccd259c8b5c25b3258914ec",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "paper-digest",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "13735c379aea59bc142c21255cf6565d7d289b51bbe511b1a025d47f01114fcd",
+      "schema_summary_sha256": "3c04f35e36af66c4e69dd6ca53605b9bd6b1814fee35fcc85ff1f49bc307b663"
+    },
+    {
+      "name": "parquet-reader",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "84247081291f700c75884e42b76d8b9c0149c82825743e0a8d29479f722c71e5",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "particle-devices",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "32cb92cb6c78af1de0ba62024e2de712529174368d0fad04eabb74066030a6fa",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "paypal-create-order",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "1b37d064f277f41c5b6c64428121438ff9858537950d57a66690df77a6f8f74f",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "pdf",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "2daa06841347115c97277d0ababbf442dfbfbc46769c95b46c0780d5b040ad2e",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "pdf-extract-tables",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "f2d9f0bd95d9b5e018091b3172a1a76c5b1a553751bee932f3353f0989157938",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "pdf-extract-text",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "7f1ea570683beb774b54bea826e2e4f140981585bc3c4a7b6133cd98da88331f",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "pdf-extractor",
+      "version": "3.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "ab083eecf13d7d8c73fba99e538eb3d968abb339fcaa1760584304cc2d1b264d",
+      "schema_summary_sha256": "286f82bcf6696de82b1ea104c23b73ed0547d11449eb2b0cb5c0f6edc7c11ba3"
+    },
+    {
+      "name": "pdftools-pro",
+      "version": "2.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "70f9d13c81ab5dfdb9343a7c9b38734a63b057a5a97c269d8983f3c14f979417",
+      "schema_summary_sha256": "286f82bcf6696de82b1ea104c23b73ed0547d11449eb2b0cb5c0f6edc7c11ba3"
+    },
+    {
+      "name": "pennylane-transactions",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "8ff4b179c09edc06847bf9db2ec3d26abaad75dec1b6dbfdde2ba7e70b5ca42c",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "personio-employees",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "314d9381102556ad87ec6683d5dcb06b0883f4d556a8cf8b29cdc48127262886",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "pexels-photo-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "8f21969e255b050967ea56b1b53aadbd1f04d0d3ca0cb13ee2edf32993a17057",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "plaid-transactions",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "203f989b548e4cc2b1e6a4bc9ef1c7e9af95c905ee7f45b6ae60dd0821f76775",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "plan-ceo-review",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "3b589bf1138f2b519cc38e89808a57053e19afdabb3957bbb7460ffc2dcff6f7",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "plan-design-review",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "f5dcf0808ae7e16d64de97e267f7021132d7c8a0e120b96f883ccdb8dfaa781f",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "plan-devex-review",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "391c5839b636363eb10addbcf031c2b89c61cd3e79b08a412c225f33d3b790e3",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "plan-eng-review",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "54ada9feaf59491986c0a365cd2b0cfcec1c4f0f7d3548f896acc9b0fcd82af4",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "plan-tune",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "f80906df7acaf4609398924d43048907ad1ecbbf877146f57d31b55e5a1202af",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "platform-voice-adapter",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "e8c72b2e13f350775393d2ab85575680cea10808743d11c777444bfbbb2316f5",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "polygon-aggregates",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "bbfbafd9bfe2caa734f625a12b1a513228b6f725230768ab7095868031393497",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "pptx",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "ca268f01711abe8cf1e59a1bfc31a7a541f76fbd1c41f349ea9a40b510262688",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "pptx-extract-slides",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "fdf87a5ff75807402e4acaefa1d0b32c24eee7d598c5018da58b84370a6acbfa",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "project-scaffold",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "8f9ceca79d3c1ddd9a2c551fc522a4aa70e8798e2cc279257824dde2f44bfd66",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "propertydata-uk-postcode",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "c903b3aea415d08402bc05f8ec002730daad23bd25f8e632475e217c2afd8d68",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "publish-repo",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "a2b960f3ea1206a10012f83f3e19dfab74dbf5465898cbe472f521f0a36cf2b9",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "pubmed-clinical-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "cc6de6d803eb2aa6c81c7df15f905d3b1fe2d53faa289300b02b279eb6c00be7",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "pubmed-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "5047f1edd351269cce1136702dcf10ee0b79c526410d6b521db3a1d446b9c9d6",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "pylint-lint",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "b0781336cf3ad97a49f14e5587a9ddada174c7fdfb645d4ee1e345e82778c883",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "pylint-pro",
+      "version": "4.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "7e252d8137d589a6267a09b87070fc7ac7920832da82c5e88bb0bbb0d569d28f",
+      "schema_summary_sha256": "5df60e3652a47eb2cce81ec06428476d467981ac02d595aa9553b7281fb93741"
+    },
+    {
+      "name": "pypi-package",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "02ad3b329acc8463f504b1245da253c964841fef20a0e677b22b84f108d408e2",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "python-backend-engineer",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "10347c98c9e35a107fb8d6ee5e6fd85ae7d7854f58bccdc3b16a628cf39d638b",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "qa",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "6fc8c3ea3d4bcf5496216a1856ccb6f6b6b9fc5f0a19dd311747f4279f5c18e6",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "qa-only",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "2074855ec93488489c4fc15f123e83fbb873ffcdc85fc47907bd2bfe84db0209",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "quant-analyst",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "200949f9061d6e6170460b6707752b001f670143f87122272791d092f354fb90",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "quant-report",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "81efc12c89cd2213bb5c3c7d6f3926c040708fae9f3174ea66edcebdc87dd3ea",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "quickbooks-online-invoices",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "1d90b4aaacfbd1cf998ca64a5f4dddb44f68642987b75932bc7dce9e79b2f248",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "rawg-games-database",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "23c739e5b84c7a9130a7131f32b422f4f834ba11c1968558e37805796183b9a1",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "realtor-com-listings",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "e51f5617defb09528f19522d6e6df26840301c00877c03c0d8a859fd3ba2fd77",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "receiving-code-review",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "3bf8e8fda529d77c640d2b4d03f25f0f02f01c966a4b68928fa04a63163cae54",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "redfin-property-detail",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "c02f28128329754b138f5dc6135a19bd3ad1254326d2f20a84987d0cbd33f9a5",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "regex-match-extract",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "daa36c927bc666b7cac15543beffa4df0619bcb8f195598813b89fbb487f7241",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "requesting-code-review",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "a8a5f8e4aad41b4cc8dca128a198d35776f0acf490e5c59e3769a26a88690d71",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "retro",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "4702a3a3d5359888898ce5c2bde73d4970e923ecbaddbe28116b9cbaeb10c146",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "review",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "579e5bc9369ef64a0db98ac933634bd13fe93ec29b801915c3f7e35b6127f92f",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "rightmove-listings",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "bdb38d518fe6b91552872ecf7e3eb34bb1807c3f1e119c5c376e475faffbb597",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "riot-games-summoner",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "7413b12722b02231c587d65bec6888934feee6cb615c658786bd9f60f911942d",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "rippling-employees",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "09258953df4f0d6b31a4ec9a60d3eea80dfee481852b9b088219564d2a6492f3",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "roll-check",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "8d9e9fb241286802930189ce116da07b2575ce0d30aec97ffabf132435800c86",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "rubygems-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "21533de7d151b3f059098d43740c5f2e74bf255f1f043b31e0a8da040f4fa70f",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "ruff-fast-lint",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "a1ca60b1ea87531de7aed33c482ee3a5cc9642c7ee9d78eee505106940125d0c",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "rxnorm-name-lookup",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "07fd92628e6587e10c545326a6937e26efdb3c60ac86c7d332dbf58da59f851c",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "sage-intacct-trial-balance",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "bbc1c4a6b53f35e437fcb85ec1542b38a40fd31d93b193e3c8dca83e869439b6",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "search-first",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "d5393f3a4de5f0322dae74e242a603b8b190d2f857c366974444ce3996446b21",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "sec-edgar-companyfacts",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "09ce369ed32549ef7acd8fefec259b39a53b5f551f990eabef094ea9b70e8fd4",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "sec-edgar-filings-list",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "9efee5498b2c63322727ed6ca63c75cccdf72457be0585a7297e1434566599d8",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "sec-edgar-financials",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "db0b8adcbdac81d8100f947948aade0a7cdf74886d16d2a18fc12460ab2e14f7",
+      "schema_summary_sha256": "7db6d573f179947663abd91a25b18c2fb06d309792c10ea3dd6bed5604f1e971"
+    },
+    {
+      "name": "sec-edgar-form4",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "f8217ec1128fe96c7adb2002057b44c215e48ce13e3db1f2f4387876d361545a",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "security-scanner",
+      "version": "1.5",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "41e3fe9f29545dd063b5c09a851f2ab2c6e38ccded627275069410417547ca3e",
+      "schema_summary_sha256": "5df60e3652a47eb2cce81ec06428476d467981ac02d595aa9553b7281fb93741"
+    },
+    {
+      "name": "self-review",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "a8e00f95051bf76d8c93937c739be21fc8dd2155c79b4ee83356a7797a7a6061",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "semantic-scholar-paper",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "80f3ed303fa35019683a064c468431f4b5acd84831579ab4019cdafbdbbfd3f7",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "sendgrid-send-mail",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "d91138854505e3b4d6650adb1c543a42b8701c68430391c280f7402c28ddd02e",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "senior-code-reviewer",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "4d8899b16e6d5a624147708312233b4bdb58da8b8739740e7feb631a7fa172f9",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "sentinel-hub-process",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "3f6f280000c3bb7b7786ea84290dcd99e3cd2171c1a5f85ef31b75f8e45fa617",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "setup-browser-cookies",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "0241591089eba90fecb515a5c10ed7e5b9d2e666fe6503fc7002357702e64ba2",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "setup-deploy",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "290075a9dc85c02dd7e092f6dc61e2a231a59ecea53385971656e17ea48d1106",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "shellcheck-bash",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "5dfda31cda7f80d7e51142e573e11a16f676062c389a5b42f4eb731c39994bd4",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "ship",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "37d4e285ee2b0ed1c695eaef2ea147b50c1ce7031e4a1c31b55c4785cea32b77",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "shodan-host-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "6d5f12cbda060b109bd18ac669e71f04f510f2a3c0fbb45c879d91d9e9602a96",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "shopify-orders-list",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "34eba13044468bc572bbf86559347de6417265dfc1f72121a76aeb80fc4e0313",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "shopify-products-list",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "0e15c04709ebd5b9708786912ea9a1f909845d2f78455a1e3c7336fd63f1ac63",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "signal-validator",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "03a1890be61fb05d7655eabd974f58d19074233428e1c3310869a4be15e19ca3",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "skill-creator",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "c46444a95ca35d577efbaf22e89f84a7dfe2fbcc97f3165f3efcd786e4d605e7",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "slack-gif-creator",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "92eb662bbd402c3c5bfc3a27a4dcc26e2c2634b74a84bec1fd739baba88e142f",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "slack-list-channels",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "7ff7b554af45926f1482bce27399061d4f0c760086264cd3b3b80d6e6891aca6",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "slack-post-message",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "190884a98ec3d654ac7046bba6d536f49ec0a80f20ba779db573757a7c2b900b",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "slow-pdf",
+      "version": "0.9",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "fe5f232d8814f5eba9ae317b9b68feaf6bc5117172b44a532599651f8da71801",
+      "schema_summary_sha256": "286f82bcf6696de82b1ea104c23b73ed0547d11449eb2b0cb5c0f6edc7c11ba3"
+    },
+    {
+      "name": "smartrecruiters-jobs",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "d630e379cdb861cb41a259645138083078034c6015e7523435ab48ab96091522",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "smoke-test",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "29fda287dcebf4e929a867e089450b5f30b6b6fcbf54786ffbb77d59255c4354",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "smoke-test-frontend",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "493c2f6586a8182fb04f316d806a1a2e78422defe4e3e608cc2bda0c1306cc1c",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "snomed-ct-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "725bbbc71f5cf4ee14b4440821d48cd7fa946f4fdff6b1a69ba66422a13b277c",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "snyk-vuln-scan",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "7acfad4081dc612c48e642dc61cbbd2d6ec800f4619b9f11da905394232b572c",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "social-brand",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "2872ed71d6824523d0658ac5f4dd56d628514901fc5624445735f1849c5e862a",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "sonarqube-quality-gate",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "1ef1131c45c3f0274cef163ea7c1b026956bd6c42f4e2c026496837e277465e6",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "spotify-audio-features",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "35ca036c00a11207f6847aa35b37065ea56cbe47c904a05464e61cd009159063",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "spotify-track-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "c2ee4b016a02af5ae976372fb2f9f0d3d0804847cae127cc0b4bcf6f43d4eb51",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "sql-query-postgres",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "3b6681994d8d793f881147d79beeb1e88cb02a3994b8f0f3c4dbbc0ba809849e",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "sql-query-sqlite",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "129910bc2e1d01b26e567eab8fe4bf29ec50ff9fcbd9c876c0b562c2c0efc528",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "stability-sd-image",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "4c6f852e16a72aafcec239601ca7fe4056883d815f9e7e6562c196a274892969",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "stackoverflow-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "f9656823ea114f749e171ecbeea2cf330e4b48ad9389c23ca325936199fa0ead",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "standards-check",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "956967d4ec72e33dc1f98c82a68eee8e959f05c88cbaa26355f660e45dd069c7",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "staticcheck-go",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "b7b1705249087d5ae1635618e84c5b37e26e1e54affc8d7df83a5ba4ed8f7dfa",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "steam-web-api",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "76267988fa22876d8955eb0c58222af1f242e2926df14b0052d97c81c3a6a23b",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "strategic-compact",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "12c3e8b4d95c121821207eeef367e332794ac66bf73d66ed44749d95bcd1575c",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "string-diff",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "d9d820750a172a8cec025a6152518bb52c070ea31f5ea84329e70ba0547b09fc",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "stripe-payment-intents",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "2d16c2d6b18a19294233bfe423b2137a5854c6184680e067f7bedb4300797aaf",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "subagent-driven-development",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "63c3693d0d1d7c420ae71a9733307a05ad77893ba31eaec56c2303c229847af6",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "summariser-mini",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "ae6c1b319044a970e8e575af5d1e20cdb3bce4ad93a2e41e9f252afc1c597623",
+      "schema_summary_sha256": "3c04f35e36af66c4e69dd6ca53605b9bd6b1814fee35fcc85ff1f49bc307b663"
+    },
+    {
+      "name": "systematic-debugging",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "c0eeeb8d6f77a66492e1484fa2ace2bf75e227be567251377ba79edc900a5036",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "template-skill",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "e2d8d93025d8caf0a96bb59b598a0e0f0ec3a0de03f79be9a419cd9212cd72e1",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "terraform-cloud-runs",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "cf74a680e3c8832bfd9d08e6b20a28c38c555bcb6fc46f9072adcecca94a2794",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "terraform-registry-module",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "2688efbfe3d328a4122e4ee8a75543a400e394b491a59e086466a85891074cd8",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "tesseract-ocr",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "81ee4c303107fac8593cc7e9464b468c78470d92873e629a502895fa12ef0b3b",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "test-driven-development",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "7855e29dfde52f000ae3485b7f87a24ff613c5064f8915c815e0085462fc2ce1",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "theme-factory",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "81056c43a38a2518a479c37d397048937a196c1a9a4e69b0968cc2e06b034cb8",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "thingsboard-telemetry",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "fcb5ffbcf50f797042d25dabf233057d7627594ca32311158b15f4ea32d89736",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "tiingo-eod",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "d0fd1d575205981b07834212e155b805f7b3f2d23ff835bbf5931783d4469574",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "timezone-from-latlng",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "f48b47e6a7cf54a828dd14939a107276a80cc18d6ab55f1ac422eea265ba5777",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "tipalti-payee-payments",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "e1f0ae4c1b01ff6a3f426a96cf63f5264585db30ee1dcf02250c8d0fa6ae0b6b",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "tldr-bot",
+      "version": "2.1",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "318b550dc83994135ef58a793702c427779fd959cb4df8614754375ea6d93508",
+      "schema_summary_sha256": "3c04f35e36af66c4e69dd6ca53605b9bd6b1814fee35fcc85ff1f49bc307b663"
+    },
+    {
+      "name": "tomorrow-io-weather",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "9a015d22f5d4499dbd66b6b2a44566c740c1dae05ec95b0fd6a3c5a35550ab41",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "tuya-cloud-devices",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "d2dc16ee11155bf747df761b01f6269956658593c8e36b8af7ec61acad87deb6",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "twilio-make-call",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "401dbfbbcae620d89c422b9c9c5a9f253c4bccf383646787e8d699e40be6d886",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "twilio-send-sms",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "134d2b8a09e3d29e3ccc9dcde19a045f38874d0209442b55f05ed39468cfccd9",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "twitch-helix-streams",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "57aa1bfc74346efe06414fed13d1bff5df8f06f71f6a9d88e089dd49de9976e4",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "twitter-thread-builder",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "193ce2e7846562ce031da807fbed68cb9520c35353680917e8662be031bade88",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "typescript-pro",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "subagent",
+      "capability_text_sha256": "0437c69b83ba6d37410a452eff6914247abcba62d4b2aaaf4d24336b8b2823a4",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "unfreeze",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "25c85f579a2001e4ba4cf89c0207649736a5d35e49297bee059931d1b0957909",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "unsplash-photo-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "140f1da517eaa2f53c6f60736e3d9f9bf60d4015dfebae470c77bf83ef86f1f3",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "us-census-acs",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "a246062e41609537352e76675d37ab025211cb146319676dda6f974f49234f55",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "usaspending-awards",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "426fa03a8e34b5670ce4541fb13fc40c498c909fd1b798d6a836716ae854014e",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "usda-nass-quickstats",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "822324057f75c7ad307027c47a668547ba372400196a6a1c8b2284147a6ec5d3",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "using-git-worktrees",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "3d82d324b87a8423d58e02b138a469d559601178bd4a34fd1a947c77eca449cf",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "using-superpowers",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "3a80363cae58aec8f5e2f313d8ab1530bd074bbc380b88d4ad3ef4c004638078",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "uspto-patents-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "c6489640f1aad3d763a729ded9db2112242a8778c6ea6d2a45a8b6dc2ef799ed",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "vercel-deployments",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "5d366876e28c7115eefa9d1ef56da6a695ce61e5c230107924308cec7f036129",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "verification-before-completion",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "99e494e5bc1e228d007254723ba9fed0bb4d3a308a95ec9459f0a515b2fb3f68",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "viral-hook-generator",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "a02c0ce12e9a90872d913a97fa2a8ee95c3cfda82fbc77cd82cec9769cf24766",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "virustotal-file-report",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "3eef56c305672f475139274b69903e46a8a8a39b41a9d022d974869b1e365bb2",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "walmart-marketplace-orders",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "677d4021b1a746c8c07fbfbaf45cb57889fe6b80a3bb72698d9169a3ac3b0b60",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "wave-accounting-customers",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "f01ad2166d93936252a0278df6fc4865b578a7001cab1c88cf661af7aefc18ad",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "web-artifacts-builder",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "ced2ba735fb60650d671c9e983fa0c1f093ede28573bb781cbd8f347e2d46eb8",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "webapp-testing",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "ae724298f1a5a54f679fa3a46db63690d7ffc928aff6583f4f3b0b907869a54e",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "whisper-audio-transcribe",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "198c150b8a8050baf785700bf694bc5634119a85edcc0810b6d04a0b78ef9578",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "who-icd11-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "46fd45f727030f1eb8987ae07323a488b974ce498217981d3927b95a06d7d06b",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "wikidata-sparql",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "4a075dc095d917ad110c5b3327fc6c497c3fb49edb14af01690b614d4c5fdc3a",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "wikipedia-fulltext",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "b23611b4722e3969aafd290b180787d79bf67fffefd8f9847f89f1848430e2a1",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "wikipedia-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "32ff89f53311bfefb4c7b549beee858a24f83911854ee6596219708211d24fd8",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "wikipedia-summary",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "19b2c8c760975a5b309ce09112f9013b7571d5c2ec7e6f3ecdcdd7161083c6dd",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "wolfram-alpha-query",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "20fe8a70e63034cde6c4c0126938e40899d734f654de82a03ab6820798626aa5",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "workday-staffing",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "43d71f52941a7e7efec5ba135743216e16ddf9ea1966055ded6f9a15a620914e",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "world-bank-indicators",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "d6b23764974dedb0dab0629117c1a3d972c2866ed882a7bea1f75bb20cf5babb",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "writing-plans",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "3c04a38908fb6800638eaa0f17f42eb4b3bcc31907a6c9c8f0c9701d9fe26e15",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "writing-skills",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "f0e31ae1a24fbe103719ef70fb02034935c1b4aace9ef9be3830311651f2b0b4",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "xero-bank-transactions",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "2f2afa927573d739ab0556b6c721793ed0416ed3017f5cb08aa738ba103442d3",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "xlsx",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "525a942a193b4c0668b6e631a7804de7121f72c75d27782fec8c6625f09a6e0d",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "xlsx-read-sheet",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "faa76615ffc27162862c23bb5b74d04d9d3aee133896f5afee63a93010cb9c81",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "yahoo-finance-fundamentals",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "38d643bc021e414b7d336ec5b7e3af3398a114b9f589b74fed5b1e5ed5eceb46",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "yahoo-finance-quote",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "14e95d5550b88757dbe089417b9ff46303f12aae02b7147dd241812152df8886",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "youtube-search",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "3116329ce7b8f69f10e0fdf0a9e9afc787063dd4762531a51ece34dca9a4421d",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "youtube-title-optimizer",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "skill",
+      "capability_text_sha256": "118697d2eb52d61f9d1e99307f49c2c5b46ed419a6cb48f8cf76bbd60eb1f55d",
+      "schema_summary_sha256": "246bdfeba4df770ab7c0f19882cd6bbb25ef0d2b07a2f145a8b852df95933af0"
+    },
+    {
+      "name": "youtube-transcript",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "eeada87500b385ed882a69421f0f9105aea0b4b5a97312e03d2fa83394e8c2da",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "zillow-bridge-listings",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "0c57d55da1dddbeee790056c401e688fc0c0dca4cbdcbf1c1509470726f3b14b",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "zoho-books-bills",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "3d866641fe6ec3e372eff8f1f8f82db02ad94d060d23bd9f34f95c101f56bedb",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    },
+    {
+      "name": "zoopla-properties",
+      "version": "1.0",
+      "namespace": "default",
+      "kind": "tool",
+      "capability_text_sha256": "b010042e62b488d634392893e534f842b7d800fbe9180c364b429cec2d4020ef",
+      "schema_summary_sha256": "22446f9c0b11534c3ac3ee0e3365152b9184854bee21f87fd219ae79777afbb9"
+    }
+  ]
+}

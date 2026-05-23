@@ -1,0 +1,70 @@
+name: v2-golden-native
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'src/**'
+      - 'scripts/**'
+      - 'tests/fixtures/v2-golden*.json'
+      - 'tests/fixtures/v2-baseline-native.json'
+      - 'tests/fixtures/v2-corpus-snapshot.json'
+      - 'tests/schemas/**'
+      - '.github/workflows/v2-golden-native.yml'
+
+jobs:
+  golden:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install
+        run: npm ci --no-audit --no-fund
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: NDCG unit test
+        run: npx tsx --test tests/v2-eval-ndcg.test.ts
+
+      # Note: full eval requires Ollama (not available on GH runners).
+      # CI only enforces (a) schema lint and (b) the formula unit test;
+      # eval body runs locally and the baseline.json is committed.
+      - name: Schema lint v2-golden.json
+        run: |
+          node -e "const Ajv=require('ajv/dist/2020.js').default;const fs=require('fs');
+            const ajv=new Ajv({strict:false,allErrors:true});
+            const schema=JSON.parse(fs.readFileSync('tests/schemas/v2-golden.schema.json','utf8'));
+            const adj=JSON.parse(fs.readFileSync('tests/schemas/v2-golden-adjudication.schema.json','utf8'));
+            const data=JSON.parse(fs.readFileSync('tests/fixtures/v2-golden.json','utf8'));
+            for(const [n,s] of [['golden',schema],['adjudication',adj]]){
+              const v=ajv.compile(s);
+              if(!v(data)){console.error(n,'lint FAIL');console.error(JSON.stringify(v.errors,null,2));process.exit(2);}
+              console.log(n,'lint OK');
+            }"
+
+      - name: Verify NDCG formula version pinned in fixture
+        run: |
+          node -e "const d=require('./tests/fixtures/v2-golden.json');
+            if(d.ndcg_formula!=='exp_gain_log2_rank1'){console.error('ndcg_formula must be exp_gain_log2_rank1, got',d.ndcg_formula);process.exit(2)}
+            console.log('formula pin OK')"
+
+      - name: Verify baseline schema if committed
+        run: |
+          if [ -f tests/fixtures/v2-baseline-native.json ]; then
+            node -e "const b=require('./tests/fixtures/v2-baseline-native.json');
+              const need=['embedder','ndcg_formula','ndcg3','mrr','recall3','single_tool_top1','runs','captured_at'];
+              for(const k of need){if(b[k]===undefined){console.error('baseline missing',k);process.exit(2)}}
+              for(const m of ['ndcg3','recall3','single_tool_top1']){
+                if(b[m].mean===undefined||b[m].stddev===undefined){console.error('baseline.'+m+' must have mean+stddev');process.exit(2)}
+              }
+              if(b.ndcg_formula!=='exp_gain_log2_rank1'){console.error('baseline formula mismatch');process.exit(2)}
+              console.log('baseline schema OK: NDCG@3 mean='+b.ndcg3.mean.toFixed(4)+' stddev='+b.ndcg3.stddev.toFixed(4))"
+          else
+            echo "no v2-baseline-native.json yet — first PR can commit it"
+          fi

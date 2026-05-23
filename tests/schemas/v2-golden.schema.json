@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://2chain.local/schemas/v2-golden.schema.json",
+  "title": "v2-native golden ranking set",
+  "type": "object",
+  "required": ["version", "corpus_sha256", "prewarm_sha256", "ndcg_formula", "queries"],
+  "additionalProperties": true,
+  "properties": {
+    "version": { "type": "integer", "const": 2 },
+    "_doc": { "type": "string" },
+    "generated_at": { "type": "string" },
+    "corpus_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "prewarm_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "ndcg_formula": { "type": "string", "const": "exp_gain_log2_rank1" },
+    "queries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "stratum", "q", "expected_top3", "relevance"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "stratum": {
+            "type": "string",
+            "enum": ["prewarm", "single-tool", "near-miss", "ambiguous", "multi-tool", "skill-subagent-boundary", "adversarial"]
+          },
+          "q": { "type": "string", "minLength": 1 },
+          "expected_top1": { "type": "string", "minLength": 1 },
+          "expected_top1_in": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "expected_top3": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "relevance": {
+            "type": "object",
+            "additionalProperties": { "type": "integer", "minimum": 0, "maximum": 3 }
+          }
+        }
+      }
+    }
+  }
+}

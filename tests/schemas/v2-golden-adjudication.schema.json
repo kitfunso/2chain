@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://2chain.local/schemas/v2-golden-adjudication.schema.json",
+  "title": "v2-golden adjudication: relevance-map completeness",
+  "description": "Enforces that every query's relevance map covers >=3 candidates (union of expected_top3 + judges' top-N). Prevents the failure mode where some queries have rich relevance maps and others sparse, which silently shifts per-query NDCG ceilings.",
+  "type": "object",
+  "required": ["queries"],
+  "additionalProperties": true,
+  "properties": {
+    "queries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "relevance"],
+        "properties": {
+          "id": { "type": "string" },
+          "relevance": {
+            "type": "object",
+            "minProperties": 3,
+            "additionalProperties": { "type": "integer", "minimum": 0, "maximum": 3 }
+          }
+        }
+      }
+    }
+  }
+}

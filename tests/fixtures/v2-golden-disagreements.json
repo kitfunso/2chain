@@ -1,0 +1,246 @@
+{
+  "queries": [
+    {
+      "id": "prewarm-01",
+      "q": "Extract tables from this financial report PDF",
+      "pairs": [
+        {
+          "query_id": "prewarm-01",
+          "q": "Extract tables from this financial report PDF",
+          "candidate": "slow-pdf@0.9",
+          "claude_rel": 0,
+          "codex_rel": 3,
+          "gap": 3,
+          "claude_rationale": "(incomplete-truncation — re-grade)",
+          "codex_rationale": "Extracts tables from PDFs, including scanned financial statements."
+        },
+        {
+          "query_id": "prewarm-01",
+          "q": "Extract tables from this financial report PDF",
+          "candidate": "flaky-extractor@0.5",
+          "claude_rel": 0,
+          "codex_rel": 2,
+          "gap": 2,
+          "claude_rationale": "(incomplete-truncation — re-grade)",
+          "codex_rationale": "Attempts PDF table extraction for financial statements but is unreliable."
+        }
+      ]
+    },
+    {
+      "id": "prewarm-05",
+      "q": "review javascript code for bugs",
+      "pairs": [
+        {
+          "query_id": "prewarm-05",
+          "q": "review javascript code for bugs",
+          "candidate": "self-review@1.0",
+          "claude_rel": 0,
+          "codex_rel": 2,
+          "gap": 2,
+          "claude_rationale": "(incomplete-truncation — re-grade)",
+          "codex_rationale": "Reviews session changes for mistakes, but is not JavaScript-specific."
+        }
+      ]
+    },
+    {
+      "id": "prewarm-12",
+      "q": "find an MCP server for postgres",
+      "pairs": [
+        {
+          "query_id": "prewarm-12",
+          "q": "find an MCP server for postgres",
+          "candidate": "mcp-github__search_repositories@1.0",
+          "claude_rel": 0,
+          "codex_rel": 2,
+          "gap": 2,
+          "claude_rationale": "GitHub search tool, unrelated to Postgres.",
+          "codex_rationale": "It could search GitHub for a Postgres MCP server, but is not one itself."
+        },
+        {
+          "query_id": "prewarm-12",
+          "q": "find an MCP server for postgres",
+          "candidate": "mcp-gitlab__search_repositories@1.0",
+          "claude_rel": 0,
+          "codex_rel": 2,
+          "gap": 2,
+          "claude_rationale": "GitLab search tool, unrelated to Postgres.",
+          "codex_rationale": "It could search GitLab for a Postgres MCP server, but is not one itself."
+        },
+        {
+          "query_id": "prewarm-12",
+          "q": "find an MCP server for postgres",
+          "candidate": "mcp-fetch__fetch@1.0",
+          "claude_rel": 0,
+          "codex_rel": 2,
+          "gap": 2,
+          "claude_rationale": "HTTP fetch tool, unrelated to Postgres.",
+          "codex_rationale": "It could fetch documentation or a registry page for a Postgres MCP server, but is not one itself."
+        }
+      ]
+    },
+    {
+      "id": "prewarm-17",
+      "q": "web scraper for product pricing",
+      "pairs": [
+        {
+          "query_id": "prewarm-17",
+          "q": "web scraper for product pricing",
+          "candidate": "isthereanydeal-prices@1.0",
+          "claude_rel": 0,
+          "codex_rel": 2,
+          "gap": 2,
+          "claude_rationale": "(incomplete-truncation — re-grade)",
+          "codex_rationale": "Tracks game prices across stores, but is category-specific and API-based."
+        }
+      ]
+    },
+    {
+      "id": "prewarm-19",
+      "q": "translate english to japanese",
+      "pairs": [
+        {
+          "query_id": "prewarm-19",
+          "q": "translate english to japanese",
+          "candidate": "mcp-everything__sample_llm@1.0",
+          "claude_rel": 0,
+          "codex_rel": 2,
+          "gap": 2,
+          "claude_rationale": "MCP sampling demonstration tool, unrelated to translation.",
+          "codex_rationale": "A sampled LLM could translate the text, though this is only a generic demo tool."
+        }
+      ]
+    },
+    {
+      "id": "prewarm-30",
+      "q": "scan a python repo for hardcoded secrets",
+      "pairs": [
+        {
+          "query_id": "prewarm-30",
+          "q": "scan a python repo for hardcoded secrets",
+          "candidate": "sonarqube-quality-gate@1.0",
+          "claude_rel": 0,
+          "codex_rel": 2,
+          "gap": 2,
+          "claude_rationale": "(incomplete-truncation — re-grade)",
+          "codex_rationale": "Project security hotspot scanning is relevant, though not specifically secrets-focused."
+        }
+      ]
+    },
+    {
+      "id": "prewarm-31",
+      "q": "check a domain for known CVEs",
+      "pairs": [
+        {
+          "query_id": "prewarm-31",
+          "q": "check a domain for known CVEs",
+          "candidate": "nvd-cve-search@1.0",
+          "claude_rel": 0,
+          "codex_rel": 2,
+          "gap": 2,
+          "claude_rationale": "(incomplete-truncation — re-grade)",
+          "codex_rationale": "Searches authoritative CVE data, but by product or CVE rather than domain."
+        }
+      ]
+    },
+    {
+      "id": "single-07",
+      "q": "list documents in an S3 bucket on AWS",
+      "pairs": [
+        {
+          "query_id": "single-07",
+          "q": "list documents in an S3 bucket on AWS",
+          "candidate": "mcp-filesystem__list_directory@1.0",
+          "claude_rel": 0,
+          "codex_rel": 2,
+          "gap": 2,
+          "claude_rationale": "(incomplete-truncation — re-grade)",
+          "codex_rationale": "Lists files in a directory, but only local filesystem rather than S3."
+        }
+      ]
+    },
+    {
+      "id": "nearmiss-04",
+      "q": "extract structured text from a scanned PDF of an invoice (OCR)",
+      "pairs": [
+        {
+          "query_id": "nearmiss-04",
+          "q": "extract structured text from a scanned PDF of an invoice (OCR)",
+          "candidate": "slow-pdf@0.9",
+          "claude_rel": 0,
+          "codex_rel": 2,
+          "gap": 2,
+          "claude_rationale": "(incomplete-truncation — re-grade)",
+          "codex_rationale": "Handles scanned PDFs and OCR text but is more general and finance-table focused than invoice-specific."
+        }
+      ]
+    },
+    {
+      "id": "ambig-05",
+      "q": "generate an image",
+      "pairs": [
+        {
+          "query_id": "ambig-05",
+          "q": "generate an image",
+          "candidate": "slack-gif-creator@1.0",
+          "claude_rel": 0,
+          "codex_rel": 2,
+          "gap": 2,
+          "claude_rationale": "(incomplete-truncation — re-grade)",
+          "codex_rationale": "It creates animated GIFs from descriptions, which is adjacent to image generation."
+        }
+      ]
+    },
+    {
+      "id": "ambig-14",
+      "q": "review my code",
+      "pairs": [
+        {
+          "query_id": "ambig-14",
+          "q": "review my code",
+          "candidate": "eslint-stylecheck@1.0",
+          "claude_rel": 0,
+          "codex_rel": 2,
+          "gap": 2,
+          "claude_rationale": "(incomplete-truncation — re-grade)",
+          "codex_rationale": "It reviews JavaScript and TypeScript code for style and bugs."
+        },
+        {
+          "query_id": "ambig-14",
+          "q": "review my code",
+          "candidate": "shellcheck-bash@1.0",
+          "claude_rel": 0,
+          "codex_rel": 2,
+          "gap": 2,
+          "claude_rationale": "(incomplete-truncation — re-grade)",
+          "codex_rationale": "It reviews shell scripts for bugs, but only for one language."
+        }
+      ]
+    },
+    {
+      "id": "multi-01",
+      "q": "extract all tables from a PDF then convert them to JSON",
+      "pairs": [
+        {
+          "query_id": "multi-01",
+          "q": "extract all tables from a PDF then convert them to JSON",
+          "candidate": "slow-pdf@0.9",
+          "claude_rel": 0,
+          "codex_rel": 3,
+          "gap": 3,
+          "claude_rationale": "(incomplete-truncation — re-grade)",
+          "codex_rationale": "Thorough PDF table extractor that can handle scanned PDFs and batch processing."
+        },
+        {
+          "query_id": "multi-01",
+          "q": "extract all tables from a PDF then convert them to JSON",
+          "candidate": "flaky-extractor@0.5",
+          "claude_rel": 0,
+          "codex_rel": 2,
+          "gap": 2,
+          "claude_rationale": "(incomplete-truncation — re-grade)",
+          "codex_rationale": "Attempts PDF table extraction but is unreliable."
+        }
+      ]
+    }
+  ]
+}
