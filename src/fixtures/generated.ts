@@ -9,7 +9,7 @@
 //   - cost + latency in plausible ranges per tier
 import type { FixtureSpec } from './tools.js';
 
-interface DomainTpl {
+export interface DomainTpl {
   domain: 'pdf-extraction' | 'summarisation' | 'code-review';
   endpoint_stub_name: string;
   input_contract: Record<string, unknown>;
@@ -27,7 +27,7 @@ const TEXT_OUTPUT = { type: 'object', properties: { summary: { type: 'string' } 
 const CODE_INPUT = { type: 'object', properties: { code: { type: 'string' } }, required: ['code'], additionalProperties: false };
 const CODE_OUTPUT = { type: 'object', properties: { issues: { type: 'array', items: { type: 'object', properties: { file: { type: 'string' }, line: { type: 'integer' }, comment: { type: 'string' } }, required: ['file', 'line', 'comment'], additionalProperties: false } } }, required: ['issues'], additionalProperties: false };
 
-const DOMAINS: DomainTpl[] = [
+export const DOMAINS: DomainTpl[] = [
   {
     domain: 'pdf-extraction',
     endpoint_stub_name: 'pdf-extractor-v3',

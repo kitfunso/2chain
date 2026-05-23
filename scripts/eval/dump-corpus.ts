@@ -17,10 +17,11 @@ import { PREWARM_QUERIES } from '../../src/services/discover.js';
 import { canonicalize, signCorpus, signPrewarm } from '../../src/eval/corpus-signature.js';
 
 const dbPath = process.env.TWOCHAIN_DB_PATH ?? 'C:/tmp/v2.db';
+const snapshotOverride = process.env.TWOCHAIN_SNAPSHOT_PATH;
 const storage = new SqliteStorage({ path: dbPath });
 await storage.init();
 
-const all = await storage.listTools({ limit: 10_000 });
+const all = await storage.listTools({ limit: 20_000 });
 const canonical = all.map(canonicalize);
 const corpus_sha256 = signCorpus(canonical);
 const prewarm_sha256 = signPrewarm(PREWARM_QUERIES);
@@ -41,7 +42,9 @@ const prewarmOut = {
   queries: PREWARM_QUERIES,
 };
 
-const corpusPath = resolve('tests/fixtures/v2-corpus-snapshot.json');
+const corpusPath = snapshotOverride
+  ? resolve(snapshotOverride)
+  : resolve('tests/fixtures/v2-corpus-snapshot.json');
 const prewarmPath = resolve('tests/fixtures/v2-prewarm-snapshot.json');
 
 writeFileSync(corpusPath, JSON.stringify(corpusOut, null, 2) + '\n');

@@ -1,0 +1,47 @@
+{
+  "embedder": "ollama:nomic-embed-text",
+  "rrf_weights": {
+    "vector": 0.5,
+    "text": 0.5
+  },
+  "corpus_sha256": "3d466787a01be2ef3474d7e8408dbda0d92596b539e269e921c49b4e0817165d",
+  "corpus_size": 1000,
+  "prewarm_sha256": "0085cd3f339ac4309b81487cf3ce995be8bd0ff7535902a9a63e5e1db4cde117",
+  "ndcg_formula": "exp_gain_log2_rank1",
+  "runs": 5,
+  "include_stress": true,
+  "ndcg3": {
+    "mean": 0.052952100494006685,
+    "stddev": 0,
+    "min": 0.052952100494006685,
+    "max": 0.052952100494006685
+  },
+  "mrr": {
+    "mean": 0.07,
+    "stddev": 0
+  },
+  "recall3": {
+    "mean": 0.026666666666666665,
+    "stddev": 0
+  },
+  "single_tool_top1": {
+    "mean": 0,
+    "stddev": 0,
+    "min": 0,
+    "max": 0,
+    "total": 14
+  },
+  "latency_p50_ms": {
+    "mean": 5.6,
+    "stddev": 4.223742416388575
+  },
+  "latency_p95_ms": {
+    "mean": 7.8,
+    "stddev": 5.192301994298868
+  },
+  "latency_p99_ms": {
+    "mean": 9.2,
+    "stddev": 5.946427498927402
+  },
+  "captured_at": "2026-05-23T18:15:37.721Z"
+}
