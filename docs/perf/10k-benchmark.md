@@ -103,6 +103,46 @@ vec0's brute-force scan over 10k 768-d vectors is well under 100ms per query. Ph
 2. **Rerank scoring with `reliability_score`** as a third arm or post-filter.
 3. **Phase 2 D (Postgres + pgvector)** picks up the retrieval restructuring with real HNSW tuning capability.
 
+## Follow-up: reliability arm as third RRF signal (2026-05-23, negative)
+
+**Hypothesis tested:** A2 open item #2 — adding `reliability_score` as a third RRF arm (alongside vector + text) might surface high-quality real-corpus tools above noisy synthetic ones at 10k scale.
+
+**Distribution context** (from a probe of `metadata.reliability_score` per corpus):
+- 434 corpus: 99.5% above 0.80 gate, mean 0.946 — clustered near 1.0, low discrimination signal
+- 10k corpus: 80.4% above 0.80 gate, mean 0.843, p10/p50/p90 = 0.60/0.85/1.00 — broader distribution
+
+**Sweep result** (`scripts/eval/sweep-reliability-arm.ts`, vec=0.5 text=0.5 fixed, reliability arm top-N=50):
+
+| Weight | 434 NDCG@3 | 10k NDCG@3 |
+|---|---|---|
+| 0.00 (baseline) | **0.7296** | **0.3139** |
+| 0.10 | 0.7178 | **0.3142** (marginal) |
+| 0.25 | 0.6691 | 0.3135 |
+| 0.50 | 0.5767 | 0.3005 |
+| 1.00 | 0.2101 | 0.1139 |
+
+**Negative on both corpora.** 434 has too little reliability discrimination (mean 0.946) for the arm to differentiate; any non-zero weight injects noise. 10k has more spread but `reliability_score` is **uncorrelated with query relevance** — a tool with reliability 1.0 isn't more likely to be the right answer for query Q than a tool with reliability 0.85, since both are already above the gate. The arm is signal-free for the eval's purpose.
+
+## The three-strikes finding
+
+Three simple remediations attempted, all negative:
+
+| Remediation | 434 vs A1 baseline | 10k vs A2 baseline |
+|---|---|---|
+| 1. Global `kind=tool` filter | 0.6765 ❌ | 0.2472 ❌ |
+| 2. Per-query kind targeting | 0.7062 ❌ | 0.2844 ❌ |
+| 3. Reliability arm (best weight) | 0.7296 ❌ tied | 0.3142 ❌ marginal |
+
+**Pattern:** A1's relevance maps were graded for the small-corpus surface with unfiltered RRF retrieval. Any single-axis change moves away from that calibration. The maps include cross-kind incidental hits (#1, #2 break those); reliability is uncorrelated with the eval's query semantics (#3 has no signal).
+
+**The remaining real fix paths are non-trivial:**
+- **Re-grade relevance maps at scale.** Run the judge ensemble against the 10k corpus with kind-restricted candidate pools, producing v2-golden-10k.json with relevance specifically calibrated for the larger corpus. Expensive (LLM calls roughly proportional to 10k×~50-candidate pool).
+- **Cross-encoder re-ranking.** After RRF top-K, re-rank with a more expensive query-aware scorer (e.g., LLM scoring of the top-20 candidates). Adds latency but could recover quality at scale.
+- **Hybrid query routing.** Different query types (e.g., "find me an MCP server for X" vs "transcribe an audio file") may need different retrieval strategies. Plan a routing layer.
+- **Phase 2 D (Postgres + pgvector).** HNSW + filter pushdown gives real tuning surface that vec0 brute-force doesn't. Combined with one of the above remediations.
+
+**What we know for sure now:** the eval gate (`v2-baseline-native.json`, 0.7296) is calibrated to 434-corpus retrieval. It's a useful **regression guard** for the small corpus but cannot be used to verify retrieval quality at production scale without one of the harder fixes above.
+
 ## Follow-up: per-query kind targeting (2026-05-23, infrastructure shipped, NDCG still drops)
 
 **Implemented:** `expected_kind` field added to every `v2-golden.json` query (90 `tool`, 4 `skill`, 3 `subagent`, 3 no-kind for adversarial). Schema enum extended. Runner passes `q.expected_kind` to `discover()`.
