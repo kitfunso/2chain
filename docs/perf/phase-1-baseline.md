@@ -16,8 +16,8 @@
 
 ## Golden ranking parity (32 queries)
 
-Source: `tests/fixtures/golden-queries.json` (5 demo prompts + 17 prewarm + 8 edge cases).
-v1 baseline captured against the live MongoDB + Voyage stack on 2026-05-02 in `tests/fixtures/v1-baseline.json`.
+Source: `tests/fixtures/legacy/golden-queries.json` (5 demo prompts + 17 prewarm + 8 edge cases).
+v1 baseline captured against the live MongoDB + Voyage stack on 2026-05-02 in `tests/fixtures/legacy/v1-baseline.json`.
 
 | Metric | v1 | v2 (nomic, 0.7/0.3) | v2 (nomic, 0.5/0.5) |
 |---|---|---|---|

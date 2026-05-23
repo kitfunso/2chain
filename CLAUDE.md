@@ -36,7 +36,13 @@ See `docs/ARCHITECTURE.md` for the full picture. Two-line summary: services call
 
 13. **SQLite writes are queue-serialized; updateHook never reads.** All writes route through `src/storage/sqlite-write-queue.ts`. The `updateHook` callback only enqueues `{op, table, rowid}` to an in-memory queue; a separate async worker drains it using a read-only snapshot connection. Why: reading inside the hook re-enters SQLite during a write transaction and can deadlock the event loop; this pattern was discovered in outside-voice review before Phase 1 Step 9.
 
-14. **Embedder swaps require a quantitative parity bar.** Any change to the embedding model (Voyage → nomic-embed-text, nomic → bge-large, etc.) must show MRR / Recall@5 parity vs `tests/fixtures/v1-baseline.json` golden ranking set, with top-1 RRF margin no more than 10% smaller than baseline. Why: a model swap that silently degrades retrieval is the easiest way to break agent trust, and the only way to catch it is to measure.
+14. **Embedder swaps require a quantitative parity bar.** Any change to the embedding model (nomic-embed-text → mxbai-embed-large, → bge-large, etc.) must clear all three floors against the v2-native baseline (`tests/fixtures/v2-baseline-native.json`):
+
+    - **NDCG@3** ≥ baseline `mean - 2 * stddev`
+    - **Recall@3** drop ≤ 10% vs baseline mean
+    - **Single-tool-unambiguous top-1 hit rate** ≥ baseline `mean - 2 * stddev` (catches "the corpus's canonical answer to a clear query stopped winning" regressions)
+
+    NDCG@3 formula is pinned in `src/eval/ndcg.ts` and locked by `tests/v2-eval-ndcg.test.ts`: `gain(rel) = 2^rel - 1`, `discount(r) = log2(r + 1)` with r starting at 1, stable name+version tie-break on equal RRF score. Runner: `scripts/smoke/v2-golden-v2native.ts`. Demo-arc 10/10 gate from earlier revisions is dropped (user directive 2026-05-23). The v1-Voyage baseline (`tests/fixtures/legacy/v1-baseline.json`) is retained for diagnostic comparison but is no longer the gate. Why: a model swap that silently degrades retrieval is the easiest way to break agent trust, and the only way to catch it is to measure.
 
 ## Coding Conventions
 

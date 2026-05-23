@@ -1,5 +1,7 @@
 # Phase 1 — Personal Tier (SQLite + Ollama, end-to-end)
 
+> **Note (2026-05-23):** Step 0's v1-Voyage baseline and the `golden-queries.json` / `v1-baseline.json` / `v2-golden-regression.ts` artefacts have been superseded by Episode A1 (`docs/plans/2026-05-23-episode-a1-v2-native-golden-set.md`). The v1 files now live at `tests/fixtures/legacy/` and `scripts/smoke/legacy/` as a diagnostic but are no longer the gate. The new parity bar is NDCG@3 against `tests/fixtures/v2-baseline-native.json`; see CLAUDE.md Rule 14.
+
 **Goal:** The five demo prompts pass end-to-end against a SQLite + sqlite-vec + FTS5 backend with an Ollama embedder, with no Atlas / Voyage code in the call path, **and with quantitative proof the swap doesn't regress retrieval quality**.
 
 **Prerequisites:** Node 24 installed; Ollama installed with `nomic-embed-text` pulled (`ollama pull nomic-embed-text`); empty `feat/v2-personal-tier` branch off `master`.
