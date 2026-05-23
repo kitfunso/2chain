@@ -99,6 +99,29 @@ vec0's brute-force scan over 10k 768-d vectors is well under 100ms per query. Ph
 
 ## Open items (next episodes)
 
-1. **`kind=tool` filter at the discover surface** (sub-episode of A2-followup or D).
+1. **`kind=tool` filter at the discover surface** — **TESTED 2026-05-23: does NOT work as a one-liner.** See "Follow-up investigation" below.
 2. **Rerank scoring with `reliability_score`** as a third arm or post-filter.
 3. **Phase 2 D (Postgres + pgvector)** picks up the retrieval restructuring with real HNSW tuning capability.
+
+## Follow-up investigation (2026-05-23, post-merge)
+
+**Hypothesis tested:** A2's open item #1 — passing `kind: 'tool'` from the eval runner would filter out skill/subagent contamination and recover NDCG@3 at scale.
+
+**Result: WORSE on both corpora.**
+
+| Metric | 434 (A1 gate) | 10k (A2 baseline) |
+|---|---|---|
+| Without kind filter | 0.7296 | 0.3139 |
+| With `kind=tool` filter | **0.6765** | **0.2472** |
+
+The kind filter trips A1's CI gate (NDCG@3 0.6765 < 0.7296 floor) and *reduces* 10k retrieval quality.
+
+**Why it failed:** `v2-golden.json` has a deliberate `skill-subagent-boundary` stratum (5 queries asking "find me a skill/subagent for X") where the graded relevance map's rel=3 entries are skill names (e.g. `senior-code-reviewer`, `commodity-backtest`, `de-sloppify`). Forcing `kind=tool` makes those queries return zero relevant results — each contributes 0 to NDCG. That penalty outweighs the skill-contamination benefit on the rest of the queries.
+
+**Real remediation requires one of:**
+- **Per-query kind expectation** (each `v2-golden.json` entry declares which `kind` it targets; runner passes that to `runRRF`). Lowest blast radius. Probably the right path.
+- **Restructure eval to filter the relevance map by kind too** (so skill queries don't penalize tool-filtered retrieval). Doable but couples the eval to the filter logic.
+- **Routing layer at the API surface** (`/discover/tools`, `/discover/skills`) instead of a unified `discover()` for all kinds. Bigger product change.
+- **Reliability-score post-filter as a third RRF arm** (open item #2). Independent of the kind question; addresses the synthetic-tool dilution half.
+
+The naïve filter is a patch, not a root-cause fix. Per global CLAUDE.md "Root Cause Over Patches": the underlying issue is that the eval graded skill targets alongside tool targets in one unified relevance map, and any kind-restrictive retrieval will inherit that mismatch. The real episode here is **"per-query kind targeting"**, not "kind filter".
