@@ -1,0 +1,33 @@
+{
+  "embedder": "ollama:nomic-embed-text",
+  "rrf_weights": {
+    "vector": 0.5,
+    "text": 0.5
+  },
+  "corpus_sha256": "a9400aebb7f7128d68cdfa336234a96b8efb8607563da406be1cd5e89528e54f",
+  "prewarm_sha256": "0085cd3f339ac4309b81487cf3ce995be8bd0ff7535902a9a63e5e1db4cde117",
+  "ndcg_formula": "exp_gain_log2_rank1",
+  "runs": 5,
+  "ndcg3": {
+    "mean": 0.7296039624147972,
+    "stddev": 0,
+    "min": 0.7296039624147972,
+    "max": 0.7296039624147972
+  },
+  "mrr": {
+    "mean": 0.7645000000000001,
+    "stddev": 0
+  },
+  "recall3": {
+    "mean": 0.42500000000000016,
+    "stddev": 0
+  },
+  "single_tool_top1": {
+    "mean": 10,
+    "stddev": 0,
+    "min": 10,
+    "max": 10,
+    "total": 14
+  },
+  "captured_at": "2026-05-23T16:34:26.976Z"
+}

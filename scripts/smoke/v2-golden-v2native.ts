@@ -20,7 +20,7 @@
 import 'dotenv/config';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import Ajv from 'ajv';
+import Ajv2020 from 'ajv/dist/2020.js';
 import { SqliteStorage } from '../../src/storage/sqlite.js';
 import { OllamaEmbedder } from '../../src/embeddings/ollama.js';
 import { discover } from '../../src/services/discover.js';
@@ -58,7 +58,7 @@ const baselineN = (() => {
 const golden = JSON.parse(readFileSync(goldenPath, 'utf-8')) as Golden;
 
 // ---- Pre-flight 1: ajv schema lint ----
-const ajv = new Ajv({ allErrors: true, strict: false });
+const ajv = new Ajv2020({ allErrors: true, strict: false });
 const goldenSchema = JSON.parse(readFileSync(goldenSchemaPath, 'utf-8'));
 const adjSchema = JSON.parse(readFileSync(adjSchemaPath, 'utf-8'));
 const validateGolden = ajv.compile(goldenSchema);
