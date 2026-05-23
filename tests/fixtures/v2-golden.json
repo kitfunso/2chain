@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "_doc": "Hand-drafted v2-native golden ranking set. 100 queries Ã— 7 strata. relevance maps {} at draft time; populated by Steps 3+4 (candidate pool + ensemble grading + adjudication). See docs/plans/2026-05-23-episode-a1-v2-native-golden-set.md.",
+  "_doc": "Hand-drafted v2-native golden ranking set. 100 queries \u00c3\u0192\u00e2\u20ac\u201d 7 strata. relevance maps {} at draft time; populated by Steps 3+4 (candidate pool + ensemble grading + adjudication). See docs/plans/2026-05-23-episode-a1-v2-native-golden-set.md.",
   "generated_at": "2026-05-23",
   "corpus_sha256": "a9400aebb7f7128d68cdfa336234a96b8efb8607563da406be1cd5e89528e54f",
   "prewarm_sha256": "0085cd3f339ac4309b81487cf3ce995be8bd0ff7535902a9a63e5e1db4cde117",
@@ -54,7 +54,8 @@
         "steam-web-api@1.0": 0,
         "image-resize@1.0": 0,
         "paypal-create-order@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-02",
@@ -106,7 +107,8 @@
         "context-restore@1.0": 0,
         "test-driven-development@1.0": 0,
         "design-shotgun@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-03",
@@ -160,7 +162,8 @@
         "review@1.0": 0,
         "mcp-sentry__get_sentry_issue@1.0": 0,
         "avro-reader@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-04",
@@ -219,7 +222,8 @@
         "yahoo-finance-quote@1.0": 0,
         "pdf-extract-text@1.0": 0,
         "azure-doc-intelligence@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-05",
@@ -269,7 +273,8 @@
         "mcp-gitlab__create_or_update_file@1.0": 0,
         "land-and-deploy@1.0": 0,
         "sql-query-sqlite@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-06",
@@ -316,7 +321,8 @@
         "xlsx@1.0": 0,
         "sec-edgar-financials@1.0": 0,
         "dispatching-parallel-agents@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-07",
@@ -363,7 +369,8 @@
         "zoopla-properties@1.0": 0,
         "iss-current-position@1.0": 0,
         "json-validate-schema@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-08",
@@ -416,7 +423,8 @@
         "isthereanydeal-prices@1.0": 0,
         "npm-package-downloads@1.0": 0,
         "github-repo-info@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-09",
@@ -468,7 +476,8 @@
         "plan-ceo-review@1.0": 0,
         "retro@1.0": 0,
         "pexels-photo-search@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-10",
@@ -518,7 +527,8 @@
         "aws-s3-list-objects@1.0": 0,
         "github-search-code@1.0": 0,
         "crossref-doi-lookup@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-11",
@@ -571,7 +581,8 @@
         "signal-validator@1.0": 0,
         "mcp-brave-search__brave_web_search@1.0": 0,
         "opencritic-game@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-12",
@@ -619,7 +630,8 @@
         "rippling-employees@1.0": 0,
         "executing-plans@1.0": 0,
         "land-and-deploy@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-13",
@@ -671,7 +683,8 @@
         "rightmove-listings@1.0": 0,
         "mcp-github__create_pull_request@1.0": 0,
         "gcal-list-events@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-14",
@@ -719,7 +732,8 @@
         "lever-postings@1.0": 0,
         "mitre-attack-techniques@1.0": 0,
         "netlify-builds@1.0": 0
-      }
+      },
+      "expected_kind": "skill"
     },
     {
       "id": "prewarm-15",
@@ -776,7 +790,8 @@
         "usaspending-awards@1.0": 0,
         "iex-cloud-stats@1.0": 0,
         "fred-series@1.0": 0
-      }
+      },
+      "expected_kind": "skill"
     },
     {
       "id": "prewarm-16",
@@ -833,7 +848,8 @@
         "coingecko-coin-price@1.0": 0,
         "claude-code-realtime@1.0": 0,
         "docker-image-scan@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-17",
@@ -888,7 +904,8 @@
         "osv-dev-query@1.0": 0,
         "pubmed-search@1.0": 0,
         "xero-bank-transactions@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-18",
@@ -932,7 +949,8 @@
         "plan-eng-review@1.0": 0,
         "heroku-platform-apps@1.0": 0,
         "pypi-package@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-19",
@@ -983,7 +1001,8 @@
         "uspto-patents-search@1.0": 0,
         "youtube-title-optimizer@1.0": 0,
         "frontend-developer@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-20",
@@ -1031,7 +1050,8 @@
         "eval-driven-dev@1.0": 0,
         "template-skill@1.0": 0,
         "gmail-list-messages@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-21",
@@ -1079,7 +1099,8 @@
         "codex@1.0": 0,
         "gstack@1.0": 0,
         "pdf-extractor@3.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-22",
@@ -1126,7 +1147,8 @@
         "pdf-extract-tables@1.0": 0,
         "gcal-list-events@1.0": 0,
         "pdf-extract-text@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-23",
@@ -1180,7 +1202,8 @@
         "benchmark-models@1.0": 0,
         "mcp-postgres__query@1.0": 0,
         "core-fulltext-search@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-24",
@@ -1234,7 +1257,8 @@
         "workday-staffing@1.0": 0,
         "mcp-memory__create_relations@1.0": 0,
         "autoplan@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-25",
@@ -1289,7 +1313,8 @@
         "avro-reader@1.0": 0,
         "xlsx-read-sheet@1.0": 0,
         "mcp-redis__get@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-26",
@@ -1344,7 +1369,8 @@
         "platform-voice-adapter@1.0": 0,
         "gdpr-cookie-categorize@1.0": 0,
         "noaa-climate-data-online@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-27",
@@ -1403,7 +1429,8 @@
         "fred-series@1.0": 0,
         "abuseipdb-check@1.0": 0,
         "mcp-everything__sample_llm@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-28",
@@ -1459,7 +1486,8 @@
         "doc-coauthoring@1.0": 0,
         "database-optimizer@1.0": 0,
         "kubernetes-api-pods@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-29",
@@ -1500,7 +1528,8 @@
         "mcp-filesystem__search_files@1.0": 0,
         "open-meteo-forecast@1.0": 0,
         "carbon-interface@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-30",
@@ -1548,7 +1577,8 @@
         "verification-before-completion@1.0": 0,
         "gstack-upgrade@1.0": 0,
         "content-hash-cache@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "prewarm-31",
@@ -1604,7 +1634,8 @@
         "thingsboard-telemetry@1.0": 0,
         "receiving-code-review@1.0": 0,
         "abuseipdb-check@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "single-01",
@@ -1659,7 +1690,8 @@
         "publish-repo@1.0": 0,
         "setup-browser-cookies@1.0": 0,
         "ebay-finding@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "single-02",
@@ -1707,7 +1739,8 @@
         "mcp-github__list_commits@1.0": 0,
         "skill-creator@1.0": 0,
         "jq-jsonpath-query@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "single-03",
@@ -1763,7 +1796,8 @@
         "docker-image-scan@1.0": 0,
         "realtor-com-listings@1.0": 0,
         "qa-only@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "single-04",
@@ -1815,7 +1849,8 @@
         "csv-to-json@1.0": 0,
         "xlsx-read-sheet@1.0": 0,
         "mcp-gitlab__create_issue@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "single-05",
@@ -1865,7 +1900,8 @@
         "mcp-github__fork_repository@1.0": 0,
         "skill-creator@1.0": 0,
         "office-hours@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "single-06",
@@ -1916,7 +1952,8 @@
         "mcp-filesystem__get_file_info@1.0": 0,
         "template-skill@1.0": 0,
         "alpha-vantage-quote@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "single-07",
@@ -1968,7 +2005,8 @@
         "shellcheck-bash@1.0": 0,
         "osv-dev-query@1.0": 0,
         "azure-doc-intelligence@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "single-08",
@@ -2021,7 +2059,8 @@
         "noaa-climate-data-online@1.0": 0,
         "rawg-games-database@1.0": 0,
         "realtor-com-listings@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "single-09",
@@ -2069,7 +2108,8 @@
         "google-maps-geocode@1.0": 0,
         "plan-tune@1.0": 0,
         "arxiv-paper-search@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "single-10",
@@ -2119,7 +2159,8 @@
         "mcp-google-drive__gdrive_search@1.0": 0,
         "pdf-extract-text@1.0": 0,
         "brand-guidelines@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "single-11",
@@ -2169,7 +2210,8 @@
         "plan-ceo-review@1.0": 0,
         "google-vision-ocr@1.0": 0,
         "unsplash-photo-search@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "single-12",
@@ -2220,7 +2262,8 @@
         "twitch-helix-streams@1.0": 0,
         "gstack-upgrade@1.0": 0,
         "pdf-extract-tables@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "single-13",
@@ -2270,7 +2313,8 @@
         "algolia-product-search@1.0": 0,
         "using-git-worktrees@1.0": 0,
         "design-review@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "single-14",
@@ -2317,7 +2361,8 @@
         "mcp-sqlite__create_table@1.0": 0,
         "pair-agent@1.0": 0,
         "aws-textract-document@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "single-15",
@@ -2372,7 +2417,8 @@
         "autonomous-loops@1.0": 0,
         "youtube-search@1.0": 0,
         "core-fulltext-search@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "single-16",
@@ -2427,7 +2473,8 @@
         "github-search@1.0": 0,
         "mcp-slack__slack_post_message@1.0": 0,
         "wikipedia-summary@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "single-17",
@@ -2479,7 +2526,8 @@
         "gcal-list-events@1.0": 0,
         "abuseipdb-check@1.0": 0,
         "security-scanner@1.5": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "single-18",
@@ -2532,7 +2580,8 @@
         "writing-plans@1.0": 0,
         "itch-io-jam@1.0": 0,
         "google-maps-geocode@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "nearmiss-01",
@@ -2580,7 +2629,8 @@
         "mcp-filesystem__move_file@1.0": 0,
         "ashby-application-events@1.0": 0,
         "requesting-code-review@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "nearmiss-02",
@@ -2631,7 +2681,8 @@
         "mcp-gitlab__create_or_update_file@1.0": 0,
         "fcc-broadband-map@1.0": 0,
         "mcp-everything__long_running_operation@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "nearmiss-03",
@@ -2679,7 +2730,8 @@
         "aws-textract-document@1.0": 0,
         "mcp-github__create_branch@1.0": 0,
         "mcp-memory__read_graph@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "nearmiss-04",
@@ -2732,7 +2784,8 @@
         "tldr-bot@2.1": 0,
         "azure-doc-intelligence@1.0": 0,
         "pdf-extractor@3.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "nearmiss-05",
@@ -2782,7 +2835,8 @@
         "csv-to-json@1.0": 0,
         "npm-package-downloads@1.0": 0,
         "pdf-extractor@3.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "nearmiss-06",
@@ -2827,7 +2881,8 @@
         "ffmpeg-trim-video@1.0": 0,
         "freshbooks-expenses@1.0": 0,
         "avro-reader@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "nearmiss-07",
@@ -2876,7 +2931,8 @@
         "office-hours@1.0": 0,
         "osm-overpass-query@1.0": 0,
         "eleven-labs-tts@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "nearmiss-08",
@@ -2923,7 +2979,8 @@
         "klarna-checkout@1.0": 0,
         "model-improve@1.0": 0,
         "thingsboard-telemetry@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "nearmiss-09",
@@ -2974,7 +3031,8 @@
         "setup-browser-cookies@1.0": 0,
         "pdf-extractor@3.0": 0,
         "subagent-driven-development@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "nearmiss-10",
@@ -3025,7 +3083,8 @@
         "pdf@1.0": 0,
         "greynoise-context@1.0": 0,
         "sec-edgar-companyfacts@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "nearmiss-11",
@@ -3071,7 +3130,8 @@
         "pdftools-pro@2.0": 0,
         "stackoverflow-search@1.0": 0,
         "snyk-vuln-scan@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "nearmiss-12",
@@ -3115,7 +3175,8 @@
         "whisper-audio-transcribe@1.0": 0,
         "mcp-postgres__query@1.0": 0,
         "rippling-employees@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "nearmiss-13",
@@ -3163,7 +3224,8 @@
         "plan-tune@1.0": 0,
         "isbn-lookup@1.0": 0,
         "propertydata-uk-postcode@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "nearmiss-14",
@@ -3210,7 +3272,8 @@
         "xero-bank-transactions@1.0": 0,
         "wikipedia-fulltext@1.0": 0,
         "fao-stat-bulk@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "nearmiss-15",
@@ -3257,7 +3320,8 @@
         "redfin-property-detail@1.0": 0,
         "alpha-vantage-quote@1.0": 0,
         "crossref-doi-lookup@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "nearmiss-16",
@@ -3308,7 +3372,8 @@
         "realtor-com-listings@1.0": 0,
         "document-release@1.0": 0,
         "github-repo-info@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "nearmiss-17",
@@ -3365,7 +3430,8 @@
         "twitch-helix-streams@1.0": 0,
         "spotify-audio-features@1.0": 0,
         "github-actions-marketplace@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "nearmiss-18",
@@ -3415,7 +3481,8 @@
         "duckdb-analytics-query@1.0": 0,
         "pdftools-pro@2.0": 0,
         "sql-query-sqlite@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "nearmiss-19",
@@ -3465,7 +3532,8 @@
         "whisper-audio-transcribe@1.0": 0,
         "twilio-make-call@1.0": 0,
         "snyk-vuln-scan@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "ambig-01",
@@ -3524,7 +3592,8 @@
         "redfin-property-detail@1.0": 0,
         "helium-iot-devices@1.0": 0,
         "aws-lambda-invoke@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "ambig-02",
@@ -3575,7 +3644,8 @@
         "codex@1.0": 0,
         "tuya-cloud-devices@1.0": 0,
         "context-restore@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "ambig-03",
@@ -3626,7 +3696,8 @@
         "skill-creator@1.0": 0,
         "mcp-puppeteer__puppeteer_evaluate@1.0": 0,
         "qa-only@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "ambig-04",
@@ -3681,7 +3752,8 @@
         "avro-reader@1.0": 0,
         "mcp-sqlite__create_table@1.0": 0,
         "snyk-vuln-scan@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "ambig-05",
@@ -3735,7 +3807,8 @@
         "mcp-redis__get@1.0": 0,
         "frontend-design@1.0": 0,
         "npm-package-downloads@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "ambig-06",
@@ -3784,7 +3857,8 @@
         "make-pdf@1.0": 0,
         "plan-tune@1.0": 0,
         "sec-edgar-financials@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "ambig-07",
@@ -3841,7 +3915,8 @@
         "claude-code-realtime@1.0": 0,
         "open-exchange-rates@1.0": 0,
         "mcp-brave-search__brave_web_search@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "ambig-08",
@@ -3890,7 +3965,8 @@
         "autonomous-loops@1.0": 0,
         "discord-bot-messages@1.0": 0,
         "zoopla-properties@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "ambig-09",
@@ -3944,7 +4020,8 @@
         "mcp-gitlab__search_repositories@1.0": 0,
         "bamboohr-employees@1.0": 0,
         "data-gov-search@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "ambig-10",
@@ -4001,7 +4078,8 @@
         "claude-code-realtime@1.0": 0,
         "google-maps-geocode@1.0": 0,
         "mcp-everything__echo@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "ambig-11",
@@ -4051,7 +4129,8 @@
         "greenhouse-candidates@1.0": 0,
         "plan-tune@1.0": 0,
         "mcp-puppeteer__puppeteer_evaluate@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "ambig-12",
@@ -4104,7 +4183,8 @@
         "aws-s3-list-objects@1.0": 0,
         "unsplash-photo-search@1.0": 0,
         "html-to-markdown@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "ambig-13",
@@ -4156,7 +4236,8 @@
         "pubmed-search@1.0": 0,
         "email-send-smtp@1.0": 0,
         "court-listener-decisions@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "ambig-14",
@@ -4208,7 +4289,8 @@
         "personio-employees@1.0": 0,
         "mcp-brave-search__brave_web_search@1.0": 0,
         "mcp-gitlab__create_merge_request@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "multi-01",
@@ -4258,7 +4340,8 @@
         "rawg-games-database@1.0": 0,
         "mcp-filesystem__search_files@1.0": 0,
         "pdf-extractor@3.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "multi-02",
@@ -4311,7 +4394,8 @@
         "strategic-compact@1.0": 0,
         "coingecko-coin-price@1.0": 0,
         "mapbox-directions@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "multi-03",
@@ -4360,7 +4444,8 @@
         "pennylane-transactions@1.0": 0,
         "autonomous-loops@1.0": 0,
         "mcp-memory__read_graph@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "multi-04",
@@ -4406,7 +4491,8 @@
         "freshbooks-expenses@1.0": 0,
         "plan-design-review@1.0": 0,
         "osrm-route@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "multi-05",
@@ -4457,7 +4543,8 @@
         "dev-framework@1.0": 0,
         "osrm-route@1.0": 0,
         "gstack-upgrade@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "multi-06",
@@ -4504,7 +4591,8 @@
         "us-census-acs@1.0": 0,
         "google-vision-ocr@1.0": 0,
         "github-issues-list@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "multi-07",
@@ -4557,7 +4645,8 @@
         "docker-hub-tags@1.0": 0,
         "pair-agent@1.0": 0,
         "mcp-slack__slack_add_reaction@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "multi-08",
@@ -4614,7 +4703,8 @@
         "mcp-github__create_or_update_file@1.0": 0,
         "wolfram-alpha-query@1.0": 0,
         "aws-textract-document@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "multi-09",
@@ -4666,7 +4756,8 @@
         "mcp-google-maps__maps_distance_matrix@1.0": 0,
         "quant-analyst@1.0": 0,
         "stackoverflow-search@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "multi-10",
@@ -4716,7 +4807,8 @@
         "mcp-filesystem__get_file_info@1.0": 0,
         "debugger@1.0": 0,
         "arxiv-paper-pdf@1.0": 0
-      }
+      },
+      "expected_kind": "tool"
     },
     {
       "id": "skill-01",
@@ -4766,7 +4858,8 @@
         "build-release@1.0": 0,
         "writing-plans@1.0": 0,
         "canvas-design@1.0": 0
-      }
+      },
+      "expected_kind": "skill"
     },
     {
       "id": "skill-02",
@@ -4820,7 +4913,8 @@
         "ruff-fast-lint@1.0": 0,
         "docx@1.0": 0,
         "office-hours@1.0": 0
-      }
+      },
+      "expected_kind": "skill"
     },
     {
       "id": "skill-03",
@@ -4868,7 +4962,8 @@
         "netsuite-suiteql@1.0": 0,
         "wikipedia-fulltext@1.0": 0,
         "debugger@1.0": 0
-      }
+      },
+      "expected_kind": "subagent"
     },
     {
       "id": "skill-04",
@@ -4926,7 +5021,8 @@
         "plan-tune@1.0": 0,
         "mcp-git__git_branch@1.0": 0,
         "ons-uk-statistics@1.0": 0
-      }
+      },
+      "expected_kind": "subagent"
     },
     {
       "id": "skill-05",
@@ -4977,7 +5073,8 @@
         "mcp-filesystem__directory_tree@1.0": 0,
         "webapp-testing@1.0": 0,
         "quant-analyst@1.0": 0
-      }
+      },
+      "expected_kind": "subagent"
     },
     {
       "id": "advers-01",
