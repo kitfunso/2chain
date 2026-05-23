@@ -55,6 +55,20 @@ const baselineN = (() => {
   return idx >= 0 ? parseInt(process.argv[idx + 1] ?? '5', 10) : 0;
 })();
 
+const corpusPathFlag = (() => {
+  const idx = process.argv.indexOf('--corpus-path');
+  return idx >= 0 ? process.argv[idx + 1] : null;
+})();
+
+const includeStress = process.argv.includes('--include-stress');
+
+const baselineOut = (() => {
+  const idx = process.argv.indexOf('--baseline-out');
+  return idx >= 0 ? process.argv[idx + 1] : baselinePath;
+})();
+
+const skipHashCheck = process.argv.includes('--skip-hash-check');
+
 const golden = JSON.parse(readFileSync(goldenPath, 'utf-8')) as Golden;
 
 // ---- Pre-flight 1: ajv schema lint ----
@@ -81,33 +95,52 @@ if (golden.ndcg_formula !== 'exp_gain_log2_rank1') {
 }
 
 // ---- Pre-flight 3+4: corpus + prewarm hash match ----
-const dbPath = process.env.TWOCHAIN_DB_PATH ?? 'C:/tmp/v2.db';
+const dbPath = corpusPathFlag ?? process.env.TWOCHAIN_DB_PATH ?? 'C:/tmp/v2.db';
 const storage = new SqliteStorage({ path: dbPath });
 await storage.init();
-const allTools = await storage.listTools({ limit: 10_000 });
+const allTools = await storage.listTools({ limit: 20_000 });
 const corpus_sha256 = signCorpus(allTools.map(canonicalize));
 const prewarm_sha256 = signPrewarm(PREWARM_QUERIES);
-if (corpus_sha256 !== golden.corpus_sha256) {
-  console.error(`PRE-FLIGHT FAIL: corpus_sha256 mismatch.\n  expected ${golden.corpus_sha256}\n  got      ${corpus_sha256}`);
-  process.exit(2);
-}
-if (prewarm_sha256 !== golden.prewarm_sha256) {
-  console.error(`PRE-FLIGHT FAIL: prewarm_sha256 mismatch.\n  expected ${golden.prewarm_sha256}\n  got      ${prewarm_sha256}`);
-  process.exit(2);
+if (!skipHashCheck) {
+  if (corpus_sha256 !== golden.corpus_sha256) {
+    console.error(`PRE-FLIGHT FAIL: corpus_sha256 mismatch.\n  expected ${golden.corpus_sha256}\n  got      ${corpus_sha256}\n  (use --skip-hash-check to bypass — for 10k-scale runs against a corpus larger than the graded set)`);
+    process.exit(2);
+  }
+  if (prewarm_sha256 !== golden.prewarm_sha256) {
+    console.error(`PRE-FLIGHT FAIL: prewarm_sha256 mismatch.\n  expected ${golden.prewarm_sha256}\n  got      ${prewarm_sha256}`);
+    process.exit(2);
+  }
+} else {
+  console.log(`(corpus_sha256 mismatch tolerated via --skip-hash-check: golden=${golden.corpus_sha256.slice(0,16)}..., db=${corpus_sha256.slice(0,16)}...)`);
 }
 
 // ---- Run the eval ----
 const embedder = new OllamaEmbedder();
 
-async function runOnce(): Promise<{ ndcg3: number; mrr: number; recall3: number; singleTopHits: number; singleTotal: number }> {
+interface StressQuery { id: string; stratum: string; q: string; expected_top3: string[]; relevance: Record<string, number> }
+const stressPath = resolve('tests/fixtures/v2-stress.json');
+const stress: { queries: StressQuery[] } | null = includeStress && existsSync(stressPath)
+  ? JSON.parse(readFileSync(stressPath, 'utf-8'))
+  : null;
+
+function percentile(sorted: number[], p: number): number {
+  if (sorted.length === 0) return 0;
+  const idx = Math.min(sorted.length - 1, Math.max(0, Math.floor((p / 100) * (sorted.length - 1))));
+  return sorted[idx];
+}
+
+async function runOnce(): Promise<{ ndcg3: number; mrr: number; recall3: number; singleTopHits: number; singleTotal: number; latencies: number[] }> {
   let sumN = 0;
   let sumM = 0;
   let sumR = 0;
   let singleHits = 0;
   let singleTotal = 0;
+  const latencies: number[] = [];
 
   for (const q of golden.queries) {
+    const t0 = Date.now();
     const out = await discover(storage, embedder, q.q, 10);
+    latencies.push(Date.now() - t0);
     const ranked = out.results.map((r) => ({ name: r.name, version: r.version, score: r.rrf_score }));
     sumN += ndcgAtK(ranked, q.relevance, 3);
     sumM += mrrIdeal(ranked, q.relevance);
@@ -117,6 +150,13 @@ async function runOnce(): Promise<{ ndcg3: number; mrr: number; recall3: number;
       if (ranked[0]?.name === q.expected_top1) singleHits++;
     }
   }
+  if (stress) {
+    for (const q of stress.queries) {
+      const t0 = Date.now();
+      await discover(storage, embedder, q.q, 10);
+      latencies.push(Date.now() - t0);
+    }
+  }
   const n = golden.queries.length;
   return {
     ndcg3: sumN / n,
@@ -124,6 +164,7 @@ async function runOnce(): Promise<{ ndcg3: number; mrr: number; recall3: number;
     recall3: sumR / n,
     singleTopHits: singleHits,
     singleTotal,
+    latencies,
   };
 }
 
@@ -134,7 +175,11 @@ if (baselineN > 0) {
   for (let i = 0; i < baselineN; i++) {
     const t = Date.now();
     const r = await runOnce();
-    console.log(`  run ${i + 1}/${baselineN}: NDCG@3=${r.ndcg3.toFixed(4)} MRR=${r.mrr.toFixed(4)} R@3=${r.recall3.toFixed(4)} single=${r.singleTopHits}/${r.singleTotal} (${Date.now() - t}ms)`);
+    const sortedLat = [...r.latencies].sort((a, b) => a - b);
+    const p50 = percentile(sortedLat, 50);
+    const p95 = percentile(sortedLat, 95);
+    const p99 = percentile(sortedLat, 99);
+    console.log(`  run ${i + 1}/${baselineN}: NDCG@3=${r.ndcg3.toFixed(4)} MRR=${r.mrr.toFixed(4)} R@3=${r.recall3.toFixed(4)} single=${r.singleTopHits}/${r.singleTotal} p50/p95/p99=${p50}/${p95}/${p99}ms (${Date.now() - t}ms)`);
     runs.push(r);
   }
   function mean(xs: number[]) { return xs.reduce((a, b) => a + b, 0) / xs.length; }
@@ -146,22 +191,31 @@ if (baselineN > 0) {
   const mrrs = runs.map((r) => r.mrr);
   const recalls = runs.map((r) => r.recall3);
   const singles = runs.map((r) => r.singleTopHits);
+  // Latency: aggregate p50/p95/p99 across all runs (per-run percentile then mean+stddev)
+  const p50s = runs.map((r) => percentile([...r.latencies].sort((a, b) => a - b), 50));
+  const p95s = runs.map((r) => percentile([...r.latencies].sort((a, b) => a - b), 95));
+  const p99s = runs.map((r) => percentile([...r.latencies].sort((a, b) => a - b), 99));
 
   const baseline = {
     embedder: embedder.name(),
     rrf_weights: { vector: 0.5, text: 0.5 },
-    corpus_sha256: golden.corpus_sha256,
-    prewarm_sha256: golden.prewarm_sha256,
+    corpus_sha256: corpus_sha256,
+    corpus_size: allTools.length,
+    prewarm_sha256: prewarm_sha256,
     ndcg_formula: golden.ndcg_formula,
     runs: baselineN,
+    include_stress: !!stress,
     ndcg3: { mean: mean(ndcgs), stddev: stddev(ndcgs), min: Math.min(...ndcgs), max: Math.max(...ndcgs) },
     mrr: { mean: mean(mrrs), stddev: stddev(mrrs) },
     recall3: { mean: mean(recalls), stddev: stddev(recalls) },
     single_tool_top1: { mean: mean(singles), stddev: stddev(singles), min: Math.min(...singles), max: Math.max(...singles), total: runs[0].singleTotal },
+    latency_p50_ms: { mean: mean(p50s), stddev: stddev(p50s) },
+    latency_p95_ms: { mean: mean(p95s), stddev: stddev(p95s) },
+    latency_p99_ms: { mean: mean(p99s), stddev: stddev(p99s) },
     captured_at: new Date().toISOString(),
   };
-  writeFileSync(baselinePath, JSON.stringify(baseline, null, 2) + '\n');
-  console.log(`\nwrote ${baselinePath}`);
+  writeFileSync(baselineOut, JSON.stringify(baseline, null, 2) + '\n');
+  console.log(`\nwrote ${baselineOut}`);
   console.log(`  NDCG@3 mean=${baseline.ndcg3.mean.toFixed(4)} stddev=${baseline.ndcg3.stddev.toFixed(4)}`);
   if (baseline.ndcg3.stddev > 0.02) {
     console.error(`WARN: stddev > 0.02 — retrieval may be non-deterministic enough to flap the gate. Root-cause before pinning.`);
