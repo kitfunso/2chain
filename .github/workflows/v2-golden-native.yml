@@ -37,7 +37,7 @@ jobs:
       # eval body runs locally and the baseline.json is committed.
       - name: Schema lint v2-golden.json
         run: |
-          node -e "const {default:Ajv}=require('ajv');const fs=require('fs');
+          node -e "const Ajv=require('ajv/dist/2020.js').default;const fs=require('fs');
             const ajv=new Ajv({strict:false,allErrors:true});
             const schema=JSON.parse(fs.readFileSync('tests/schemas/v2-golden.schema.json','utf8'));
             const adj=JSON.parse(fs.readFileSync('tests/schemas/v2-golden-adjudication.schema.json','utf8'));
