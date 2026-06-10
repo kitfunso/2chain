@@ -241,7 +241,7 @@ MCP surface (stdio):
 4. `discover.ts` calls `embedder.embed(query)` → 768-dim vector.
 5. `discover.ts` calls `storage.runRRF(vec, query, topK=20, gate=0.80)`.
 6. Storage executes one SQL CTE that combines vector ANN, FTS5/tsvector BM25, and reciprocal rank fusion server-side. Reliability gate is in the WHERE clause of both arms.
-7. `discover.ts` runs in-memory rerank (term overlap + reliability boost + cost penalty) on the 20 candidates, returns top-5.
+7. `discover.ts` re-sorts the K candidates by `final_score = rrf_score + W_FRESHNESS_RRF × freshness` (plain stable sort, no secondary key — see "Ranking Formula" below), attaches `last_verified_at` / `verification_streak` / `freshness` per result, snapshots the re-sorted order to `rankings`, and returns it.
 8. Response goes back through MCP shim to agent.
 9. Agent picks tool, sends `call_tool({tool_name, version, input})`.
 10. MCP shim → `POST /call` → `routes/call.ts` → `services/call.ts`.
@@ -345,6 +345,28 @@ LIMIT $top_k;
 Postgres uses `pg_search` (ParadeDB BM25) instead of `tsvector + ts_rank_cd` — true BM25 puts retrieval quality at parity with v1. `paradedb.match` and `paradedb.score` are pg_search functions; `@@@` is its match operator.
 
 Both queries are wrapped in `storage.runRRF()` so services never see SQL.
+
+## Ranking Formula (RRF → freshness re-sort, E5)
+
+`runRRF` returns the top-K ordered by `rrf_score`. `src/services/discover.ts` then re-sorts those K results — after fusion, **before** the `insertRanking` snapshot, so trending aggregates the order agents actually saw:
+
+```
+freshness   = 0.5 ^ (age_days(metadata.last_eval_run) / FRESHNESS_HALF_LIFE_DAYS)
+final_score = rrf_score + W_FRESHNESS_RRF * freshness
+```
+
+Plain stable sort by `final_score` desc with NO secondary key: JS sort stability preserves runRRF's tie order, so uniform-freshness corpora are order-invariant by construction (an additive constant shifts every score equally). Missing or unparseable `last_eval_run` ⇒ freshness 0 via a `Number.isFinite` guard (NaN in a sort key silently disorders). The reliability gate stays in SQL (rule 7) — freshness weights, never gates. `rank_score` keeps its informational v1-compat definition; `final_score` is the ordering key and ships in the payload alongside `freshness`, `last_verified_at`, and `verification_streak` (consecutive clean reverify runs, computed by the pure `src/services/streak.ts` over `listEvalRunsForTool(id, 20, 'reverify')`, for the returned top-K only — K ≤ 20 by route/shim cap).
+
+| Constant | Value | Role |
+|---|---|---|
+| `RRF_K_CONSTANT` | 60 | rank discount inside each RRF arm |
+| `RRF_DEFAULT_VECTOR_WEIGHT` | 0.5 | vector arm weight |
+| `RRF_DEFAULT_TEXT_WEIGHT` | 0.5 | text arm weight |
+| `RELIABILITY_GATE` | 0.80 | SQL-side gate in both arms (rule 7) — never post-hoc |
+| `FRESHNESS_HALF_LIFE_DAYS` | 7 | freshness half-life |
+| `W_FRESHNESS_RRF` | 0.0005 | freshness term weight on the RRF scale |
+
+Calibration (the full table lives beside the constants in `src/types.ts`): one RRF arm contributes `w/(60+rank)`, max ≈ 0.0082 at arm weight 0.5; adjacent-rank gaps are ≈ 1.3e-4 at the top, shrinking with depth. The full freshness delta (5e-4) covers ~3-4 adjacent-rank gaps — a fresh tool climbs past NEAR-TIED stale neighbours — but stays an order of magnitude below one arm contribution and below the rank 10→1 cumulative gap (≈ 1.1e-3), so freshness cannot overtake a tool 5 or more RRF ranks ahead (rank distance, not raw similarity margin, is the guarantee: RRF compresses any cosine gap between adjacent ranks to ~1.3e-4, so a near-tied rank-1 can be passed however large its raw-similarity lead). Real catalog imports carry freshness 0 by design until a reverify sweep scores them — unverified means stale.
 
 ## Deployment
 

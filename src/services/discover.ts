@@ -15,8 +15,11 @@ import {
   RANKING_W_RELIABILITY,
   RRF_DEFAULT_VECTOR_WEIGHT,
   RRF_DEFAULT_TEXT_WEIGHT,
+  FRESHNESS_HALF_LIFE_DAYS,
+  W_FRESHNESS_RRF,
   DEFAULT_NAMESPACE,
 } from '../types.js';
+import { STREAK_WINDOW, verificationStreak } from './streak.js';
 
 export interface DiscoverResult {
   name: string;
@@ -27,6 +30,14 @@ export interface DiscoverResult {
   vec_score: number;
   rank_score: number;
   rrf_score: number;
+  /** The actual ordering key post-E5: rrf_score + W_FRESHNESS_RRF * freshness. */
+  final_score: number;
+  /** 0.5^(age_days(last_eval_run)/7); 0 when last_eval_run missing/unparseable. */
+  freshness: number;
+  /** metadata.last_eval_run verbatim, null when the tool was never evaluated. */
+  last_verified_at: string | null;
+  /** Consecutive most-recent clean reverify-triggered runs (window 20). */
+  verification_streak: number;
   cost_per_call_usd: number;
   p95_latency_ms: number;
   tool_kind: ToolKind;
@@ -119,24 +130,67 @@ export async function discover(
   });
   const searchMs = Date.now() - tSearch;
 
-  const results: DiscoverResult[] = rrf.map((r) => ({
-    name: r.name,
-    version: r.version,
-    capability_text: r.capability_text,
-    endpoint_stub_name: r.endpoint_stub_name,
-    reliability_score: r.metadata.reliability_score,
-    vec_score: r.vec_score,
-    // Composite ranking score that blends vec similarity with reliability,
-    // matching the v1 surface. Useful for downstream consumers that aren't
-    // RRF-aware.
-    rank_score:
-      r.vec_score * RANKING_W_VEC +
-      r.metadata.reliability_score * RANKING_W_RELIABILITY,
-    rrf_score: r.rrf_score,
-    cost_per_call_usd: r.metadata.cost_per_call_usd,
-    p95_latency_ms: r.metadata.p95_latency_ms,
-    tool_kind: r.tool_kind,
-  }));
+  // ----- Freshness re-sort (E5) -------------------------------------------
+  // freshness = 0.5^(age_days(last_eval_run)/7), final_score = rrf_score +
+  // W_FRESHNESS_RRF * freshness (calibration table beside the constants in
+  // types.ts). Reliability gating stayed in SQL (rule 7) — freshness
+  // weights, never gates: every runRRF candidate is still returned, only
+  // the order can change, and only across NEAR-TIED rrf scores.
+  const now = Date.now();
+  const scored = rrf.map((r) => {
+    const lastEvalRun = r.metadata.last_eval_run ?? null;
+    let freshness = 0;
+    if (lastEvalRun !== null) {
+      const ageDays = (now - Date.parse(lastEvalRun)) / 86_400_000;
+      const decayed = Math.pow(0.5, ageDays / FRESHNESS_HALF_LIFE_DAYS);
+      // Unparseable ⇒ NaN (collapses to 0); absurd-past ⇒ ~0. FUTURE dates
+      // yield FINITE values > 1 all the way to ~19 years ahead (+30d ≈
+      // 19.5 ⇒ a term larger than one full RRF arm — leapfrog invariant
+      // broken), so the clamp to 1 is load-bearing, not cosmetic: fresher
+      // than "verified right now" does not exist.
+      if (Number.isFinite(decayed)) freshness = Math.min(decayed, 1);
+    }
+    return { r, freshness, final_score: r.rrf_score + W_FRESHNESS_RRF * freshness };
+  });
+  // PLAIN STABLE sort, NO secondary key: JS sort stability preserves
+  // runRRF's tie order, so uniform-freshness corpora are order-invariant BY
+  // CONSTRUCTION (an additive constant shifts every score equally). The
+  // name+version tie-break in src/eval/ndcg.ts is eval-side normalization,
+  // not production behavior — untouched.
+  scored.sort((a, b) => b.final_score - a.final_score);
+
+  const results: DiscoverResult[] = [];
+  for (const { r, freshness, final_score } of scored) {
+    // Streak for the returned top-K only — the route and MCP shim cap
+    // top at 20, so this is at most 20 indexed queries per request.
+    const reverifyRuns = await storage.listEvalRunsForTool(
+      r.id,
+      STREAK_WINDOW,
+      'reverify',
+    );
+    results.push({
+      name: r.name,
+      version: r.version,
+      capability_text: r.capability_text,
+      endpoint_stub_name: r.endpoint_stub_name,
+      reliability_score: r.metadata.reliability_score,
+      vec_score: r.vec_score,
+      // Composite ranking score that blends vec similarity with reliability,
+      // matching the v1 surface. Useful for downstream consumers that aren't
+      // RRF-aware. Informational only — final_score is the ordering key.
+      rank_score:
+        r.vec_score * RANKING_W_VEC +
+        r.metadata.reliability_score * RANKING_W_RELIABILITY,
+      rrf_score: r.rrf_score,
+      final_score,
+      freshness,
+      last_verified_at: r.metadata.last_eval_run ?? null,
+      verification_streak: verificationStreak(reverifyRuns, RELIABILITY_GATE),
+      cost_per_call_usd: r.metadata.cost_per_call_usd,
+      p95_latency_ms: r.metadata.p95_latency_ms,
+      tool_kind: r.tool_kind,
+    });
+  }
 
   // Append-only ranking snapshot for the dashboard.
   await storage.insertRanking({
@@ -149,6 +203,10 @@ export async function discover(
       rrf_score: r.rrf_score,
       vec_score: r.vec_score,
       reliability_score: r.reliability_score,
+      // The snapshot must be able to explain its own ordering: rows are in
+      // final_score order, and rrf_score alone is non-monotonic with it.
+      final_score: r.final_score,
+      freshness: r.freshness,
     })),
     occurred_at: new Date().toISOString(),
   });

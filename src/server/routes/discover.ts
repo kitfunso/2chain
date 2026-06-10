@@ -58,6 +58,8 @@ export function registerDiscoverRoute(
           vec_score: r.vec_score,
           rank_score: r.rank_score,
           rrf_score: r.rrf_score,
+          final_score: r.final_score,
+          freshness: r.freshness,
         })),
         meta,
         ts: new Date().toISOString(),
