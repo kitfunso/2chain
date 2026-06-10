@@ -1092,6 +1092,10 @@ export const DASHBOARD_HTML = `<!doctype html>
   // on payload enums compare via escapeHtml(...): enum values contain no HTML
   // specials so escaping is a no-op, and it keeps the region mechanically
   // checkable (no bare payload-field access anywhere).
+  function renderHealthLoading(name) {
+    const box = document.getElementById('d-health');
+    if (box) box.innerHTML = '<div class="muted">loading health: ' + escapeHtml(name) + '...</div>';
+  }
   function renderHealth(hr) {
     const box = document.getElementById('d-health');
     if (!box) return;
@@ -1148,6 +1152,10 @@ export const DASHBOARD_HTML = `<!doctype html>
   async function loadHealth(name) {
     state.healthName = name;
     const seq = ++healthSeq;
+    // Clear immediately: the seq guard stops LATE overwrites, but without
+    // this the previous tool's report lingers under the new header for the
+    // whole fetch window (codex P2).
+    renderHealthLoading(name);
     try {
       const r = await fetch('/health-view/' + encodeURIComponent(name));
       if (!r.ok) {

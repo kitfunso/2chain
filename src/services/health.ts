@@ -78,15 +78,13 @@ export async function toolHealth(
   name: string,
   namespace: string = DEFAULT_NAMESPACE,
 ): Promise<HealthReport | null> {
-  // Versions enumerated via listToolsByName (indexed exact match, no cap on
-  // the LOOKUP - but the REPORT is bounded: each version costs ~3 evidence
-  // queries and /health-view is unauthenticated, so an unbounded report
-  // would scale per-request work with author-controlled data (1+3N).
-  // Newest HEALTH_VERSIONS_LIMIT versions only; the report is for humans.
-  const all = await storage.listToolsByName(name, namespace);
-  const tools = [...all]
-    .sort((a, b) => (a.created_at < b.created_at ? 1 : a.created_at > b.created_at ? -1 : 0))
-    .slice(0, HEALTH_VERSIONS_LIMIT);
+  // Newest HEALTH_VERSIONS_LIMIT versions, bounded IN the query (codex P2:
+  // each version costs ~3 evidence queries and /health-view is
+  // unauthenticated, so neither the report NOR the lookup may scale with
+  // author-controlled version count).
+  const tools = await storage.listToolsByName(name, namespace, {
+    limit: HEALTH_VERSIONS_LIMIT,
+  });
   if (tools.length === 0) return null;
 
   const sinceIso = new Date(

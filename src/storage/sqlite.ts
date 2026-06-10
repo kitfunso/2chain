@@ -294,10 +294,24 @@ export class SqliteStorage implements Storage {
   async listToolsByName(
     name: string,
     namespace = DEFAULT_NAMESPACE,
+    opts?: { newestFirst?: boolean; limit?: number },
   ): Promise<ToolV2[]> {
-    // Prefix of the UNIQUE(namespace_id, name, version) index — exact match,
-    // no LIMIT (a tool's version count is small; the 5k listTools scan this
-    // replaces was the fail-open hazard).
+    // Prefix of the UNIQUE(namespace_id, name, version) index — exact match.
+    // Default: ALL versions, oldest-first (push's ownership + predecessor
+    // checks need the full set — the 5k listTools scan this replaced was the
+    // fail-open hazard). With opts, the bound runs IN SQL: the health
+    // surface must not fetch-and-sort unbounded author-controlled rows per
+    // unauthenticated request (codex P2).
+    if (opts?.limit !== undefined) {
+      const rows = this.db
+        .prepare<[string, string, number], ToolRow>(
+          `SELECT rowid, * FROM tools WHERE namespace_id = ? AND name = ?
+           ORDER BY created_at ${opts.newestFirst === false ? 'ASC' : 'DESC'}, version DESC
+           LIMIT ?`,
+        )
+        .all(namespace, name, opts.limit);
+      return rows.map(rowToTool);
+    }
     const rows = this.db
       .prepare<[string, string], ToolRow>(
         `SELECT rowid, * FROM tools WHERE namespace_id = ? AND name = ? ORDER BY created_at, version`,

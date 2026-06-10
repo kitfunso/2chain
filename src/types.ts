@@ -314,7 +314,7 @@ export interface Storage {
   /** All versions of a tool by exact name. Indexed (namespace_id, name)
    *  prefix of the UNIQUE(namespace_id, name, version) index — no list cap,
    *  so push's ownership + prior-version lookups never silently truncate. */
-  listToolsByName(name: string, namespace?: string): Promise<ToolV2[]>;
+  listToolsByName(name: string, namespace?: string, opts?: { newestFirst?: boolean; limit?: number }): Promise<ToolV2[]>;
   /** Atomic patch of ONLY reliability_score + last_eval_run; never writes
    *  status and never replaces whole metadata — safe for sweeps whose
    *  read-time snapshot may be stale by write time (reverify TOCTOU). */
