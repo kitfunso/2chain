@@ -221,6 +221,57 @@ export interface AgentRow {
   created_at: string;
 }
 
+// ----- Contract drift (E3) ------------------------------------------------
+
+export type DriftDirection = 'input' | 'output';
+
+/** identical = no semantic change; compatible = additive/loosening only;
+ *  breaking = at least one change that can invalidate existing callers
+ *  (input direction) or consumers (output direction). */
+export type DriftClassification = 'identical' | 'compatible' | 'breaking';
+
+export type ContractChangeKind =
+  | 'property-added-optional'
+  | 'property-added-required'
+  | 'property-removed'
+  | 'type-changed'
+  | 'enum-narrowed'
+  | 'enum-widened'
+  | 'required-added'
+  | 'required-removed'
+  | 'additional-properties-restricted'
+  | 'additional-properties-relaxed'
+  | 'unknown-construct-changed'
+  | 'depth-exceeded';
+
+export interface ContractChange {
+  /** Pointer-ish path, e.g. `properties.user.properties.email`. */
+  path: string;
+  kind: ContractChangeKind;
+  breaking: boolean;
+  detail: string;
+}
+
+export interface ContractDiff {
+  classification: DriftClassification;
+  changes: ContractChange[];
+}
+
+/** One row per accepted push per non-identical direction. `identical`
+ *  classifications write nothing (the table records accepted drift). */
+export interface DriftEventRow {
+  id?: string;
+  namespace_id: string;
+  tool_name: string;
+  from_version: string;
+  to_version: string;
+  direction: DriftDirection;
+  classification: 'compatible' | 'breaking';
+  changes: ContractChange[];
+  author_agent_id: string;
+  created_at: string;
+}
+
 export interface RrfResult {
   id: string;
   name: string;
@@ -260,6 +311,10 @@ export interface Storage {
     metadata: ToolSpecV2['metadata'],
     status: ToolStatus,
   ): Promise<void>;
+  /** All versions of a tool by exact name. Indexed (namespace_id, name)
+   *  prefix of the UNIQUE(namespace_id, name, version) index — no list cap,
+   *  so push's ownership + prior-version lookups never silently truncate. */
+  listToolsByName(name: string, namespace?: string): Promise<ToolV2[]>;
   /** Atomic patch of ONLY reliability_score + last_eval_run; never writes
    *  status and never replaces whole metadata — safe for sweeps whose
    *  read-time snapshot may be stale by write time (reverify TOCTOU). */
@@ -289,6 +344,15 @@ export interface Storage {
   insertUsage(u: UsageRow): Promise<void>;
   insertEvalRun(e: EvalRunRow): Promise<void>;
   insertRanking(r: RankingRow): Promise<void>;
+
+  // Contract drift (E3). Write side fires from /push after upsertTool;
+  // read side is minimal (the operator surface is E4's).
+  insertDriftEvent(e: DriftEventRow): Promise<void>;
+  listDriftEvents(
+    toolName: string,
+    namespace?: string,
+    limit?: number,
+  ): Promise<DriftEventRow[]>;
 
   // Dashboard reads (the surface /state, /atlas-stats, dashboardHtml use)
   listTools(opts: {

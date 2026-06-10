@@ -1,7 +1,15 @@
 // v2 push — Storage + Embedder via DI. No MongoDB. No Voyage.
 
-import type { Storage, Embedder, ToolSpecV2, ToolKind } from '../types.js';
+import type {
+  Storage,
+  Embedder,
+  ToolSpecV2,
+  ToolKind,
+  ToolV2,
+  ContractDiff,
+} from '../types.js';
 import { DEFAULT_NAMESPACE } from '../types.js';
+import { diffContracts, compareVersions, majorOf } from './contractDiff.js';
 import { runKindEval } from './kindEvalRunner.js';
 import { runToolEvals } from './runToolEvals.js';
 import { getStub } from './stubs.js';
@@ -23,6 +31,14 @@ export interface PushInput {
   tool_kind?: ToolKind;
 }
 
+/** Contract drift vs the latest prior version of the same name (E3).
+ *  Present on PushResult whenever a prior version existed. */
+export interface DriftSummary {
+  from_version: string;
+  input: ContractDiff;
+  output: ContractDiff;
+}
+
 export interface PushResult {
   ok: true;
   tool_id: string;
@@ -37,6 +53,7 @@ export interface PushResult {
   push_ms: number;
   embed_ms: number;
   eval_ms: number;
+  drift?: DriftSummary;
 }
 
 export type PushError =
@@ -45,7 +62,13 @@ export type PushError =
   | { ok: false; code: 'unknown_stub'; message: string }
   | { ok: false; code: 'contract_too_large'; message: string }
   | { ok: false; code: 'embed_failed'; message: string }
-  | { ok: false; code: 'invalid_tool_kind'; message: string };
+  | { ok: false; code: 'invalid_tool_kind'; message: string }
+  | {
+      ok: false;
+      code: 'breaking_contract_requires_major_bump';
+      message: string;
+      details?: Record<string, unknown>;
+    };
 
 export async function push(
   storage: Storage,
@@ -78,15 +101,93 @@ export async function push(
     return { ok: false, code: 'unknown_stub', message: `endpoint_stub_name '${body.endpoint_stub_name}' is not a registered first-party stub` };
   }
 
-  // Pre-checks
+  // Pre-checks. listToolsByName is an indexed exact-match with no list cap —
+  // the previous listTools({ limit: 5_000 }) scan would silently miss rows
+  // beyond 5k tools and fail open on both ownership and drift.
   const existing = await storage.getToolByNameVersion(body.name, body.version, namespace);
   if (existing) {
     return { ok: false, code: 'duplicate_version', message: `tool ${body.name}@${body.version} already exists` };
   }
-  const sameName = await storage.listTools({ namespace, limit: 5_000 });
-  const conflict = sameName.find((t) => t.name === body.name && t.author_agent_id !== authorAgentId);
+  const sameName = await storage.listToolsByName(body.name, namespace);
+  const conflict = sameName.find((t) => t.author_agent_id !== authorAgentId);
   if (conflict) {
     return { ok: false, code: 'name_owned_by_other', message: `tool ${body.name} is owned by another author` };
+  }
+
+  // Contract drift check (E3) — after ownership, BEFORE embed (fail fast, no
+  // wasted embed cost). Baseline = the greatest existing version LOWER than
+  // the pushed one (its predecessor in the version line), NOT the global max:
+  // diffing against the global max both rejects legitimate backports whose
+  // contracts match their own line AND fails open when a lower-line push
+  // matches the newest major while breaking its actual predecessor (codex P2
+  // + independent-review MED, convergent). A push below every existing
+  // version has no predecessor and skips the check, like a first version.
+  let prior: ToolV2 | null = null;
+  if (majorOf(body.version) === null && sameName.length > 0) {
+    // Unorderable pushed version: a predecessor cannot be determined, so the
+    // check must not silently skip (fail-open). Diff against the global max
+    // and let the unordered-version gate branch reject any breaking change.
+    for (const t of sameName) {
+      if (!prior || compareVersions(t.version, prior.version) > 0) prior = t;
+    }
+  } else {
+    for (const t of sameName) {
+      // Skip only STRICTLY greater versions: an equal-by-compare alias
+      // ('1.0' vs a pushed '1.0.0') must become the baseline, not be skipped
+      // — skipping it left prior null and bypassed the gate entirely
+      // (codex P2, round 3). Breaking-vs-alias then demands major > major,
+      // which can never hold, so alias pushes can only be compatible.
+      if (compareVersions(t.version, body.version) > 0) continue;
+      if (!prior || compareVersions(t.version, prior.version) > 0) prior = t;
+    }
+  }
+  let drift: DriftSummary | undefined;
+  if (prior) {
+    const inputDiff = diffContracts(prior.input_contract, body.input_contract, 'input');
+    const outputDiff = diffContracts(prior.output_contract, body.output_contract, 'output');
+    const isBreaking =
+      inputDiff.classification === 'breaking' || outputDiff.classification === 'breaking';
+    if (isBreaking) {
+      const details: Record<string, unknown> = {
+        from_version: prior.version,
+        to_version: body.version,
+        input: inputDiff,
+        output: outputDiff,
+      };
+      const breakingPaths = [
+        ...inputDiff.changes.filter((c) => c.breaking).map((c) => `input:${c.path}`),
+        ...outputDiff.changes.filter((c) => c.breaking).map((c) => `output:${c.path}`),
+      ];
+      const newMajor = majorOf(body.version);
+      const priorMajor = majorOf(prior.version);
+      if (newMajor === null || priorMajor === null) {
+        // Unordered versions + breaking change: fail loud, never fail open.
+        return {
+          ok: false,
+          code: 'breaking_contract_requires_major_bump',
+          message:
+            `breaking contract change from ${prior.version} to ${body.version}, but the ` +
+            `version is not numerically ordered (no leading integer) so a major bump ` +
+            `cannot be verified. ${breakingPaths.length} breaking change(s): ` +
+            breakingPaths.slice(0, 3).join(', '),
+          details,
+        };
+      }
+      if (newMajor <= priorMajor) {
+        return {
+          ok: false,
+          code: 'breaking_contract_requires_major_bump',
+          message:
+            `breaking contract change from ${prior.version} to ${body.version} requires a ` +
+            `major version bump (major ${newMajor} is not greater than ${priorMajor}). ` +
+            `${breakingPaths.length} breaking change(s): ` +
+            breakingPaths.slice(0, 3).join(', ') +
+            (breakingPaths.length > 3 ? ', ...' : ''),
+          details,
+        };
+      }
+    }
+    drift = { from_version: prior.version, input: inputDiff, output: outputDiff };
   }
 
   // Embed
@@ -120,6 +221,39 @@ export async function push(
     tool_kind: kind,
   };
   const inserted = await storage.upsertTool(pendingSpec, embedding, namespace);
+
+  // Persist drift events AFTER upsertTool succeeds (the table records what
+  // the registry ACCEPTED; pushes that fail embed/insert write nothing).
+  // FAIL-SOFT (pinned execute decision): the tool is already registered, so
+  // an event-write failure logs and the push still succeeds — a registered
+  // tool's push must never 500 on a post-commit side effect.
+  if (drift) {
+    // Per-direction try/catch: an input-event write failure must not abort
+    // the output event — the audit trail degrades per-row, not wholesale.
+    for (const [direction, diff] of [
+      ['input', drift.input],
+      ['output', drift.output],
+    ] as const) {
+      if (diff.classification === 'identical') continue;
+      try {
+        await storage.insertDriftEvent({
+          namespace_id: namespace,
+          tool_name: body.name,
+          from_version: drift.from_version,
+          to_version: body.version,
+          direction,
+          classification: diff.classification,
+          changes: diff.changes,
+          author_agent_id: authorAgentId,
+          created_at: new Date().toISOString(),
+        });
+      } catch (err) {
+        console.warn(
+          `[push] ${direction} drift event write failed for ${body.name}@${body.version} (push still ok): ${(err as Error).message}`,
+        );
+      }
+    }
+  }
 
   // Skills, subagents, and prompts run the per-kind rubric instead of the
   // fixture eval harness. Pass-rate becomes reliability_score so the trust
@@ -166,6 +300,7 @@ export async function push(
         push_ms: Date.now() - tStart,
         embed_ms: embedMs,
         eval_ms: evalMs,
+        ...(drift ? { drift } : {}),
       };
     }
   }
@@ -218,5 +353,6 @@ export async function push(
     push_ms: Date.now() - tStart,
     embed_ms: embedMs,
     eval_ms: evalMs,
+    ...(drift ? { drift } : {}),
   };
 }

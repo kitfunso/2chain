@@ -25,6 +25,7 @@ async function push(file) {
     process.exit(1);
   }
   console.log(`✓ pushed ${j.name}@${j.version}`);
+  if (j.drift) console.log(`  drift:       ${j.drift.from_version} → ${j.version}  input=${j.drift.input.classification} output=${j.drift.output.classification}`);
   console.log(`  pass_rate:   ${j.pass_rate} (${j.pass_count}/${j.total_count})`);
   console.log(`  status:      ${j.status}`);
   console.log(`  reliability: ${j.reliability_score}`);
