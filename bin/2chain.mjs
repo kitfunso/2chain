@@ -119,6 +119,46 @@ async function reverify(args) {
   }
 }
 
+async function health(args) {
+  // Strict args: exactly one positional (the tool name). A second positional
+  // is a typo, not a request — die before any fetch.
+  if (args.length !== 1) die('usage: 2chain health <name>');
+  const name = args[0];
+  const t = Date.now();
+  const r = await fetch(`${HOST}/v1/tools/${encodeURIComponent(name)}/health`, {
+    headers: { 'x-api-key': KEY },
+  });
+  const j = await r.json();
+  if (!r.ok || !j.ok) {
+    console.error(`health failed (${r.status}): ${j.error?.message ?? JSON.stringify(j)}`);
+    process.exit(1);
+  }
+  console.log(`✓ health ${j.name} (${Date.now() - t}ms)`);
+  console.log('  version   status           score  streak  last-verified');
+  for (const v of j.versions) {
+    const score = Number(v.reliability_score ?? 0).toFixed(2);
+    const statusCol = v.status === 'active' ? `\x1b[32m${v.status.padEnd(16)}\x1b[0m`
+      : v.status === 'circuit_broken' ? `\x1b[31m${v.status.padEnd(16)}\x1b[0m`
+      : v.status.padEnd(16);
+    console.log(`  ${v.version.padEnd(9)} ${statusCol} ${score}   ${String(v.verification_streak).padEnd(7)} ${v.last_eval_run ?? '(never)'}`);
+  }
+  if (j.drift_events.length) {
+    // The payload is capped at the newest 10 events; never imply totality.
+    console.log(`  drift (newest ${j.drift_events.length}):`);
+    for (const d of j.drift_events) {
+      const cls = d.classification === 'breaking' ? `\x1b[31m${d.classification}\x1b[0m` : d.classification;
+      console.log(`    - ${d.from_version} → ${d.to_version}  ${d.direction}  ${cls}  (${d.created_at})`);
+    }
+  } else {
+    console.log('  drift: (none)');
+  }
+  const agg = {};
+  for (const v of j.versions) {
+    for (const [k, n] of Object.entries(v.usage ?? {})) agg[k] = (agg[k] ?? 0) + n;
+  }
+  console.log(`  usage (7d): ${Object.entries(agg).map(([k, n]) => `${k}=${n}`).join('  ') || '(none)'}`);
+}
+
 const HELP = `2chain CLI
 
   2chain push <tool.json>             # publish a tool, run inline evals
@@ -127,6 +167,7 @@ const HELP = `2chain CLI
                                       # call a tool through the contract layer
   2chain reverify [--tool name@version]
                                       # re-run publish-time evals; full sweep is admin-only
+  2chain health <name>                # per-version status/score/streak + drift & usage
 `;
 
 try {
@@ -135,6 +176,7 @@ try {
     case 'discover':   if (!rest[0]) die('missing query'); await discover(rest.join(' ')); break;
     case 'call':       await call(rest[0], rest[1], rest[2]); break;
     case 'reverify':   await reverify(rest); break;
+    case 'health':     await health(rest); break;
     case '--help':
     case '-h':
     case undefined:    process.stdout.write(HELP); break;
