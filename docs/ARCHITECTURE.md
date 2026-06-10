@@ -113,7 +113,8 @@
 │   │   ├── call.ts                 # ajv input -> tool stub -> ajv output -> circuit-break
 │   │   ├── evalRunner.ts           # Run case fixtures -> reliability score
 │   │   ├── runToolEvals.ts         # Shared push/reverify eval invocation (grader-policy parity)
-│   │   ├── reverify.ts             # Re-run publish-time evals over the fleet; re-score, gate-drop rot
+│   │   ├── reverify.ts             # Re-run publish-time evals over the fleet; blend-score, gate-drop rot, recover circuit-broken
+│   │   ├── scoreLifecycle.ts       # Pure reliability blend (decay + usage) + recovery criteria (E2)
 │   │   ├── graders.ts              # numeric_tolerance, regex, length, json_schema_array
 │   │   └── rerank.ts               # Heuristic re-rank: term overlap x reliability x cost
 │   ├── tools/                      # Bundled tool stubs (real-fetch + canned)
@@ -216,13 +217,16 @@ MCP surface (stdio):
 | Hybrid retrieval (RRF) | `src/storage/{sqlite,postgres}.ts` | Anything HTTP, anything user-facing |
 | Embedding | `src/embeddings/*.ts` | Storage layer, contract validation |
 | Contract validation | `src/services/call.ts` (uses ajv) | Database driver internals |
-| Re-verification | `src/services/reverify.ts` (shares `runToolEvals.ts` with push so grader policy cannot fork) | Status transitions (only `call.ts` flips `circuit_broken`), tools without an eval suite |
+| Re-verification | `src/services/reverify.ts` (shares `runToolEvals.ts` with push so grader policy cannot fork) | Status transitions EXCEPT the D34-amendment recovery flip (`circuit_broken` → `active` after 3 clean reverify runs spanning ≥ 60min, unfiltered sweeps only; `call.ts` remains the only flip TO `circuit_broken`), tools without an eval suite |
+| Reliability scoring (blend + recovery policy) | `src/services/scoreLifecycle.ts` (pure module: decay/blend formula, recovery criteria, tuning constants; `now` injected) | Storage, embeddings, HTTP — reverify.ts fetches the evidence via the `Storage` interface and passes plain data in |
 | Contract drift detection | `src/services/contractDiff.ts` (pure differ + version ordering); gate + event writes in `src/services/push.ts` | Storage, embeddings, HTTP — the differ is a pure module with no imports beyond shared types |
 | Live updates | `src/live/*.ts` | HTTP handlers (only emits events; routes subscribe via SSE manager) |
 | Tool stubs | `src/tools/*.ts` | Storage, embeddings, MCP — they're pure functions |
 | MCP shim | `bin/2chain-mcp.mjs` | Storage directly (talks via HTTP only) |
 
 **Hard rule:** `src/services/*` calls `src/storage/*` only through the `Storage` interface. No service file imports `pg` or `better-sqlite3` directly.
+
+**Reliability lifecycle write points (E2):** `metadata.reliability_score` stays the materialized truth the SQL gate reads — no read-time views. Push writes the publish pass_rate (a new version is a new tool_id, so the blend of one sample IS that sample); each reverify sweep recomputes the blend from the tool's eval history + windowed usage evidence and writes it via `recordEvalOutcome`. `/call` outcomes are deliberately NOT recomputed per call (latency-critical path; the rule-7 gate consumes the materialized score) — usage evidence enters at the next sweep.
 
 ## Data Flow (primary use case: agent calls discover_tools then call_tool)
 

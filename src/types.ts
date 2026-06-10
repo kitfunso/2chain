@@ -324,6 +324,26 @@ export interface Storage {
     lastEvalRun: string,
   ): Promise<void>;
 
+  // Reliability lifecycle reads (E2) — evidence inputs for the blend in
+  // src/services/scoreLifecycle.ts, fetched per tool by the reverify sweep.
+  /** Most recent eval runs for one tool, newest first (all triggered_by
+   *  values — the blend reads the whole evidence line). Rides
+   *  idx_eval_runs_tool; the per-tool sort after lookup is fine at
+   *  per-tool scale (a composite (tool_id, triggered_at) index is a
+   *  future option, not added speculatively). */
+  listEvalRunsForTool(toolId: string, limit: number): Promise<EvalRunRow[]>;
+  /** Per-tool usage outcome counts since `sinceIso` (the caller computes
+   *  the window, e.g. USAGE_WINDOW_DAYS). All outcomes are returned; the
+   *  scoring layer decides which count as evidence. */
+  usageOutcomeCountsForTool(
+    toolId: string,
+    sinceIso: string,
+  ): Promise<Record<string, number>>;
+  /** Count of `violations` rows WHERE stage='output' for one tool since
+   *  `sinceIso`. Output-stage only: input-stage violations are caller-fault
+   *  and never count against the tool. */
+  outputViolationCountForTool(toolId: string, sinceIso: string): Promise<number>;
+
   // Agent auth (used by /push, /call, /discover guards)
   getAgentByKeyHash(hash: string): Promise<AgentRow | null>;
   upsertAgent(agent: AgentRow): Promise<void>;

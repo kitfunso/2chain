@@ -1,10 +1,21 @@
-// E1 re-verification engine — re-runs the publish-time eval suite over the
-// registered fleet so a tool that rots AFTER publish (upstream API change,
-// stub regression, contract drift) is gate-dropped by the registry instead
-// of being discovered live by a user's agent.
+// E1/E2 re-verification engine — re-runs the publish-time eval suite over
+// the registered fleet so a tool that rots AFTER publish (upstream API
+// change, stub regression, contract drift) is gate-dropped by the registry
+// instead of being discovered live by a user's agent.
 //
-// Score semantics match publish: reliability_score = latest pass_rate.
-// Decay/blend across runs is E2's concern, not E1's.
+// Score semantics (E2 — THE deliberate semantic change from E1's "latest
+// pass_rate"): after each recorded run, the materialized reliability_score
+// is the evidence blend from scoreLifecycle.ts — a recency-decayed eval leg
+// (7-day half-life, all triggered_by values) plus a windowed usage leg in
+// which caller-fault never counts (see scoreLifecycle.ts). Publish-time
+// score writes are unchanged: a new version is a new tool_id, so the blend
+// of one sample IS that sample.
+//
+// Recovery (the documented D34 amendment): during UNFILTERED sweeps only,
+// a circuit_broken tool whose 3 most recent reverify-triggered runs are all
+// clean and span >= 60 minutes is flipped back to active. Direction-bound:
+// reverify may flip circuit_broken -> active ONLY — never the reverse, and
+// never touches pending. call.ts remains the only flip TO circuit_broken.
 //
 // THE trap this partition exists for: runEvals returns pass_rate 0 for any
 // stub without a STUB_DOMAIN entry. A naive sweep would zero every scraped
@@ -15,6 +26,12 @@ import type { Storage, ToolV2 } from '../types.js';
 import { DEFAULT_NAMESPACE, RELIABILITY_GATE } from '../types.js';
 import { STUB_DOMAIN, casesForDomain } from '../fixtures/cases.js';
 import { runToolEvals } from './runToolEvals.js';
+import {
+  EVAL_HISTORY_LIMIT,
+  USAGE_WINDOW_DAYS,
+  blendReliability,
+  evaluateRecovery,
+} from './scoreLifecycle.js';
 
 const SWEEP_LIST_LIMIT = 10_000;
 
@@ -22,13 +39,22 @@ export type ReverifySkipReason = 'no-eval-suite' | 'catalog-kind' | 'pending-sta
 
 export interface ReverifySummary {
   executed: number;
+  /** RAW-RUN facts: this sweep's suite pass_rate vs RELIABILITY_GATE. A run
+   *  can be `passed` yet the tool `gate_dropped` (clean run, history still
+   *  bad), or `failed` without `gate_dropped` (blend still above gate) —
+   *  both are correct evidence semantics under the blend. */
   passed: number;
   failed: number;
   skipped: Array<{ name: string; version: string; reason: ReverifySkipReason }>;
-  /** name@version of tools whose score crossed from >= gate to < gate. */
+  /** name@version of tools whose MATERIALIZED score crossed the gate this
+   *  sweep: previous score >= gate AND new BLENDED score < gate. */
   gate_dropped: string[];
-  /** name@version of tools whose eval or writes threw; sweep continues. */
-  errored: string[];
+  /** name@version of circuit-broken tools flipped back to active by
+   *  evidence-based recovery (unfiltered sweeps only — D34 amendment). */
+  recovered: string[];
+  /** Tools whose eval or writes threw; sweep continues. `tool` is
+   *  name@version, `error` is the thrown message (diagnostics, E1 debt). */
+  errored: Array<{ tool: string; error: string }>;
   /** True when the sweep hit SWEEP_LIST_LIMIT — tools beyond it were NOT
    *  re-verified this run (truncation honesty: never report a capped sweep
    *  as full coverage). Always false for an exact name@version request. */
@@ -79,12 +105,18 @@ async function runSweep(
   storage: Storage,
   opts: ReverifyOpts,
 ): Promise<ReverifySummary> {
+  // Recovery is evaluated ONLY during unfiltered sweeps (admin/interval).
+  // The tool_author filtered path can refresh blended scores but never
+  // flips status — see registerReverifyRoute's authz rationale.
+  const isUnfilteredSweep = !opts.toolName;
+
   const summary: ReverifySummary = {
     executed: 0,
     passed: 0,
     failed: 0,
     skipped: [],
     gate_dropped: [],
+    recovered: [],
     errored: [],
     truncated: false,
   };
@@ -149,10 +181,10 @@ async function runSweep(
 
       // NOTE (E2): insertEvalRun + recordEvalOutcome are sequential queue
       // writes, not one transaction. A crash between them leaves an eval_runs
-      // row not yet reflected in reliability_score — self-healing under E1's
-      // latest-pass_rate semantics (the next deterministic re-run converges),
-      // but E2's decay/blend must either wrap these in a tx or tolerate the
-      // orphan row when reading the time series.
+      // row not yet reflected in reliability_score — and that is now
+      // self-consistent BY DESIGN: the blend READS the eval_runs series, so
+      // the orphan row simply influences the next computed score. No tx
+      // needed; the next sweep converges.
       await storage.insertEvalRun({
         tool_id: tool.id,
         tool_name: tool.name,
@@ -169,28 +201,69 @@ async function runSweep(
         duration_ms: evalResult.duration_ms,
       });
 
-      // Status is NEVER written by reverify (D34): recordEvalOutcome patches
-      // ONLY reliability_score + last_eval_run atomically, so a concurrent
-      // /call circuit-break (or a pending row) can never be overwritten by
-      // this sweep's stale read-time snapshot. Recovery from circuit_broken
-      // is E2's concern; the recorded run feeds its signal.
+      // E2 blend: the materialized score is the evidence blend, not the raw
+      // run's pass_rate. History is fetched AFTER the insert so the run just
+      // recorded is part of its own evidence line. Usage evidence enters at
+      // sweep cadence only — /call never recomputes (latency-critical path;
+      // the rule-7 SQL gate consumes this materialized score).
+      const history = await storage.listEvalRunsForTool(tool.id, EVAL_HISTORY_LIMIT);
+      const sinceIso = new Date(
+        Date.now() - USAGE_WINDOW_DAYS * 86_400_000,
+      ).toISOString();
+      const usageCounts = await storage.usageOutcomeCountsForTool(tool.id, sinceIso);
+      const outputViolations = await storage.outputViolationCountForTool(tool.id, sinceIso);
+      const blended = blendReliability(
+        history,
+        {
+          ok: usageCounts.ok ?? 0,
+          output_violations: outputViolations,
+          timeout: usageCounts.timeout ?? 0,
+        },
+        new Date(),
+      );
+
+      // Status is NEVER written here (D34): recordEvalOutcome patches ONLY
+      // reliability_score + last_eval_run atomically, so a concurrent /call
+      // circuit-break (or a pending row) can never be overwritten by this
+      // sweep's stale read-time snapshot. The ONE status write reverify may
+      // make is the recovery flip below — circuit_broken -> active only.
       await storage.recordEvalOutcome(
         tool.id,
-        evalResult.pass_rate,
+        blended,
         new Date().toISOString(),
       );
 
       summary.executed += 1;
+      // passed/failed stay RAW-RUN facts (this suite run vs the gate);
+      // gate_dropped is a BLEND crossing. The two are independent.
       if (evalResult.pass_rate >= RELIABILITY_GATE) {
         summary.passed += 1;
       } else {
         summary.failed += 1;
-        if (previousScore >= RELIABILITY_GATE) {
-          summary.gate_dropped.push(`${tool.name}@${tool.version}`);
-        }
       }
-    } catch {
-      summary.errored.push(`${tool.name}@${tool.version}`);
+      if (previousScore >= RELIABILITY_GATE && blended < RELIABILITY_GATE) {
+        summary.gate_dropped.push(`${tool.name}@${tool.version}`);
+      }
+
+      // Recovery (D34 amendment, direction-bound): unfiltered sweeps only;
+      // circuit_broken -> active iff the 3 most recent reverify-triggered
+      // runs are all clean AND span >= 60 minutes (evaluateRecovery filters
+      // and sorts; `history` already contains the run recorded above).
+      // Recovered tools re-enter discover with the evidence-weighted blend
+      // written above, not a clean slate.
+      if (
+        isUnfilteredSweep &&
+        tool.status === 'circuit_broken' &&
+        evaluateRecovery(history, RELIABILITY_GATE)
+      ) {
+        await storage.setStatus(tool.id, 'active');
+        summary.recovered.push(`${tool.name}@${tool.version}`);
+      }
+    } catch (err) {
+      summary.errored.push({
+        tool: `${tool.name}@${tool.version}`,
+        error: err instanceof Error ? err.message : String(err),
+      });
     }
   }
 

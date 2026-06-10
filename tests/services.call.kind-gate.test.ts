@@ -1,6 +1,9 @@
-// services/call gate test: skills + subagents are discovery-only and must
-// be refused with kind_not_callable instead of falling through to the
-// catalog-only-stub payload.
+// services/call gate test: catalog kinds (skill/subagent/prompt) are
+// discovery-only and must be refused with kind_not_callable instead of
+// falling through to a stub payload. 'prompt' joined the gate in E2
+// (plan §4c): a callable prompt could circuit-break and then be skipped
+// forever by reverify's catalog-kind partition — a dead end recovery could
+// never reach.
 
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
@@ -93,19 +96,20 @@ test('call rejects tool_kind=subagent with kind_not_callable', async () => {
   assert.match(r.error.message, /Spawn the subagent/);
 });
 
-test('call allows tool_kind=prompt (still callable via prompt-template-stub)', async () => {
-  // Prompt template needs to be in the runtime registry. Importing the seed
-  // file isn't enough — only importPrompts populates PROMPT_TEMPLATES. So
-  // we just assert that the gate doesn't fire; the stub will fail later
-  // because no template was registered, which is a different error.
+test('call rejects tool_kind=prompt with kind_not_callable (E2: prompts are discovery-only)', async () => {
+  // REVERSES the E1-era assertion that prompts pass the gate. A prompt that
+  // reaches the stub can circuit-break (e.g. unregistered template), and
+  // reverify's catalog-kind partition would then skip it forever — recovery
+  // could never flip it back. Discovery-only is the root fix.
   const r = await call(storage, 'agent-1', 'caller', {
     tool_name: 'commit-prompt',
     tool_version: '1.0',
     input: { vars: {} },
   });
-  // Either ok=true (if a template happens to be registered) or ok=false
-  // with code=stub_timeout — but NOT kind_not_callable.
-  if (!r.ok) {
-    assert.notEqual(r.error.code, 'kind_not_callable', 'prompts must not be gated');
-  }
+  assert.equal(r.ok, false);
+  if (r.ok) return;
+  assert.equal(r.status, 400);
+  assert.equal(r.error.code, 'kind_not_callable');
+  assert.match(r.error.message, /prompt/);
+  assert.match(r.error.message, /Render the prompt template into agent context/);
 });
