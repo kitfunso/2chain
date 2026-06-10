@@ -91,6 +91,7 @@
 │   │       ├── push.ts             # POST /push -> embed + evals + storage.upsert()
 │   │       ├── call.ts             # POST /call -> ajv validation + tool stub + circuit-break
 │   │       ├── reverify.ts         # POST /v1/reverify -> services/reverify.ts (sweep admin-only)
+│   │       ├── health.ts           # GET /v1/tools/:name/health + /health-view/:name (E4, read-only)
 │   │       └── dashboard.ts        # GET / (HTML), /events (SSE), /state (snapshot)
 │   ├── storage/
 │   │   ├── index.ts                # Storage interface; selects driver via env
@@ -114,6 +115,7 @@
 │   │   ├── evalRunner.ts           # Run case fixtures -> reliability score
 │   │   ├── runToolEvals.ts         # Shared push/reverify eval invocation (grader-policy parity)
 │   │   ├── reverify.ts             # Re-run publish-time evals over the fleet; re-score, gate-drop rot
+│   │   ├── health.ts               # Read-only per-tool health aggregator (E4; no writes)
 │   │   ├── graders.ts              # numeric_tolerance, regex, length, json_schema_array
 │   │   └── rerank.ts               # Heuristic re-rank: term overlap x reliability x cost
 │   ├── tools/                      # Bundled tool stubs (real-fetch + canned)
@@ -201,8 +203,10 @@ Unchanged from v1 — the whole point is wire-level compatibility.
 | `/push` | POST | x-api-key (admin) | Register a new tool version |
 | `/call` | POST | x-api-key | Invoke a tool with contract validation |
 | `/v1/reverify` | POST | x-api-key (admin for full sweep; tool_author for single-tool) | Re-run publish-time evals, re-score reliability |
+| `/v1/tools/:name/health` | GET | x-api-key (any role) | Read-only per-tool health report: per-version status/score/streak/history/usage + recent drift |
+| `/health-view/:name` | GET | none (dashboard-scoped, read-only) | Same health report via the same service for the dashboard panel; projected drift fields only (`changes_json` never ships) |
 | `/state` | GET | none (read-only) | Snapshot for dashboard |
-| `/events` | GET | none | SSE: `discover_ran`, `tool_invoked`, `tool_changed`, `eval_completed`, `violation_logged` |
+| `/events` | GET | none | SSE: `discover_ran`, `tool_invoked`, `eval_completed`, `violation_logged` (`tool_changed` was never emitted; the dead client listener was removed in E4) |
 | `/atlas-stats` | GET | none | Renamed `/db-stats` for v2; backend-agnostic stats |
 
 MCP surface (stdio):
@@ -218,6 +222,7 @@ MCP surface (stdio):
 | Contract validation | `src/services/call.ts` (uses ajv) | Database driver internals |
 | Re-verification | `src/services/reverify.ts` (shares `runToolEvals.ts` with push so grader policy cannot fork) | Status transitions (only `call.ts` flips `circuit_broken`), tools without an eval suite |
 | Contract drift detection | `src/services/contractDiff.ts` (pure differ + version ordering); gate + event writes in `src/services/push.ts` | Storage, embeddings, HTTP — the differ is a pure module with no imports beyond shared types |
+| Tool health surface | `src/services/health.ts` — read-only aggregator over the `Storage` interface (E4) | Writes of ANY kind: no status flips, no score recompute (lifecycle is E2's); storage drivers (interface types only); `changes_json` (drift events ship projected fields only) |
 | Live updates | `src/live/*.ts` | HTTP handlers (only emits events; routes subscribe via SSE manager) |
 | Tool stubs | `src/tools/*.ts` | Storage, embeddings, MCP — they're pure functions |
 | MCP shim | `bin/2chain-mcp.mjs` | Storage directly (talks via HTTP only) |

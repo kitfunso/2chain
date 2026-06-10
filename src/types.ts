@@ -324,6 +324,23 @@ export interface Storage {
     lastEvalRun: string,
   ): Promise<void>;
 
+  // Per-tool evidence reads — surface shared with E2's parked branch
+  // (byte-identical signatures so whichever merges second resolves
+  // trivially). E4's health aggregator reads them; E2's score blend will.
+  /** Most recent eval runs for one tool, newest first (all triggered_by
+   *  values — the blend reads the whole evidence line). Rides
+   *  idx_eval_runs_tool; the per-tool sort after lookup is fine at
+   *  per-tool scale (a composite (tool_id, triggered_at) index is a
+   *  future option, not added speculatively). */
+  listEvalRunsForTool(toolId: string, limit: number, triggeredBy?: string): Promise<EvalRunRow[]>;
+  /** Per-tool usage outcome counts since `sinceIso` (the caller computes
+   *  the window, e.g. USAGE_WINDOW_DAYS). All outcomes are returned; the
+   *  scoring layer decides which count as evidence. */
+  usageOutcomeCountsForTool(
+    toolId: string,
+    sinceIso: string,
+  ): Promise<Record<string, number>>;
+
   // Agent auth (used by /push, /call, /discover guards)
   getAgentByKeyHash(hash: string): Promise<AgentRow | null>;
   upsertAgent(agent: AgentRow): Promise<void>;

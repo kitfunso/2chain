@@ -6,6 +6,7 @@ import { registerDiscoverRoute } from './routes/discover.js';
 import { registerPushRoute } from './routes/push.js';
 import { registerCallRoute } from './routes/call.js';
 import { registerDashboardRoutes } from './routes/dashboard.js';
+import { registerHealthRoutes } from './routes/health.js';
 import { registerReverifyRoute } from './routes/reverify.js';
 import { discover, prewarmDiscover, DEMO_AGENT_QUERY, PREWARM_QUERIES } from '../services/discover.js';
 import { isSweepInFlight, reverifyTools } from '../services/reverify.js';
@@ -54,6 +55,10 @@ export async function buildServer(): Promise<FastifyInstance> {
   registerPushRoute(app, storage, embedder);
   registerCallRoute(app, storage);
   registerDashboardRoutes(app, storage);
+  // E4 health surface: /v1/tools/:name/health (authenticated) and the
+  // dashboard-scoped /health-view/:name (unauthenticated, same trust
+  // boundary as /, /state, /events).
+  registerHealthRoutes(app, storage);
   // Assigned after rerankAndBroadcast is defined below; both sweep trigger
   // paths (route + interval) call it once per completed unfiltered sweep.
   let postSweepRerank: () => Promise<void> = async () => {};

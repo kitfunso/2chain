@@ -718,16 +718,8 @@ export class SqliteStorage implements Storage {
     }));
   }
 
-  async listEvalRuns(
-    limit: number,
-    namespace = DEFAULT_NAMESPACE,
-  ): Promise<EvalRunRow[]> {
-    const rows = this.db
-      .prepare<[string, number], any>(
-        `SELECT * FROM eval_runs WHERE namespace_id = ? ORDER BY triggered_at DESC LIMIT ?`,
-      )
-      .all(namespace, limit);
-    return rows.map((r) => ({
+  private mapEvalRun(r: any): EvalRunRow {
+    return {
       id: r.id,
       tool_id: r.tool_id,
       tool_name: r.tool_name,
@@ -740,7 +732,67 @@ export class SqliteStorage implements Storage {
       total_count: r.total_count,
       pass_rate: r.pass_rate,
       duration_ms: r.duration_ms,
-    }));
+    };
+  }
+
+  async listEvalRuns(
+    limit: number,
+    namespace = DEFAULT_NAMESPACE,
+  ): Promise<EvalRunRow[]> {
+    const rows = this.db
+      .prepare<[string, number], any>(
+        `SELECT * FROM eval_runs WHERE namespace_id = ? ORDER BY triggered_at DESC LIMIT ?`,
+      )
+      .all(namespace, limit);
+    return rows.map((r) => this.mapEvalRun(r));
+  }
+
+  // ----- Per-tool evidence reads (E4; signatures shared with parked E2) -----
+
+  async listEvalRunsForTool(
+    toolId: string,
+    limit: number,
+    triggeredBy?: string,
+  ): Promise<EvalRunRow[]> {
+    // Rides idx_eval_runs_tool for the lookup; sorting the per-tool slice is
+    // fine at per-tool scale (composite (tool_id, triggered_at) index noted
+    // as a future option, not added speculatively). The optional triggeredBy
+    // filter applies BEFORE the limit: recovery's reverify-only window must
+    // not be starved by other-trigger rows filling the cap (codex cap round).
+    const rows = triggeredBy
+      ? this.db
+          .prepare<[string, string, number], any>(
+            `SELECT * FROM eval_runs WHERE tool_id = ? AND triggered_by = ? ORDER BY triggered_at DESC LIMIT ?`,
+          )
+          .all(toolId, triggeredBy, limit)
+      : this.db
+          .prepare<[string, number], any>(
+            `SELECT * FROM eval_runs WHERE tool_id = ? ORDER BY triggered_at DESC LIMIT ?`,
+          )
+          .all(toolId, limit);
+    return rows.map((r) => this.mapEvalRun(r));
+  }
+
+  async usageOutcomeCountsForTool(
+    toolId: string,
+    sinceIso: string,
+  ): Promise<Record<string, number>> {
+    const rows = this.db
+      .prepare<[string, string], { outcome: string; n: number }>(
+        `SELECT outcome, COUNT(*) AS n FROM usage
+         WHERE tool_id = ? AND occurred_at >= ?
+         GROUP BY outcome`,
+      )
+      .all(toolId, sinceIso);
+    const out: Record<string, number> = {
+      ok: 0,
+      circuit_broken: 0,
+      gated: 0,
+      violation: 0,
+      timeout: 0,
+    };
+    for (const r of rows) out[r.outcome] = r.n;
+    return out;
   }
 
   async usageOutcomeCounts(
