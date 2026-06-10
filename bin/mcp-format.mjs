@@ -17,7 +17,11 @@
 // of neutralization closes row-forging; rendering stays single-line.
 function clean(s) {
   // eslint-disable-next-line no-control-regex
-  return String(s).replace(/[\r\n\u0000-\u001f\u007f]/g, ' ');
+  // ALL line-break/control categories (codex P2): C0 + DEL + C1 (incl.
+  // U+0085 NEL) + U+2028/U+2029 Unicode separators - many consumers
+  // render the separators as hard breaks, re-opening row-forging past a
+  // C0-only strip.
+  return String(s).replace(/[\r\n\u0000-\u001f\u007f-\u009f\u2028\u2029]/g, ' ');
 }
 
 function pad(s, n) {
