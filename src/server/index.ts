@@ -8,7 +8,7 @@ import { registerCallRoute } from './routes/call.js';
 import { registerDashboardRoutes } from './routes/dashboard.js';
 import { registerReverifyRoute } from './routes/reverify.js';
 import { discover, prewarmDiscover, DEMO_AGENT_QUERY, PREWARM_QUERIES } from '../services/discover.js';
-import { reverifyTools } from '../services/reverify.js';
+import { isSweepInFlight, reverifyTools } from '../services/reverify.js';
 import { broadcast } from './sse.js';
 import type { Storage, Embedder } from '../types.js';
 // Side-effect: register all stubs in the in-process registry.
@@ -54,7 +54,10 @@ export async function buildServer(): Promise<FastifyInstance> {
   registerPushRoute(app, storage, embedder);
   registerCallRoute(app, storage);
   registerDashboardRoutes(app, storage);
-  registerReverifyRoute(app, storage);
+  // Assigned after rerankAndBroadcast is defined below; both sweep trigger
+  // paths (route + interval) call it once per completed unfiltered sweep.
+  let postSweepRerank: () => Promise<void> = async () => {};
+  registerReverifyRoute(app, storage, () => postSweepRerank());
 
   // Opt-in continuous re-verification. REVERIFY_INTERVAL_MIN unset = OFF so
   // fly.io / laptop deployments opt in deliberately (no surprise CPU).
@@ -77,7 +80,12 @@ export async function buildServer(): Promise<FastifyInstance> {
       }
       reverifyInFlight = true;
       reverifyTools(storage)
-        .then((summary) => app.log.info(summary, 'scheduled reverify sweep complete'))
+        .then(async (summary) => {
+          app.log.info(summary, 'scheduled reverify sweep complete');
+          // One coalesced rerank for the whole sweep (per-event reranks are
+          // suppressed while the sweep is in flight).
+          await postSweepRerank();
+        })
         .catch((e) => app.log.error({ err: (e as Error).message }, 'scheduled reverify sweep failed'))
         .finally(() => { reverifyInFlight = false; });
     }, reverifyIntervalMin * 60_000);
@@ -124,8 +132,7 @@ export async function buildServer(): Promise<FastifyInstance> {
   // Fires on any change event the storage driver reports; we filter for tool
   // mutations and rebroadcast a fresh ranking. Step 9 wires SqliteStorage's
   // updateHook to actually fire these; for now this is a no-op subscription.
-  storage.watchChanges(async (event) => {
-    if (event.table !== 'tools') return;
+  const rerankAndBroadcast = async (trigger: string): Promise<void> => {
     try {
       const { results, meta } = await discover(storage, embedder, DEMO_AGENT_QUERY, 5);
       broadcast('discover_ran', {
@@ -139,11 +146,24 @@ export async function buildServer(): Promise<FastifyInstance> {
         })),
         meta,
         ts: new Date().toISOString(),
-        trigger: event.type,
+        trigger,
       });
     } catch (e) {
       app.log.warn({ err: (e as Error).message }, 're-rank on tool change failed');
     }
+  };
+
+  postSweepRerank = () => rerankAndBroadcast('reverify-sweep');
+
+  // Sweep coalescing (codex P2): an unfiltered reverify sweep writes the
+  // tools table once per verified tool; reranking on each write would spawn
+  // a discover per tool on top of the eval work. Per-event reranks are
+  // suppressed while a sweep is in flight; the sweep's trigger paths (route
+  // + interval) fire exactly ONE rerank after the sweep completes.
+  storage.watchChanges(async (event) => {
+    if (event.table !== 'tools') return;
+    if (isSweepInFlight()) return;
+    await rerankAndBroadcast(event.type);
   });
 
   app.addHook('onClose', async () => {

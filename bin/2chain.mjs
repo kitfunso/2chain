@@ -72,6 +72,12 @@ async function call(toolNameVer, caseId, inputJson) {
 
 async function reverify(args) {
   let body = {};
+  // Strict args on a mutating verb: a forgotten '--tool' (e.g.
+  // `2chain reverify pdf-extractor@3.0`) must never silently widen into an
+  // unfiltered fleet sweep. Only [] or ['--tool', '<spec>'] are accepted.
+  if (args.length !== 0 && !(args.length === 2 && args[0] === '--tool')) {
+    die('usage: 2chain reverify [--tool name@version]');
+  }
   const flagIdx = args.indexOf('--tool');
   if (flagIdx !== -1) {
     const spec = args[flagIdx + 1];

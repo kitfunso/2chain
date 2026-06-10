@@ -17,7 +17,11 @@ const reverifyBodySchema = {
   },
 } as const;
 
-export function registerReverifyRoute(app: FastifyInstance, storage: Storage): void {
+export function registerReverifyRoute(
+  app: FastifyInstance,
+  storage: Storage,
+  afterSweep?: () => Promise<void>,
+): void {
   app.post<{ Body: ReverifyBody }>('/v1/reverify', { schema: { body: reverifyBodySchema } }, async (req, reply) => {
     // A tool_author may re-score other authors' tools via the filtered path —
     // suites are deterministic so that is benign; the unfiltered fleet sweep
@@ -44,6 +48,9 @@ export function registerReverifyRoute(app: FastifyInstance, storage: Storage): v
         toolName: req.body?.tool_name,
         toolVersion: req.body?.tool_version,
       });
+      // One coalesced rerank per completed unfiltered sweep (per-event
+      // reranks are suppressed while the sweep runs).
+      if (!req.body?.tool_name && afterSweep) await afterSweep();
       reply.code(200).send({ ok: true, ...summary });
     } catch (err) {
       if (err instanceof SweepInFlightError) {

@@ -52,6 +52,13 @@ export class SweepInFlightError extends Error {
 
 let unfilteredSweepInFlight = false;
 
+/** True while an unfiltered fleet sweep is running. Change-watchers use this
+ *  to coalesce per-tool rerank/broadcast work into one post-sweep refresh
+ *  instead of reacting to every tools-table write a sweep emits. */
+export function isSweepInFlight(): boolean {
+  return unfilteredSweepInFlight;
+}
+
 export async function reverifyTools(
   storage: Storage,
   opts: ReverifyOpts = {},
