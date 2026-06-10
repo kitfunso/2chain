@@ -23,9 +23,12 @@ export function registerReverifyRoute(
   afterSweep?: () => Promise<void>,
 ): void {
   app.post<{ Body: ReverifyBody }>('/v1/reverify', { schema: { body: reverifyBodySchema } }, async (req, reply) => {
-    // A tool_author may re-score other authors' tools via the filtered path —
-    // suites are deterministic so that is benign; the unfiltered fleet sweep
-    // (long request, re-scores every author) stays admin-only.
+    // A tool_author may re-score other authors' tools via the filtered path.
+    // That is benign because the filtered path can only refresh BLENDED
+    // scores and never flips status: recovery (the D34 amendment,
+    // circuit_broken -> active) is evaluated exclusively during UNFILTERED
+    // sweeps. The unfiltered fleet sweep (long request, re-scores every
+    // author, may restore circuit-broken tools) stays admin-only.
     const isFiltered = Boolean(req.body?.tool_name);
     const ctx = await requireAuth(
       storage,

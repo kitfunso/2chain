@@ -112,6 +112,13 @@ export interface ToolSpecV2 {
     reliability_score: number;
     last_eval_run?: string; // ISO timestamp in v2 (no MongoDB Date)
     last_eval_run_id?: string;
+    /** Set ONCE at the circuit-break transition (markCircuitBroken), read by
+     *  recovery as the watermark post-break evidence must postdate. Usage
+     *  rows can NOT serve as this watermark: call.ts logs the same outcome
+     *  on every post-break 503 rejection, so retry traffic would advance it
+     *  forever and recovery would never fire. Stale on re-activated tools
+     *  (harmless: recovery only reads it while status='circuit_broken'). */
+    broken_at?: string;
   };
   status: ToolStatus;
   domain?: string;
@@ -314,7 +321,7 @@ export interface Storage {
   /** All versions of a tool by exact name. Indexed (namespace_id, name)
    *  prefix of the UNIQUE(namespace_id, name, version) index — no list cap,
    *  so push's ownership + prior-version lookups never silently truncate. */
-  listToolsByName(name: string, namespace?: string): Promise<ToolV2[]>;
+  listToolsByName(name: string, namespace?: string, opts?: { newestFirst?: boolean; limit?: number }): Promise<ToolV2[]>;
   /** Atomic patch of ONLY reliability_score + last_eval_run; never writes
    *  status and never replaces whole metadata — safe for sweeps whose
    *  read-time snapshot may be stale by write time (reverify TOCTOU). */
@@ -324,15 +331,30 @@ export interface Storage {
     lastEvalRun: string,
   ): Promise<void>;
 
-  // Per-tool evidence reads — surface shared byte-identically with the
-  // parked E2 + E4 branches (whichever merges later resolves trivially).
-  // E5's discover freshness payload reads the reverify streak through it.
+  // Reliability lifecycle reads (E2) — evidence inputs for the blend in
+  // src/services/scoreLifecycle.ts, fetched per tool by the reverify sweep.
   /** Most recent eval runs for one tool, newest first (all triggered_by
    *  values — the blend reads the whole evidence line). Rides
    *  idx_eval_runs_tool; the per-tool sort after lookup is fine at
    *  per-tool scale (a composite (tool_id, triggered_at) index is a
    *  future option, not added speculatively). */
   listEvalRunsForTool(toolId: string, limit: number, triggeredBy?: string): Promise<EvalRunRow[]>;
+  /** Per-tool usage outcome counts since `sinceIso` (the caller computes
+   *  the window, e.g. USAGE_WINDOW_DAYS). All outcomes are returned; the
+   *  scoring layer decides which count as evidence. */
+  usageOutcomeCountsForTool(
+    toolId: string,
+    sinceIso: string,
+  ): Promise<Record<string, number>>;
+  /** Count of `violations` rows WHERE stage='output' for one tool since
+   *  `sinceIso`. Output-stage only: input-stage violations are caller-fault
+   *  and never count against the tool. */
+  outputViolationCountForTool(toolId: string, sinceIso: string): Promise<number>;
+  /** The D34 circuit-break flip, atomically: status='circuit_broken' AND
+   *  metadata.broken_at=atIso in one write. broken_at is the watermark
+   *  recovery evidence must postdate; recorded ONCE at the transition
+   *  (post-break 503 rejections must never advance it). */
+  markCircuitBroken(toolId: string, atIso: string): Promise<void>;
 
   // Agent auth (used by /push, /call, /discover guards)
   getAgentByKeyHash(hash: string): Promise<AgentRow | null>;

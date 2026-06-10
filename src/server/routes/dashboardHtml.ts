@@ -232,6 +232,20 @@ export const DASHBOARD_HTML = `<!doctype html>
   .reliability-bar .meter > i { display: block; height: 100%; background: var(--green); }
   .reliability-bar .meter > i.gated { background: var(--red); }
 
+  /* ----- health panel (E4) ----- */
+  .health-panel { font-family: var(--mono); font-size: 12px; margin-top: 8px; }
+  .health-panel .h-title { font-size: 11px; color: var(--ink-2); letter-spacing: 1.5px;
+    text-transform: uppercase; font-weight: 800; border-bottom: 2px solid var(--ink);
+    padding-bottom: 4px; margin-bottom: 6px; }
+  .health-panel table { width: 100%; border-collapse: collapse; }
+  .health-panel th { text-align: left; color: var(--ink-2); font-weight: 700;
+    font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.5px;
+    padding: 2px 6px 2px 0; }
+  .health-panel td { padding: 2px 6px 2px 0; vertical-align: top; }
+  .health-panel .h-hist td { font-size: 11px; }
+  .health-panel .h-sub { margin-top: 6px; }
+  .health-panel .h-drift { padding: 1px 0; }
+
   .feed-head { font-size: 11px; color: var(--ink-2); letter-spacing: 1.5px;
     text-transform: uppercase; padding: 6px 0; border-bottom: 2px solid var(--ink);
     margin-top: 4px; font-weight: 800; }
@@ -587,6 +601,7 @@ export const DASHBOARD_HTML = `<!doctype html>
           <div class="submeta" id="d-submeta"></div>
           <p class="blurb" id="d-blurb">Click a row in the ranking table or wait for /discover to populate.</p>
           <div class="kv" id="d-kv"></div>
+          <div class="health-panel" id="d-health"></div>
         </div>
         <div class="feed-head">▌ LIVE FEED ▌ /events</div>
         <div id="feed">
@@ -708,6 +723,7 @@ export const DASHBOARD_HTML = `<!doctype html>
     feed: [],
     sortBy: '',           // '' = name (default), 'gh' = github stars desc
     violationsCount: 0,
+    healthName: '',       // tool name whose health panel is showing
   };
   function sourceBucket(t) {
     const s = t.endpoint_stub_name || '';
@@ -1063,9 +1079,108 @@ export const DASHBOARD_HTML = `<!doctype html>
       + '<span class="k" title="Endpoint stub: which built-in handler implements /call for this tool. catalog-only-stub = discovery only, not callable.">stub</span><span>' + (tool.endpoint_stub_name || '—') + '</span>'
       + '<span class="k" title="Time of last continuous eval run.">last eval</span><span>' + fmt.time(meta.last_eval_run) + '</span>'
       + sourceRow;
+    // health detail view for the selected tool (per NAME — all versions)
+    loadHealth(tool.name);
     // refresh row outline
     renderTable();
   }
+
+  // ---- health panel (E4) ----------------------------------------------------
+  // SECURITY: every interpolation of health-payload data below MUST be wrapped
+  // in escapeHtml( — tests/health.test.ts statically asserts this over the
+  // source region between these two markers. That is also why equality checks
+  // on payload enums compare via escapeHtml(...): enum values contain no HTML
+  // specials so escaping is a no-op, and it keeps the region mechanically
+  // checkable (no bare payload-field access anywhere).
+  function renderHealthLoading(name) {
+    const box = document.getElementById('d-health');
+    if (box) box.innerHTML = '<div class="muted">loading health: ' + escapeHtml(name) + '...</div>';
+  }
+  function renderHealth(hr) {
+    const box = document.getElementById('d-health');
+    if (!box) return;
+    if (!hr || !hr.ok || !Array.isArray(hr.versions)) { box.innerHTML = ''; return; }
+    let html = '<div class="h-title">health: ' + escapeHtml(hr.name) + '</div>';
+    html += '<table><thead><tr><th>ver</th><th>status</th><th>score</th><th>streak</th><th>last verified</th></tr></thead><tbody>';
+    for (const v of hr.versions) {
+      const stCls = escapeHtml(v.status) === 'active' ? 'green bright'
+        : escapeHtml(v.status) === 'circuit_broken' ? 'red bright' : 'yellow bright';
+      html += '<tr>'
+        + '<td>' + escapeHtml(v.version) + '</td>'
+        + '<td class="' + stCls + '">' + escapeHtml(v.status) + '</td>'
+        + '<td>' + escapeHtml(Number(v.reliability_score ?? 0).toFixed(2)) + '</td>'
+        + '<td>' + escapeHtml(String(v.verification_streak ?? 0)) + '</td>'
+        + '<td class="muted">' + escapeHtml(v.last_eval_run || 'never') + '</td>'
+        + '</tr>';
+      const hist = (v.score_history || []).slice(0, 5);
+      if (hist.length) {
+        html += '<tr class="h-hist"><td colspan="5" class="muted">history: '
+          + hist.map((s) => escapeHtml(Number(s.pass_rate ?? 0).toFixed(2)) + '·' + escapeHtml(s.triggered_by)).join('  ')
+          + '</td></tr>';
+      }
+    }
+    html += '</tbody></table>';
+    const drift = hr.drift_events || [];
+    if (drift.length) {
+      html += '<div class="h-sub">drift (' + escapeHtml(String(drift.length)) + '):</div>';
+      for (const d of drift) {
+        const dCls = escapeHtml(d.classification) === 'breaking' ? 'red bright' : 'muted';
+        html += '<div class="h-drift">'
+          + escapeHtml(d.from_version) + ' → ' + escapeHtml(d.to_version)
+          + ' <span class="muted">' + escapeHtml(d.direction) + '</span>'
+          + ' <span class="' + dCls + '">' + escapeHtml(d.classification) + '</span>'
+          + ' <span class="muted">' + escapeHtml(d.created_at) + '</span>'
+          + '</div>';
+      }
+    } else {
+      html += '<div class="h-sub muted">drift: (none)</div>';
+    }
+    const agg = {};
+    for (const v of hr.versions) {
+      const u = v.usage || {};
+      for (const k in u) agg[k] = (agg[k] || 0) + u[k];
+    }
+    html += '<div class="h-sub muted">usage 7d: '
+      + escapeHtml(Object.entries(agg).map(([k, n]) => k + '=' + n).join('  ') || '(none)')
+      + '</div>';
+    box.innerHTML = html;
+  }
+
+  // Stale-response guard: only the newest in-flight fetch may render, and only
+  // if the user has not selected a different tool since it was issued.
+  let healthSeq = 0;
+  let healthInFlightName = null;
+  async function loadHealth(name) {
+    // In-flight dedupe: a second request for the SAME name while one is
+    // pending costs an extra fetch fan-out for an identical answer (the
+    // renderDetail + SSE-listener double-fire).
+    if (healthInFlightName === name) return;
+    healthInFlightName = name;
+    state.healthName = name;
+    const seq = ++healthSeq;
+    // Clear immediately: the seq guard stops LATE overwrites, but without
+    // this the previous tool's report lingers under the new header for the
+    // whole fetch window (codex P2).
+    renderHealthLoading(name);
+    try {
+      const r = await fetch('/health-view/' + encodeURIComponent(name));
+      if (!r.ok) {
+        if (seq === healthSeq && state.healthName === name) renderHealth(null);
+        return;
+      }
+      // The body downloads during json() - the guard must run AFTER it, or a
+      // slow earlier fetch can finish last and render over a newer selection.
+      const payload = await r.json();
+      if (seq !== healthSeq || state.healthName !== name) return;
+      renderHealth(payload);
+    } catch (e) {
+      // Never leave a previous tool's panel under a new selection's header.
+      if (seq === healthSeq && state.healthName === name) renderHealth(null);
+    } finally {
+      if (healthInFlightName === name) healthInFlightName = null;
+    }
+  }
+  // ---- end health panel (E4) ------------------------------------------------
 
   // ---- live feed -----------------------------------------------------------
   // Klass is interpolated into a class attribute so it MUST be escaped — even
@@ -1101,6 +1216,12 @@ export const DASHBOARD_HTML = `<!doctype html>
         if (t) renderDetail(t);
       }
       pushFeed('<span class="chip dscv">DSCV</span> "' + (d.query || '').slice(0, 50) + '" → ' + (d.results || []).length + ' res ' + (meta.total_ms || 0) + 'ms');
+      // Refresh the open panel ONLY for write-driven events: the watcher and
+      // post-sweep broadcasts carry a trigger field ('insert'/'update'/
+      // 'delete'/'reverify-sweep'); ordinary /discover searches broadcast
+      // WITHOUT one, and refreshing on those amplifies normal search
+      // traffic into per-version health queries (codex P2). No polling.
+      if (state.healthName && d.trigger) loadHealth(state.healthName);
     });
 
     es.addEventListener('tool_invoked', (e) => {
@@ -1114,20 +1235,14 @@ export const DASHBOARD_HTML = `<!doctype html>
       const key = d.tool_name + '@' + d.tool_version;
       const row = document.querySelector('tr[data-key="' + CSS.escape(key) + '"]');
       if (row) { row.classList.remove('flash'); void row.offsetWidth; row.classList.add('flash'); }
+      // a call changes the 7d usage counts — refresh the open health panel
+      // (only when the invoked tool is the one being inspected).
+      if (state.healthName && d.tool_name === state.healthName) loadHealth(state.healthName);
     });
 
-    es.addEventListener('tool_changed', (e) => {
-      const data = JSON.parse(e.data);
-      const t = data.tool || data;
-      if (!t || !t.name) return;
-      const idx = state.tools.findIndex((x) => x.name === t.name && x.version === t.version);
-      if (idx >= 0) state.tools[idx] = { ...state.tools[idx], ...t };
-      else state.tools.push(t);
-      recomputeAllCounts();
-      renderTable();
-      pushFeed('<span class="chip push">PUSH</span> ' + escapeHtml(t.name + '@' + t.version)
-        + ' <span class="muted">' + escapeHtml(t.status || '?') + '</span>');
-    });
+    // (Dead 'tool_changed' listener removed: the server never broadcasts that
+    // event — tools-table writes surface as 'discover_ran' via watchChanges →
+    // rerankAndBroadcast in server/index.ts.)
 
     es.addEventListener('violation_logged', onViolation);
     es.addEventListener('violation_added', onViolation);
