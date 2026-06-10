@@ -131,19 +131,20 @@ async function runSweep(
       DEFAULT_NAMESPACE,
     );
     tools = tool ? [tool] : [];
+  } else if (opts.toolName) {
+    // Name-only requests use the indexed exact-match too (codex P2, E2
+    // round): paging the capped sweep list and filtering in memory misses
+    // names sorting past the cap (executed:0) and silently drops versions
+    // straddling it. Exact lookups are never truncated.
+    tools = await storage.listToolsByName(opts.toolName, DEFAULT_NAMESPACE);
   } else {
-    const page = await storage.listTools({
+    tools = await storage.listTools({
       namespace: DEFAULT_NAMESPACE,
       limit: SWEEP_LIST_LIMIT,
     });
-    const pageWasFull = page.length === SWEEP_LIST_LIMIT;
-    tools = opts.toolName ? page.filter((t) => t.name === opts.toolName) : page;
-    // Truncation honesty AFTER filtering: an unfiltered capped sweep is
-    // truncated; a name-only filter is truncated only when the name was not
-    // found on a full page (it may exist past the cap).
-    summary.truncated = opts.toolName
-      ? pageWasFull && tools.length === 0
-      : pageWasFull;
+    // Truncation honesty: a capped unfiltered sweep must never report as
+    // full coverage.
+    summary.truncated = tools.length === SWEEP_LIST_LIMIT;
   }
 
   for (const tool of tools) {
@@ -243,6 +244,13 @@ async function runSweep(
       }
       if (previousScore >= RELIABILITY_GATE && blended < RELIABILITY_GATE) {
         summary.gate_dropped.push(`${tool.name}@${tool.version}`);
+        // Server-side trace regardless of trigger path: a crossing detected
+        // by a FILTERED request is otherwise visible only in that caller's
+        // response, and the next sweep cannot re-report it (previousScore
+        // is already below the gate by then).
+        console.warn(
+          `[reverify] ${tool.name}@${tool.version} dropped below the reliability gate (${previousScore.toFixed(3)} -> ${blended.toFixed(3)})`,
+        );
       }
 
       // Recovery (D34 amendment, direction-bound): unfiltered sweeps only;
@@ -256,7 +264,10 @@ async function runSweep(
         // counted; a recovery failure must neither abort remaining tools
         // nor double-count this one into `errored` (it retries next sweep).
         try {
-          const brokenAt = await storage.lastCircuitBreakAt(tool.id);
+          // The watermark is the transition marker written by
+          // markCircuitBroken — never derived from usage rows (rejections
+          // share the same outcome value and would advance it forever).
+          const brokenAt = tool.metadata.broken_at ?? null;
           if (evaluateRecovery(history, RELIABILITY_GATE, brokenAt)) {
             await storage.setStatus(tool.id, 'active');
             summary.recovered.push(`${tool.name}@${tool.version}`);

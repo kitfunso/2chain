@@ -112,6 +112,13 @@ export interface ToolSpecV2 {
     reliability_score: number;
     last_eval_run?: string; // ISO timestamp in v2 (no MongoDB Date)
     last_eval_run_id?: string;
+    /** Set ONCE at the circuit-break transition (markCircuitBroken), read by
+     *  recovery as the watermark post-break evidence must postdate. Usage
+     *  rows can NOT serve as this watermark: call.ts logs the same outcome
+     *  on every post-break 503 rejection, so retry traffic would advance it
+     *  forever and recovery would never fire. Stale on re-activated tools
+     *  (harmless: recovery only reads it while status='circuit_broken'). */
+    broken_at?: string;
   };
   status: ToolStatus;
   domain?: string;
@@ -343,10 +350,11 @@ export interface Storage {
    *  `sinceIso`. Output-stage only: input-stage violations are caller-fault
    *  and never count against the tool. */
   outputViolationCountForTool(toolId: string, sinceIso: string): Promise<number>;
-  /** Newest usage outcome='circuit_broken' timestamp for the tool — the
-   *  break event recovery evidence must postdate; null = no recorded break
-   *  (recovery fails closed). */
-  lastCircuitBreakAt(toolId: string): Promise<string | null>;
+  /** The D34 circuit-break flip, atomically: status='circuit_broken' AND
+   *  metadata.broken_at=atIso in one write. broken_at is the watermark
+   *  recovery evidence must postdate; recorded ONCE at the transition
+   *  (post-break 503 rejections must never advance it). */
+  markCircuitBroken(toolId: string, atIso: string): Promise<void>;
 
   // Agent auth (used by /push, /call, /discover guards)
   getAgentByKeyHash(hash: string): Promise<AgentRow | null>;

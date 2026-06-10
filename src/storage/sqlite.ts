@@ -796,16 +796,23 @@ export class SqliteStorage implements Storage {
     return row?.n ?? 0;
   }
 
-  async lastCircuitBreakAt(toolId: string): Promise<string | null> {
-    // call.ts logs outcome='circuit_broken' at every break, so the newest
-    // such row IS the break timestamp recovery evidence must postdate.
-    const row = this.db
-      .prepare<[string], { at: string | null }>(
-        `SELECT MAX(occurred_at) AS at FROM usage
-         WHERE tool_id = ? AND outcome = 'circuit_broken'`,
-      )
-      .get(toolId);
-    return row?.at ?? null;
+  async markCircuitBroken(toolId: string, atIso: string): Promise<void> {
+    // The break transition, recorded ONCE: usage rows cannot serve as the
+    // recovery watermark because call.ts logs outcome='circuit_broken' on
+    // every post-break 503 rejection too — retry traffic would advance a
+    // MAX(occurred_at) watermark forever and recovery would never fire
+    // (codex P2 + independent-review HIGH, convergent).
+    await this.queue.run(() => {
+      this.db
+        .prepare(
+          `UPDATE tools
+           SET status = 'circuit_broken',
+               metadata = json_set(metadata, '$.broken_at', ?),
+               updated_at = ?
+           WHERE id = ?`,
+        )
+        .run(atIso, new Date().toISOString(), toolId);
+    }, 'tools');
   }
 
   async usageOutcomeCounts(

@@ -157,7 +157,10 @@ export async function call(
     // reverify runs spanning >= 60min, unfiltered sweeps only) — never the
     // reverse, and never touches pending. See services/scoreLifecycle.ts.
     if (tool.output_repair_strategy === 'fail-fast') {
-      await storage.setStatus(tool.id, 'circuit_broken');
+      // Atomic flip + broken_at watermark (recovery evidence must postdate
+      // the TRANSITION; the 503 rejections this tool now answers also log
+      // outcome='circuit_broken' usage rows and must not move the mark).
+      await storage.markCircuitBroken(tool.id, new Date().toISOString());
       await logUsage(storage, tool, agentId, callId, 'circuit_broken', Date.now() - t0, namespace);
       return {
         ok: false,
