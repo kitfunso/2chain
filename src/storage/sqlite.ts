@@ -796,6 +796,18 @@ export class SqliteStorage implements Storage {
     return row?.n ?? 0;
   }
 
+  async lastCircuitBreakAt(toolId: string): Promise<string | null> {
+    // call.ts logs outcome='circuit_broken' at every break, so the newest
+    // such row IS the break timestamp recovery evidence must postdate.
+    const row = this.db
+      .prepare<[string], { at: string | null }>(
+        `SELECT MAX(occurred_at) AS at FROM usage
+         WHERE tool_id = ? AND outcome = 'circuit_broken'`,
+      )
+      .get(toolId);
+    return row?.at ?? null;
+  }
+
   async usageOutcomeCounts(
     limit: number,
     namespace = DEFAULT_NAMESPACE,

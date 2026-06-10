@@ -71,21 +71,15 @@ export async function call(
     return { ok: false, status: 404, error: { code: 'tool_not_found', message: `${input.tool_name}@${input.tool_version} not found` } };
   }
 
-  if (tool.status === 'pending') {
-    await logUsage(storage, tool, agentId, callId, 'gated', Date.now() - t0, namespace);
-    return { ok: false, status: 403, error: { code: 'tool_pending', message: 'tool eval not yet complete' } };
-  }
-  if (tool.status === 'circuit_broken') {
-    await logUsage(storage, tool, agentId, callId, 'circuit_broken', Date.now() - t0, namespace);
-    return { ok: false, status: 503, error: { code: 'circuit_broken', message: `tool ${input.tool_name}@${input.tool_version} is circuit-broken` } };
-  }
-
   // Catalog kinds (skill/subagent/prompt) are discovery-only — agents load
   // skills into context, spawn subagents via the Task tool, and render
   // prompts into context; none is a /call target. Refuse up front instead
   // of returning a stub payload silently. 'prompt' joined in E2: a callable
   // prompt could circuit-break, then be skipped forever by reverify's
-  // catalog-kind partition — a dead end recovery could never reach.
+  // catalog-kind partition — a dead end recovery could never reach. This
+  // check sits ABOVE the status checks so a catalog row circuit-broken
+  // BEFORE E2 answers kind_not_callable (the truthful error) instead of
+  // 503 circuit_broken forever.
   if (tool.tool_kind === 'skill' || tool.tool_kind === 'subagent' || tool.tool_kind === 'prompt') {
     await logUsage(storage, tool, agentId, callId, 'gated', Date.now() - t0, namespace);
     const remedy =
@@ -103,6 +97,15 @@ export async function call(
         details: { tool_name: tool.name, tool_version: tool.version, tool_kind: tool.tool_kind },
       },
     };
+  }
+
+  if (tool.status === 'pending') {
+    await logUsage(storage, tool, agentId, callId, 'gated', Date.now() - t0, namespace);
+    return { ok: false, status: 403, error: { code: 'tool_pending', message: 'tool eval not yet complete' } };
+  }
+  if (tool.status === 'circuit_broken') {
+    await logUsage(storage, tool, agentId, callId, 'circuit_broken', Date.now() - t0, namespace);
+    return { ok: false, status: 503, error: { code: 'circuit_broken', message: `tool ${input.tool_name}@${input.tool_version} is circuit-broken` } };
   }
 
   const score = tool.metadata.reliability_score ?? 0;

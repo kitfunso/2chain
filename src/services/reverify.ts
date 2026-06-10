@@ -251,13 +251,21 @@ async function runSweep(
       // and sorts; `history` already contains the run recorded above).
       // Recovered tools re-enter discover with the evidence-weighted blend
       // written above, not a clean slate.
-      if (
-        isUnfilteredSweep &&
-        tool.status === 'circuit_broken' &&
-        evaluateRecovery(history, RELIABILITY_GATE)
-      ) {
-        await storage.setStatus(tool.id, 'active');
-        summary.recovered.push(`${tool.name}@${tool.version}`);
+      if (isUnfilteredSweep && tool.status === 'circuit_broken') {
+        // Own fail-soft catch: the run above is already recorded and
+        // counted; a recovery failure must neither abort remaining tools
+        // nor double-count this one into `errored` (it retries next sweep).
+        try {
+          const brokenAt = await storage.lastCircuitBreakAt(tool.id);
+          if (evaluateRecovery(history, RELIABILITY_GATE, brokenAt)) {
+            await storage.setStatus(tool.id, 'active');
+            summary.recovered.push(`${tool.name}@${tool.version}`);
+          }
+        } catch (err) {
+          console.warn(
+            `[reverify] recovery check failed for ${tool.name}@${tool.version} (sweep continues): ${(err as Error).message}`,
+          );
+        }
       }
     } catch (err) {
       summary.errored.push({

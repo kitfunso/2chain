@@ -81,11 +81,18 @@ function decayedEvalScore(
   let weighted = 0;
   let total = 0;
   for (const run of evalHistory) {
-    const ageDays = Math.max(0, (nowMs - Date.parse(run.triggered_at)) / MS_PER_DAY);
+    const parsedMs = Date.parse(run.triggered_at);
+    // A NaN age would flow into the blend and then into the materialized
+    // score, where NaN bypasses every gate comparison (NaN < gate is false
+    // — fail-open). Skip unparseable timestamps; ignoring a corrupt row is
+    // conservative.
+    if (!Number.isFinite(parsedMs)) continue;
+    const ageDays = Math.max(0, (nowMs - parsedMs) / MS_PER_DAY);
     const w = Math.pow(0.5, ageDays / HALF_LIFE_DAYS);
     weighted += w * run.pass_rate;
     total += w;
   }
+  if (total === 0) return null;
   return weighted / total;
 }
 
@@ -115,22 +122,31 @@ export function blendReliability(
 /** True iff the tool has earned recovery from circuit_broken (D34
  *  amendment, evaluated by reverify during UNFILTERED sweeps only):
  *
- *  1. ≥ RECOVERY_CONSECUTIVE_CLEAN (3) runs with triggered_by='reverify',
- *     and the 3 most recent all have pass_rate >= gate;
- *  2. the oldest and newest of those 3 are ≥ RECOVERY_MIN_SPAN_MINUTES (60)
- *     apart — the span is measured oldest-to-newest WITHIN the 3 runs (no
- *     `now` param), so evidence must accumulate across real time.
+ *  1. `brokenAt` is known, and ONLY runs strictly after it count — without
+ *     this, a tool with a clean daily-sweep history that is live-broken by
+ *     an output violation the suite does not cover recovers on the FIRST
+ *     next sweep using yesterday's runs (fail-open; code-review HIGH).
+ *     call.ts logs a usage outcome='circuit_broken' row at every break, so
+ *     a missing break timestamp means the evidence trail is gone: fail
+ *     CLOSED (an admin can setStatus manually; recovery never guesses).
+ *  2. ≥ RECOVERY_CONSECUTIVE_CLEAN (3) post-break runs with
+ *     triggered_by='reverify', the 3 most recent all pass_rate >= gate;
+ *  3. the oldest and newest of those 3 are ≥ RECOVERY_MIN_SPAN_MINUTES (60)
+ *     apart — measured oldest-to-newest WITHIN the 3 runs, so evidence
+ *     must accumulate across real time.
  *
  *  Non-reverify runs (push/manual) are ignored: publish-time evals prove
  *  the suite passed once, not that the tool stays healthy in place. */
 export function evaluateRecovery(
   recentReverifyRuns: readonly ReverifyRunPoint[],
   gate: number,
+  brokenAt: string | null,
 ): boolean {
+  if (brokenAt === null) return false;
   const reverifyRuns = recentReverifyRuns
-    .filter((r) => r.triggered_by === 'reverify')
-    // ISO-8601 strings sort lexicographically; newest first.
-    .sort((a, b) => b.triggered_at.localeCompare(a.triggered_at));
+    .filter((r) => r.triggered_by === 'reverify' && r.triggered_at > brokenAt)
+    // ISO-8601 strings sort lexicographically; plain comparison, locale-free.
+    .sort((a, b) => (a.triggered_at < b.triggered_at ? 1 : -1));
   if (reverifyRuns.length < RECOVERY_CONSECUTIVE_CLEAN) return false;
 
   const latest = reverifyRuns.slice(0, RECOVERY_CONSECUTIVE_CLEAN);

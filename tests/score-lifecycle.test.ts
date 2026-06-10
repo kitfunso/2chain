@@ -96,6 +96,19 @@ function repointStub(storage: SqliteStorage, name: string, stub: string): void {
     .run(stub, name, '1.0');
 }
 
+// Insert the usage row call.ts logs at every circuit break — the break
+// timestamp recovery evidence must postdate (fail-closed without it).
+let brkSeq = 0;
+function recordBreak(storage: SqliteStorage, toolId: string, minutesAgo: number): void {
+  brkSeq += 1;
+  rawDb(storage)
+    .prepare(
+      `INSERT INTO usage (id, tool_id, agent_id, namespace_id, call_id, outcome, latency_ms, occurred_at)
+       VALUES (?, ?, 'agent-test', 'default', ?, 'circuit_broken', 5, ?)`,
+    )
+    .run(`brk-${brkSeq}`, toolId, `call-brk-${brkSeq}`, new Date(Date.now() - minutesAgo * MIN_MS).toISOString());
+}
+
 function backdateRun(storage: SqliteStorage, runId: string, minutesAgo: number): void {
   rawDb(storage)
     .prepare(`UPDATE eval_runs SET triggered_at = ? WHERE id = ?`)
@@ -213,15 +226,17 @@ test('blend: a future-dated run (clock skew) clamps to weight 1 — no weight ex
 test('evaluateRecovery: 3 clean spaced reverify runs recover; spam, gaps, and mixed runs do not', () => {
   const now = new Date('2026-06-10T12:00:00.000Z');
   const gate = RELIABILITY_GATE;
+  // Break recorded BEFORE the oldest run in every legacy case below.
+  const broke = (minutesAgo: number) => new Date(now.getTime() - minutesAgo * MIN_MS).toISOString();
 
   // Exactly 3 cleans spanning 90 minutes → true.
   assert.equal(
-    evaluateRecovery([reverifyRun(1.0, 0, now), reverifyRun(1.0, 45, now), reverifyRun(1.0, 90, now)], gate),
+    evaluateRecovery([reverifyRun(1.0, 0, now), reverifyRun(1.0, 45, now), reverifyRun(1.0, 90, now)], gate, broke(200)),
     true,
   );
   // 2 cleans → false.
   assert.equal(
-    evaluateRecovery([reverifyRun(1.0, 0, now), reverifyRun(1.0, 90, now)], gate),
+    evaluateRecovery([reverifyRun(1.0, 0, now), reverifyRun(1.0, 90, now)], gate, broke(200)),
     false,
   );
   // Older failure beyond the 3 most recent does not block: clean-fail-clean-clean-clean.
@@ -232,6 +247,7 @@ test('evaluateRecovery: 3 clean spaced reverify runs recover; spam, gaps, and mi
         reverifyRun(0.0, 120, now), reverifyRun(1.0, 150, now),
       ],
       gate,
+      broke(200),
     ),
     true,
   );
@@ -240,18 +256,19 @@ test('evaluateRecovery: 3 clean spaced reverify runs recover; spam, gaps, and mi
     evaluateRecovery(
       [reverifyRun(1.0, 0, now), reverifyRun(0.4, 45, now), reverifyRun(1.0, 90, now), reverifyRun(1.0, 150, now)],
       gate,
+      broke(200),
     ),
     false,
   );
   // Back-to-back spam (span < 60min) → false: three sweeps of a
   // deterministic suite in two minutes carry the evidence of one.
   assert.equal(
-    evaluateRecovery([reverifyRun(1.0, 0, now), reverifyRun(1.0, 1, now), reverifyRun(1.0, 2, now)], gate),
+    evaluateRecovery([reverifyRun(1.0, 0, now), reverifyRun(1.0, 1, now), reverifyRun(1.0, 2, now)], gate, broke(200)),
     false,
   );
   // Exactly 60 minutes is inclusive.
   assert.equal(
-    evaluateRecovery([reverifyRun(1.0, 0, now), reverifyRun(1.0, 30, now), reverifyRun(1.0, 60, now)], gate),
+    evaluateRecovery([reverifyRun(1.0, 0, now), reverifyRun(1.0, 30, now), reverifyRun(1.0, 60, now)], gate, broke(200)),
     true,
   );
   // Non-reverify runs are ignored: 3 clean push runs + 2 clean reverify → false.
@@ -262,13 +279,25 @@ test('evaluateRecovery: 3 clean spaced reverify runs recover; spam, gaps, and mi
         reverifyRun(1.0, 90, now), reverifyRun(1.0, 180, now),
       ],
       gate,
+      broke(200),
     ),
     false,
   );
   // Input order is irrelevant (module sorts); pass_rate exactly at the gate counts as clean.
   assert.equal(
-    evaluateRecovery([reverifyRun(gate, 90, now), reverifyRun(gate, 0, now), reverifyRun(gate, 45, now)], gate),
+    evaluateRecovery([reverifyRun(gate, 90, now), reverifyRun(gate, 0, now), reverifyRun(gate, 45, now)], gate, broke(200)),
     true,
+  );
+  // POST-BREAK evidence only (code-review HIGH): a break newer than every
+  // run means zero post-break evidence -> false, however clean the history.
+  assert.equal(
+    evaluateRecovery([reverifyRun(1.0, 120, now), reverifyRun(1.0, 60, now), reverifyRun(1.0, 5, now)], gate, now.toISOString()),
+    false,
+  );
+  // No recorded break timestamp -> fail CLOSED, never guess.
+  assert.equal(
+    evaluateRecovery([reverifyRun(1.0, 0, now), reverifyRun(1.0, 45, now), reverifyRun(1.0, 90, now)], gate, null),
+    false,
   );
 });
 
@@ -383,8 +412,11 @@ test('recovery e2e: rot, circuit-break, restore, 3 spaced clean sweeps → activ
     const rotSweep = await reverifyTools(storage);
     assert.deepEqual(rotSweep.gate_dropped, ['phoenix@1.0']);
 
-    // Circuit-break — the same setStatus write call.ts's D34 flip site makes.
+    // Circuit-break — the same setStatus write call.ts's D34 flip site
+    // makes, PLUS the usage row call.ts logs at the break (23h ago: after
+    // the rot run, before every clean run).
     await storage.setStatus(pushed.tool_id, 'circuit_broken');
+    recordBreak(storage, pushed.tool_id, 23 * 60);
 
     // Upstream recovers.
     repointStub(storage, 'phoenix', 'pdf-extractor-v3');
@@ -439,6 +471,7 @@ test('recovery: never fires while the tool is still rotten, even with spacing', 
     const pushed = await pushOk(storage, { name: 'zombie' });
     repointStub(storage, 'zombie', 'rotten-pdf-v1');
     await storage.setStatus(pushed.tool_id, 'circuit_broken');
+    recordBreak(storage, pushed.tool_id, 240);
 
     await reverifyTools(storage);
     await reverifyTools(storage);
@@ -464,6 +497,7 @@ test('recovery: 3 back-to-back clean sweeps do NOT recover (no 60min span); spac
   try {
     const pushed = await pushOk(storage, { name: 'sprinter' });
     await storage.setStatus(pushed.tool_id, 'circuit_broken');
+    recordBreak(storage, pushed.tool_id, 240);
 
     // Three clean sweeps within milliseconds: deterministic-suite spam.
     await reverifyTools(storage);
@@ -494,6 +528,7 @@ test('recovery: filtered requests refresh scores but NEVER flip status; the unfi
   try {
     const pushed = await pushOk(storage, { name: 'gatekeeper' });
     await storage.setStatus(pushed.tool_id, 'circuit_broken');
+    recordBreak(storage, pushed.tool_id, 240);
 
     await reverifyTools(storage);
     await reverifyTools(storage);
@@ -697,6 +732,66 @@ test('errored entries carry {tool, error} diagnostics and the sweep continues', 
       assert.ok(e.error.length > 0, 'the diagnostic message must surface');
       assert.match(e.error, /eval_runs/, 'the real failure cause is visible');
     }
+  } finally {
+    await storage.close();
+  }
+});
+
+// ---- 9. Post-break evidence (code-review HIGH fail-open regression) ----------
+
+test('recovery: a clean PRE-break history never recovers a live-broken tool', async () => {
+  const storage = await freshStorage();
+  try {
+    const pushed = await pushOk(storage, { name: 'sleeper' });
+
+    // A healthy daily-sweep history: 3 clean spaced reverify runs.
+    await reverifyTools(storage);
+    await reverifyTools(storage);
+    await reverifyTools(storage);
+    const runs = await storage.listEvalRunsForTool(pushed.tool_id, 10);
+    const cleans = runs
+      .filter((r) => r.triggered_by === 'reverify')
+      .sort((a, b) => (a.triggered_at < b.triggered_at ? -1 : 1));
+    backdateRun(storage, cleans[0].id!, 180);
+    backdateRun(storage, cleans[1].id!, 120);
+    backdateRun(storage, cleans[2].id!, 90);
+
+    // NOW the live break lands (suite-undetectable rot: the eval suite
+    // still passes, live calls do not).
+    await storage.setStatus(pushed.tool_id, 'circuit_broken');
+    recordBreak(storage, pushed.tool_id, 30);
+
+    // The next sweep records ONE more clean run — yesterday's history must
+    // not count; one post-break run is not 3 spanning 60min.
+    const s = await reverifyTools(storage);
+    assert.deepEqual(s.recovered, [], 'pre-break evidence must never recover a tool');
+    assert.equal((await storage.getToolByNameVersion('sleeper', '1.0'))!.status, 'circuit_broken');
+  } finally {
+    await storage.close();
+  }
+});
+
+test('recovery: no recorded break evidence fails CLOSED', async () => {
+  const storage = await freshStorage();
+  try {
+    const pushed = await pushOk(storage, { name: 'ghost' });
+    // Broken without a usage trail (legacy/manual setStatus only).
+    await storage.setStatus(pushed.tool_id, 'circuit_broken');
+
+    await reverifyTools(storage);
+    await reverifyTools(storage);
+    await reverifyTools(storage);
+    const runs = await storage.listEvalRunsForTool(pushed.tool_id, 10);
+    const cleans = runs
+      .filter((r) => r.triggered_by === 'reverify')
+      .sort((a, b) => (a.triggered_at < b.triggered_at ? -1 : 1));
+    backdateRun(storage, cleans[0].id!, 180);
+    backdateRun(storage, cleans[1].id!, 120);
+    backdateRun(storage, cleans[2].id!, 90);
+
+    const s = await reverifyTools(storage);
+    assert.deepEqual(s.recovered, [], 'no break timestamp -> recovery never guesses');
+    assert.equal((await storage.getToolByNameVersion('ghost', '1.0'))!.status, 'circuit_broken');
   } finally {
     await storage.close();
   }

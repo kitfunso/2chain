@@ -343,6 +343,10 @@ export interface Storage {
    *  `sinceIso`. Output-stage only: input-stage violations are caller-fault
    *  and never count against the tool. */
   outputViolationCountForTool(toolId: string, sinceIso: string): Promise<number>;
+  /** Newest usage outcome='circuit_broken' timestamp for the tool — the
+   *  break event recovery evidence must postdate; null = no recorded break
+   *  (recovery fails closed). */
+  lastCircuitBreakAt(toolId: string): Promise<string | null>;
 
   // Agent auth (used by /push, /call, /discover guards)
   getAgentByKeyHash(hash: string): Promise<AgentRow | null>;

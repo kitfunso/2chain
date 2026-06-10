@@ -113,3 +113,26 @@ test('call rejects tool_kind=prompt with kind_not_callable (E2: prompts are disc
   assert.match(r.error.message, /prompt/);
   assert.match(r.error.message, /Render the prompt template into agent context/);
 });
+
+test('a circuit-broken catalog kind answers kind_not_callable, not circuit_broken (pre-E2 dead-end rows)', async () => {
+  // The kind gate sits ABOVE the status checks: a prompt circuit-broken
+  // BEFORE E2 closed the gate must get the truthful discovery-only error
+  // forever, not 503 circuit_broken (reverify skips catalog kinds, so
+  // recovery can never reach it - the dead end is answered, not hidden).
+  const row = (storage as unknown as {
+    db: { prepare: (s: string) => { get: (...a: unknown[]) => { id: string } } };
+  }).db
+    .prepare(`SELECT id FROM tools WHERE name = ? AND version = ?`)
+    .get('commit-prompt', '1.0');
+  await storage.setStatus(row.id, 'circuit_broken');
+
+  const r = await call(storage, 'agent-1', 'caller', {
+    tool_name: 'commit-prompt',
+    tool_version: '1.0',
+    input: { vars: {} },
+  });
+  assert.equal(r.ok, false);
+  if (r.ok) return;
+  assert.equal(r.status, 400, 'kind gate fires before the circuit_broken 503');
+  assert.equal(r.error.code, 'kind_not_callable');
+});
