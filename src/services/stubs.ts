@@ -215,6 +215,18 @@ registerStub('pdf-extractor-v3', (input, caseId) => {
 });
 
 // =====================================================================
+// rotten-pdf v1.0 — deterministically FAILS every pdf-extraction grader
+// (returns zero rows, so every numeric_tolerance row-count check misses).
+// Rot fixture for the E1 re-verification engine: tests re-point a healthy
+// tool's endpoint_stub_name here to simulate post-publish upstream rot
+// with no mocks (CLAUDE.md rule 5). First-party and inert: registered
+// like every other stub (rule 12) but referenced by NO seeded/demo tool.
+// =====================================================================
+registerStub('rotten-pdf-v1', (_input, _caseId) => {
+  return { rows: [] };
+});
+
+// =====================================================================
 // pdf-extractor v3.1 — decimal-comma swap bug
 // Returns wrong numeric values for non-integer cases (financial-numbers,
 // negative-number, currency-symbol-strip). single-row (42.0) and

@@ -70,12 +70,59 @@ async function call(toolNameVer, caseId, inputJson) {
   }
 }
 
+async function reverify(args) {
+  let body = {};
+  // Strict args on a mutating verb: a forgotten '--tool' (e.g.
+  // `2chain reverify pdf-extractor@3.0`) must never silently widen into an
+  // unfiltered fleet sweep. Only [] or ['--tool', '<spec>'] are accepted.
+  if (args.length !== 0 && !(args.length === 2 && args[0] === '--tool')) {
+    die('usage: 2chain reverify [--tool name@version]');
+  }
+  const flagIdx = args.indexOf('--tool');
+  if (flagIdx !== -1) {
+    const spec = args[flagIdx + 1];
+    if (!spec) die('usage: 2chain reverify [--tool name@version]');
+    const [name, version] = spec.split('@');
+    if (!name) die('usage: 2chain reverify [--tool name@version]');
+    // A trailing '@' (empty version) on a mutating verb must error, not
+    // silently widen scope to every version of the name.
+    if (spec.includes('@') && !version) die('--tool: version is empty; use name@version or bare name');
+    body = version ? { tool_name: name, tool_version: version } : { tool_name: name };
+  }
+  const t = Date.now();
+  const r = await fetch(`${HOST}/v1/reverify`, {
+    method: 'POST',
+    headers: { 'x-api-key': KEY, 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const j = await r.json();
+  if (!r.ok || !j.ok) {
+    console.error(`reverify failed (${r.status}): ${j.error?.message ?? JSON.stringify(j)}`);
+    process.exit(1);
+  }
+  console.log(`✓ reverify complete (${Date.now() - t}ms)`);
+  console.log(`  executed: ${j.executed}   passed: ${j.passed}   failed: ${j.failed}`);
+  console.log(`  gate-dropped: ${j.gate_dropped.length ? j.gate_dropped.join(', ') : '(none)'}`);
+  if (j.errored?.length) {
+    console.log(`  errored (${j.errored.length}): ${j.errored.join(', ')}`);
+  }
+  if (j.truncated) {
+    console.log('  WARNING: sweep truncated at the list cap; tools beyond it were NOT re-verified');
+  }
+  if (j.skipped.length) {
+    console.log(`  skipped (${j.skipped.length}):`);
+    for (const s of j.skipped) console.log(`    - ${s.name}@${s.version}  (${s.reason})`);
+  }
+}
+
 const HELP = `2chain CLI
 
   2chain push <tool.json>             # publish a tool, run inline evals
   2chain discover "<natural query>"   # query the registry, see ranked top-N
   2chain call <name@version> <case_id> [<input_json>]
                                       # call a tool through the contract layer
+  2chain reverify [--tool name@version]
+                                      # re-run publish-time evals; full sweep is admin-only
 `;
 
 try {
@@ -83,6 +130,7 @@ try {
     case 'push':       if (!rest[0]) die('missing tool.json path'); await push(rest[0]); break;
     case 'discover':   if (!rest[0]) die('missing query'); await discover(rest.join(' ')); break;
     case 'call':       await call(rest[0], rest[1], rest[2]); break;
+    case 'reverify':   await reverify(rest); break;
     case '--help':
     case '-h':
     case undefined:    process.stdout.write(HELP); break;
