@@ -470,3 +470,44 @@ test('drift event write failure is fail-soft: push still succeeds', async () => 
   const events = await storage.listDriftEvents('drift-failsoft');
   assert.equal(events.length, 0, 'the injected failure prevented the event write');
 });
+
+// ---- Fail-open hole regression (code-review HIGH) -------------------------
+// Identically-malformed guard shapes (`required` as a string, `properties` as
+// an array) used to early-return WITHOUT diffing the structure beneath, so a
+// breaking change under them classified `identical` and bypassed the gate.
+// Malformed-but-equal pieces are now treated as empty and the diff continues.
+
+test('differ: identically-malformed required does not mask a retype beneath', () => {
+  const prevSchema = {
+    type: 'object',
+    required: 'not-an-array',
+    properties: { amount: { type: 'number' } },
+  } as Record<string, unknown>;
+  const nextSchema = {
+    type: 'object',
+    required: 'not-an-array',
+    properties: { amount: { type: 'string' } },
+  } as Record<string, unknown>;
+  const diff = diffContracts(prevSchema, nextSchema, 'output');
+  assert.equal(diff.classification, 'breaking', 'retype under malformed required must still classify breaking');
+  assert.ok(
+    diff.changes.some((c) => c.kind === 'type-changed' && c.path.includes('amount')),
+    'the retyped property is named',
+  );
+});
+
+test('differ: identically-malformed properties does not mask a required change', () => {
+  const prevSchema = {
+    type: 'object',
+    properties: ['bogus'],
+    required: ['a'],
+  } as Record<string, unknown>;
+  const nextSchema = {
+    type: 'object',
+    properties: ['bogus'],
+    required: [],
+  } as Record<string, unknown>;
+  // required 'a' removed on OUTPUT = breaking (field may now be absent).
+  const diff = diffContracts(prevSchema, nextSchema, 'output');
+  assert.equal(diff.classification, 'breaking', 'required change under malformed properties must still classify');
+});

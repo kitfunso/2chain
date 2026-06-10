@@ -169,29 +169,30 @@ function diffPropertiesAndRequired(
   direction: DriftDirection,
   changes: ContractChange[],
 ): void {
+  // Malformed guard shapes must NEVER abort the rest of the diff (fail-open
+  // hole, code-review HIGH): identically-malformed `required` on both sides
+  // used to early-return here, so a retyped property beneath it classified
+  // `identical` and bypassed the gate. Malformed pieces are flagged as
+  // unknown-construct when they DIFFER and treated as empty for diffing
+  // either way — the surrounding structure is always still diffed.
   const prevPropsRaw = prev['properties'];
   const nextPropsRaw = next['properties'];
-  if (
+  const propsMalformed =
     (prevPropsRaw !== undefined && !isPlainObject(prevPropsRaw)) ||
-    (nextPropsRaw !== undefined && !isPlainObject(nextPropsRaw))
-  ) {
-    if (canonicalJson(prevPropsRaw) !== canonicalJson(nextPropsRaw)) {
-      changes.push(unknownConstruct(joinPath(path, 'properties'), 'properties is not an object on one side'));
-    }
-    return;
+    (nextPropsRaw !== undefined && !isPlainObject(nextPropsRaw));
+  if (propsMalformed && canonicalJson(prevPropsRaw) !== canonicalJson(nextPropsRaw)) {
+    changes.push(unknownConstruct(joinPath(path, 'properties'), 'properties is not an object on one side'));
   }
   const prevReqArr = stringArrayOrNull(prev['required']);
   const nextReqArr = stringArrayOrNull(next['required']);
-  if (prevReqArr === null || nextReqArr === null) {
-    if (canonicalJson(prev['required']) !== canonicalJson(next['required'])) {
-      changes.push(unknownConstruct(joinPath(path, 'required'), 'required is not a string array on one side'));
-    }
-    return;
+  const reqMalformed = prevReqArr === null || nextReqArr === null;
+  if (reqMalformed && canonicalJson(prev['required']) !== canonicalJson(next['required'])) {
+    changes.push(unknownConstruct(joinPath(path, 'required'), 'required is not a string array on one side'));
   }
-  const prevProps = (prevPropsRaw as Record<string, unknown> | undefined) ?? {};
-  const nextProps = (nextPropsRaw as Record<string, unknown> | undefined) ?? {};
-  const prevReq = new Set(prevReqArr);
-  const nextReq = new Set(nextReqArr);
+  const prevProps = propsMalformed ? {} : ((prevPropsRaw as Record<string, unknown> | undefined) ?? {});
+  const nextProps = propsMalformed ? {} : ((nextPropsRaw as Record<string, unknown> | undefined) ?? {});
+  const prevReq = new Set(prevReqArr ?? []);
+  const nextReq = new Set(nextReqArr ?? []);
 
   for (const key of Object.keys(nextProps).sort()) {
     const propPath = joinPath(path, `properties.${key}`);

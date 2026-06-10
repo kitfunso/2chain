@@ -208,12 +208,14 @@ export async function push(
   // an event-write failure logs and the push still succeeds — a registered
   // tool's push must never 500 on a post-commit side effect.
   if (drift) {
-    try {
-      for (const [direction, diff] of [
-        ['input', drift.input],
-        ['output', drift.output],
-      ] as const) {
-        if (diff.classification === 'identical') continue;
+    // Per-direction try/catch: an input-event write failure must not abort
+    // the output event — the audit trail degrades per-row, not wholesale.
+    for (const [direction, diff] of [
+      ['input', drift.input],
+      ['output', drift.output],
+    ] as const) {
+      if (diff.classification === 'identical') continue;
+      try {
         await storage.insertDriftEvent({
           namespace_id: namespace,
           tool_name: body.name,
@@ -225,11 +227,11 @@ export async function push(
           author_agent_id: authorAgentId,
           created_at: new Date().toISOString(),
         });
+      } catch (err) {
+        console.warn(
+          `[push] ${direction} drift event write failed for ${body.name}@${body.version} (push still ok): ${(err as Error).message}`,
+        );
       }
-    } catch (err) {
-      console.warn(
-        `[push] drift event write failed for ${body.name}@${body.version} (push still ok): ${(err as Error).message}`,
-      );
     }
   }
 
