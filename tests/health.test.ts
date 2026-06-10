@@ -124,6 +124,8 @@ async function seedAgents(storage: SqliteStorage): Promise<{ caller: string; aut
 
 // ---- 1. Healthy multi-version tool -----------------------------------------
 
+// Versions are NEWEST-FIRST: the report caps at HEALTH_VERSIONS_LIMIT and
+// must keep the newest, so ordering is part of the contract.
 test('multi-version tool: both versions present with scores and last_eval_run', async () => {
   const storage = await freshStorage();
   try {
@@ -134,7 +136,7 @@ test('multi-version tool: both versions present with scores and last_eval_run', 
     assert.ok(report);
     assert.equal(report.name, 'multi-ver');
     assert.equal(report.versions.length, 2);
-    assert.deepEqual(report.versions.map((v) => v.version), ['1.0', '2.0']);
+    assert.deepEqual(report.versions.map((v) => v.version), ['2.0', '1.0']);
 
     const runs = await storage.listEvalRuns(500);
     for (const v of report.versions) {
@@ -528,7 +530,7 @@ test('dashboard health renderer: every payload interpolation site is escapeHtml-
   // Every access to a string-bearing health-payload field inside the region
   // must be the direct argument of escapeHtml( — author-controlled strings
   // (version, drift paths, triggered_by, ...) must never reach innerHTML raw.
-  const FIELD_ACCESS = /\b[A-Za-z_$][\w$]*\.(name|version|from_version|to_version|direction|classification|created_at|last_eval_run|triggered_by|at)\b/g;
+  const FIELD_ACCESS = /\b[A-Za-z_$][\w$]*\.(name|version|from_version|to_version|direction|classification|created_at|last_eval_run|triggered_by|at|status)\b/g;
   const WRAP = 'escapeHtml(';
   let sites = 0;
   for (const m of region.matchAll(FIELD_ACCESS)) {

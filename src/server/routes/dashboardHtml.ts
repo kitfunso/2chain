@@ -1150,10 +1150,19 @@ export const DASHBOARD_HTML = `<!doctype html>
     const seq = ++healthSeq;
     try {
       const r = await fetch('/health-view/' + encodeURIComponent(name));
+      if (!r.ok) {
+        if (seq === healthSeq && state.healthName === name) renderHealth(null);
+        return;
+      }
+      // The body downloads during json() - the guard must run AFTER it, or a
+      // slow earlier fetch can finish last and render over a newer selection.
+      const payload = await r.json();
       if (seq !== healthSeq || state.healthName !== name) return;
-      if (!r.ok) { renderHealth(null); return; }
-      renderHealth(await r.json());
-    } catch (e) { /* transient fetch failure: keep the last rendered panel */ }
+      renderHealth(payload);
+    } catch (e) {
+      // Never leave a previous tool's panel under a new selection's header.
+      if (seq === healthSeq && state.healthName === name) renderHealth(null);
+    }
   }
   // ---- end health panel (E4) ------------------------------------------------
 
