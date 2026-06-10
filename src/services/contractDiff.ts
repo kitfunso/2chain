@@ -83,13 +83,24 @@ function stringArrayOrNull(value: unknown): string[] | null {
   return null;
 }
 
+function normalizeType(value: unknown): unknown {
+  // JSON Schema treats a `type` ARRAY as an unordered union — a pure reorder
+  // (['string','null'] -> ['null','string']) is the same contract. Sort
+  // string members for comparison; anything non-string passes through and
+  // falls to canonical inequality (conservative).
+  if (Array.isArray(value) && value.every((v) => typeof v === 'string')) {
+    return [...value].sort();
+  }
+  return value;
+}
+
 function diffType(
   prev: Record<string, unknown>,
   next: Record<string, unknown>,
   path: string,
   changes: ContractChange[],
 ): void {
-  if (canonicalJson(prev['type']) === canonicalJson(next['type'])) return;
+  if (canonicalJson(normalizeType(prev['type'])) === canonicalJson(normalizeType(next['type']))) return;
   // Retyped: breaking in BOTH directions per the rule table.
   changes.push({
     path: joinPath(path, 'type'),

@@ -115,11 +115,26 @@ export async function push(
   }
 
   // Contract drift check (E3) — after ownership, BEFORE embed (fail fast, no
-  // wasted embed cost). Drift is exactly: new version vs the latest prior
-  // version of the same name, same author.
+  // wasted embed cost). Baseline = the greatest existing version LOWER than
+  // the pushed one (its predecessor in the version line), NOT the global max:
+  // diffing against the global max both rejects legitimate backports whose
+  // contracts match their own line AND fails open when a lower-line push
+  // matches the newest major while breaking its actual predecessor (codex P2
+  // + independent-review MED, convergent). A push below every existing
+  // version has no predecessor and skips the check, like a first version.
   let prior: ToolV2 | null = null;
-  for (const t of sameName) {
-    if (!prior || compareVersions(t.version, prior.version) > 0) prior = t;
+  if (majorOf(body.version) === null && sameName.length > 0) {
+    // Unorderable pushed version: a predecessor cannot be determined, so the
+    // check must not silently skip (fail-open). Diff against the global max
+    // and let the unordered-version gate branch reject any breaking change.
+    for (const t of sameName) {
+      if (!prior || compareVersions(t.version, prior.version) > 0) prior = t;
+    }
+  } else {
+    for (const t of sameName) {
+      if (compareVersions(t.version, body.version) >= 0) continue;
+      if (!prior || compareVersions(t.version, prior.version) > 0) prior = t;
+    }
   }
   let drift: DriftSummary | undefined;
   if (prior) {

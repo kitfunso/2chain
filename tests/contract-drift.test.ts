@@ -511,3 +511,39 @@ test('differ: identically-malformed properties does not mask a required change',
   const diff = diffContracts(prevSchema, nextSchema, 'output');
   assert.equal(diff.classification, 'breaking', 'required change under malformed properties must still classify');
 });
+
+// ---- Baseline selection (codex P2-1 + independent MED, convergent) --------
+// Prior = the predecessor in the version line (greatest version BELOW the
+// push), not the global max. Global-max selection both rejected legitimate
+// backports AND failed open: 1.1 matching 2.0's contract bypassed the gate
+// while breaking 1.0 callers.
+
+test('baseline: lower-line push diffs against its predecessor, not the global max', async () => {
+  const OUT_NUM = schema({ v: num }, { required: ['v'], additionalProperties: false });
+  const OUT_STR = schema({ v: str }, { required: ['v'], additionalProperties: false });
+
+  // 1.0 returns a number; 2.0 legitimately retyped to string via major bump.
+  assert.equal((await pushVersion('line-tool', '1.0', IN_BASE, OUT_NUM)).ok, true);
+  assert.equal((await pushVersion('line-tool', '2.0', IN_BASE, OUT_STR)).ok, true);
+
+  // Pushing 1.1 with the STRING contract matches 2.0 but breaks the 1.x
+  // line - must be rejected against predecessor 1.0, not global max 2.0.
+  const sneaky = await pushVersion('line-tool', '1.1', IN_BASE, OUT_STR);
+  assert.equal(sneaky.ok, false, 'gate must compare 1.1 against 1.0, not 2.0');
+  if (sneaky.ok) return;
+  assert.equal(sneaky.code, 'breaking_contract_requires_major_bump');
+  assert.ok(sneaky.details);
+  assert.equal(sneaky.details['from_version'], '1.0');
+
+  // A backport compatible with ITS line is allowed (was a false positive
+  // under global-max selection: 1.1 vs 2.0 demanded major > 2).
+  const backport = await pushVersion('line-tool', '1.1', IN_BASE, OUT_NUM);
+  assert.equal(backport.ok, true, 'line-compatible backport must be allowed');
+});
+
+test('differ: type-array reorder is not a change', () => {
+  const prevSchema = { type: 'object', properties: { v: { type: ['string', 'null'] } } } as Record<string, unknown>;
+  const nextSchema = { type: 'object', properties: { v: { type: ['null', 'string'] } } } as Record<string, unknown>;
+  const diff = diffContracts(prevSchema, nextSchema, 'input');
+  assert.equal(diff.classification, 'identical', 'pure type-array reorder is the same contract');
+});
