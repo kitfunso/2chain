@@ -1149,7 +1149,13 @@ export const DASHBOARD_HTML = `<!doctype html>
   // Stale-response guard: only the newest in-flight fetch may render, and only
   // if the user has not selected a different tool since it was issued.
   let healthSeq = 0;
+  let healthInFlightName = null;
   async function loadHealth(name) {
+    // In-flight dedupe: a second request for the SAME name while one is
+    // pending costs an extra fetch fan-out for an identical answer (the
+    // renderDetail + SSE-listener double-fire).
+    if (healthInFlightName === name) return;
+    healthInFlightName = name;
     state.healthName = name;
     const seq = ++healthSeq;
     // Clear immediately: the seq guard stops LATE overwrites, but without
@@ -1170,6 +1176,8 @@ export const DASHBOARD_HTML = `<!doctype html>
     } catch (e) {
       // Never leave a previous tool's panel under a new selection's header.
       if (seq === healthSeq && state.healthName === name) renderHealth(null);
+    } finally {
+      if (healthInFlightName === name) healthInFlightName = null;
     }
   }
   // ---- end health panel (E4) ------------------------------------------------
@@ -1208,10 +1216,12 @@ export const DASHBOARD_HTML = `<!doctype html>
         if (t) renderDetail(t);
       }
       pushFeed('<span class="chip dscv">DSCV</span> "' + (d.query || '').slice(0, 50) + '" → ' + (d.results || []).length + ' res ' + (meta.total_ms || 0) + 'ms');
-      // discover_ran fires on every tools-table write (watchChanges →
-      // rerankAndBroadcast) — covers pushes and reverify score writes, so
-      // refresh the open health panel. No polling.
-      if (state.healthName) loadHealth(state.healthName);
+      // Refresh the open panel ONLY for write-driven events: the watcher and
+      // post-sweep broadcasts carry a trigger field ('insert'/'update'/
+      // 'delete'/'reverify-sweep'); ordinary /discover searches broadcast
+      // WITHOUT one, and refreshing on those amplifies normal search
+      // traffic into per-version health queries (codex P2). No polling.
+      if (state.healthName && d.trigger) loadHealth(state.healthName);
     });
 
     es.addEventListener('tool_invoked', (e) => {
