@@ -268,7 +268,11 @@ async function runSweep(
           // markCircuitBroken — never derived from usage rows (rejections
           // share the same outcome value and would advance it forever).
           const brokenAt = tool.metadata.broken_at ?? null;
-          if (evaluateRecovery(history, RELIABILITY_GATE, brokenAt)) {
+          // Reverify-only window, filtered BEFORE the limit: the blend's
+          // mixed-trigger history cap could starve out the latest reverify
+          // runs and leave a recovered tool broken (codex cap round).
+          const reverifyRuns = await storage.listEvalRunsForTool(tool.id, 10, 'reverify');
+          if (evaluateRecovery(reverifyRuns, RELIABILITY_GATE, brokenAt)) {
             await storage.setStatus(tool.id, 'active');
             summary.recovered.push(`${tool.name}@${tool.version}`);
           }

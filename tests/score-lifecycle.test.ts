@@ -420,9 +420,9 @@ test('recovery e2e: rot, circuit-break, restore, 3 spaced clean sweeps → activ
     const rotSweep = await reverifyTools(storage);
     assert.deepEqual(rotSweep.gate_dropped, ['phoenix@1.0']);
 
-    // Circuit-break — the same setStatus write call.ts's D34 flip site
-    // makes, PLUS the usage row call.ts logs at the break (23h ago: after
-    // the rot run, before every clean run).
+    // Circuit-break via the REAL transition path (markCircuitBroken: atomic
+    // status + broken_at watermark), backdated 23h: after the rot run,
+    // before every clean run.
     await recordBreak(storage, pushed.tool_id, 23 * 60);
 
     // Upstream recovers.
@@ -829,6 +829,26 @@ test('recovery: post-break 503 rejections never advance the watermark (liveness)
     const s = await reverifyTools(storage);
     assert.deepEqual(s.recovered, ['retried@1.0'], 'rejections carry no health evidence and must not block recovery');
     assert.equal((await storage.getToolByNameVersion('retried', '1.0'))!.status, 'active');
+  } finally {
+    await storage.close();
+  }
+});
+
+test('markCircuitBroken: the transition winner stamps broken_at; losers are no-ops', async () => {
+  const storage = await freshStorage();
+  try {
+    const pushed = await pushOk(storage, { name: 'contested' });
+    const first = new Date(Date.now() - 120 * MIN_MS).toISOString();
+    const second = new Date(Date.now() - 5 * MIN_MS).toISOString();
+
+    // Two in-flight calls both fail validation and both queue the flip;
+    // the second write must not re-stamp the watermark.
+    await storage.markCircuitBroken(pushed.tool_id, first);
+    await storage.markCircuitBroken(pushed.tool_id, second);
+
+    const tool = await storage.getToolByNameVersion('contested', '1.0');
+    assert.equal(tool!.status, 'circuit_broken');
+    assert.equal(tool!.metadata.broken_at, first, 'losing concurrent flip must not advance the watermark');
   } finally {
     await storage.close();
   }

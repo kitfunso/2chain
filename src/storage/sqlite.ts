@@ -749,15 +749,27 @@ export class SqliteStorage implements Storage {
 
   // ----- Reliability lifecycle reads (E2) ----------------------------------
 
-  async listEvalRunsForTool(toolId: string, limit: number): Promise<EvalRunRow[]> {
+  async listEvalRunsForTool(
+    toolId: string,
+    limit: number,
+    triggeredBy?: string,
+  ): Promise<EvalRunRow[]> {
     // Rides idx_eval_runs_tool for the lookup; sorting the per-tool slice is
     // fine at per-tool scale (composite (tool_id, triggered_at) index noted
-    // as a future option, not added speculatively).
-    const rows = this.db
-      .prepare<[string, number], any>(
-        `SELECT * FROM eval_runs WHERE tool_id = ? ORDER BY triggered_at DESC LIMIT ?`,
-      )
-      .all(toolId, limit);
+    // as a future option, not added speculatively). The optional triggeredBy
+    // filter applies BEFORE the limit: recovery's reverify-only window must
+    // not be starved by other-trigger rows filling the cap (codex cap round).
+    const rows = triggeredBy
+      ? this.db
+          .prepare<[string, string, number], any>(
+            `SELECT * FROM eval_runs WHERE tool_id = ? AND triggered_by = ? ORDER BY triggered_at DESC LIMIT ?`,
+          )
+          .all(toolId, triggeredBy, limit)
+      : this.db
+          .prepare<[string, number], any>(
+            `SELECT * FROM eval_runs WHERE tool_id = ? ORDER BY triggered_at DESC LIMIT ?`,
+          )
+          .all(toolId, limit);
     return rows.map((r) => this.mapEvalRun(r));
   }
 
@@ -805,11 +817,15 @@ export class SqliteStorage implements Storage {
     await this.queue.run(() => {
       this.db
         .prepare(
+          // Transition-winner-only (codex cap round): two in-flight calls
+          // can both fail validation and both queue this write; the loser
+          // must not re-stamp broken_at (recovery evidence would be
+          // measured from the wrong, later transition).
           `UPDATE tools
            SET status = 'circuit_broken',
                metadata = json_set(metadata, '$.broken_at', ?),
                updated_at = ?
-           WHERE id = ?`,
+           WHERE id = ? AND status != 'circuit_broken'`,
         )
         .run(atIso, new Date().toISOString(), toolId);
     }, 'tools');

@@ -338,7 +338,7 @@ export interface Storage {
    *  idx_eval_runs_tool; the per-tool sort after lookup is fine at
    *  per-tool scale (a composite (tool_id, triggered_at) index is a
    *  future option, not added speculatively). */
-  listEvalRunsForTool(toolId: string, limit: number): Promise<EvalRunRow[]>;
+  listEvalRunsForTool(toolId: string, limit: number, triggeredBy?: string): Promise<EvalRunRow[]>;
   /** Per-tool usage outcome counts since `sinceIso` (the caller computes
    *  the window, e.g. USAGE_WINDOW_DAYS). All outcomes are returned; the
    *  scoring layer decides which count as evidence. */

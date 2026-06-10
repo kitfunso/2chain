@@ -126,9 +126,13 @@ export function blendReliability(
  *     this, a tool with a clean daily-sweep history that is live-broken by
  *     an output violation the suite does not cover recovers on the FIRST
  *     next sweep using yesterday's runs (fail-open; code-review HIGH).
- *     call.ts logs a usage outcome='circuit_broken' row at every break, so
- *     a missing break timestamp means the evidence trail is gone: fail
- *     CLOSED (an admin can setStatus manually; recovery never guesses).
+ *     `brokenAt` is metadata.broken_at, written ONCE at the transition by
+ *     Storage.markCircuitBroken. It must NEVER be derived from usage rows:
+ *     call.ts logs outcome='circuit_broken' on every post-break 503
+ *     rejection too, so a usage-derived watermark advances with retry
+ *     traffic and recovery never fires (the round-1 liveness bug). A
+ *     missing marker (legacy/manual setStatus break) fails CLOSED — an
+ *     admin can setStatus manually; recovery never guesses.
  *  2. ≥ RECOVERY_CONSECUTIVE_CLEAN (3) post-break runs with
  *     triggered_by='reverify', the 3 most recent all pass_rate >= gate;
  *  3. the oldest and newest of those 3 are ≥ RECOVERY_MIN_SPAN_MINUTES (60)
