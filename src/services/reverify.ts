@@ -26,28 +26,35 @@ export interface ReverifySummary {
   failed: number;
   skipped: Array<{ name: string; version: string; reason: ReverifySkipReason }>;
   gate_dropped: string[];
+  /** True when the sweep hit SWEEP_LIST_LIMIT — tools beyond it were NOT
+   *  re-verified this run (truncation honesty: never report a capped sweep
+   *  as full coverage). */
+  truncated: boolean;
 }
 
 export interface ReverifyOpts {
   toolName?: string;
   toolVersion?: string;
-  namespace?: string;
 }
 
 export async function reverifyTools(
   storage: Storage,
   opts: ReverifyOpts = {},
 ): Promise<ReverifySummary> {
-  const namespace = opts.namespace ?? DEFAULT_NAMESPACE;
   const summary: ReverifySummary = {
     executed: 0,
     passed: 0,
     failed: 0,
     skipped: [],
     gate_dropped: [],
+    truncated: false,
   };
 
-  let tools: ToolV2[] = await storage.listTools({ namespace, limit: SWEEP_LIST_LIMIT });
+  let tools: ToolV2[] = await storage.listTools({
+    namespace: DEFAULT_NAMESPACE,
+    limit: SWEEP_LIST_LIMIT,
+  });
+  summary.truncated = tools.length === SWEEP_LIST_LIMIT;
   if (opts.toolName) {
     tools = tools.filter(
       (t) =>
@@ -85,6 +92,12 @@ export async function reverifyTools(
       cost_per_call_usd: tool.metadata.cost_per_call_usd,
     });
 
+    // NOTE (E2): insertEvalRun + updateToolAfterEval are sequential queue
+    // writes, not one transaction. A crash between them leaves an eval_runs
+    // row not yet reflected in reliability_score — self-healing under E1's
+    // latest-pass_rate semantics (the next deterministic re-run converges),
+    // but E2's decay/blend must either wrap these in a tx or tolerate the
+    // orphan row when reading the time series.
     await storage.insertEvalRun({
       tool_id: tool.id,
       tool_name: tool.name,

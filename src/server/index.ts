@@ -58,8 +58,16 @@ export async function buildServer(): Promise<FastifyInstance> {
 
   // Opt-in continuous re-verification. REVERIFY_INTERVAL_MIN unset = OFF so
   // fly.io / laptop deployments opt in deliberately (no surprise CPU).
+  // Cap: setInterval delays above 2^31-1 ms overflow and Node clamps the
+  // interval to 1ms — an absurd REVERIFY_INTERVAL_MIN would hot-loop the
+  // sweep back-to-back. ~24 days is the largest safe interval.
+  const REVERIFY_INTERVAL_MAX_MIN = 35_000;
   const reverifyIntervalMin = Number(process.env.REVERIFY_INTERVAL_MIN);
-  if (Number.isFinite(reverifyIntervalMin) && reverifyIntervalMin > 0) {
+  if (
+    Number.isFinite(reverifyIntervalMin) &&
+    reverifyIntervalMin > 0 &&
+    reverifyIntervalMin <= REVERIFY_INTERVAL_MAX_MIN
+  ) {
     // In-flight guard: a slow sweep must never overlap the next tick.
     let reverifyInFlight = false;
     const reverifyTimer = setInterval(() => {
@@ -76,6 +84,11 @@ export async function buildServer(): Promise<FastifyInstance> {
     reverifyTimer.unref();
     app.log.info({ interval_min: reverifyIntervalMin }, 'reverify interval enabled');
     app.addHook('onClose', async () => clearInterval(reverifyTimer));
+  } else if (Number.isFinite(reverifyIntervalMin) && reverifyIntervalMin > REVERIFY_INTERVAL_MAX_MIN) {
+    app.log.warn(
+      { interval_min: reverifyIntervalMin, max_min: REVERIFY_INTERVAL_MAX_MIN },
+      'REVERIFY_INTERVAL_MIN exceeds the setInterval-safe maximum; interval disabled',
+    );
   }
 
   // Pre-warm prewarm queries so demo cold-call is sub-100ms.
