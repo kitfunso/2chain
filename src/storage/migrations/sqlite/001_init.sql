@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS eval_runs (
   tool_version   TEXT NOT NULL,
   namespace_id   TEXT NOT NULL DEFAULT 'default',
   triggered_at   TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
-  triggered_by   TEXT NOT NULL,                                     -- push|manual|scheduled
+  triggered_by   TEXT NOT NULL,                                     -- push|manual|scheduled|reverify
   cases          TEXT NOT NULL,                                     -- JSON array of case results
   pass_count     INTEGER NOT NULL,
   total_count    INTEGER NOT NULL,

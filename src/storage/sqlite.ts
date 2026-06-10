@@ -761,7 +761,7 @@ export class SqliteStorage implements Storage {
     return rows.map((r) => this.mapEvalRun(r));
   }
 
-  // ----- Per-tool evidence reads (E4; signatures shared with parked E2) -----
+  // ----- Reliability lifecycle reads (E2) ----------------------------------
 
   async listEvalRunsForTool(
     toolId: string,
@@ -807,6 +807,42 @@ export class SqliteStorage implements Storage {
     };
     for (const r of rows) out[r.outcome] = r.n;
     return out;
+  }
+
+  async outputViolationCountForTool(
+    toolId: string,
+    sinceIso: string,
+  ): Promise<number> {
+    const row = this.db
+      .prepare<[string, string], { n: number }>(
+        `SELECT COUNT(*) AS n FROM violations
+         WHERE tool_id = ? AND stage = 'output' AND occurred_at >= ?`,
+      )
+      .get(toolId, sinceIso);
+    return row?.n ?? 0;
+  }
+
+  async markCircuitBroken(toolId: string, atIso: string): Promise<void> {
+    // The break transition, recorded ONCE: usage rows cannot serve as the
+    // recovery watermark because call.ts logs outcome='circuit_broken' on
+    // every post-break 503 rejection too — retry traffic would advance a
+    // MAX(occurred_at) watermark forever and recovery would never fire
+    // (codex P2 + independent-review HIGH, convergent).
+    await this.queue.run(() => {
+      this.db
+        .prepare(
+          // Transition-winner-only (codex cap round): two in-flight calls
+          // can both fail validation and both queue this write; the loser
+          // must not re-stamp broken_at (recovery evidence would be
+          // measured from the wrong, later transition).
+          `UPDATE tools
+           SET status = 'circuit_broken',
+               metadata = json_set(metadata, '$.broken_at', ?),
+               updated_at = ?
+           WHERE id = ? AND status != 'circuit_broken'`,
+        )
+        .run(atIso, new Date().toISOString(), toolId);
+    }, 'tools');
   }
 
   async usageOutcomeCounts(
