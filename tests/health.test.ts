@@ -18,6 +18,7 @@ import {
   toolHealth,
   SCORE_HISTORY_LIMIT,
   DRIFT_EVENTS_LIMIT,
+  HEALTH_VERSIONS_LIMIT,
 } from '../src/services/health.js';
 import { registerHealthRoutes } from '../src/server/routes/health.js';
 import { DASHBOARD_HTML } from '../src/server/routes/dashboardHtml.js';
@@ -600,6 +601,70 @@ test('security: no `changes` key on any drift event in EITHER route payload', as
     }
   } finally {
     await app.close();
+    await storage.close();
+  }
+});
+
+// ---- Version cap (fix-commit regression: HEALTH_VERSIONS_LIMIT) ----------
+
+test('report enumerates only the newest HEALTH_VERSIONS_LIMIT versions', async () => {
+  const storage = await freshStorage();
+  try {
+    // Raw rows (no evals needed): listToolsByName reads the tools table and
+    // the per-version evidence queries tolerate empty histories.
+    const db = rawDb(storage);
+    const base = Date.now();
+    for (let i = 1; i <= HEALTH_VERSIONS_LIMIT + 5; i++) {
+      db.prepare(
+        `INSERT INTO tools (id, namespace_id, name, version, author_agent_id, capability_text,
+           capability_embedding, input_contract, output_contract, output_repair_strategy,
+           endpoint_stub_name, metadata, status, tool_kind, created_at, updated_at)
+         VALUES (?, 'default', 'many-ver', ?, 'agent-author', 'cap test',
+           ?, '{}', '{}', 'fail-fast', 'pdf-extractor-v3',
+           '{"cost_per_call_usd":0,"p95_latency_ms":1,"reliability_score":1}', 'active', 'tool', ?, ?)`,
+      ).run(
+        `cap-${i}`,
+        `0.${i}`,
+        Buffer.alloc(768 * 4),
+        new Date(base - (HEALTH_VERSIONS_LIMIT + 5 - i) * 60_000).toISOString(),
+        new Date(base).toISOString(),
+      );
+    }
+    const report = await toolHealth(storage, 'many-ver');
+    assert.ok(report);
+    assert.equal(report.versions.length, HEALTH_VERSIONS_LIMIT, 'report bounded at the cap');
+    assert.equal(report.versions[0].version, `0.${HEALTH_VERSIONS_LIMIT + 5}`, 'newest kept first');
+    assert.ok(
+      !report.versions.some((v) => v.version === '0.1'),
+      'oldest versions fall past the cap',
+    );
+  } finally {
+    await storage.close();
+  }
+});
+
+test('route round-trips URL-encoded HTML-special names safely', async () => {
+  const storage = await freshStorage();
+  try {
+    // push has no name-charset validation: a name with spaces and angle
+    // brackets is storable and must round-trip through the path param.
+    const weird = 'odd <tool> name';
+    await pushOk(storage, { name: weird, version: '1.0' });
+    const app = Fastify();
+    registerHealthRoutes(app, storage);
+    try {
+      const res = await app.inject({
+        method: 'GET',
+        url: `/health-view/${encodeURIComponent(weird)}`,
+      });
+      assert.equal(res.statusCode, 200);
+      const body = res.json();
+      assert.equal(body.name, weird, 'decoded name matches exactly');
+      assert.equal(body.versions.length, 1);
+    } finally {
+      await app.close();
+    }
+  } finally {
     await storage.close();
   }
 });

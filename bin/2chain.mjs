@@ -140,7 +140,8 @@ async function health(args) {
     console.log(`  ${v.version.padEnd(9)} ${statusCol} ${score}   ${String(v.verification_streak).padEnd(7)} ${v.last_eval_run ?? '(never)'}`);
   }
   if (j.drift_events.length) {
-    console.log(`  drift (${j.drift_events.length}):`);
+    // The payload is capped at the newest 10 events; never imply totality.
+    console.log(`  drift (newest ${j.drift_events.length}):`);
     for (const d of j.drift_events) {
       const cls = d.classification === 'breaking' ? `\x1b[31m${d.classification}\x1b[0m` : d.classification;
       console.log(`    - ${d.from_version} → ${d.to_version}  ${d.direction}  ${cls}  (${d.created_at})`);
