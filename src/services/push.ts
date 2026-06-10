@@ -10,8 +10,8 @@ import type {
 } from '../types.js';
 import { DEFAULT_NAMESPACE } from '../types.js';
 import { diffContracts, compareVersions, majorOf } from './contractDiff.js';
-import { runEvals } from './evalRunner.js';
 import { runKindEval } from './kindEvalRunner.js';
+import { runToolEvals } from './runToolEvals.js';
 import { getStub } from './stubs.js';
 import { validateContract } from './contract-bounds.js';
 
@@ -305,13 +305,13 @@ export async function push(
     }
   }
 
-  // Run evals (D34: status always flips to 'active', reliability does the gating)
+  // Run evals (D34: status always flips to 'active', reliability does the gating).
+  // Shared with reverify so grader policy (incl. the malformed-bot lenient
+  // override) can never diverge between publish and re-verification.
   const tEval = Date.now();
-  const isMalformedBot = body.endpoint_stub_name === 'malformed-bot-v1';
-  const evalResult = await runEvals({
+  const evalResult = await runToolEvals({
     endpoint_stub_name: body.endpoint_stub_name,
     cost_per_call_usd: body.metadata.cost_per_call_usd,
-    malformed_bot_lenient_override: isMalformedBot,
   });
   const evalMs = Date.now() - tEval;
 

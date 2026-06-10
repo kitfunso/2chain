@@ -90,6 +90,7 @@
 │   │       ├── discover.ts         # GET /discover -> storage.discoverHybrid()
 │   │       ├── push.ts             # POST /push -> embed + evals + storage.upsert()
 │   │       ├── call.ts             # POST /call -> ajv validation + tool stub + circuit-break
+│   │       ├── reverify.ts         # POST /v1/reverify -> services/reverify.ts (sweep admin-only)
 │   │       └── dashboard.ts        # GET / (HTML), /events (SSE), /state (snapshot)
 │   ├── storage/
 │   │   ├── index.ts                # Storage interface; selects driver via env
@@ -111,6 +112,8 @@
 │   │   ├── contractDiff.ts         # Pure JSON Schema differ + version ordering (E3, no storage)
 │   │   ├── call.ts                 # ajv input -> tool stub -> ajv output -> circuit-break
 │   │   ├── evalRunner.ts           # Run case fixtures -> reliability score
+│   │   ├── runToolEvals.ts         # Shared push/reverify eval invocation (grader-policy parity)
+│   │   ├── reverify.ts             # Re-run publish-time evals over the fleet; re-score, gate-drop rot
 │   │   ├── graders.ts              # numeric_tolerance, regex, length, json_schema_array
 │   │   └── rerank.ts               # Heuristic re-rank: term overlap x reliability x cost
 │   ├── tools/                      # Bundled tool stubs (real-fetch + canned)
@@ -197,6 +200,7 @@ Unchanged from v1 — the whole point is wire-level compatibility.
 | `/discover` | GET | x-api-key | Hybrid retrieval, returns top-K |
 | `/push` | POST | x-api-key (admin) | Register a new tool version |
 | `/call` | POST | x-api-key | Invoke a tool with contract validation |
+| `/v1/reverify` | POST | x-api-key (admin for full sweep; tool_author for single-tool) | Re-run publish-time evals, re-score reliability |
 | `/state` | GET | none (read-only) | Snapshot for dashboard |
 | `/events` | GET | none | SSE: `discover_ran`, `tool_invoked`, `tool_changed`, `eval_completed`, `violation_logged` |
 | `/atlas-stats` | GET | none | Renamed `/db-stats` for v2; backend-agnostic stats |
@@ -212,6 +216,7 @@ MCP surface (stdio):
 | Hybrid retrieval (RRF) | `src/storage/{sqlite,postgres}.ts` | Anything HTTP, anything user-facing |
 | Embedding | `src/embeddings/*.ts` | Storage layer, contract validation |
 | Contract validation | `src/services/call.ts` (uses ajv) | Database driver internals |
+| Re-verification | `src/services/reverify.ts` (shares `runToolEvals.ts` with push so grader policy cannot fork) | Status transitions (only `call.ts` flips `circuit_broken`), tools without an eval suite |
 | Contract drift detection | `src/services/contractDiff.ts` (pure differ + version ordering); gate + event writes in `src/services/push.ts` | Storage, embeddings, HTTP — the differ is a pure module with no imports beyond shared types |
 | Live updates | `src/live/*.ts` | HTTP handlers (only emits events; routes subscribe via SSE manager) |
 | Tool stubs | `src/tools/*.ts` | Storage, embeddings, MCP — they're pure functions |

@@ -328,6 +328,28 @@ export class SqliteStorage implements Storage {
     }, 'tools');
   }
 
+  async recordEvalOutcome(
+    toolId: string,
+    reliabilityScore: number,
+    lastEvalRun: string,
+  ): Promise<void> {
+    // Atomic JSON patch of ONLY the eval-result fields, inside the serialized
+    // write queue. Never touches the status column and never rewrites the
+    // rest of metadata, so a re-verification sweep cannot resurrect a
+    // concurrently circuit-broken tool (the sweep's read-time status may be
+    // minutes stale by write time) nor clobber a concurrent metadata write.
+    await this.queue.run(() => {
+      this.db
+        .prepare(
+          `UPDATE tools
+           SET metadata = json_set(metadata, '$.reliability_score', ?, '$.last_eval_run', ?),
+               updated_at = ?
+           WHERE id = ?`,
+        )
+        .run(reliabilityScore, lastEvalRun, new Date().toISOString(), toolId);
+    }, 'tools');
+  }
+
   // ----- Agents ------------------------------------------------------------
 
   async getAgentByKeyHash(hash: string): Promise<AgentRow | null> {
