@@ -139,6 +139,9 @@ export const STUB_DOMAIN: Record<string, CapabilityDomain> = {
   'pdf-extractor-v3': 'pdf-extraction',
   'pdf-extractor-v3-1': 'pdf-extraction',
   'pdftools-pro-v2': 'pdf-extraction',
+  // Rot fixture for the E1 reverify tests — deterministically fails the
+  // pdf-extraction graders. Used by no seeded/demo tool.
+  'rotten-pdf-v1': 'pdf-extraction',
   'summariser-mini-v1': 'summarisation',
   'code-review-mini-v1': 'code-review',
   'malformed-bot-v1': 'code-review',

@@ -144,7 +144,7 @@ export interface EvalRunRow {
   tool_version: string;
   namespace_id: string;
   triggered_at: string;
-  triggered_by: 'push' | 'manual' | 'scheduled';
+  triggered_by: 'push' | 'manual' | 'scheduled' | 'reverify';
   cases: EvalCaseResultV2[];
   pass_count: number;
   total_count: number;

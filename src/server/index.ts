@@ -6,7 +6,9 @@ import { registerDiscoverRoute } from './routes/discover.js';
 import { registerPushRoute } from './routes/push.js';
 import { registerCallRoute } from './routes/call.js';
 import { registerDashboardRoutes } from './routes/dashboard.js';
+import { registerReverifyRoute } from './routes/reverify.js';
 import { discover, prewarmDiscover, DEMO_AGENT_QUERY, PREWARM_QUERIES } from '../services/discover.js';
+import { reverifyTools } from '../services/reverify.js';
 import { broadcast } from './sse.js';
 import type { Storage, Embedder } from '../types.js';
 // Side-effect: register all stubs in the in-process registry.
@@ -52,6 +54,29 @@ export async function buildServer(): Promise<FastifyInstance> {
   registerPushRoute(app, storage, embedder);
   registerCallRoute(app, storage);
   registerDashboardRoutes(app, storage);
+  registerReverifyRoute(app, storage);
+
+  // Opt-in continuous re-verification. REVERIFY_INTERVAL_MIN unset = OFF so
+  // fly.io / laptop deployments opt in deliberately (no surprise CPU).
+  const reverifyIntervalMin = Number(process.env.REVERIFY_INTERVAL_MIN);
+  if (Number.isFinite(reverifyIntervalMin) && reverifyIntervalMin > 0) {
+    // In-flight guard: a slow sweep must never overlap the next tick.
+    let reverifyInFlight = false;
+    const reverifyTimer = setInterval(() => {
+      if (reverifyInFlight) {
+        app.log.warn('reverify sweep still in flight; skipping this tick');
+        return;
+      }
+      reverifyInFlight = true;
+      reverifyTools(storage)
+        .then((summary) => app.log.info(summary, 'scheduled reverify sweep complete'))
+        .catch((e) => app.log.error({ err: (e as Error).message }, 'scheduled reverify sweep failed'))
+        .finally(() => { reverifyInFlight = false; });
+    }, reverifyIntervalMin * 60_000);
+    reverifyTimer.unref();
+    app.log.info({ interval_min: reverifyIntervalMin }, 'reverify interval enabled');
+    app.addHook('onClose', async () => clearInterval(reverifyTimer));
+  }
 
   // Pre-warm prewarm queries so demo cold-call is sub-100ms.
   prewarmDiscover(embedder)
