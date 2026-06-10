@@ -35,6 +35,7 @@ Both tiers share one product. The difference is deployment topology, not feature
 8. **Two deployment modes** — `npm install -g 2chain` for personal (single binary, embedded SQLite + sqlite-vec fallback if no Postgres available); `docker compose up` for enterprise (Postgres 16 + pgvector + the 2chain server).
 9. **Existing tool fixtures preserved** — the 14 hand-crafted tools including `sec-edgar-financials` and `arxiv-paper-search` migrate as-is. The 185 generated fixtures port over without changes.
 10. **Live dashboard** — single HTML page showing registry, eval runs, violations panel, live call feed. SSE-driven, zero polling.
+11. **Contract drift detection on push** — pushing a new version of an existing tool diffs both JSON Schema contracts against the latest prior version, direction-aware (callers send inputs, consumers receive outputs). A breaking change without a major version bump is rejected (`breaking_contract_requires_major_bump`, full diff in `error.details`); accepted drift is recorded per direction in a `drift_events` audit table. The differ is conservative: unmodeled schema constructs that change classify as breaking.
 
 ## What This Product IS NOT
 

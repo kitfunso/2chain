@@ -26,7 +26,15 @@ export function registerPushRoute(
       const result = await push(storage, embedder, ctx.agent_id, b);
       if (!result.ok) {
         const code = result.code === 'name_owned_by_other' ? 403 : 400;
-        reply.code(code).send({ ok: false, error: { code: result.code, message: result.message } });
+        // Serialize details when present (the /call route's error.details
+        // precedent) — breaking_contract_requires_major_bump carries the
+        // full contract diff there.
+        const error: { code: string; message: string; details?: Record<string, unknown> } = {
+          code: result.code,
+          message: result.message,
+        };
+        if ('details' in result && result.details !== undefined) error.details = result.details;
+        reply.code(code).send({ ok: false, error });
         return;
       }
       reply.code(200).send(result);

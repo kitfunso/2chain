@@ -6,7 +6,7 @@
     "type": "object",
     "properties": { "pdf_text": { "type": "string" } },
     "required": ["pdf_text"],
-    "additionalProperties": false
+    "additionalProperties": true
   },
   "output_contract": {
     "type": "object",

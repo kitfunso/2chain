@@ -107,7 +107,8 @@
 │   │   └── openai.ts               # Optional OpenAIEmbedder
 │   ├── services/
 │   │   ├── discover.ts             # Hybrid retrieve: storage.runRRF() -> rerank()
-│   │   ├── push.ts                 # Embed -> evalRunner -> storage.upsert()
+│   │   ├── push.ts                 # Drift gate -> embed -> evalRunner -> storage.upsert()
+│   │   ├── contractDiff.ts         # Pure JSON Schema differ + version ordering (E3, no storage)
 │   │   ├── call.ts                 # ajv input -> tool stub -> ajv output -> circuit-break
 │   │   ├── evalRunner.ts           # Run case fixtures -> reliability score
 │   │   ├── graders.ts              # numeric_tolerance, regex, length, json_schema_array
@@ -211,6 +212,7 @@ MCP surface (stdio):
 | Hybrid retrieval (RRF) | `src/storage/{sqlite,postgres}.ts` | Anything HTTP, anything user-facing |
 | Embedding | `src/embeddings/*.ts` | Storage layer, contract validation |
 | Contract validation | `src/services/call.ts` (uses ajv) | Database driver internals |
+| Contract drift detection | `src/services/contractDiff.ts` (pure differ + version ordering); gate + event writes in `src/services/push.ts` | Storage, embeddings, HTTP — the differ is a pure module with no imports beyond shared types |
 | Live updates | `src/live/*.ts` | HTTP handlers (only emits events; routes subscribe via SSE manager) |
 | Tool stubs | `src/tools/*.ts` | Storage, embeddings, MCP — they're pure functions |
 | MCP shim | `bin/2chain-mcp.mjs` | Storage directly (talks via HTTP only) |

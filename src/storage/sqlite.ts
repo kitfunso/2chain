@@ -22,6 +22,7 @@ import type {
   UsageRow,
   EvalRunRow,
   RankingRow,
+  DriftEventRow,
   DbStats,
   ChangeEvent,
   AgentRow,
@@ -147,7 +148,7 @@ export class SqliteStorage implements Storage {
           )`,
       )
       .run();
-    const files = ['001_init.sql', '002_tool_kind.sql']; // explicit list, in apply order
+    const files = ['001_init.sql', '002_tool_kind.sql', '003_drift_events.sql']; // explicit list, in apply order
     for (const file of files) {
       const already = this.db
         .prepare('SELECT 1 FROM _migrations WHERE name = ?')
@@ -288,6 +289,21 @@ export class SqliteStorage implements Storage {
         .get(id)!;
       return rowToTool(row);
     }, 'tools');
+  }
+
+  async listToolsByName(
+    name: string,
+    namespace = DEFAULT_NAMESPACE,
+  ): Promise<ToolV2[]> {
+    // Prefix of the UNIQUE(namespace_id, name, version) index — exact match,
+    // no LIMIT (a tool's version count is small; the 5k listTools scan this
+    // replaces was the fail-open hazard).
+    const rows = this.db
+      .prepare<[string, string], ToolRow>(
+        `SELECT rowid, * FROM tools WHERE namespace_id = ? AND name = ? ORDER BY created_at, version`,
+      )
+      .all(namespace, name);
+    return rows.map(rowToTool);
   }
 
   async setStatus(toolId: string, status: ToolStatus): Promise<void> {
@@ -561,6 +577,71 @@ export class SqliteStorage implements Storage {
           r.occurred_at,
         );
     }, 'rankings');
+  }
+
+  // ----- Contract drift (E3) -------------------------------------------------
+
+  async insertDriftEvent(e: DriftEventRow): Promise<void> {
+    await this.queue.run(() => {
+      const id = e.id ?? randomUUID();
+      this.db
+        .prepare(
+          `INSERT INTO drift_events (
+              id, namespace_id, tool_name, from_version, to_version,
+              direction, classification, changes_json, author_agent_id, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        )
+        .run(
+          id,
+          e.namespace_id,
+          e.tool_name,
+          e.from_version,
+          e.to_version,
+          e.direction,
+          e.classification,
+          JSON.stringify(e.changes),
+          e.author_agent_id,
+          e.created_at,
+        );
+    }, 'drift_events');
+  }
+
+  async listDriftEvents(
+    toolName: string,
+    namespace = DEFAULT_NAMESPACE,
+    limit = 100,
+  ): Promise<DriftEventRow[]> {
+    interface DriftDbRow {
+      id: string;
+      namespace_id: string;
+      tool_name: string;
+      from_version: string;
+      to_version: string;
+      direction: string;
+      classification: string;
+      changes_json: string;
+      author_agent_id: string;
+      created_at: string;
+    }
+    const rows = this.db
+      .prepare<[string, string, number], DriftDbRow>(
+        `SELECT * FROM drift_events
+         WHERE namespace_id = ? AND tool_name = ?
+         ORDER BY created_at DESC LIMIT ?`,
+      )
+      .all(namespace, toolName, limit);
+    return rows.map((r) => ({
+      id: r.id,
+      namespace_id: r.namespace_id,
+      tool_name: r.tool_name,
+      from_version: r.from_version,
+      to_version: r.to_version,
+      direction: r.direction as DriftEventRow['direction'],
+      classification: r.classification as DriftEventRow['classification'],
+      changes: JSON.parse(r.changes_json) as DriftEventRow['changes'],
+      author_agent_id: r.author_agent_id,
+      created_at: r.created_at,
+    }));
   }
 
   // ----- Dashboard reads ---------------------------------------------------
