@@ -260,6 +260,14 @@ export interface Storage {
     metadata: ToolSpecV2['metadata'],
     status: ToolStatus,
   ): Promise<void>;
+  /** Atomic patch of ONLY reliability_score + last_eval_run; never writes
+   *  status and never replaces whole metadata — safe for sweeps whose
+   *  read-time snapshot may be stale by write time (reverify TOCTOU). */
+  recordEvalOutcome(
+    toolId: string,
+    reliabilityScore: number,
+    lastEvalRun: string,
+  ): Promise<void>;
 
   // Agent auth (used by /push, /call, /discover guards)
   getAgentByKeyHash(hash: string): Promise<AgentRow | null>;

@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import type { Storage } from '../../types.js';
-import { reverifyTools } from '../../services/reverify.js';
+import { reverifyTools, SweepInFlightError } from '../../services/reverify.js';
 import { requireAuth } from '../auth.js';
 
 interface ReverifyBody {
@@ -46,6 +46,13 @@ export function registerReverifyRoute(app: FastifyInstance, storage: Storage): v
       });
       reply.code(200).send({ ok: true, ...summary });
     } catch (err) {
+      if (err instanceof SweepInFlightError) {
+        reply.code(409).send({
+          ok: false,
+          error: { code: err.code, message: err.message },
+        });
+        return;
+      }
       req.log.error(err, 'reverify failed');
       reply.code(500).send({
         ok: false,

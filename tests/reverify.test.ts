@@ -172,7 +172,7 @@ test('rot leg + restore leg: gate-drop on rot, absent from discover, recovers on
     const rotSummary = await reverifyTools(storage);
     assert.equal(rotSummary.executed, 1);
     assert.equal(rotSummary.failed, 1);
-    assert.deepEqual(rotSummary.gate_dropped, ['rot-target']);
+    assert.deepEqual(rotSummary.gate_dropped, ['rot-target@1.0']);
 
     const afterRot = await storage.getToolByNameVersion('rot-target', '1.0');
     assert.equal(afterRot!.metadata.reliability_score, 0, 'rotten stub fails every case');
@@ -468,5 +468,78 @@ test('push parity: factored eval helper preserves publish-time scores and run sh
     assert.equal(runs[0].pass_rate, 0.6);
   } finally {
     await storage.close();
+  }
+});
+
+// ---- TOCTOU mechanism locks (codex P1 + independent-review crit) ----------
+// The race (a /call circuit-break landing between the sweep's read and its
+// write) is made STRUCTURALLY impossible because the sweep's write never
+// touches status and never replaces whole metadata. These tests lock that
+// mechanism directly — stronger than reproducing one interleave.
+
+test('recordEvalOutcome never writes status: circuit_broken survives the eval write', async () => {
+  const storage = await freshStorage();
+  try {
+    await pushOk(storage, { name: 'race-target', version: '1.0' });
+    const tool = await storage.getToolByNameVersion('race-target', '1.0');
+    assert.ok(tool);
+
+    // Simulate the concurrent /call circuit-break landing AFTER the sweep
+    // read its snapshot but BEFORE the sweep's write.
+    await storage.setStatus(tool.id, 'circuit_broken');
+    await storage.recordEvalOutcome(tool.id, 0.95, new Date().toISOString());
+
+    const after = await storage.getToolByNameVersion('race-target', '1.0');
+    assert.equal(after?.status, 'circuit_broken', 'eval write must not resurrect a circuit-broken tool');
+    assert.equal(after?.metadata.reliability_score, 0.95, 'score patch still lands');
+  } finally {
+    await storage.close?.();
+  }
+});
+
+test('recordEvalOutcome patches only eval fields: concurrent metadata writes survive', async () => {
+  const storage = await freshStorage();
+  try {
+    await pushOk(storage, { name: 'meta-target', version: '1.0' });
+    const tool = await storage.getToolByNameVersion('meta-target', '1.0');
+    assert.ok(tool);
+
+    // A concurrent writer lands a metadata change after the sweep's read.
+    const db = rawDb(storage as SqliteStorage);
+    db.prepare(
+      `UPDATE tools SET metadata = json_set(metadata, '$.cost_per_call_usd', 9.99) WHERE id = ?`,
+    ).run(tool.id);
+
+    await storage.recordEvalOutcome(tool.id, 0.9, new Date().toISOString());
+
+    const after = await storage.getToolByNameVersion('meta-target', '1.0');
+    assert.equal(after?.metadata.cost_per_call_usd, 9.99, 'concurrent metadata write must survive the eval patch');
+    assert.equal(after?.metadata.reliability_score, 0.9);
+  } finally {
+    await storage.close?.();
+  }
+});
+
+test('concurrent unfiltered sweeps: second throws SweepInFlightError', async () => {
+  const storage = await freshStorage();
+  try {
+    await pushOk(storage, { name: 'sweep-guard', version: '1.0' });
+    const results = await Promise.allSettled([
+      reverifyTools(storage),
+      reverifyTools(storage),
+    ]);
+    const fulfilled = results.filter((r) => r.status === 'fulfilled');
+    const rejected = results.filter((r) => r.status === 'rejected');
+    assert.equal(fulfilled.length, 1, 'exactly one sweep runs');
+    assert.equal(rejected.length, 1, 'the overlapping sweep is rejected');
+    assert.equal(
+      (rejected[0] as PromiseRejectedResult).reason?.code,
+      'sweep_in_flight',
+    );
+    // The guard resets: a follow-up sweep succeeds.
+    const again = await reverifyTools(storage);
+    assert.equal(again.executed >= 1, true);
+  } finally {
+    await storage.close?.();
   }
 });

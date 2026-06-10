@@ -78,6 +78,9 @@ async function reverify(args) {
     if (!spec) die('usage: 2chain reverify [--tool name@version]');
     const [name, version] = spec.split('@');
     if (!name) die('usage: 2chain reverify [--tool name@version]');
+    // A trailing '@' (empty version) on a mutating verb must error, not
+    // silently widen scope to every version of the name.
+    if (spec.includes('@') && !version) die('--tool: version is empty; use name@version or bare name');
     body = version ? { tool_name: name, tool_version: version } : { tool_name: name };
   }
   const t = Date.now();
@@ -94,6 +97,12 @@ async function reverify(args) {
   console.log(`✓ reverify complete (${Date.now() - t}ms)`);
   console.log(`  executed: ${j.executed}   passed: ${j.passed}   failed: ${j.failed}`);
   console.log(`  gate-dropped: ${j.gate_dropped.length ? j.gate_dropped.join(', ') : '(none)'}`);
+  if (j.errored?.length) {
+    console.log(`  errored (${j.errored.length}): ${j.errored.join(', ')}`);
+  }
+  if (j.truncated) {
+    console.log('  WARNING: sweep truncated at the list cap; tools beyond it were NOT re-verified');
+  }
   if (j.skipped.length) {
     console.log(`  skipped (${j.skipped.length}):`);
     for (const s of j.skipped) console.log(`    - ${s.name}@${s.version}  (${s.reason})`);

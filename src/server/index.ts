@@ -84,10 +84,13 @@ export async function buildServer(): Promise<FastifyInstance> {
     reverifyTimer.unref();
     app.log.info({ interval_min: reverifyIntervalMin }, 'reverify interval enabled');
     app.addHook('onClose', async () => clearInterval(reverifyTimer));
-  } else if (Number.isFinite(reverifyIntervalMin) && reverifyIntervalMin > REVERIFY_INTERVAL_MAX_MIN) {
+  } else if (process.env.REVERIFY_INTERVAL_MIN !== undefined) {
+    // Set-but-unusable (NaN from a typo like '60m', zero/negative, or above
+    // the setInterval-safe cap): the operator believes continuous
+    // re-verification is on — say loudly that it is not.
     app.log.warn(
-      { interval_min: reverifyIntervalMin, max_min: REVERIFY_INTERVAL_MAX_MIN },
-      'REVERIFY_INTERVAL_MIN exceeds the setInterval-safe maximum; interval disabled',
+      { raw: process.env.REVERIFY_INTERVAL_MIN, max_min: REVERIFY_INTERVAL_MAX_MIN },
+      'REVERIFY_INTERVAL_MIN is set but not a usable interval; reverify interval DISABLED',
     );
   }
 
