@@ -444,3 +444,59 @@ test('verificationStreak unit matrix', () => {
   // sub-gate newest ⇒ 0
   assert.equal(verificationStreak([r(0.5, 'reverify', 1), r(1, 'reverify', 2)], RELIABILITY_GATE), 0);
 });
+
+// ---- Future-date clamp (code-review MED) + snapshot order ------------------
+
+test('future-dated last_eval_run clamps to freshness 1 (never leapfrogs via clock skew)', async () => {
+  const storage = await freshStorage();
+  try {
+    const tool = await storage.upsertTool(spec('time-traveler'), QUERY_VEC);
+    // +30 days: unclamped this would be freshness ~19.5 - a term larger
+    // than one full RRF arm contribution (the leapfrog invariant breaks).
+    await storage.recordEvalOutcome(
+      tool.id,
+      0.95,
+      new Date(Date.now() + 30 * 86_400_000).toISOString(),
+    );
+    const { results } = await discover(storage, embedder, QUERY, 5);
+    const r = results.find((x) => x.name === 'time-traveler');
+    assert.ok(r);
+    assert.ok(r.freshness <= 1 + 1e-9, `freshness must clamp to 1, got ${r.freshness}`);
+    assert.ok(Number.isFinite(r.final_score));
+  } finally {
+    await storage.close();
+  }
+});
+
+test('rankings snapshot records the re-sorted order agents actually saw', async () => {
+  const storage = await freshStorage();
+  try {
+    // Same construction as the acceptance test: stale tool at the better
+    // vec rank, fresh runner-up adjacent - fresh overtakes in the RETURNED
+    // order, and the trending snapshot must record that same order.
+    const stale = await storage.upsertTool(spec('snap-stale'), QUERY_VEC);
+    const fresh = await storage.upsertTool(spec('snap-fresh'), mixVec(QUERY_VEC, OFF_AXIS, 0.05));
+    await storage.recordEvalOutcome(stale.id, 0.95, daysAgoIso(90));
+    await storage.recordEvalOutcome(fresh.id, 0.95, daysAgoIso(0));
+
+    const { results } = await discover(storage, embedder, QUERY, 5);
+    const returnedOrder = results.map((r) => r.name);
+    assert.equal(returnedOrder[0], 'snap-fresh');
+
+    // rankings stores a JSON top-K snapshot per query (001_init.sql), not
+    // per-tool rows - parse the newest snapshot's results blob.
+    const row = (storage as unknown as {
+      db: { prepare: (s: string) => { get: () => { results: string } } };
+    }).db
+      .prepare(`SELECT results FROM rankings ORDER BY occurred_at DESC LIMIT 1`)
+      .get();
+    const snapshot = JSON.parse(row.results) as Array<{ name: string }>;
+    assert.deepEqual(
+      snapshot.map((s) => s.name),
+      returnedOrder,
+      'trending must aggregate the post-re-sort order',
+    );
+  } finally {
+    await storage.close();
+  }
+});

@@ -143,10 +143,12 @@ export async function discover(
     if (lastEvalRun !== null) {
       const ageDays = (now - Date.parse(lastEvalRun)) / 86_400_000;
       const decayed = Math.pow(0.5, ageDays / FRESHNESS_HALF_LIFE_DAYS);
-      // Unparseable timestamp ⇒ NaN, absurd-past ⇒ ~0, absurd-future ⇒
-      // Infinity. NaN/Infinity in a sort key silently disorders (E2's
-      // lesson), so anything non-finite collapses to 0 = "treat as stale".
-      if (Number.isFinite(decayed)) freshness = decayed;
+      // Unparseable ⇒ NaN (collapses to 0); absurd-past ⇒ ~0. FUTURE dates
+      // yield FINITE values > 1 all the way to ~19 years ahead (+30d ≈
+      // 19.5 ⇒ a term larger than one full RRF arm — leapfrog invariant
+      // broken), so the clamp to 1 is load-bearing, not cosmetic: fresher
+      // than "verified right now" does not exist.
+      if (Number.isFinite(decayed)) freshness = Math.min(decayed, 1);
     }
     return { r, freshness, final_score: r.rrf_score + W_FRESHNESS_RRF * freshness };
   });
