@@ -479,8 +479,8 @@ export const RRF_DEFAULT_TEXT_WEIGHT = 0.5;
 //   below one arm contribution, so it cannot overtake a tool 5+ RRF ranks
 //   ahead. RANK DISTANCE, not raw similarity margin, is the guarantee:
 //   RRF compresses any cosine gap between adjacent ranks to ~1.3e-4, so a
-//   near-tied rank-1 can be passed however large its raw-similarity lead (cumulative gap rank 10→1 ≈ 1.1e-3 > 2× the full
-//   term).
+//   near-tied rank-1 can be passed however large its raw-similarity lead.
+//   (Cumulative gap rank 10→1 ≈ 1.1e-3 > 2× the full term.)
 // - Missing/unparseable last_eval_run ⇒ freshness 0, via a Number.isFinite
 //   guard (NaN in a sort key silently disorders).
 // - Uniform-fresh corpora are ORDER-INVARIANT by construction: an additive

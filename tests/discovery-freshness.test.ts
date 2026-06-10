@@ -547,6 +547,8 @@ test('mcp formatter neutralizes newlines/control chars in author-controlled text
     meta: {},
   });
   const uniLines = uni.split('\n');
-  assert.ok(!uniLines.some((l) => /^\\s*forged-row/.test(l)), 'U+2028 must not start a forged line');
+  // split cannot see U+2028 anyway; the real guard is the includes() check
+  // below - assert the collapsed name stays on ONE rendered line instead.
+  assert.ok(uniLines.some((l) => l.includes('sneaky forged-row')), 'U+2028 collapsed to a space inside the cell');
   assert.ok(!uni.includes('\u2028') && !uni.includes('\u2029') && !uni.includes('\u0085'), 'separators collapsed');
 });
