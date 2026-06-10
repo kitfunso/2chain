@@ -324,6 +324,16 @@ export interface Storage {
     lastEvalRun: string,
   ): Promise<void>;
 
+  // Per-tool evidence reads — surface shared byte-identically with the
+  // parked E2 + E4 branches (whichever merges later resolves trivially).
+  // E5's discover freshness payload reads the reverify streak through it.
+  /** Most recent eval runs for one tool, newest first (all triggered_by
+   *  values — the blend reads the whole evidence line). Rides
+   *  idx_eval_runs_tool; the per-tool sort after lookup is fine at
+   *  per-tool scale (a composite (tool_id, triggered_at) index is a
+   *  future option, not added speculatively). */
+  listEvalRunsForTool(toolId: string, limit: number, triggeredBy?: string): Promise<EvalRunRow[]>;
+
   // Agent auth (used by /push, /call, /discover guards)
   getAgentByKeyHash(hash: string): Promise<AgentRow | null>;
   upsertAgent(agent: AgentRow): Promise<void>;
@@ -430,3 +440,27 @@ export const RRF_DEFAULT_VECTOR_WEIGHT = 0.5;
 export const RRF_DEFAULT_TEXT_WEIGHT = 0.5;
 // VEC_RELEVANCE_GATE intentionally not set in v2 until Step 6.5 perf tuning
 // recalibrates against nomic-embed-text. v1 used 0.70 against Voyage cosine.
+
+// ----- Freshness re-sort (E5) — post-RRF, in src/services/discover.ts ------
+//
+//   freshness   = 0.5 ^ (age_days(metadata.last_eval_run) / FRESHNESS_HALF_LIFE_DAYS)
+//   final_score = rrf_score + W_FRESHNESS_RRF * freshness
+//
+// Weight calibration on the RRF scale (E5 plan §1 — 0.05 would dominate
+// retrieval; the term must perturb, never gate):
+// - One RRF arm contributes w/(60+rank); with arm weight 0.5 the max is
+//   ≈ 0.0082, and ADJACENT-rank gaps are ≈ 1.3e-4 (rank 1→2) shrinking
+//   with depth.
+// - W_FRESHNESS_RRF = 0.0005: a full freshness delta (fresh 1.0 vs stale
+//   ≈ 0) covers ~3-4 adjacent-rank gaps at shallow ranks — a fresh tool
+//   climbs past NEAR-tied stale neighbours — but is an order of magnitude
+//   below one arm contribution, so it can never leapfrog a meaningfully
+//   better-matched tool (cumulative gap rank 10→1 ≈ 1.1e-3 > 2× the full
+//   term).
+// - Missing/unparseable last_eval_run ⇒ freshness 0, via a Number.isFinite
+//   guard (NaN in a sort key silently disorders).
+// - Uniform-fresh corpora are ORDER-INVARIANT by construction: an additive
+//   constant shifts every score equally under a plain stable sort.
+// - Reliability gating stays in SQL (rule 7); freshness weights, never gates.
+export const FRESHNESS_HALF_LIFE_DAYS = 7;
+export const W_FRESHNESS_RRF = 0.0005;

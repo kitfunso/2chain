@@ -137,7 +137,16 @@ try {
   if (INCLUDE_REAL_CORPUS) {
     const offset = ALL_TOOLS.length;
     for (let i = 0; i < REAL_CORPUS.length; i++) {
-      await storage.upsertTool(REAL_CORPUS[i], embeddings[offset + i]);
+      const spec = REAL_CORPUS[i];
+      // Golden-corpus normalization for eval comparability (E5): uniform
+      // last_eval_run keeps the additive freshness term constant across both
+      // seeded populations, so the golden floors keep measuring retrieval,
+      // not seed metadata. NOT importer-mirroring — real catalog imports
+      // carry freshness 0 by design until a reverify sweep scores them.
+      await storage.upsertTool(
+        { ...spec, metadata: { ...spec.metadata, last_eval_run: nowIso } },
+        embeddings[offset + i],
+      );
     }
     console.log(`  inserted ${ALL_TOOLS.length} fixture + ${REAL_CORPUS.length} real-corpus tools in ${Date.now() - tInsert}ms`);
   } else {

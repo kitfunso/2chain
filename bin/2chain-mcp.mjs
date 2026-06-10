@@ -11,6 +11,7 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
+import { formatDiscoverTools } from './mcp-format.mjs';
 
 const HOST = process.env.TWOCHAIN_HOST || 'http://127.0.0.1:3030';
 const API_KEY = process.env.TWOCHAIN_API_KEY || 'sk_demo_pdf_agent_8f2c4a';
@@ -27,8 +28,9 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       name: 'discover_tools',
       description:
         'Search the 2chain tool registry for tools that fulfil a natural-language capability query. ' +
-        'Returns a ranked list of tools with reliability scores, plus a trace showing the MongoDB Atlas ' +
-        'pipeline used (vector search + text search via $rankFusion), candidate counts, and per-tool scores. ' +
+        'Returns a ranked list of tools with reliability scores, freshness (recency of last verification), ' +
+        'and verification streaks, plus a trace showing the hybrid retrieval pipeline (vector + BM25 fused ' +
+        'via reciprocal rank fusion), candidate counts, and per-tool scores. ' +
         'ALWAYS use this BEFORE call_tool — it surfaces only tools that pass the 0.80 reliability gate.',
       inputSchema: {
         type: 'object',
@@ -58,8 +60,6 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
   ],
 }));
 
-function pad(s, n) { return String(s).padEnd(n); }
-
 server.setRequestHandler(CallToolRequestSchema, async (req) => {
   const { name, arguments: args } = req.params;
 
@@ -76,36 +76,14 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
       return { content: [{ type: 'text', text: `[2chain] discover failed: HTTP ${r.status} ${JSON.stringify(j.error ?? j)}` }], isError: true };
     }
 
-    const lines = [];
-    lines.push('=== 2chain.discover_tools ===');
-    lines.push(`query:       "${q}"`);
-    lines.push(`mode:        ${mode}${mode === 'hybrid' ? '  (Atlas $rankFusion: vector 0.7 + text 0.3)' : '  (pure $vectorSearch)'}`);
-    lines.push(`embed:       ${j.meta.embed_ms ?? 0}ms${(j.meta.embed_ms ?? 0) === 0 ? '  (cached)' : '  (Voyage voyage-3, 1024-dim)'}`);
-    lines.push(`atlas:       ${j.meta.search_ms ?? 0}ms  (MongoDB pipeline)`);
-    lines.push(`wall:        ${wallMs}ms`);
-    lines.push(`returned:    ${j.results.length} tool(s) passing reliability >= 0.80`);
-    lines.push('');
-    if (!j.results.length) {
-      lines.push('(no candidates passed the gates)');
-    } else {
-      lines.push('rank  name              ver   rel    score');
-      lines.push('────  ───────────────── ───   ────   ──────');
-      for (const [i, t] of j.results.entries()) {
-        const score = (t.rank_score ?? t.rrf_score ?? 0).toFixed(4);
-        lines.push(`  ${i + 1}   ${pad(t.name, 17)} ${pad(t.version, 4)}  ${t.reliability_score.toFixed(2)}   ${score}`);
-      }
-      lines.push('');
-      lines.push('descriptions (for picking the right one):');
-      for (const t of j.results) {
-        lines.push(`  • ${t.name}@${t.version}: ${t.capability_text}`);
-      }
-    }
-    if (VERBOSE && mode === 'hybrid' && j.meta.pipeline_json) {
-      lines.push('');
-      lines.push('--- MongoDB pipeline ---');
-      lines.push(j.meta.pipeline_json);
-    }
-    return { content: [{ type: 'text', text: lines.join('\n') }] };
+    const text = formatDiscoverTools({
+      query: q,
+      mode,
+      wallMs,
+      meta: j.meta,
+      results: j.results,
+    });
+    return { content: [{ type: 'text', text }] };
   }
 
   if (name === 'call_tool') {
