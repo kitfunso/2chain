@@ -547,3 +547,28 @@ test('differ: type-array reorder is not a change', () => {
   const diff = diffContracts(prevSchema, nextSchema, 'input');
   assert.equal(diff.classification, 'identical', 'pure type-array reorder is the same contract');
 });
+
+// ---- Version-alias bypass (codex P2, round 3) -----------------------------
+// '1.0' and '1.0.0' compare equal (missing segments = 0). Skipping equal-by-
+// compare versions left prior = null, bypassing the gate entirely for alias
+// pushes. Equal-compare versions are now the baseline: breaking-vs-alias
+// demands major > major, which never holds.
+
+test('baseline: version alias (1.0 vs 1.0.0) cannot bypass the gate', async () => {
+  const OUT_NUM = schema({ v: num }, { required: ['v'], additionalProperties: false });
+  const OUT_STR = schema({ v: str }, { required: ['v'], additionalProperties: false });
+
+  assert.equal((await pushVersion('alias-tool', '1.0', IN_BASE, OUT_NUM)).ok, true);
+
+  // Breaking contract under an alias version string: must be rejected
+  // against the equal-compare baseline, never silently accepted.
+  const sneaky = await pushVersion('alias-tool', '1.0.0', IN_BASE, OUT_STR);
+  assert.equal(sneaky.ok, false, 'alias version must not bypass the drift gate');
+  if (sneaky.ok) return;
+  assert.equal(sneaky.code, 'breaking_contract_requires_major_bump');
+  assert.equal(sneaky.details?.['from_version'], '1.0');
+
+  // A contract-identical alias push remains allowed (new unique version string).
+  const benign = await pushVersion('alias-tool', '1.0.1', IN_BASE, OUT_NUM);
+  assert.equal(benign.ok, true);
+});

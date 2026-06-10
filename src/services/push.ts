@@ -132,7 +132,12 @@ export async function push(
     }
   } else {
     for (const t of sameName) {
-      if (compareVersions(t.version, body.version) >= 0) continue;
+      // Skip only STRICTLY greater versions: an equal-by-compare alias
+      // ('1.0' vs a pushed '1.0.0') must become the baseline, not be skipped
+      // — skipping it left prior null and bypassed the gate entirely
+      // (codex P2, round 3). Breaking-vs-alias then demands major > major,
+      // which can never hold, so alias pushes can only be compatible.
+      if (compareVersions(t.version, body.version) > 0) continue;
       if (!prior || compareVersions(t.version, prior.version) > 0) prior = t;
     }
   }
