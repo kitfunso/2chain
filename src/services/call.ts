@@ -71,6 +71,34 @@ export async function call(
     return { ok: false, status: 404, error: { code: 'tool_not_found', message: `${input.tool_name}@${input.tool_version} not found` } };
   }
 
+  // Catalog kinds (skill/subagent/prompt) are discovery-only — agents load
+  // skills into context, spawn subagents via the Task tool, and render
+  // prompts into context; none is a /call target. Refuse up front instead
+  // of returning a stub payload silently. 'prompt' joined in E2: a callable
+  // prompt could circuit-break, then be skipped forever by reverify's
+  // catalog-kind partition — a dead end recovery could never reach. This
+  // check sits ABOVE the status checks so a catalog row circuit-broken
+  // BEFORE E2 answers kind_not_callable (the truthful error) instead of
+  // 503 circuit_broken forever.
+  if (tool.tool_kind === 'skill' || tool.tool_kind === 'subagent' || tool.tool_kind === 'prompt') {
+    await logUsage(storage, tool, agentId, callId, 'gated', Date.now() - t0, namespace);
+    const remedy =
+      tool.tool_kind === 'skill'
+        ? 'Load the skill into agent context instead.'
+        : tool.tool_kind === 'subagent'
+          ? 'Spawn the subagent via the Task tool instead.'
+          : 'Render the prompt template into agent context instead.';
+    return {
+      ok: false,
+      status: 400,
+      error: {
+        code: 'kind_not_callable',
+        message: `tool_kind="${tool.tool_kind}" is discovery-only and cannot be invoked via /call. ${remedy}`,
+        details: { tool_name: tool.name, tool_version: tool.version, tool_kind: tool.tool_kind },
+      },
+    };
+  }
+
   if (tool.status === 'pending') {
     await logUsage(storage, tool, agentId, callId, 'gated', Date.now() - t0, namespace);
     return { ok: false, status: 403, error: { code: 'tool_pending', message: 'tool eval not yet complete' } };
@@ -78,26 +106,6 @@ export async function call(
   if (tool.status === 'circuit_broken') {
     await logUsage(storage, tool, agentId, callId, 'circuit_broken', Date.now() - t0, namespace);
     return { ok: false, status: 503, error: { code: 'circuit_broken', message: `tool ${input.tool_name}@${input.tool_version} is circuit-broken` } };
-  }
-
-  // Skills and subagents are discovery-only — agents load skills into context
-  // and spawn subagents via the Task tool, neither is a /call target. Refuse
-  // up front instead of returning the catalog-only-stub payload silently.
-  if (tool.tool_kind === 'skill' || tool.tool_kind === 'subagent') {
-    await logUsage(storage, tool, agentId, callId, 'gated', Date.now() - t0, namespace);
-    return {
-      ok: false,
-      status: 400,
-      error: {
-        code: 'kind_not_callable',
-        message:
-          `tool_kind="${tool.tool_kind}" is discovery-only and cannot be invoked via /call. ` +
-          (tool.tool_kind === 'skill'
-            ? 'Load the skill into agent context instead.'
-            : 'Spawn the subagent via the Task tool instead.'),
-        details: { tool_name: tool.name, tool_version: tool.version, tool_kind: tool.tool_kind },
-      },
-    };
   }
 
   const score = tool.metadata.reliability_score ?? 0;
@@ -143,9 +151,16 @@ export async function call(
     const errs = ajvErrors(outputValidator.errors);
     await logViolation(storage, tool, agentId, callId, 1, 'output', raw, errs, namespace);
 
-    // fail-fast: circuit-break immediately (D34: only place that flips to circuit_broken)
+    // fail-fast: circuit-break immediately. D34 (amended E2): call.ts stays
+    // the ONLY place that flips a tool TO circuit_broken; reverify may flip
+    // circuit_broken -> active after evidence-based recovery (3 clean
+    // reverify runs spanning >= 60min, unfiltered sweeps only) — never the
+    // reverse, and never touches pending. See services/scoreLifecycle.ts.
     if (tool.output_repair_strategy === 'fail-fast') {
-      await storage.setStatus(tool.id, 'circuit_broken');
+      // Atomic flip + broken_at watermark (recovery evidence must postdate
+      // the TRANSITION; the 503 rejections this tool now answers also log
+      // outcome='circuit_broken' usage rows and must not move the mark).
+      await storage.markCircuitBroken(tool.id, new Date().toISOString());
       await logUsage(storage, tool, agentId, callId, 'circuit_broken', Date.now() - t0, namespace);
       return {
         ok: false,

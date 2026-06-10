@@ -85,7 +85,7 @@ Read these before modifying their area:
 - **Forgetting to L2-normalize embeddings before vec0 cosine.** sqlite-vec computes raw cosine distance; if inputs aren't unit length, "distance" is no longer monotonic with similarity. The Embedder normalizes on output; if you swap implementations, normalize there too.
 - **`vec0` virtual tables don't update in place.** UPDATE on a base-table row requires DELETE + INSERT inside the trigger to refresh the vec0 row. See `001_init.sql` `tools_au` trigger.
 - **`bm25()` in FTS5 is lower-is-better.** Order ASC, not DESC. Easy to miss because every other ranking function in SQL goes the other way.
-- **Skills and subagents are discovery-only.** `/call` rejects them with `code: 'kind_not_callable'` — see `src/services/call.ts`. Skills are loaded into agent context, subagents are spawned via the Task tool. Don't try to forward through the catalog-only-stub.
+- **Skills, subagents, and prompts are discovery-only.** `/call` rejects all three with `code: 'kind_not_callable'` — see `src/services/call.ts`. Skills are loaded into agent context, subagents are spawned via the Task tool, prompts are rendered into context. 'prompt' joined the gate in E2 (2026-06-10): a callable prompt could circuit-break and then be skipped forever by reverify's catalog-kind partition — a dead end recovery can never reach. Don't try to forward through the catalog-only-stub.
 
 ## Update Triggers
 

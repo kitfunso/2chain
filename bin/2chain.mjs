@@ -104,8 +104,11 @@ async function reverify(args) {
   console.log(`✓ reverify complete (${Date.now() - t}ms)`);
   console.log(`  executed: ${j.executed}   passed: ${j.passed}   failed: ${j.failed}`);
   console.log(`  gate-dropped: ${j.gate_dropped.length ? j.gate_dropped.join(', ') : '(none)'}`);
+  if (j.recovered?.length) {
+    console.log(`  recovered: ${j.recovered.join(', ')}`);
+  }
   if (j.errored?.length) {
-    console.log(`  errored (${j.errored.length}): ${j.errored.join(', ')}`);
+    console.log(`  errored (${j.errored.length}): ${j.errored.map((e) => `${e.tool} (${e.error})`).join(', ')}`);
   }
   if (j.truncated) {
     console.log('  WARNING: sweep truncated at the list cap; tools beyond it were NOT re-verified');
