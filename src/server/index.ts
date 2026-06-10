@@ -148,6 +148,10 @@ export async function buildServer(): Promise<FastifyInstance> {
           vec_score: r.vec_score,
           rank_score: r.rank_score,
           rrf_score: r.rrf_score,
+          // Order coherence: rows arrive in final_score order; consumers
+          // re-deriving order from scores need the actual ordering key.
+          final_score: r.final_score,
+          freshness: r.freshness,
         })),
         meta,
         ts: new Date().toISOString(),

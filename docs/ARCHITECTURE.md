@@ -366,7 +366,7 @@ Plain stable sort by `final_score` desc with NO secondary key: JS sort stability
 | `FRESHNESS_HALF_LIFE_DAYS` | 7 | freshness half-life |
 | `W_FRESHNESS_RRF` | 0.0005 | freshness term weight on the RRF scale |
 
-Calibration (the full table lives beside the constants in `src/types.ts`): one RRF arm contributes `w/(60+rank)`, max ≈ 0.0082 at arm weight 0.5; adjacent-rank gaps are ≈ 1.3e-4 at the top, shrinking with depth. The full freshness delta (5e-4) covers ~3-4 adjacent-rank gaps — a fresh tool climbs past NEAR-TIED stale neighbours — but stays an order of magnitude below one arm contribution and below the rank 10→1 cumulative gap (≈ 1.1e-3), so freshness can never leapfrog a meaningfully better-matched tool. Real catalog imports carry freshness 0 by design until a reverify sweep scores them — unverified means stale.
+Calibration (the full table lives beside the constants in `src/types.ts`): one RRF arm contributes `w/(60+rank)`, max ≈ 0.0082 at arm weight 0.5; adjacent-rank gaps are ≈ 1.3e-4 at the top, shrinking with depth. The full freshness delta (5e-4) covers ~3-4 adjacent-rank gaps — a fresh tool climbs past NEAR-TIED stale neighbours — but stays an order of magnitude below one arm contribution and below the rank 10→1 cumulative gap (≈ 1.1e-3), so freshness cannot overtake a tool 5 or more RRF ranks ahead (rank distance, not raw similarity margin, is the guarantee: RRF compresses any cosine gap between adjacent ranks to ~1.3e-4, so a near-tied rank-1 can be passed however large its raw-similarity lead). Real catalog imports carry freshness 0 by design until a reverify sweep scores them — unverified means stale.
 
 ## Deployment
 

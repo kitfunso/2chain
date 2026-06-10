@@ -203,6 +203,10 @@ export async function discover(
       rrf_score: r.rrf_score,
       vec_score: r.vec_score,
       reliability_score: r.reliability_score,
+      // The snapshot must be able to explain its own ordering: rows are in
+      // final_score order, and rrf_score alone is non-monotonic with it.
+      final_score: r.final_score,
+      freshness: r.freshness,
     })),
     occurred_at: new Date().toISOString(),
   });

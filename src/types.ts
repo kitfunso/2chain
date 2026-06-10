@@ -476,8 +476,10 @@ export const RRF_DEFAULT_TEXT_WEIGHT = 0.5;
 // - W_FRESHNESS_RRF = 0.0005: a full freshness delta (fresh 1.0 vs stale
 //   ≈ 0) covers ~3-4 adjacent-rank gaps at shallow ranks — a fresh tool
 //   climbs past NEAR-tied stale neighbours — but is an order of magnitude
-//   below one arm contribution, so it can never leapfrog a meaningfully
-//   better-matched tool (cumulative gap rank 10→1 ≈ 1.1e-3 > 2× the full
+//   below one arm contribution, so it cannot overtake a tool 5+ RRF ranks
+//   ahead. RANK DISTANCE, not raw similarity margin, is the guarantee:
+//   RRF compresses any cosine gap between adjacent ranks to ~1.3e-4, so a
+//   near-tied rank-1 can be passed however large its raw-similarity lead (cumulative gap rank 10→1 ≈ 1.1e-3 > 2× the full
 //   term).
 // - Missing/unparseable last_eval_run ⇒ freshness 0, via a Number.isFinite
 //   guard (NaN in a sort key silently disorders).

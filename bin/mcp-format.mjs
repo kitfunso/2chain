@@ -10,6 +10,16 @@
 // voyage-3' trace text was provably false and the freshness column must
 // not sit under it.
 
+// Author-controlled strings (name/version/capability_text) render into
+// AGENT-VISIBLE text: a newline inside capability_text could forge extra
+// table rows with fake reliability/final scores, and control characters
+// could impersonate the trace header (independent-review HIGH). One line
+// of neutralization closes row-forging; rendering stays single-line.
+function clean(s) {
+  // eslint-disable-next-line no-control-regex
+  return String(s).replace(/[\r\n\u0000-\u001f\u007f]/g, ' ');
+}
+
 function pad(s, n) {
   return String(s).padEnd(n);
 }
@@ -46,12 +56,12 @@ export function formatDiscoverTools({ query = '', mode = 'hybrid', wallMs = 0, m
     for (const [i, t] of safeResults.entries()) {
       const finalScore = Number(t.final_score ?? t.rrf_score ?? 0).toFixed(5);
       const freshness = Number(t.freshness ?? 0).toFixed(2);
-      lines.push(`  ${i + 1}   ${pad(t.name ?? '?', 17)} ${pad(t.version ?? '?', 4)}  ${Number(t.reliability_score ?? 0).toFixed(2)}   ${finalScore}   ${freshness}`);
+      lines.push(`  ${i + 1}   ${pad(clean(t.name ?? '?'), 17)} ${pad(clean(t.version ?? '?'), 4)}  ${Number(t.reliability_score ?? 0).toFixed(2)}   ${finalScore}   ${freshness}`);
     }
     lines.push('');
     lines.push('descriptions (for picking the right one):');
     for (const t of safeResults) {
-      lines.push(`  • ${t.name ?? '?'}@${t.version ?? '?'}: ${t.capability_text ?? ''}`);
+      lines.push(`  • ${clean(t.name ?? '?')}@${clean(t.version ?? '?')}: ${clean(t.capability_text ?? '')}`);
     }
   }
   return lines.join('\n');
