@@ -1,5 +1,7 @@
 # 2chain on stage — split-screen runbook
 
+> **Historical (v1, May 2026 hackathon).** Kept as a record of the original Atlas stage demo.
+
 > **Goal**: light up MongoDB Atlas as the second protagonist. Don't keep it under the hood.
 
 ---

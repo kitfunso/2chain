@@ -1,5 +1,7 @@
 # 2chain — DESIGN
 
+> **Historical (v1, May 2026 hackathon).** Kept as a record of the original Atlas build's decision log. Current architecture lives in `docs/ARCHITECTURE.md`; current scope in `docs/PRD.md`; current rules in `CLAUDE.md`.
+
 Technical design doc for Saturday's build. README is the *what* and the *narrative*; this is the *how*. Every choice here exists because it makes the 3-minute demo deterministic on M0 + flaky venue WiFi in 6.5 hours.
 
 ---

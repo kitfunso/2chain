@@ -1,5 +1,7 @@
 # 2chain — EVALS
 
+> **Historical (v1, May 2026 hackathon).** The live quality gates are now `npm run eval:golden` (NDCG@3 / Recall@3 / top-1 floors, see CLAUDE.md rule 14) and the real-DB suite in `tests/`. Tool eval suites also re-run continuously via `/v1/reverify`.
+
 Two layers of evals live in this project. **Don't conflate them.**
 
 | Layer | What it evaluates | Where it lives | When it runs |

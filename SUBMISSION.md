@@ -1,5 +1,7 @@
 # 2chain — Submission assets
 
+> **Historical (v1, May 2026 hackathon).** Kept as a record of the submission.
+
 This file contains the 60-second submission video script (E) and the 90-second round-1 panel pitch (F). Both reference the same demo build at master HEAD.
 
 ---

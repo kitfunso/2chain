@@ -1,5 +1,7 @@
 # 2chain — DEMO.md
 
+> **Historical (v1, May 2026 hackathon).** Stage script for the original Atlas demo, kept as a record.
+
 The word-for-word 3-minute live script. Rehearse to **2:45 spoken** so there's a 15s buffer for stage handoff, slide advance, and breath. **Read the script verbatim in rehearsals 1-3.** Improvise only after the muscle memory is set.
 
 Locked to DESIGN.md D1-D27 and EVALS.md §1.
