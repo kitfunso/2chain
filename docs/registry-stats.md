@@ -1,6 +1,6 @@
 # Registry stats
 
-Snapshot generated: `2026-07-01T07:22:40.272Z`
+Snapshot generated: `2026-07-02T07:02:04.149Z`
 
 Total unique specs: **1199**
 
@@ -8,14 +8,14 @@ Total unique specs: **1199**
 
 | Source | Specs | Duration |
 |---|---:|---:|
-| npm:keywords:mcp | 150 | 486ms |
-| npm:keywords:openapi | 50 | 251ms |
-| npm:keywords:vector-database | 26 | 409ms |
-| awesome:awesome-mcp-servers | 300 | 72ms |
-| awesome:awesome-claude-prompts | 1 | 136ms |
-| awesome:awesome-langchain | 199 | 64ms |
-| awesome:awesome-rag | 32 | 216ms |
-| awesome:awesome-llmops | 186 | 109ms |
-| pypi:default | 55 | 733ms |
-| hf:models | 150 | 165ms |
-| hf:datasets | 50 | 54ms |
+| npm:keywords:mcp | 150 | 607ms |
+| npm:keywords:openapi | 50 | 594ms |
+| npm:keywords:vector-database | 26 | 444ms |
+| awesome:awesome-mcp-servers | 300 | 64ms |
+| awesome:awesome-claude-prompts | 1 | 54ms |
+| awesome:awesome-langchain | 199 | 44ms |
+| awesome:awesome-rag | 32 | 167ms |
+| awesome:awesome-llmops | 186 | 80ms |
+| pypi:default | 55 | 596ms |
+| hf:models | 150 | 93ms |
+| hf:datasets | 50 | 32ms |
