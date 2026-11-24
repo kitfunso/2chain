@@ -44,7 +44,7 @@ jobs:
       - name: Run unit + integration tests (no Ollama, skips Ollama-only suites)
         run: npm test
         env:
-          OLLAMA_HOST: http://127.0.0.1:99999  # unreachable on purpose so suites with `skip` skip cleanly
+          OLLAMA_HOST: http://127.0.0.1:99999
 
       - name: lint:no-mongodb (CLAUDE.md rule 1+3)
         run: npm run lint:no-mongodb

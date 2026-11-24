@@ -2,15 +2,15 @@ name: nightly-scrape
 
 on:
   schedule:
-    - cron: '0 6 * * *'      # daily 06:00 UTC
-  workflow_dispatch:           # manual trigger
+    - cron: '0 6 * * *'
+  workflow_dispatch:
     inputs:
       reason:
         description: 'Why are you running this manually?'
         required: false
 
 permissions:
-  contents: write              # commits the snapshot + stats files
+  contents: write
 
 jobs:
   scrape:
