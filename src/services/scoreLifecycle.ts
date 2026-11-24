@@ -111,7 +111,6 @@ export function evaluateRecovery(
   if (brokenAt === null) return false;
   const reverifyRuns = recentReverifyRuns
     .filter((r) => r.triggered_by === 'reverify' && r.triggered_at > brokenAt)
-    // ISO-8601 strings sort lexicographically; plain comparison, locale-free.
     .sort((a, b) => (a.triggered_at < b.triggered_at ? 1 : -1));
   if (reverifyRuns.length < RECOVERY_CONSECUTIVE_CLEAN) return false;
 

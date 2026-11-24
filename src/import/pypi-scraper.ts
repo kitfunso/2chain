@@ -15,7 +15,6 @@ export interface PypiPackageInfo {
 
 interface PypiJsonResponse {
   info: PypiPackageInfo;
-  // urls, releases etc. not used here
 }
 
 const PYPI_BASE = 'https://pypi.org/pypi';
@@ -49,7 +48,7 @@ function infoToSpec(info: PypiPackageInfo, domain: string): ToolSpecV2 {
   if (repo) parts.push('Source: ' + repo + '.');
 
   return {
-    name: 'py:' + info.name.toLowerCase(),  // py: prefix avoids collision with npm same-named packages
+    name: 'py:' + info.name.toLowerCase(),
     version: '1.0',
     author_agent_id: 'pypi-scrape',
     capability_text: parts.join('  '),

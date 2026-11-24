@@ -99,7 +99,7 @@ export async function buildServer(): Promise<FastifyInstance> {
       if (rankingCount === 0) {
         app.log.info({ queries: PREWARM_QUERIES.length }, 'seeding trending via real /discover (cold start)');
         for (const q of PREWARM_QUERIES) {
-          try { await discover(storage, embedder, q, 10); } catch { /* tolerate per-query failures */ }
+          try { await discover(storage, embedder, q, 10); } catch {}
         }
         const after = await storage.dbStats();
         app.log.info({ rankings: after.collection_counts.rankings }, 'trending seed complete');

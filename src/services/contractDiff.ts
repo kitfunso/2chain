@@ -127,7 +127,7 @@ function diffEnum(
     changes.push({
       path: enumPath,
       kind: 'enum-narrowed',
-      breaking: direction === 'input', // old values rejected by NEW input schema
+      breaking: direction === 'input',
       detail: `enum values removed: ${removed.join(', ')}`,
     });
   }
@@ -135,7 +135,7 @@ function diffEnum(
     changes.push({
       path: enumPath,
       kind: 'enum-widened',
-      breaking: direction === 'output', // consumer can meet an unknown value
+      breaking: direction === 'output',
       detail: `enum values added: ${added.join(', ')}`,
     });
   }
@@ -175,7 +175,7 @@ function diffPropertiesAndRequired(
         changes.push({
           path: propPath,
           kind: 'property-added-required',
-          breaking: direction === 'input', // old payloads lack it
+          breaking: direction === 'input',
           detail: 'required property added' + (direction === 'output' ? ' (always present now)' : ''),
         });
       } else {
@@ -208,7 +208,7 @@ function diffPropertiesAndRequired(
       changes.push({
         path: propPath,
         kind: 'property-removed',
-        breaking: true, // consumers may read it
+        breaking: true,
         detail: 'property removed from output; consumers may read it',
       });
     }
@@ -232,7 +232,7 @@ function diffRequired(
     changes.push({
       path: joinPath(path, `properties.${name}`),
       kind: 'required-added',
-      breaking: direction === 'input', // old payloads may omit it
+      breaking: direction === 'input',
       detail: 'property became required',
     });
   }
@@ -242,7 +242,7 @@ function diffRequired(
     changes.push({
       path: joinPath(path, `properties.${name}`),
       kind: 'required-removed',
-      breaking: direction === 'output', // field may now be absent for consumers
+      breaking: direction === 'output',
       detail: 'property no longer required',
     });
   }
@@ -270,14 +270,14 @@ function diffAdditionalProperties(
     changes.push({
       path: apPath,
       kind: 'additional-properties-restricted',
-      breaking: direction === 'input', // old payloads with extra fields rejected
+      breaking: direction === 'input',
       detail: 'additionalProperties true -> false',
     });
   } else {
     changes.push({
       path: apPath,
       kind: 'additional-properties-relaxed',
-      breaking: direction === 'output', // unknown fields can reach the consumer
+      breaking: direction === 'output',
       detail: 'additionalProperties false -> true',
     });
   }

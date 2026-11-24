@@ -42,7 +42,6 @@ export async function ensureConnectedForVerify(
     try {
       transport.close();
     } catch {
-      /* ignore */
     }
   }, VERIFY_TIMEOUT_MS);
 
@@ -60,7 +59,6 @@ export async function ensureConnectedForVerify(
     try {
       await client.close();
     } catch {
-      /* ignore */
     }
   }
 }

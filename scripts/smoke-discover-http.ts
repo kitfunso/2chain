@@ -75,7 +75,7 @@ try {
     okJson.results?.[0]?.reliability_score === 1.0,
     okJson.results?.[1]?.name === 'pdftools-pro',
     okJson.results?.[1]?.version === '2.0',
-    okJson.meta.total_ms < 1500,  // first-call: cold embed (no pre-cache yet)
+    okJson.meta.total_ms < 1500,
   ];
   if (a4.some((x) => !x)) throw new Error(`test 4 failed: ${JSON.stringify(a4)}`);
   console.log('  ✓ all 7 assertions');

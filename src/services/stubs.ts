@@ -160,17 +160,17 @@ registerStub('rotten-pdf-v1', (_input, _caseId) => {
 const PDF_V3_1_BUGGY: Record<string, unknown> = {
   'financial-numbers': {
     rows: [
-      { label: 'Revenue', value: 1234 },           // wrong, expected 1234.56
-      { label: 'Cost of goods', value: 789 },      // wrong
-      { label: 'Gross margin', value: 445 },       // wrong
-      { label: 'Operating expenses', value: 200 }, // wrong
-      { label: 'Net income', value: 245 },         // wrong
+      { label: 'Revenue', value: 1234 },
+      { label: 'Cost of goods', value: 789 },
+      { label: 'Gross margin', value: 445 },
+      { label: 'Operating expenses', value: 200 },
+      { label: 'Net income', value: 245 },
     ],
   },
-  'single-row': { rows: [{ label: 'Total', value: 42.0 }] },           // pass — integer
-  'negative-number': { rows: [{ label: 'Loss', value: -123 }] },        // wrong (lost .45)
-  'multi-page-text': { rows: [{ label: 'Total', value: 50.0 }] },       // pass — integer
-  'currency-symbol-strip': { rows: [{ label: 'Revenue', value: 1000.0 }] }, // pass — integer
+  'single-row': { rows: [{ label: 'Total', value: 42.0 }] },
+  'negative-number': { rows: [{ label: 'Loss', value: -123 }] },
+  'multi-page-text': { rows: [{ label: 'Total', value: 50.0 }] },
+  'currency-symbol-strip': { rows: [{ label: 'Revenue', value: 1000.0 }] },
 };
 registerStub('pdf-extractor-v3-1', (_input, caseId) => {
   if (!caseId || !(caseId in PDF_V3_1_BUGGY)) return { rows: [] };
@@ -181,7 +181,7 @@ const PDFTOOLS_PRO_V2: Record<string, unknown> = {
   'financial-numbers': PDF_V3_CORRECT['financial-numbers'],
   'single-row': PDF_V3_CORRECT['single-row'],
   'negative-number': PDF_V3_CORRECT['negative-number'],
-  'multi-page-text': { rows: [] },  // FAIL: multi-page boundary lost
+  'multi-page-text': { rows: [] },
   'currency-symbol-strip': PDF_V3_CORRECT['currency-symbol-strip'],
 };
 registerStub('pdftools-pro-v2', (input, caseId) => {

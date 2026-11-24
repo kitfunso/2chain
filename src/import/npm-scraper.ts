@@ -55,7 +55,7 @@ function packageToSpec(pkg: NpmSearchPackage, domain: string): ToolSpecV2 {
 
   return {
     name: pkg.name,
-    version: '1.0', // we don't echo the npm version — that's the *package* version,
+    version: '1.0',
     author_agent_id: 'npm-scrape',
     capability_text,
     input_contract: { type: 'object', additionalProperties: true },

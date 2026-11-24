@@ -74,7 +74,6 @@ async function ensureConnected(serverId: string): Promise<ConnectedClient> {
       try {
         transport.close();
       } catch {
-        /* swallow */
       }
     }, SPAWN_TIMEOUT_MS);
     try {
@@ -133,7 +132,6 @@ export async function shutdownAll(): Promise<void> {
     try {
       await conn.client.close();
     } catch {
-      /* ignore */
     }
     if (!conn.proc.killed) conn.proc.kill();
   }

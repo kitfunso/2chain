@@ -845,7 +845,7 @@ export class SqliteStorage implements Storage {
       database: this.opts.path,
       total_docs: tools.n + evalRuns.n + agents.n + violations.n + usage.n + rankings.n,
       data_size_bytes: dataSize,
-      index_size_bytes: 0, // SQLite doesn't break this out per-index
+      index_size_bytes: 0,
       collection_counts: {
         tools: tools.n,
         eval_runs: evalRuns.n,

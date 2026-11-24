@@ -91,7 +91,6 @@ for (const gq of golden.queries) {
           claude_rationale: c.rationale,
           codex_rationale: x.rationale,
         });
-        // Leave out of relevance map — must be adjudicated.
       } else {
         mergedPairs++;
         newRelevance[key] = Math.round((c.relevance + x.relevance) / 2);
@@ -107,7 +106,6 @@ for (const gq of golden.queries) {
 
   for (const name of gq.expected_top3 ?? []) {
     if (!Object.keys(newRelevance).some((k) => k.startsWith(name + '@'))) {
-      // Skip: author-only entries without judge coverage aren't graded.
     }
   }
 

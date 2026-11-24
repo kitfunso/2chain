@@ -39,7 +39,7 @@ function parseCsv(text: string): string[][] {
       if (c === '"') inQuotes = true;
       else if (c === ',') { row.push(field); field = ''; }
       else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
-      else if (c === '\r') { /* skip */ }
+      else if (c === '\r') {}
       else field += c;
     }
   }

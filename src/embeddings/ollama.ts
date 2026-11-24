@@ -15,7 +15,6 @@ export interface OllamaEmbedderOpts {
 
 interface OllamaEmbeddingResponse {
   embedding?: number[];
-  // older /api/embed returns embeddings: number[][]
 }
 
 const NOMIC_EMBED_DIM = 768;

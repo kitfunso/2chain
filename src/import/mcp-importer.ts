@@ -55,7 +55,7 @@ function specFromMcp(server: McpServerEntry, tool: { name: string; capabilityTex
     metadata: {
       cost_per_call_usd: 0,
       p95_latency_ms: 1500,
-      reliability_score: 0.95,    // pre-eval; verify mode trims this for unreachable servers
+      reliability_score: 0.95,
     },
     status: 'active',
     domain: server.domain,
