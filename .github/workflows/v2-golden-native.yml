@@ -32,9 +32,6 @@ jobs:
       - name: NDCG unit test
         run: npx tsx --test tests/v2-eval-ndcg.test.ts
 
-      # Note: full eval requires Ollama (not available on GH runners).
-      # CI only enforces (a) schema lint and (b) the formula unit test;
-      # eval body runs locally and the baseline.json is committed.
       - name: Schema lint v2-golden.json
         run: |
           node -e "const Ajv=require('ajv/dist/2020.js').default;const fs=require('fs');

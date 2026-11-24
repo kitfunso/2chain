@@ -1,19 +1,3 @@
-// v2 seed: SQLite + Ollama. Atomic reseed via .tmp + rename so a running
-// server doesn't get mid-write reads. Phase 1 plan Step 8.
-//
-// Defaults to REAL-ONLY: 14 hand-crafted demo fixtures + 142 real-corpus
-// tools (verifiable public products: SEC EDGAR, GitHub, Stripe, Polygon,
-// Mapbox, OpenFDA, Spotify, etc.). The ~185 generated.ts fixtures use
-// synthetic vendor names ("expensy-parser", "captable-pro", "1040-bot")
-// to demonstrate registry scale; they are NOT real products and are
-// off by default. Pass INCLUDE_GENERATED=true to opt in.
-//
-// Usage:
-//   STORAGE_DRIVER=sqlite EMBEDDER=ollama tsx scripts/seed-fixtures.ts
-//   TWOCHAIN_DB_PATH=/tmp/v2.db    # override
-//   INCLUDE_GENERATED=true         # opt in to ~185 synthetic fixtures
-//   INCLUDE_REAL_CORPUS=false      # exclude the 142 real-corpus catalog
-
 import 'dotenv/config';
 import { existsSync, renameSync, unlinkSync, mkdirSync } from 'node:fs';
 import { homedir } from 'node:os';
@@ -27,8 +11,6 @@ import { generateFixtures } from '../src/fixtures/generated.js';
 import { REAL_CORPUS } from '../src/fixtures/real-corpus.js';
 import type { ToolSpecV2 } from '../src/types.js';
 
-// Default OFF — generated.ts contains ~185 synthetic vendor names that are
-// NOT real shipped products. Opt in via env if you want demo-arc scale.
 const INCLUDE_GENERATED = process.env.INCLUDE_GENERATED === 'true';
 const INCLUDE_REAL_CORPUS = process.env.INCLUDE_REAL_CORPUS !== 'false';
 const ALL_TOOLS: FixtureSpec[] = INCLUDE_GENERATED
@@ -62,7 +44,6 @@ console.log(
 console.log(`seed: embedder=${embedder.name()} dim=${embedder.dim()}`);
 
 try {
-  // 1. Agents
   console.log('\n=== agents ===');
   const nowIso = new Date().toISOString();
   for (const a of FIXTURE_AGENTS) {
@@ -76,7 +57,6 @@ try {
     console.log(`  ${a._id} [${a.role}] key=${a.api_key.slice(0, 12)}...`);
   }
 
-  // 2. Embed all capability_text in chunks of 32 (OllamaEmbedder caps inner concurrency at 4)
   const realTexts = INCLUDE_REAL_CORPUS ? REAL_CORPUS.map((t) => t.capability_text) : [];
   const texts = [...ALL_TOOLS.map((t) => t.capability_text), ...realTexts];
   console.log(`\n=== embedding ${texts.length} capability_texts ===`);
@@ -91,7 +71,6 @@ try {
   }
   console.log(`\n  embedded in ${Date.now() - tEmbed}ms`);
 
-  // 3. Tools (status='active', reliability already known from fixture)
   console.log('\n=== tools ===');
   const tInsert = Date.now();
   for (let i = 0; i < ALL_TOOLS.length; i++) {
@@ -115,7 +94,6 @@ try {
     };
     const inserted = await storage.upsertTool(v2, embeddings[i]);
 
-    // Eval run from fixture results
     const totalLatency = spec.case_results.reduce((s, c) => s + c.latency_ms, 0);
     await storage.insertEvalRun({
       tool_id: inserted.id,
@@ -131,18 +109,10 @@ try {
       duration_ms: totalLatency,
     });
   }
-  // 3b. Real-corpus tools: catalog-only entries with status='active' but
-  // pointing at the catalog-only-stub. Searchable but /call returns
-  // a "spec only" structured error.
   if (INCLUDE_REAL_CORPUS) {
     const offset = ALL_TOOLS.length;
     for (let i = 0; i < REAL_CORPUS.length; i++) {
       const spec = REAL_CORPUS[i];
-      // Golden-corpus normalization for eval comparability (E5): uniform
-      // last_eval_run keeps the additive freshness term constant across both
-      // seeded populations, so the golden floors keep measuring retrieval,
-      // not seed metadata. NOT importer-mirroring — real catalog imports
-      // carry freshness 0 by design until a reverify sweep scores them.
       await storage.upsertTool(
         { ...spec, metadata: { ...spec.metadata, last_eval_run: nowIso } },
         embeddings[offset + i],
@@ -153,7 +123,6 @@ try {
     console.log(`  inserted ${ALL_TOOLS.length} tools + eval_runs in ${Date.now() - tInsert}ms`);
   }
 
-  // 4. Stats
   const stats = await storage.dbStats();
   console.log('\n=== verification ===');
   console.log(`  tools:     ${stats.collection_counts.tools}`);
@@ -164,9 +133,7 @@ try {
 
   await storage.close();
 
-  // 5. Atomic swap
   if (existsSync(finalPath)) unlinkSync(finalPath);
-  // Also remove WAL/SHM files so the swap is clean
   for (const ext of ['-wal', '-shm']) {
     const sib = `${finalPath}${ext}`;
     if (existsSync(sib)) unlinkSync(sib);

@@ -1,10 +1,3 @@
-// Run the per-kind eval rubric on every tool in the live DB and write the
-// pass-rate as the new reliability_score. Tools below the 0.80 gate get
-// status='circuit_broken' so they drop out of /discover results.
-//
-// The rubric is deterministic and side-effect-free. Runs in microseconds
-// per tool, so 1000+ tools complete in <1s.
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';
@@ -12,10 +5,6 @@ import { SqliteStorage } from '../src/storage/sqlite.js';
 import { runSkillEval, runSubagentEval, runPromptEval } from '../src/services/kindEvalRunner.js';
 import type { ToolSpecV2 } from '../src/types.js';
 
-// Lightweight tool eval that only checks structural quality. The full eval
-// would re-run the fixture cases against a callable stub, which most
-// catalog-only entries can't satisfy. Score = pass/total of: has-name,
-// has-version, has-description (>=40 chars), has-body (>=100 chars).
 function runToolEval(spec: ToolSpecV2): { pass_count: number; total_count: number; pass_rate: number } {
   let pass = 0, total = 0;
   total++; if ((spec.name || '').length >= 2) pass++;
@@ -29,9 +18,6 @@ function runToolEval(spec: ToolSpecV2): { pass_count: number; total_count: numbe
 const dbPath = resolve(process.env.TWOCHAIN_DB_PATH ?? `${homedir()}/.2chain/db.sqlite`);
 const storage = new SqliteStorage({ path: dbPath });
 await storage.init();
-
-// SqliteStorage registers the notify_change UDF in init() so the trigger
-// fires cleanly when updateToolAfterEval() runs. No extra setup needed.
 
 try {
   const tools = await storage.listTools({ limit: 10000 });

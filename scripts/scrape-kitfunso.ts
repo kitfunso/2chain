@@ -1,8 +1,3 @@
-// Pull Keith's first-party repos from github.com/kitfunso so 2chain ranks
-// our own work alongside the public catalog. Curated whitelist: course
-// exercises and case-study repos are excluded; the rest are real shipping
-// tools / MCP servers / SDKs.
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';
@@ -19,8 +14,6 @@ const WHITELIST: Record<string, { domain: string; kind: 'tool' | 'skill' | 'suba
   '2chain':           { domain: 'ai',       kind: 'tool' },
   'omniskill':        { domain: 'code',     kind: 'tool' },
   'token-discipline': { domain: 'ai',       kind: 'tool' },
-  // openclaw removed: real openclaw is openclaw/openclaw, not kitfunso/openclaw.
-  // Now lives in scripts/scrape-agent-infra.ts.
   'backtestlab':      { domain: 'finance',  kind: 'tool' },
   'boring-maths':     { domain: 'docs',     kind: 'tool' },
 };

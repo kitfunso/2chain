@@ -12,7 +12,6 @@ import { discover, prewarmDiscover, DEMO_AGENT_QUERY, PREWARM_QUERIES } from '..
 import { isSweepInFlight, reverifyTools } from '../services/reverify.js';
 import { broadcast } from './sse.js';
 import type { Storage, Embedder } from '../types.js';
-// Side-effect: register all stubs in the in-process registry.
 import '../services/stubs.js';
 import { registerAllMcpServers } from '../import/mcp-importer.js';
 
@@ -36,11 +35,6 @@ export async function buildServer(): Promise<FastifyInstance> {
   app.decorate('storage', storage);
   app.decorate('embedder', embedder);
 
-  // Wire the MCP runtime bridge so curated `endpoint_stub_name=mcp-bridge`
-  // catalog rows are callable even after a cold restart (no manual import
-  // required). The catalog-vs-runtime split was a real bug: scrapers wrote
-  // mcp-bridge specs but only `npm run import:mcp` ever called
-  // registerMcpServer, so /call returned "unknown server" until that ran.
   const bridgeReg = registerAllMcpServers();
   app.log.info({ servers: bridgeReg.registered }, 'mcp runtime bridge registered');
 
@@ -55,17 +49,10 @@ export async function buildServer(): Promise<FastifyInstance> {
   registerPushRoute(app, storage, embedder);
   registerCallRoute(app, storage);
   registerDashboardRoutes(app, storage);
-  // E4 health surface: /v1/tools/:name/health (authenticated) and the
-  // dashboard-scoped /health-view/:name (unauthenticated, same trust
-  // boundary as /, /state, /events).
   registerHealthRoutes(app, storage);
-  // Assigned after rerankAndBroadcast is defined below; both sweep trigger
-  // paths (route + interval) call it once per completed unfiltered sweep.
   let postSweepRerank: () => Promise<void> = async () => {};
   registerReverifyRoute(app, storage, () => postSweepRerank());
 
-  // Opt-in continuous re-verification. REVERIFY_INTERVAL_MIN unset = OFF so
-  // fly.io / laptop deployments opt in deliberately (no surprise CPU).
   // Cap: setInterval delays above 2^31-1 ms overflow and Node clamps the
   // interval to 1ms — an absurd REVERIFY_INTERVAL_MIN would hot-loop the
   // sweep back-to-back. ~24 days is the largest safe interval.
@@ -76,7 +63,6 @@ export async function buildServer(): Promise<FastifyInstance> {
     reverifyIntervalMin > 0 &&
     reverifyIntervalMin <= REVERIFY_INTERVAL_MAX_MIN
   ) {
-    // In-flight guard: a slow sweep must never overlap the next tick.
     let reverifyInFlight = false;
     const reverifyTimer = setInterval(() => {
       if (reverifyInFlight) {
@@ -87,8 +73,6 @@ export async function buildServer(): Promise<FastifyInstance> {
       reverifyTools(storage)
         .then(async (summary) => {
           app.log.info(summary, 'scheduled reverify sweep complete');
-          // One coalesced rerank for the whole sweep (per-event reranks are
-          // suppressed while the sweep is in flight).
           await postSweepRerank();
         })
         .catch((e) => app.log.error({ err: (e as Error).message }, 'scheduled reverify sweep failed'))
@@ -98,24 +82,16 @@ export async function buildServer(): Promise<FastifyInstance> {
     app.log.info({ interval_min: reverifyIntervalMin }, 'reverify interval enabled');
     app.addHook('onClose', async () => clearInterval(reverifyTimer));
   } else if (process.env.REVERIFY_INTERVAL_MIN !== undefined) {
-    // Set-but-unusable (NaN from a typo like '60m', zero/negative, or above
-    // the setInterval-safe cap): the operator believes continuous
-    // re-verification is on — say loudly that it is not.
     app.log.warn(
       { raw: process.env.REVERIFY_INTERVAL_MIN, max_min: REVERIFY_INTERVAL_MAX_MIN },
       'REVERIFY_INTERVAL_MIN is set but not a usable interval; reverify interval DISABLED',
     );
   }
 
-  // Pre-warm prewarm queries so demo cold-call is sub-100ms.
   prewarmDiscover(embedder)
     .then(() => app.log.info({ count: 17 }, 'embedder prewarm complete'))
     .catch((e) => app.log.warn({ err: (e as Error).message }, 'embedder prewarm failed (non-fatal)'));
 
-  // Seed the rankings table by firing each prewarm query through real /discover
-  // so the /trending endpoint has data on day one. Cold-only: gate on count===0
-  // not <length, so a crash mid-seed doesn't double-count on next boot. The
-  // seed runs once per database lifetime — re-seed by deleting from rankings.
   (async () => {
     try {
       const stats = await storage.dbStats();
@@ -133,10 +109,6 @@ export async function buildServer(): Promise<FastifyInstance> {
     }
   })();
 
-  // v1's MongoDB change-stream re-rank, expressed against the Storage interface.
-  // Fires on any change event the storage driver reports; we filter for tool
-  // mutations and rebroadcast a fresh ranking. Step 9 wires SqliteStorage's
-  // updateHook to actually fire these; for now this is a no-op subscription.
   const rerankAndBroadcast = async (trigger: string): Promise<void> => {
     try {
       const { results, meta } = await discover(storage, embedder, DEMO_AGENT_QUERY, 5);
@@ -148,8 +120,6 @@ export async function buildServer(): Promise<FastifyInstance> {
           vec_score: r.vec_score,
           rank_score: r.rank_score,
           rrf_score: r.rrf_score,
-          // Order coherence: rows arrive in final_score order; consumers
-          // re-deriving order from scores need the actual ordering key.
           final_score: r.final_score,
           freshness: r.freshness,
         })),
@@ -164,11 +134,6 @@ export async function buildServer(): Promise<FastifyInstance> {
 
   postSweepRerank = () => rerankAndBroadcast('reverify-sweep');
 
-  // Sweep coalescing (codex P2): an unfiltered reverify sweep writes the
-  // tools table once per verified tool; reranking on each write would spawn
-  // a discover per tool on top of the eval work. Per-event reranks are
-  // suppressed while a sweep is in flight; the sweep's trigger paths (route
-  // + interval) fire exactly ONE rerank after the sweep completes.
   storage.watchChanges(async (event) => {
     if (event.table !== 'tools') return;
     if (isSweepInFlight()) return;

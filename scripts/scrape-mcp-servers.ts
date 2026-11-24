@@ -1,8 +1,3 @@
-// Scrape the punkpeye/awesome-mcp-servers README and import each entry as
-// a kind='tool' spec with endpoint_stub_name='mcp-bridge' so it counts in
-// the dashboard's MCP source bucket. Capable of being called via /call once
-// the mcp-bridge stub is wired up.
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';
@@ -34,14 +29,6 @@ try {
     author: SOURCE.author,
     kind: 'tool',
   });
-  // Catalog-only by design. The awesome-mcp-servers README is a directory of
-  // GitHub repos, not packaged servers — most entries lack a published npm
-  // package or stable spawn command, so we cannot register them on the
-  // runtime bridge. Marking them mcp-bridge would be false advertising:
-  // /discover returns them, /call fails with "unknown server".
-  // Curated servers in src/import/mcp-registry.ts (imported via
-  // `npm run import:mcp`) keep endpoint_stub_name=mcp-bridge because they
-  // have verified spawn config.
   const specs: ToolSpecV2[] = r.specs.slice(0, MAX).map((s) => ({
     ...s,
     endpoint_stub_name: 'catalog-only-stub',

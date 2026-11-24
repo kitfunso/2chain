@@ -1,11 +1,3 @@
-// Import data/registry-snapshot.json into the live SQLite DB. Embeds via
-// the configured Embedder (Ollama by default) and dedupes via the
-// existing scrape-import path.
-//
-// Usage:
-//   TWOCHAIN_DB_PATH=~/.2chain/db.sqlite npm run import:snapshot
-//   npm run import:snapshot -- --limit 200       # cap embeddings done in one go
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { readFileSync } from 'node:fs';

@@ -1,10 +1,3 @@
-// Embedder factory. Reads EMBEDDER env, returns the concrete impl.
-// Implementations land in subsequent steps:
-//   ollama          -> Step 5 (Phase 1)
-//   transformersjs  -> Phase 3
-//   voyage          -> already exists (legacy v1 path), wrapped here in Phase 3
-//   openai          -> Phase 3
-
 import type { Embedder } from '../types.js';
 
 export type EmbedderDriver = 'ollama' | 'transformersjs' | 'voyage' | 'openai';

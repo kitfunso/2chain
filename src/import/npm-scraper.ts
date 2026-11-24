@@ -1,14 +1,3 @@
-// npm registry scraper — pulls real packages by keyword/text query, normalises
-// each into a 2chain ToolSpecV2 row. Returns specs only; persistence is the
-// caller's job (so we can dry-run, dedupe against existing tools, etc.).
-//
-// Source of truth: https://registry.npmjs.org/-/v1/search?text=<q>&size=<n>
-// Documented at: https://github.com/npm/registry/blob/main/docs/REGISTRY-API.md
-//
-// Why this isn't a mock: we hit the real npm registry. Tests inject a
-// `fetchImpl` so they can replay a recorded payload without network
-// (CLAUDE.md rule 5 forbids mocking storage; HTTP is allowed to be replayed).
-
 import type { ToolSpecV2 } from '../types.js';
 
 export interface NpmSearchPackage {
@@ -39,15 +28,10 @@ const NPM_SEARCH_URL = 'https://registry.npmjs.org/-/v1/search';
 const PAGE_SIZE = 250; // npm caps at 250 per page
 
 export interface ScrapeNpmOptions {
-  /** npm search query — `keywords:mcp`, `text:openapi`, etc. */
   query: string;
-  /** Maximum total packages to scrape across pages. */
   limit?: number;
-  /** Override the fetch implementation (used by tests to replay a payload). */
   fetchImpl?: typeof fetch;
-  /** 2chain domain bucket to assign. Defaults to 'devtools'. */
   domain?: string;
-  /** User-Agent header — npm asks for one. */
   userAgent?: string;
 }
 
@@ -58,12 +42,6 @@ export interface ScrapeNpmResult {
   duration_ms: number;
 }
 
-/**
- * Build the 2chain capability_text from an npm package's metadata. Uses
- * description + keywords + repo URL so the embedder has enough signal even
- * for terse descriptions ("MCP server for X" -> we add the keywords to the
- * text so similar packages cluster).
- */
 function packageToSpec(pkg: NpmSearchPackage, domain: string): ToolSpecV2 {
   const parts: string[] = [pkg.name];
   if (pkg.description) parts.push(pkg.description);
@@ -75,14 +53,9 @@ function packageToSpec(pkg: NpmSearchPackage, domain: string): ToolSpecV2 {
   }
   const capability_text = parts.join('  ');
 
-  // The 2chain tool name uses the npm package name verbatim. Scoped packages
-  // (@scope/name) keep the slash; SQLite UNIQUE(namespace, name, version) is
-  // happy with it. Authors can republish under their own name later.
   return {
     name: pkg.name,
     version: '1.0', // we don't echo the npm version — that's the *package* version,
-                     // not the registry-entry version. Re-scrapes may bump capability_text
-                     // but the tool stays at v1.0 for the discovery surface.
     author_agent_id: 'npm-scrape',
     capability_text,
     input_contract: { type: 'object', additionalProperties: true },
@@ -125,7 +98,7 @@ export async function scrapeNpm(opts: ScrapeNpmOptions): Promise<ScrapeNpmResult
       specs.push(packageToSpec(obj.package, domain));
     }
     page++;
-    if (body.objects.length < size) break; // last page
+    if (body.objects.length < size) break;
   }
 
   return {

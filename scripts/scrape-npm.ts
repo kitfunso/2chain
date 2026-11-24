@@ -1,11 +1,3 @@
-// CLI: scrape the npm registry for packages matching a query and import
-// them into 2chain as tool_kind='tool', endpoint_stub_name='catalog-only-stub'.
-//
-// Usage:
-//   npm run scrape:npm -- --query "keywords:mcp" --limit 100
-//   npm run scrape:npm -- --query "openapi" --domain devtools --limit 50
-//   npm run scrape:npm -- --query "keywords:mcp" --dry-run     # no embedding/insert
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';

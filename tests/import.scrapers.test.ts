@@ -1,7 +1,3 @@
-// Scraper tests — exercise npm + awesome-list parsers against recorded
-// payloads. The HTTP layer is injected (fetchImpl) so tests don't depend
-// on network. Storage is real :memory: SQLite per CLAUDE.md rule 5.
-
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { SqliteStorage } from '../src/storage/sqlite.js';
@@ -31,8 +27,6 @@ function makeUnitVec(seed: number): Float32Array {
   return v;
 }
 
-// Real-shape recorded npm registry response (3 sample @modelcontextprotocol packages).
-// Trimmed to the fields the scraper actually reads.
 const NPM_PAYLOAD = {
   total: 3,
   time: 'Sun May 03 2026 12:00:00 GMT+0000',
@@ -120,8 +114,6 @@ after(async () => {
   await storage.close();
 });
 
-// ---- npm scraper ---------------------------------------------------------
-
 test('scrapeNpm parses 3 packages from a recorded payload', async () => {
   const fetchImpl = async (): Promise<Response> =>
     new Response(JSON.stringify(NPM_PAYLOAD), { status: 200 });
@@ -151,12 +143,8 @@ test('scrapeNpm throws on non-2xx', async () => {
   );
 });
 
-// ---- awesome-list parser -------------------------------------------------
-
 test('parseAwesomeMarkdown extracts entries, skips code blocks and short descs', () => {
   const { entries } = parseAwesomeMarkdown(AWESOME_MD);
-  // 4 valid bullets (Filesystem, GitHub, Postgres, Slack). 'tooshort' rejected
-  // (description < 5 chars), code block bullet skipped.
   assert.equal(entries.length, 4);
   assert.equal(entries[0].name, 'Filesystem');
   assert.equal(entries[2].name, 'Postgres');
@@ -182,8 +170,6 @@ test('scrapeAwesomeList returns deduped specs with catalog-only stubs', async ()
   }
 });
 
-// ---- importScrapedSpecs --------------------------------------------------
-
 test('importScrapedSpecs upserts new specs and skips existing on re-run', async () => {
   const fresh = new SqliteStorage({ path: ':memory:' });
   await fresh.init();
@@ -198,7 +184,6 @@ test('importScrapedSpecs upserts new specs and skips existing on re-run', async 
   assert.equal(first.imported, 4);
   assert.equal(first.skipped_existing, 0);
 
-  // Re-run with the same specs — every one should be skipped.
   const second = await importScrapedSpecs(fresh, embedder, scraped.specs);
   assert.equal(second.imported, 0);
   assert.equal(second.skipped_existing, 4);

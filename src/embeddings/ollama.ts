@@ -1,25 +1,16 @@
-// OllamaEmbedder — Phase 1 default embedder.
-// Hits localhost:11434/api/embeddings with `nomic-embed-text` (768 dim).
 // L2-normalises output; Ollama returns un-normalised vectors.
-//
-// Concurrency: embedBatch caps parallel in-flight calls at 4 because
-// nomic-embed-text on M-series sits ~50ms/call; on CPU-only Linux it can
-// be 500ms+/call. Concurrency 4 keeps the seed under the 30s PRD bar
-// on M-series and roughly 6s extra on CPU.
 
 import type { Embedder, EmbedResult } from '../types.js';
 import { LruEmbeddingCache } from './cache.js';
 
 export interface OllamaEmbedderOpts {
-  host?: string;             // default http://localhost:11434
-  model?: string;            // default nomic-embed-text
-  /** Expected embedding dim. Defaults to 768 (nomic-embed-text).
-   *  Set to 1024 for mxbai-embed-large. Validated at first call. */
+  host?: string;
+  model?: string;
   dim?: number;
-  timeoutMs?: number;        // default 10_000
-  cacheCapacity?: number;    // default 256
-  concurrency?: number;      // default 4
-  warmupOnInit?: boolean;    // default false (set by setup-personal.ts in Step 8)
+  timeoutMs?: number;
+  cacheCapacity?: number;
+  concurrency?: number;
+  warmupOnInit?: boolean;
 }
 
 interface OllamaEmbeddingResponse {
@@ -70,7 +61,6 @@ export class OllamaEmbedder implements Embedder {
     this.concurrency = Math.max(1, opts.concurrency ?? Number(process.env.OLLAMA_CONCURRENCY ?? 4));
     this.cache = new LruEmbeddingCache(opts.cacheCapacity ?? 256);
     if (opts.warmupOnInit ?? process.env.OLLAMA_WARMUP === 'true') {
-      // fire-and-forget; ignore failures so constructor is always safe.
       this.embed('warmup', 'document').then(() => { this.warmedUp = true; }).catch(() => undefined);
     }
   }

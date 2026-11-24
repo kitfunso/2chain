@@ -1,12 +1,3 @@
-// Content-addressed corpus signature for v2-native golden ranking set.
-//
-// Hashes a canonicalised projection of the tool set so the signature
-// survives:
-//   - re-seeds of the same logical corpus (no ephemeral id/timestamp drift)
-//   - the SQLite -> Postgres backend swap planned for Phase 2
-//
-// See docs/plans/2026-05-23-episode-a1-v2-native-golden-set.md, Step 1.
-
 import { createHash } from 'node:crypto';
 import type { ToolV2 } from '../types.js';
 
@@ -23,7 +14,6 @@ function sha256Hex(input: string): string {
   return createHash('sha256').update(input, 'utf8').digest('hex');
 }
 
-/** Canonical schema summary: stable JSON of {input, output} contracts. */
 function schemaSummary(tool: Pick<ToolV2, 'input_contract' | 'output_contract'>): string {
   return canonicalStringify({
     input: tool.input_contract ?? {},
@@ -31,7 +21,6 @@ function schemaSummary(tool: Pick<ToolV2, 'input_contract' | 'output_contract'>)
   });
 }
 
-/** Stable JSON.stringify with sorted object keys (JCS-lite). */
 function canonicalStringify(value: unknown): string {
   if (value === null || typeof value !== 'object') {
     return JSON.stringify(value);

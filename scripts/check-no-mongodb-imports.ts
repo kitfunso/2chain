@@ -1,13 +1,9 @@
-// Lightweight guard: fail CI if any v2 source file imports `mongodb`.
-// CLAUDE.md rule 1+3: storage access via Storage interface only.
-// Lighter than wiring eslint just for this one rule.
-
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
 const FORBIDDEN = ["from 'mongodb'", 'from "mongodb"', "require('mongodb')"];
 const ROOTS = ['src/services', 'src/server'];
-const ALLOWED_PATHS = new Set<string>(); // intentionally empty in v2
+const ALLOWED_PATHS = new Set<string>();
 
 function walk(dir: string): string[] {
   const out: string[] = [];

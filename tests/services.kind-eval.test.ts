@@ -1,8 +1,3 @@
-// Per-kind eval rubric tests. Pure functions over ToolSpecV2 — no storage,
-// no network. Verifies the rubric catches the failure modes that mattered
-// when we found them: empty descriptions, missing domain, malformed
-// templates, missing action verbs.
-
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -84,7 +79,6 @@ test('runSubagentEval fails agent-routing-signal when description is generic', (
 
 test('runPromptEval requires a registered template + that it renders', () => {
   _resetPromptTemplatesForTests();
-  // No template registered yet
   const noTemplate = runPromptEval(spec({
     tool_kind: 'prompt', domain: 'code', name: 'my-prompt',
     endpoint_stub_name: 'prompt-template-stub',
@@ -92,7 +86,6 @@ test('runPromptEval requires a registered template + that it renders', () => {
   const failed1 = noTemplate.cases.filter((c) => !c.pass).map((c) => c.case_id);
   assert.ok(failed1.includes('template-registered'));
 
-  // Register a template, eval should now pass.
   setPromptTemplate('my-prompt', 'Hello {{name}}, welcome!');
   const withTemplate = runPromptEval(spec({
     tool_kind: 'prompt', domain: 'code', name: 'my-prompt',

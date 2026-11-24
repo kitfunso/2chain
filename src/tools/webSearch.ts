@@ -1,7 +1,3 @@
-// Real-fetch helpers for the github-search, npm-search, and wikipedia-search
-// callable stubs. All three use unauthenticated public APIs; GitHub uses the
-// optional GITHUB_TOKEN secret if present (lifts rate limit 60 -> 5000/hr).
-
 const FETCH_TIMEOUT_MS = 6000;
 const USER_AGENT = '2chain-web-search/1.0';
 
@@ -20,8 +16,6 @@ async function fetchJson<T>(url: string, headers: Record<string, string> = {}): 
     clearTimeout(t);
   }
 }
-
-// ---------- GitHub repo search ----------
 
 export interface GithubRepoHit {
   full_name: string;
@@ -52,8 +46,6 @@ export async function searchGithubRepos(query: string, limit = 10): Promise<{ qu
   return { query, total_count: j.total_count, results };
 }
 
-// ---------- npm package search ----------
-
 export interface NpmHit {
   name: string;
   version: string;
@@ -75,14 +67,11 @@ export async function searchNpm(query: string, limit = 10): Promise<{ query: str
   };
 }
 
-// ---------- Wikipedia opensearch + extract ----------
-
 export interface WikiHit { title: string; description: string; url: string }
 
 export async function searchWikipedia(query: string, limit = 10): Promise<{ query: string; results: WikiHit[] }> {
   const cap = Math.min(Math.max(limit, 1), 20);
   const url = `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=${cap}&namespace=0&format=json&origin=*`;
-  // opensearch returns a fixed 4-tuple: [query, [titles], [descriptions], [urls]]
   const arr = await fetchJson<[string, string[], string[], string[]]>(url);
   const titles = arr[1] || [];
   const descs = arr[2] || [];

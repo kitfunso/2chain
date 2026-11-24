@@ -1,10 +1,3 @@
-// Discover claude-code skill repos at scale by querying GitHub's search API
-// across topic and keyword queries. Each result becomes a kind='skill' spec
-// with real stars + last-commit timestamps. Idempotent via skip-existing.
-//
-// Auth: requires GITHUB_TOKEN (search API rate-limit is ~10 req/min unauth,
-// ~30 req/min authed). Without it, the script will likely 403 partway through.
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';
@@ -34,7 +27,6 @@ interface GhSearchResp { total_count: number; items: GhRepoHit[] }
 
 interface Query { q: string; kind: ToolKind; domain: string; per_page: number }
 
-// Each query targets a different slice of the skills/agent ecosystem.
 // Queries run sequentially with a 2s pause between to stay under search rate-limit.
 const QUERIES: Query[] = [
   { q: 'topic:claude-code-skill',      kind: 'skill', domain: 'ai',   per_page: 50 },

@@ -19,9 +19,6 @@ if ! ollama list 2>/dev/null | grep -q nomic-embed-text; then
   ollama pull nomic-embed-text
 fi
 
-# First-boot synchronous data load. Each marker gates one phase so a partial
-# boot can resume cleanly. We block server start until imports finish — slow
-# first boot, but reliable, no SSH dance.
 cd /app
 
 if [ ! -f /data/.corpus-imported ]; then
@@ -96,32 +93,17 @@ if [ ! -f /data/.skills-discovery-imported ]; then
   ( setsid sh -c 'sleep 180 && cd /app && npm run discover:skills >>/data/discover-skills.log 2>&1 && touch /data/.skills-discovery-imported' </dev/null >/dev/null 2>&1 ) &
 fi
 
-# GitHub stars + last-commit enrichment. Idempotent (skips rows refreshed
-# within last 7d), so runs on every boot to keep stats current. Slow without
-# GITHUB_TOKEN (60/hr unauth limit) but resumable across reboots.
 echo "dispatching github stats enrichment in background"
 ( setsid sh -c 'sleep 120 && cd /app && npm run enrich:github >>/data/enrich-github.log 2>&1' </dev/null >/dev/null 2>&1 ) &
 
-# Chunked snapshot import (1200 specs from npm + PyPI + HF + awesome-*).
-# Runs in background AFTER server starts so the slow import doesn't block
-# the dashboard. Skip-existing makes it resumable across reboots.
 if [ ! -f /data/.snapshot-imported ]; then
   echo "first-boot: dispatching chunked snapshot import in background"
   ( setsid sh -c 'sleep 30 && cd /app && npm run import:snapshot:chunked >>/data/import-snapshot.log 2>&1 && touch /data/.snapshot-imported' </dev/null >/dev/null 2>&1 ) &
 fi
 
-# Always-run domain reclassifier so newly imported entries get bucketed.
-# Domain classification now happens INLINE in src/import/scrape-import.ts at
-# import time, so every imported row already lands in a canonical bucket.
-# The reclassify script is retained for retroactive cleanup (run on demand
-# when keyword rules change), but is NOT part of the boot workflow.
-
-# Per-kind eval rubric: scores every tool's reliability based on rubric
-# pass-rate. Sub-second total runtime, no embedder calls.
 echo "running per-kind eval rubric..."
 npm run eval:all 2>&1 | tee /data/eval-all.log | tail -10 || true
 
-# Auto-create the public demo + author agents if missing (idempotent upsert).
 if [ ! -f /data/.agents-bootstrapped ]; then
   echo "first-boot: bootstrapping demo agents..."
   npm run agent:create -- --name public-demo --role caller --key sk_public_caller_09e45ffbb6781f2f 2>&1 | tail -2 || true

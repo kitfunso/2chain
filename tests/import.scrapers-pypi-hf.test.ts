@@ -1,5 +1,3 @@
-// PyPI + HF scraper tests with recorded payloads.
-
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { scrapePypi } from '../src/import/pypi-scraper.js';
@@ -87,7 +85,6 @@ test('scrapeHuggingFace assigns datasets/apps domain by resource', async () => {
   const fetchImpl = async (): Promise<Response> => new Response('[]', { status: 200 });
   const r1 = await scrapeHuggingFace({ resource: 'datasets', limit: 1, fetchImpl: fetchImpl as typeof fetch });
   const r2 = await scrapeHuggingFace({ resource: 'spaces', limit: 1, fetchImpl: fetchImpl as typeof fetch });
-  // No specs, but verify the function doesn't throw on empty.
   assert.equal(r1.fetched, 0);
   assert.equal(r2.fetched, 0);
 });

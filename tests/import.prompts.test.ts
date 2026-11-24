@@ -1,8 +1,3 @@
-// Prompts importer integration test.
-// Real SQLite, real seed list, deterministic stub embedder.
-// Also exercises the prompt-template-stub via callStub to confirm
-// substitution works end-to-end.
-
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { SqliteStorage } from '../src/storage/sqlite.js';
@@ -72,7 +67,6 @@ test('importPrompts upserts one row per seed with tool_kind=prompt', async () =>
 });
 
 test('prompt-template-stub substitutes {{vars}} when called via callStub', async () => {
-  // Pick a seed with known vars and exercise the stub through call.ts's path.
   const seed = PROMPT_SEEDS.find((s) => s.slug === 'pr-description');
   assert.ok(seed, 'pr-description seed missing');
 
@@ -86,7 +80,6 @@ test('prompt-template-stub substitutes {{vars}} when called via callStub', async
   const rendered = (out as { rendered: string }).rendered;
   assert.match(rendered, /fix login bug/);
   assert.match(rendered, /- a\n- b/);
-  // Unsubstituted vars must not crash; not used by this seed but verify shape.
   assert.ok(!/\{\{context\}\}/.test(rendered), 'context should be substituted');
 });
 
@@ -134,7 +127,6 @@ test('prompt-template-stub leaves placeholders intact when vars is null', async 
 });
 
 test('prompt-template-stub does not String-coerce non-string vars', async () => {
-  // {{x}} with x={a:1} must NOT render "[object Object]" — render literally instead.
   const out = await callStub(
     'prompt-template-stub',
     {

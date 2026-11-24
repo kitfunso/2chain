@@ -1,10 +1,3 @@
-// CLI: scrape Hugging Face Hub for top models / datasets / spaces.
-// Usage:
-//   npm run scrape:hf                                          # top 100 models by downloads
-//   npm run scrape:hf -- --resource datasets --limit 50
-//   npm run scrape:hf -- --filter "pipeline_tag=text-generation" --limit 100
-//   npm run scrape:hf -- --dry-run
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';

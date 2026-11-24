@@ -1,6 +1,3 @@
-// v2 call — Storage via DI. No MongoDB. ajv contracts enforced on every call.
-// LRU-bounded schema cache per CLAUDE.md rule 11.
-
 import * as ajvNs from 'ajv';
 import type { AnySchemaObject, ValidateFunction } from 'ajv';
 type AjvInstance = { compile: (schema: unknown) => ValidateFunction };
@@ -22,7 +19,6 @@ function compileCached(schema: AnySchemaObject): ValidateFunction {
   const key = createHash('sha256').update(JSON.stringify(schema)).digest('hex');
   let v = schemaCache.get(key);
   if (v) {
-    // LRU touch: re-insert to mark as most recently used.
     schemaCache.delete(key);
     schemaCache.set(key, v);
     return v;
@@ -71,15 +67,6 @@ export async function call(
     return { ok: false, status: 404, error: { code: 'tool_not_found', message: `${input.tool_name}@${input.tool_version} not found` } };
   }
 
-  // Catalog kinds (skill/subagent/prompt) are discovery-only — agents load
-  // skills into context, spawn subagents via the Task tool, and render
-  // prompts into context; none is a /call target. Refuse up front instead
-  // of returning a stub payload silently. 'prompt' joined in E2: a callable
-  // prompt could circuit-break, then be skipped forever by reverify's
-  // catalog-kind partition — a dead end recovery could never reach. This
-  // check sits ABOVE the status checks so a catalog row circuit-broken
-  // BEFORE E2 answers kind_not_callable (the truthful error) instead of
-  // 503 circuit_broken forever.
   if (tool.tool_kind === 'skill' || tool.tool_kind === 'subagent' || tool.tool_kind === 'prompt') {
     await logUsage(storage, tool, agentId, callId, 'gated', Date.now() - t0, namespace);
     const remedy =
@@ -124,7 +111,6 @@ export async function call(
     }
   }
 
-  // Validate input
   const inputValidator = compileCached(tool.input_contract as AnySchemaObject);
   if (!inputValidator(input.input)) {
     const errs = ajvErrors(inputValidator.errors);
@@ -133,7 +119,6 @@ export async function call(
     return { ok: false, status: 400, error: { code: 'input_contract_violation', message: 'input failed schema validation', details: { schema_errors: errs } } };
   }
 
-  // Forward to stub
   let raw: unknown;
   try {
     raw = await Promise.race([
@@ -145,21 +130,12 @@ export async function call(
     return { ok: false, status: 504, error: { code: 'stub_timeout', message: (e as Error).message } };
   }
 
-  // Validate output
   const outputValidator = compileCached(tool.output_contract as AnySchemaObject);
   if (!outputValidator(raw)) {
     const errs = ajvErrors(outputValidator.errors);
     await logViolation(storage, tool, agentId, callId, 1, 'output', raw, errs, namespace);
 
-    // fail-fast: circuit-break immediately. D34 (amended E2): call.ts stays
-    // the ONLY place that flips a tool TO circuit_broken; reverify may flip
-    // circuit_broken -> active after evidence-based recovery (3 clean
-    // reverify runs spanning >= 60min, unfiltered sweeps only) — never the
-    // reverse, and never touches pending. See services/scoreLifecycle.ts.
     if (tool.output_repair_strategy === 'fail-fast') {
-      // Atomic flip + broken_at watermark (recovery evidence must postdate
-      // the TRANSITION; the 503 rejections this tool now answers also log
-      // outcome='circuit_broken' usage rows and must not move the mark).
       await storage.markCircuitBroken(tool.id, new Date().toISOString());
       await logUsage(storage, tool, agentId, callId, 'circuit_broken', Date.now() - t0, namespace);
       return {

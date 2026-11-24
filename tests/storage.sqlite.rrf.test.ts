@@ -1,12 +1,3 @@
-// Real-DB RRF tests for SqliteStorage. Uses real Ollama embeddings so the
-// vector arm is meaningful. Skips entire suite if Ollama unreachable.
-//
-// Phase 1 plan Step 6 verify criterion. Validates:
-//  - tools matching only one arm still surface
-//  - reliability gate cuts off below-0.80 tools
-//  - namespace gate isolates per-tenant data
-//  - top-1 routes correctly for the kind of queries v1 routes correctly for
-
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { SqliteStorage } from '../src/storage/sqlite.js';
@@ -65,7 +56,6 @@ async function freshStorageWithTools(specs: ToolSpecV2[], namespace?: string) {
 }
 
 test('RRF top-1 picks the SEC tool for a DCF query', { skip }, async () => {
-  // Use the same query for vector embedding AND FTS5 — what v1 does.
   const query =
     'I am building a DCF model for NVIDIA pull the latest year income statement from 10-K filing live ticker';
   const s = await freshStorageWithTools([
@@ -158,7 +148,6 @@ test('reliability gate excludes tools below 0.80', { skip }, async () => {
     gate: 0.8,
     weights: { vector: 0.7, text: 0.3 },
   });
-  // flaky-extractor must not appear in any result
   const names = results.map((r) => r.name);
   assert.ok(names.includes('good-extractor'));
   assert.ok(!names.includes('flaky-extractor'), 'gated tool should be invisible');
@@ -221,14 +210,11 @@ test('RRF returns empty for queries that match nothing in either arm', { skip },
     gate: 0.8,
     weights: { vector: 0.7, text: 0.3 },
   });
-  // Will likely return the one tool (vector arm always returns top-50) but
-  // we just want to verify no crash and result has rrf_score > 0.
   assert.ok(Array.isArray(results));
   await s.close();
 });
 
 test('tools matching only the text arm surface (vector miss but BM25 hit)', { skip }, async () => {
-  // Force a case where vector similarity is low but exact term matches
   const s = await freshStorageWithTools([
     makeSpec({
       name: 'literal-extractor',
@@ -243,8 +229,6 @@ test('tools matching only the text arm surface (vector miss but BM25 hit)', { sk
     'extract tables from documents',
     'query',
   );
-  // Query with the literal word "zorblax" plus normal content; text arm
-  // should pull literal-extractor in even though vector won't.
   const results = await s.runRRF({
     queryEmbedding,
     queryText: 'extract tables zorblax',

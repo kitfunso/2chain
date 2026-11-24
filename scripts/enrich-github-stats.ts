@@ -1,10 +1,3 @@
-// Enrich each tool's metadata with github_stars + github_last_commit_at by
-// extracting the Source URL from capability_text and calling GitHub's REST API.
-// Idempotent: skips tools whose metadata.github_fetched_at is < REFRESH_DAYS old.
-//
-// Auth: set GITHUB_TOKEN to get 5000/hr; unauthenticated is 60/hr.
-// Run: STORAGE_DRIVER=sqlite tsx scripts/enrich-github-stats.ts
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';
@@ -21,8 +14,6 @@ if (TOKEN) HEADERS.authorization = `Bearer ${TOKEN}`;
 
 interface ToolRow { rowid: number; name: string; author_agent_id: string; metadata: string; capability_text: string }
 
-// Authors whose entries point at an aggregator catalog repo (not the per-tool
-// repo), so the inherited star count is meaningless and floods sort-by-stars.
 const SKIP_AUTHORS = new Set([
   'awesome-chatgpt-prompts',
   'awesome-voltagent-claude-subagents',
@@ -67,7 +58,6 @@ for (const row of rows) {
   let meta: Record<string, unknown> = {};
   try { meta = JSON.parse(row.metadata || '{}'); } catch {}
 
-  // Aggregator-sourced rows: clear any inherited parent-repo stars and skip.
   if (SKIP_AUTHORS.has(row.author_agent_id)) {
     if (meta.github_stars !== undefined) {
       delete meta.github_stars;

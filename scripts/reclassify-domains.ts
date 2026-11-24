@@ -1,10 +1,3 @@
-// Retroactive domain cleanup. Inline classification at import time
-// (src/import/scrape-import.ts) is the primary path; this tool exists for:
-//   1. Migrating legacy rows that landed before inline classify shipped.
-//   2. Re-running after the RULES in src/import/domain-classifier.ts change.
-// It is no longer required on every boot. Run on demand via:
-//   STORAGE_DRIVER=sqlite tsx scripts/reclassify-domains.ts
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';
@@ -26,7 +19,6 @@ const upd = db.prepare('UPDATE tools SET domain = ? WHERE rowid = ?');
 
 for (const row of rows) {
   const current = (row.domain || '').toLowerCase();
-  // Curated authors with a canonical domain: leave alone.
   if (CURATED_AUTHORS.has(row.author_agent_id) && CANONICAL_DOMAINS.has(current)) {
     curated_skipped++;
     continue;

@@ -1,22 +1,3 @@
-// v2-native NDCG@3 regression runner. Replaces v2-golden-regression.ts.
-//
-// Reads tests/fixtures/v2-golden.json (hand-graded), replays each query
-// through discover(), computes NDCG@3 + MRR + Recall@3, and (if invoked
-// with --baseline N) writes tests/fixtures/v2-baseline-native.json by
-// averaging across N=5 runs and reporting stddev.
-//
-// Pre-flight (refuses to run any pre-flight fail):
-//   1. ajv lint v2-golden.json AND adjudication completeness
-//   2. ndcg_formula === "exp_gain_log2_rank1"
-//   3. corpus_sha256 matches current DB
-//   4. prewarm_sha256 matches current PREWARM_QUERIES
-//
-// Usage:
-//   TWOCHAIN_DB_PATH=C:/tmp/v2.db npx tsx scripts/smoke/v2-golden-v2native.ts
-//   ...                                              --baseline 5
-//
-// Exit codes: 0 ok / 1 NDCG below baseline / 2 pre-flight or schema fail.
-
 import 'dotenv/config';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -70,17 +51,10 @@ const baselineOut = (() => {
 
 const skipHashCheck = process.argv.includes('--skip-hash-check');
 
-// Per-query kind targeting (Episode follow-up to A2): opt-in. Defaults off
-// so the baseline numbers in v2-baseline-native.json (A1's CI gate) remain
-// reproducible. Pass --per-query-kind to use each query's expected_kind
-// field as the filter. See docs/perf/10k-benchmark.md "per-query kind
-// targeting" section — infrastructure ships but NDCG drops on both corpora
-// because A1's relevance maps include cross-kind incidental grades.
 const perQueryKind = process.argv.includes('--per-query-kind');
 
 const golden = JSON.parse(readFileSync(goldenPath, 'utf-8')) as Golden;
 
-// ---- Pre-flight 1: ajv schema lint ----
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 const goldenSchema = JSON.parse(readFileSync(goldenSchemaPath, 'utf-8'));
 const adjSchema = JSON.parse(readFileSync(adjSchemaPath, 'utf-8'));
@@ -97,13 +71,11 @@ if (!validateAdj(golden)) {
   process.exit(2);
 }
 
-// ---- Pre-flight 2: NDCG formula version ----
 if (golden.ndcg_formula !== 'exp_gain_log2_rank1') {
   console.error(`PRE-FLIGHT FAIL: ndcg_formula must be "exp_gain_log2_rank1", got "${golden.ndcg_formula}"`);
   process.exit(2);
 }
 
-// ---- Pre-flight 3+4: corpus + prewarm hash match ----
 const dbPath = corpusPathFlag ?? process.env.TWOCHAIN_DB_PATH ?? 'C:/tmp/v2.db';
 const storage = new SqliteStorage({ path: dbPath });
 await storage.init();
@@ -123,7 +95,6 @@ if (!skipHashCheck) {
   console.log(`(corpus_sha256 mismatch tolerated via --skip-hash-check: golden=${golden.corpus_sha256.slice(0,16)}..., db=${corpus_sha256.slice(0,16)}...)`);
 }
 
-// ---- Run the eval ----
 const embedder = new OllamaEmbedder();
 
 interface StressQuery { id: string; stratum: string; q: string; expected_top3: string[]; relevance: Record<string, number> }
@@ -179,7 +150,6 @@ async function runOnce(): Promise<{ ndcg3: number; mrr: number; recall3: number;
 }
 
 if (baselineN > 0) {
-  // Baseline mode: run N times, write v2-baseline-native.json
   console.log(`baseline mode: ${baselineN} runs of ${golden.queries.length} queries`);
   const runs: Array<Awaited<ReturnType<typeof runOnce>>> = [];
   for (let i = 0; i < baselineN; i++) {
@@ -201,7 +171,6 @@ if (baselineN > 0) {
   const mrrs = runs.map((r) => r.mrr);
   const recalls = runs.map((r) => r.recall3);
   const singles = runs.map((r) => r.singleTopHits);
-  // Latency: aggregate p50/p95/p99 across all runs (per-run percentile then mean+stddev)
   const p50s = runs.map((r) => percentile([...r.latencies].sort((a, b) => a - b), 50));
   const p95s = runs.map((r) => percentile([...r.latencies].sort((a, b) => a - b), 95));
   const p99s = runs.map((r) => percentile([...r.latencies].sort((a, b) => a - b), 99));
@@ -234,7 +203,6 @@ if (baselineN > 0) {
   process.exit(0);
 }
 
-// ---- Single-run gate mode ----
 const t = Date.now();
 const r = await runOnce();
 console.log(`run: NDCG@3=${r.ndcg3.toFixed(4)} MRR=${r.mrr.toFixed(4)} R@3=${r.recall3.toFixed(4)} single=${r.singleTopHits}/${r.singleTotal} (${Date.now() - t}ms)`);

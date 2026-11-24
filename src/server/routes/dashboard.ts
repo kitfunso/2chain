@@ -6,11 +6,6 @@ import { DASHBOARD_HTML } from './dashboardHtml.js';
 
 export function registerDashboardRoutes(app: FastifyInstance, storage: Storage): void {
   app.get('/', async (_req, reply) => {
-    // CSP layer: blocks remote script loads, eval, base-uri hijack, framing.
-    // Does NOT defang inline-script XSS — 'unsafe-inline' permits any injected
-    // <script>. The actual XSS defense is escapeHtml() on every interpolation.
-    // CSP is defense-in-depth, not the primary control. To strengthen later,
-    // move to a per-response nonce ('nonce-...') and drop 'unsafe-inline'.
     reply
       .header(
         'content-security-policy',
@@ -33,7 +28,6 @@ export function registerDashboardRoutes(app: FastifyInstance, storage: Storage):
     return reply;
   });
 
-  // Snapshot endpoint for initial render
   app.get('/state', async (_req, reply) => {
     const tools = await storage.listTools({ limit: 5000 });
     const violations = await storage.listViolations(20);
@@ -50,16 +44,12 @@ export function registerDashboardRoutes(app: FastifyInstance, storage: Storage):
     const q = (req.query as Record<string, string>) ?? {};
     const days = Math.max(1, Math.min(90, Number(q.days ?? 7)));
     const limit = Math.max(1, Math.min(100, Number(q.limit ?? 20)));
-    // Trending aggregates over a 7-day window from rankings; safe to cache for
-    // a minute. Browsers + Fly's edge will dedupe repeated dashboard hits.
     reply.header('cache-control', 'public, max-age=60');
     const trending = await storage.getTrending(days, limit);
     if (trending.length === 0) {
       reply.send({ window_days: days, results: [] });
       return;
     }
-    // Hydrate with full tool metadata so the dashboard can render rows
-    // without a second round-trip.
     const all = await storage.listTools({ limit: 5000 });
     const idx = new Map(all.map((t) => [t.name + '@' + t.version, t]));
     const results = trending
@@ -71,9 +61,6 @@ export function registerDashboardRoutes(app: FastifyInstance, storage: Storage):
     reply.send({ window_days: days, results });
   });
 
-  // v1 endpoint name kept for dashboard wire-compat. Reports the current
-  // storage driver + collection counts; "Atlas" is a misnomer in v2 but
-  // changing it would break the dashboard HTML which is shipped as a string.
   app.get('/atlas-stats', async (_req, reply) => {
     try {
       const stats = await storage.dbStats();

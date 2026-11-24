@@ -1,8 +1,3 @@
-// Helper used by the kind importers (skills, subagents, prompts) to run
-// the per-kind eval rubric and persist the resulting reliability_score.
-// Keeps importers DRY — they all want the same "upsert + evaluate + update"
-// shape but the eval rubric differs per kind.
-
 import type { Storage, ToolV2 } from '../types.js';
 import { runKindEval } from './kindEvalRunner.js';
 

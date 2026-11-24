@@ -1,12 +1,3 @@
-// mxbai-embed-large parity check (Phase 1.5 deferred follow-up).
-//
-// Builds a fresh /tmp/v2-mxbai.db with 1024-dim schema, embeds the 199
-// fixture corpus + 142 catalog entries with mxbai-embed-large, then
-// replays the 32-query golden set and prints v2(nomic) vs v2(mxbai).
-//
-// Doesn't touch the production /tmp/v2.db. Doesn't change any defaults.
-// If mxbai is materially better, we'll lock it in via a follow-up commit.
-
 import { readFileSync, existsSync, unlinkSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { SqliteStorage } from '../../src/storage/sqlite.js';
@@ -22,7 +13,6 @@ import type { ToolSpecV2 } from '../../src/types.js';
 const DB_PATH = '/tmp/v2-mxbai.db';
 const NOMIC_DB_PATH = process.env.NOMIC_DB_PATH ?? '/tmp/v2.db';
 
-// Wipe + rebuild the mxbai DB
 for (const ext of ['', '-wal', '-shm']) {
   if (existsSync(DB_PATH + ext)) unlinkSync(DB_PATH + ext);
 }
@@ -32,7 +22,6 @@ await storage.init();
 const embedder = new OllamaEmbedder({ model: 'mxbai-embed-large', dim: 1024, concurrency: 4 });
 console.log(`mxbai parity: ${embedder.name()} dim=${embedder.dim()}`);
 
-// 1. Agents
 for (const a of FIXTURE_AGENTS) {
   await storage.upsertAgent({
     id: a._id,
@@ -43,7 +32,6 @@ for (const a of FIXTURE_AGENTS) {
   });
 }
 
-// 2. Build the same corpus as production: 199 fixtures + 142 catalog.
 const fixtureSpecs = [...FIXTURE_TOOLS, ...generateFixtures()];
 const fixtureV2: ToolSpecV2[] = fixtureSpecs.map((s) => ({
   name: s.name,
@@ -82,7 +70,6 @@ for (let i = 0; i < all.length; i++) {
 }
 console.log(`  ${(await storage.dbStats()).collection_counts.tools} tools indexed`);
 
-// 3. Replay the golden set
 interface GQ { id: string; q: string; expected_top1?: string; expected_top1_in?: string[] }
 interface BL { entries: Array<{ id: string; top1: { name: string }; top3: Array<{ name: string }>; expected_match: boolean | null }> }
 const golden = JSON.parse(readFileSync(resolve('tests/fixtures/golden-queries.json'), 'utf-8')) as { queries: GQ[] };

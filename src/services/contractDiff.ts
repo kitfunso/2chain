@@ -1,19 +1,3 @@
-// contractDiff — pure, dependency-free JSON Schema contract differ (E3).
-//
-// Direction-aware: callers SEND inputs (an old payload must stay valid
-// against the NEW input schema), consumers RECEIVE outputs (an old reader's
-// expectations must stay valid against the NEW output schema). The rule
-// table in docs/plans/2026-06-10-e3-contract-drift.md is the single
-// normative spec for every cell below.
-//
-// Modeled constructs: `type`, `properties`, `required`, `enum`,
-// `additionalProperties`, single-schema `items` (recurse). Everything else
-// (`oneOf`/`anyOf`/`allOf`/`not`/`pattern`/`format`/`min*`/`max*`/tuple
-// `items`/...) is compared by canonical-JSON equality per subtree; any
-// change is conservatively `breaking` (`unknown-construct-changed`).
-//
-// No storage imports, no driver imports, no embedder imports. Pure module.
-
 import type {
   ContractChange,
   ContractDiff,
@@ -39,8 +23,6 @@ function isPlainObject(v: unknown): v is Record<string, unknown> {
   return v !== null && typeof v === 'object' && !Array.isArray(v);
 }
 
-/** Stable stringify: sorted object keys, arrays in order. `undefined`
- *  (absent key) gets a sentinel distinct from every JSON value. */
 function canonicalJson(value: unknown): string {
   if (value === undefined) return '__absent__';
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
@@ -64,17 +46,12 @@ function unknownConstruct(path: string, detail: string): ContractChange {
   return { path: orRoot(path), kind: 'unknown-construct-changed', breaking: true, detail };
 }
 
-/** Effective additionalProperties: absent = true (the MCP-client default,
- *  see CLAUDE.md "Common Mistakes"). A schema-form AP is restrictive and is
- *  reported as 'schema' so callers can treat it conservatively. */
 function effectiveAp(value: unknown): true | false | 'schema' {
   if (value === undefined || value === true) return true;
   if (value === false) return false;
   return 'schema';
 }
 
-/** `required`/`enum`-style array guard: [] when absent, null when present
- *  but malformed (handled as an unknown construct by the caller). */
 function stringArrayOrNull(value: unknown): string[] | null {
   if (value === undefined) return [];
   if (Array.isArray(value) && value.every((v) => typeof v === 'string')) {
@@ -84,10 +61,6 @@ function stringArrayOrNull(value: unknown): string[] | null {
 }
 
 function normalizeType(value: unknown): unknown {
-  // JSON Schema treats a `type` ARRAY as an unordered union — a pure reorder
-  // (['string','null'] -> ['null','string']) is the same contract. Sort
-  // string members for comparison; anything non-string passes through and
-  // falls to canonical inequality (conservative).
   if (Array.isArray(value) && value.every((v) => typeof v === 'string')) {
     return [...value].sort();
   }
@@ -101,7 +74,6 @@ function diffType(
   changes: ContractChange[],
 ): void {
   if (canonicalJson(normalizeType(prev['type'])) === canonicalJson(normalizeType(next['type']))) return;
-  // Retyped: breaking in BOTH directions per the rule table.
   changes.push({
     path: joinPath(path, 'type'),
     kind: 'type-changed',
@@ -127,9 +99,6 @@ function diffEnum(
     changes.push(unknownConstruct(joinPath(path, 'enum'), 'enum is not an array on one side'));
     return;
   }
-  // Absent enum = unconstrained value set. Adding an enum narrows from the
-  // universe; dropping it widens to the universe. Member-level adds/removes
-  // are narrowing/widening of the set. A mixed change emits both rows.
   const prevSet = new Map((prevRaw as unknown[] | undefined ?? []).map((v) => [canonicalJson(v), v]));
   const nextSet = new Map((nextRaw as unknown[] | undefined ?? []).map((v) => [canonicalJson(v), v]));
   const enumPath = joinPath(path, 'enum');
@@ -180,12 +149,6 @@ function diffPropertiesAndRequired(
   direction: DriftDirection,
   changes: ContractChange[],
 ): void {
-  // Malformed guard shapes must NEVER abort the rest of the diff (fail-open
-  // hole, code-review HIGH): identically-malformed `required` on both sides
-  // used to early-return here, so a retyped property beneath it classified
-  // `identical` and bypassed the gate. Malformed pieces are flagged as
-  // unknown-construct when they DIFFER and treated as empty for diffing
-  // either way — the surrounding structure is always still diffed.
   const prevPropsRaw = prev['properties'];
   const nextPropsRaw = next['properties'];
   const propsMalformed =
@@ -232,10 +195,6 @@ function diffPropertiesAndRequired(
     if (key in nextProps) continue;
     const propPath = joinPath(path, `properties.${key}`);
     if (direction === 'input') {
-      // Breaking iff the NEW schema's effective additionalProperties is not
-      // permissive (absent = true): old payloads carrying the property are
-      // rejected by the NEW schema. Schema-form AP is treated as restrictive
-      // (conservative).
       const apPermits = effectiveAp(next['additionalProperties']) === true;
       changes.push({
         path: propPath,
@@ -269,7 +228,7 @@ function diffRequired(
 ): void {
   for (const name of [...nextReq].sort()) {
     if (prevReq.has(name)) continue;
-    if (name in nextProps && !(name in prevProps)) continue; // counted as property-added-required
+    if (name in nextProps && !(name in prevProps)) continue;
     changes.push({
       path: joinPath(path, `properties.${name}`),
       kind: 'required-added',
@@ -279,7 +238,7 @@ function diffRequired(
   }
   for (const name of [...prevReq].sort()) {
     if (nextReq.has(name)) continue;
-    if (name in prevProps && !(name in nextProps)) continue; // subsumed by property-removed
+    if (name in prevProps && !(name in nextProps)) continue;
     changes.push({
       path: joinPath(path, `properties.${name}`),
       kind: 'required-removed',
@@ -306,7 +265,7 @@ function diffAdditionalProperties(
     changes.push(unknownConstruct(apPath, 'schema-form additionalProperties changed'));
     return;
   }
-  if (prevEff === nextEff) return; // absent vs explicit true: no semantic change
+  if (prevEff === nextEff) return;
   if (prevEff === true && nextEff === false) {
     changes.push({
       path: apPath,
@@ -339,7 +298,6 @@ function diffItems(
     diffNode(prevItems, nextItems, joinPath(path, 'items'), depth + 1, direction, changes);
     return;
   }
-  // Tuple form, added, or removed items: unmodeled — conservative breaking.
   changes.push(unknownConstruct(joinPath(path, 'items'), 'items changed in an unmodeled form (tuple/added/removed)'));
 }
 
@@ -367,7 +325,7 @@ function diffNode(
   direction: DriftDirection,
   changes: ContractChange[],
 ): void {
-  if (canonicalJson(prev) === canonicalJson(next)) return; // identical subtree
+  if (canonicalJson(prev) === canonicalJson(next)) return;
   if (depth > MAX_DIFF_DEPTH) {
     changes.push({
       path: orRoot(path),
@@ -407,10 +365,6 @@ export function diffContracts(
   return { classification, changes };
 }
 
-// ---- Version ordering ------------------------------------------------------
-
-/** Split a version segment into its numeric prefix + string remainder.
- *  Missing/empty segments compare as { num: 0, rest: '' }. */
 function segmentParts(segment: string | undefined): { num: number; rest: string } {
   if (segment === undefined || segment === '') return { num: 0, rest: '' };
   const m = /^(\d+)(.*)$/.exec(segment);

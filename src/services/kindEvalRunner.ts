@@ -1,16 +1,3 @@
-// Per-kind eval harness. Skills, subagents, and prompts can't reuse the
-// fixture eval cases (those expect the demo stubs: pdf-extractor,
-// summariser, malformed-bot...). Each non-tool kind needs its own rubric
-// because the trust signal it carries is different:
-//
-//   skill    -> "is this discoverable?" (frontmatter complete, body informative)
-//   subagent -> same shape, plus a description specific enough to route
-//   prompt   -> "does the template actually work?" (registered + substitutes)
-//
-// All rubrics are deterministic, side-effect-free, and run in microseconds.
-// Output mirrors the fixture EvalRunRow shape so push.ts and the dashboard
-// don't need to special-case kind.
-
 import type { ToolSpecV2 } from '../types.js';
 import { getPromptTemplate, callStub } from './stubs.js';
 
@@ -56,8 +43,6 @@ function commonChecks(spec: ToolSpecV2, expectedDomain: string): KindEvalCase[] 
       : bad('has-version', `version "${spec.version}" missing or invalid`),
   );
 
-  // capability_text is what the embedder consumes — under-MIN_DESC means
-  // retrieval will be unreliable (sparse vector, weak BM25 match).
   const capLen = (spec.capability_text ?? '').trim().length;
   cases.push(
     capLen >= MIN_DESC_CHARS
@@ -83,8 +68,6 @@ function commonChecks(spec: ToolSpecV2, expectedDomain: string): KindEvalCase[] 
 export function runSkillEval(spec: ToolSpecV2): KindEvalResult {
   const t0 = Date.now();
   const cases = commonChecks(spec, 'skills');
-  // Skill-specific: the capability_text is name + description + body excerpt;
-  // a healthy skill mentions at least one verb-y action word.
   const text = (spec.capability_text ?? '').toLowerCase();
   const ACTION_WORDS = /\b(use|build|review|check|verify|create|generate|run|find|search|extract|test|debug|fix|deploy|scrape|parse)\b/;
   cases.push(
@@ -98,9 +81,6 @@ export function runSkillEval(spec: ToolSpecV2): KindEvalResult {
 export function runSubagentEval(spec: ToolSpecV2): KindEvalResult {
   const t0 = Date.now();
   const cases = commonChecks(spec, 'subagents');
-  // Subagent-specific: descriptions usually reference "agent" or "use this"
-  // pattern. We don't enforce verbatim — just check the description is
-  // specific enough to distinguish from the next subagent.
   const text = (spec.capability_text ?? '').toLowerCase();
   cases.push(
     /\b(agent|review|debug|build|design|specialist|expert)\b/.test(text)
@@ -120,12 +100,9 @@ export function runPromptEval(spec: ToolSpecV2): KindEvalResult {
   const t0 = Date.now();
   const cases: KindEvalCase[] = commonChecks(spec, spec.domain ?? '');
 
-  // Domain-set check is naturally permissive for prompts (many domains are
-  // valid: code, marketing, grants, ...). Override the expected-domain miss.
   const idx = cases.findIndex((c) => c.case_id === 'domain-set');
   if (idx >= 0 && spec.domain) cases[idx] = ok('domain-set');
 
-  // Template must be registered.
   const template = getPromptTemplate(spec.name);
   if (!template) {
     cases.push(bad('template-registered', `no template registered for "${spec.name}"`));
@@ -133,7 +110,6 @@ export function runPromptEval(spec: ToolSpecV2): KindEvalResult {
   }
   cases.push(ok('template-registered'));
 
-  // Template should actually substitute when called via the stub.
   try {
     const result = callStub(
       'prompt-template-stub',
@@ -172,6 +148,6 @@ export function runKindEval(spec: ToolSpecV2): KindEvalResult | null {
     case 'subagent': return runSubagentEval(spec);
     case 'prompt':   return runPromptEval(spec);
     case 'tool':
-    default:         return null; // tools use the existing fixture eval harness
+    default:         return null;
   }
 }

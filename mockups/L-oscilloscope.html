@@ -139,32 +139,27 @@
   <div class="scope">
     <div class="canvas">
       <svg viewBox="0 0 1000 600" preserveAspectRatio="none">
-        <!-- center axes -->
         <line class="axis" x1="0" y1="300" x2="1000" y2="300"/>
         <line class="axis" x1="500" y1="0" x2="500" y2="600"/>
 
-        <!-- CH1: top1 RRF over time (organic, mostly stable around 0.0164) -->
         <path class="wave wave-1" d="
           M0,310 L40,308 L80,312 L120,302 L160,295 L200,290 L240,295 L280,300
           L320,285 L360,278 L400,265 L440,260 L480,250 L520,245 L560,238 L600,228
           L640,220 L680,215 L720,210 L760,200 L800,195 L840,190 L880,185 L920,180 L960,175 L1000,170
         "/>
 
-        <!-- CH2: ok rate (tighter wave near top) -->
         <path class="wave wave-2" d="
           M0,140 L40,142 L80,138 L120,141 L160,140 L200,138 L240,140 L280,139
           L320,137 L360,140 L400,138 L440,141 L480,140 L520,139 L560,141 L600,140
           L640,138 L680,140 L720,139 L760,140 L800,141 L840,140 L880,138 L920,140 L960,141 L1000,140
         "/>
 
-        <!-- CH3: violations (mostly silent, single spike for malformed-bot CB) -->
         <path class="wave wave-3" d="
           M0,440 L40,440 L80,440 L120,440 L160,440 L200,440 L240,440 L280,440
           L320,440 L360,440 L400,440 L440,440 L480,440 L520,440 L560,440 L600,440
           L640,440 L680,440 L720,440 L750,440 L760,400 L770,360 L780,440 L800,440 L840,440 L880,440 L920,440 L960,440 L1000,440
         "/>
 
-        <!-- horizontal phosphor reference ticks -->
         <g>
           <line class="ph-tick" x1="0" y1="100" x2="6" y2="100"/>
           <line class="ph-tick" x1="0" y1="200" x2="6" y2="200"/>
@@ -172,13 +167,11 @@
           <line class="ph-tick" x1="0" y1="500" x2="6" y2="500"/>
         </g>
 
-        <!-- annotations -->
         <text class="label" x="14" y="142">CH2 · 99.6%</text>
         <text class="label" x="14" y="172" style="fill:var(--fg-dim);">100%</text>
         <text class="label" x="14" y="304">0V baseline</text>
         <text class="label" x="14" y="442" style="fill:var(--fg-dim);">CH3 · 0</text>
 
-        <!-- Tool-call blip markers (amber on x axis) -->
         <g style="filter: drop-shadow(0 0 4px var(--amber));">
           <line x1="180" y1="290" x2="180" y2="310" stroke="var(--amber)" stroke-width="2"/>
           <line x1="380" y1="270" x2="380" y2="290" stroke="var(--amber)" stroke-width="2"/>
@@ -187,7 +180,6 @@
           <line x1="940" y1="180" x2="940" y2="200" stroke="var(--amber)" stroke-width="2"/>
         </g>
 
-        <!-- ChMP write — top1 candidates as a phosphor "bargraph" along bottom -->
         <g class="top-trace">
           <rect x="20" y="555" width="80" height="20" fill="var(--fg)" opacity="0.85"/>
           <rect x="105" y="558" width="78" height="17" fill="var(--fg)" opacity="0.7"/>
@@ -204,7 +196,6 @@
         </g>
       </svg>
 
-      <!-- "blip" labels -->
       <div class="blip" style="left: 18%; top: 38%;">/call sec-edgar 1191ms ✓</div>
       <div class="blip" style="left: 38%; top: 32%; animation-delay: 0.4s;">/call mcp-everything 12 ✓</div>
       <div class="blip" style="left: 76%; top: 50%; animation-delay: 0.8s; border-color: var(--red); color: var(--red);

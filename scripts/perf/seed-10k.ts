@@ -1,10 +1,3 @@
-// Generates 10,000 synthetic ToolSpecV2 entries with diverse capability_text
-// and seeds them into a fresh DB at /tmp/v2-perf-10k.db. Used by the
-// benchmark-discover.ts script to measure p50/p95/p99 retrieval latency.
-//
-// Phase 1 plan Step 6.5. Run-time on RTX 5080 + Ollama: ~2-3 min for embed,
-// ~5s for insert. Total ~3-4 min.
-
 import { existsSync, unlinkSync } from 'node:fs';
 import { SqliteStorage } from '../../src/storage/sqlite.js';
 import { OllamaEmbedder } from '../../src/embeddings/ollama.js';
@@ -24,8 +17,6 @@ const embedder = new OllamaEmbedder({ concurrency: 4 });
 console.log(`perf seed: ${TARGET_COUNT} synthetic tools -> ${DB_PATH}`);
 console.log(`           embedder=${embedder.name()}`);
 
-// Domain templates — varied enough that retrieval has signal, structured
-// enough that we can score relevance against a hand-graded query set.
 const DOMAINS = [
   { domain: 'finance', verbs: ['fetch', 'parse', 'calculate', 'forecast', 'audit', 'reconcile'], objects: ['10-K filing', 'income statement', 'balance sheet', 'cash flow', 'earnings call transcript', 'analyst report', 'cap table', 'invoice', 'receipt', 'payroll', 'tax form', 'expense report', 'budget'] },
   { domain: 'research', verbs: ['search', 'fetch', 'summarise', 'extract', 'cite', 'translate'], objects: ['arxiv paper', 'pubmed citation', 'patent abstract', 'thesis', 'preprint', 'conference proceeding', 'systematic review'] },
@@ -49,7 +40,6 @@ function pick<T>(arr: readonly T[], rng: () => number): T {
   return arr[Math.floor(rng() * arr.length)];
 }
 
-// Deterministic PRNG so re-runs build the same corpus.
 function mulberry32(seed: number): () => number {
   let s = seed;
   return () => {
@@ -71,7 +61,6 @@ for (let i = 0; i < TARGET_COUNT; i++) {
   const v = pick(dom.verbs, rng);
   const o = pick(dom.objects, rng);
   const vendor = pick(VENDORS, rng);
-  // Build a unique-ish name with a hash suffix so collisions are rare.
   const baseName = `${o.toLowerCase().replace(/\s+/g, '-')}-${vendor}-${i.toString(16)}`;
   if (seenNames.has(baseName)) {
     collisions++;
@@ -102,7 +91,6 @@ for (let i = 0; i < TARGET_COUNT; i++) {
 
 console.log(`generated ${specs.length} unique specs (${collisions} collisions skipped)`);
 
-// Embed in chunks
 console.log(`embedding ${specs.length} capability_texts (chunk=64, concurrency=4)...`);
 const tEmbed = Date.now();
 const embeddings: Float32Array[] = [];
@@ -117,7 +105,6 @@ for (let i = 0; i < specs.length; i += CHUNK) {
 }
 console.log(`\n  embedded in ${((Date.now() - tEmbed) / 1000).toFixed(1)}s`);
 
-// Insert
 console.log(`inserting ${specs.length} tools...`);
 const tInsert = Date.now();
 for (let i = 0; i < specs.length; i++) {

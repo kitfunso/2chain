@@ -1,9 +1,5 @@
 name: v2 install smoke (cross-OS)
 
-# Phase 1 plan Step 11.5: gate the merge on `npm install` succeeding without
-# native build tools on Windows x64, macOS arm64, and Linux x64. CLAUDE.md
-# rule 10: better-sqlite3 + sqlite-vec must ship prebuilt binaries.
-
 on:
   push:
     branches: [master, main]
@@ -40,9 +36,6 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: Verify better-sqlite3 + sqlite-vec load
-        # Imports both natives, opens an in-memory DB, loads sqlite-vec, creates
-        # a vec0 virtual table, runs a tiny vector query. If any prebuilt
-        # binary is missing this fails with a meaningful error.
         run: node -e "const Database = require('better-sqlite3'); const sv = require('sqlite-vec'); const db = new Database(':memory:'); sv.load(db); db.exec('CREATE VIRTUAL TABLE t USING vec0(e float[768] distance_metric=cosine)'); console.log('sqlite-vec', db.prepare('SELECT vec_version() AS v').get()); db.close();"
 
       - name: Run typecheck

@@ -1,9 +1,3 @@
-// Curated list of additional skills repos to grow beyond anthropics/skills.
-// Mix of:
-//  (a) Single-skill repos -> imported as one kind='skill' entry
-//  (b) Awesome-skills lists -> README parsed to extract per-skill rows
-// Stars + last-commit pulled per entry so the GH column is populated.
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';
@@ -20,7 +14,6 @@ interface Repo { full_name: string; description: string | null; html_url: string
 
 interface SingleSkill { repo: string; name: string; domain: string }
 
-// Single-skill repos: each becomes one kind='skill' entry.
 const SINGLE_SKILLS: SingleSkill[] = [
   { repo: 'JuliusBrussee/caveman',                      name: 'caveman',                       domain: 'ai' },
   { repo: 'OthmanAdi/planning-with-files',              name: 'planning-with-files',           domain: 'ai' },
@@ -36,11 +29,6 @@ const SINGLE_SKILLS: SingleSkill[] = [
   { repo: 'anthropics/claude-plugins-official',         name: 'anthropic-plugins-official',     domain: 'ai' },
 ];
 
-// Awesome-skills lists: each is a single kind='tool' entry pointing to the list.
-// The actual skill markdown files inside aren't worth scraping individually
-// here - they're already covered by the anthropics/skills + voltagent
-// subagent scrapers, and the awesome lists are useful entries in their own
-// right (curated meta-resources).
 const AWESOME_LISTS: SingleSkill[] = [
   { repo: 'hesreallyhim/awesome-claude-code',           name: 'awesome-claude-code',            domain: 'ai' },
   { repo: 'VoltAgent/awesome-agent-skills',             name: 'awesome-agent-skills',           domain: 'ai' },

@@ -1,6 +1,3 @@
-// Real-DB tests for SqliteStorage CRUD + dashboard reads.
-// Phase 1 plan Step 4 verify criterion. Real :memory: SQLite, no mocks.
-
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { SqliteStorage } from '../src/storage/sqlite.js';
@@ -41,7 +38,7 @@ async function freshStorage(): Promise<SqliteStorage> {
 
 test('init runs migrations idempotently', async () => {
   const s = await freshStorage();
-  await s.init(); // second call should be a no-op (migration tracker)
+  await s.init();
   const stats = await s.dbStats();
   assert.equal(stats.driver, 'sqlite');
   assert.ok(stats.version.includes('sqlite-vec'));
@@ -95,7 +92,6 @@ test('setStatus changes status and updated_at', async () => {
   const s = await freshStorage();
   const t = await s.upsertTool(makeSpec(), makeEmbedding(1));
   const beforeUpdated = t.updated_at;
-  // Briefly wait so updated_at can change at ms resolution
   await new Promise((r) => setTimeout(r, 5));
   await s.setStatus(t.id, 'circuit_broken');
   const refetched = await s.getToolByNameVersion('tool-x', '1.0');

@@ -1,19 +1,3 @@
-// Skills importer — turns Claude Code skills (SKILL.md frontmatter + body)
-// into 2chain ToolSpecV2 rows with tool_kind='skill'.
-//
-// Pipeline:
-//   scan <root>/*/SKILL.md or <root>/SKILL.md
-//     -> parse YAML frontmatter (name + description)
-//     -> build capability_text from name + description + body excerpt
-//     -> embed
-//     -> upsert with endpoint_stub_name='catalog-only-stub'
-//
-// Skills are discovery-only — calling one means loading it into agent context,
-// not RPC. No bridge stub. Reliability gate is bypassed at retrieval time
-// only when the caller filters by tool_kind='skill'; storage runRRF still
-// enforces the gate, so we ship skills with reliability_score=0.95 and
-// status='active' so they pass through.
-
 import { readdirSync, readFileSync, lstatSync } from 'node:fs';
 import { resolve, basename } from 'node:path';
 import type { Embedder, Storage, ToolSpecV2 } from '../types.js';
@@ -24,15 +8,10 @@ const DEFAULT_AUTHOR = 'skill-import';
 const BODY_EXCERPT_CHARS = 600;
 
 export interface ParsedSkill {
-  /** Skill directory name (e.g. "office-hours"). Used as 2chain tool name. */
   slug: string;
-  /** Frontmatter `name` field (falls back to slug if missing). */
   name: string;
-  /** Frontmatter `description` field. */
   description: string;
-  /** First N chars of body after frontmatter. */
   bodyExcerpt: string;
-  /** Absolute path to the SKILL.md that produced this entry. */
   sourcePath: string;
 }
 
@@ -54,11 +33,11 @@ export function parseSkillFile(text: string, slug: string, sourcePath: string): 
   };
 
   const description = get('description') ?? '';
-  if (!description) return null; // require a description — no point indexing without one
+  if (!description) return null;
 
   const bodyExcerpt = body
-    .replace(/^#+\s.*$/gm, '')           // drop heading lines
-    .replace(/```[\s\S]*?```/g, '')      // drop fenced code blocks
+    .replace(/^#+\s.*$/gm, '')
+    .replace(/```[\s\S]*?```/g, '')
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, BODY_EXCERPT_CHARS);
@@ -86,14 +65,11 @@ export function findSkillFiles(root: string): Array<{ slug: string; path: string
     return out;
   }
 
-  // Single-skill layout
   if (entries.includes('SKILL.md')) {
     out.push({ slug: basename(root), path: resolve(root, 'SKILL.md') });
     return out;
   }
 
-  // Multi-skill layout (the common case). Use lstatSync so a symlink at
-  // <root>/<slug> doesn't escape the skills root.
   for (const entry of entries) {
     const sub = resolve(root, entry);
     let lst: ReturnType<typeof lstatSync>;
@@ -144,13 +120,9 @@ function specFromSkill(parsed: ParsedSkill): ToolSpecV2 {
 }
 
 export interface SkillImportOptions {
-  /** Root directory to scan. Defaults to $HOME/.claude/skills. */
   root?: string;
-  /** Restrict to specific skill slugs. */
   only?: string[];
-  /** Skip embedder calls; useful for dry-run + tests. */
   skipEmbedding?: boolean;
-  /** Minimum number of skills required; throws if found < min. Default 0. */
   minImports?: number;
 }
 

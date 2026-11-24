@@ -1,6 +1,3 @@
-// Quick RRF weight sweep against the golden set. Reports which weight pair
-// best matches v1 baseline. Read-only; doesn't mutate anything.
-
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { SqliteStorage } from '../../src/storage/sqlite.js';
@@ -19,7 +16,6 @@ const s = new SqliteStorage({ path: dbPath });
 await s.init();
 const e = new OllamaEmbedder();
 
-// Embed every query once, reuse across weight sweep.
 const cache = new Map<string, Float32Array>();
 for (const q of golden.queries) cache.set(q.id, await e.embed(q.q, 'query'));
 

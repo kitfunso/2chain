@@ -1,10 +1,3 @@
-// E4 tool health surface tests (plan section 6, 13 pinned items). Real SQLite
-// (:memory:), real stubs, real pushes/reverifies — NO mocks (CLAUDE.md rule 5).
-// Harness copied from tests/reverify.test.ts (StubEmbedder, freshStorage,
-// pushOk, rawDb). spawnSync is used ONLY for the CLI strict-arg rejection
-// cases (E2 cli-spawn precedent); route assertions go through Fastify
-// app.inject like every sibling route test.
-
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { test } from 'node:test';
@@ -26,7 +19,6 @@ import { hashKey } from '../src/server/auth.js';
 import type { Embedder, ToolSpecV2 } from '../src/types.js';
 import '../src/services/stubs.js';
 
-// ---- Deterministic stub embedder (no Ollama dependency) ----
 function makeUnitVec(seed: number): Float32Array {
   const v = new Float32Array(768);
   for (let i = 0; i < 768; i++) v[i] = Math.sin(seed * (i + 1) * 0.001);
@@ -66,9 +58,6 @@ async function freshStorage(): Promise<SqliteStorage> {
   return storage;
 }
 
-// Test-side raw handle for constructing rot (same precedent as
-// tests/reverify.test.ts — rule 1 binds src/services and src/server/routes,
-// not tests).
 function rawDb(storage: SqliteStorage): { prepare: (s: string) => { run: (...a: unknown[]) => unknown } } {
   return (storage as unknown as { db: { prepare: (s: string) => { run: (...a: unknown[]) => unknown } } }).db;
 }
@@ -123,10 +112,6 @@ async function seedAgents(storage: SqliteStorage): Promise<{ caller: string; aut
   return keys;
 }
 
-// ---- 1. Healthy multi-version tool -----------------------------------------
-
-// Versions are NEWEST-FIRST: the report caps at HEALTH_VERSIONS_LIMIT and
-// must keep the newest, so ordering is part of the contract.
 test('multi-version tool: both versions present with scores and last_eval_run', async () => {
   const storage = await freshStorage();
   try {
@@ -151,7 +136,6 @@ test('multi-version tool: both versions present with scores and last_eval_run', 
       assert.equal(v.score_history.length, 1);
       assert.equal(v.score_history[0].triggered_by, 'push');
       assert.equal(v.score_history[0].pass_rate, 1.0);
-      // 7d usage window with no calls: all outcome keys present, all zero.
       assert.deepEqual(v.usage, { ok: 0, circuit_broken: 0, gated: 0, violation: 0, timeout: 0 });
     }
   } finally {
@@ -159,22 +143,17 @@ test('multi-version tool: both versions present with scores and last_eval_run', 
   }
 });
 
-// ---- 2. Streak semantics ----------------------------------------------------
-
 test('streak: 3 clean reverifies = 3; interleaved manual run filtered not breaking; clean-fail-clean = 1; push-only = 0', async () => {
   const storage = await freshStorage();
   try {
-    // (a) 3 clean reverify runs ⇒ streak 3.
     await pushOk(storage, { name: 'streak-3', version: '1.0' });
     for (let i = 0; i < 3; i++) {
       await reverifyTools(storage, { toolName: 'streak-3', toolVersion: '1.0' });
-      await sleep(10); // distinct triggered_at (ISO ms precision)
+      await sleep(10);
     }
     let report = (await toolHealth(storage, 'streak-3'))!;
     assert.equal(report.versions[0].verification_streak, 3);
 
-    // Interleaved NON-reverify run, failing and NEWEST: it must be FILTERED
-    // OUT of the streak window (skipped), never streak-breaking.
     const streak3 = (await storage.getToolByNameVersion('streak-3', '1.0'))!;
     const manualAt = new Date(Date.now() + 1_000).toISOString();
     await storage.insertEvalRun({
@@ -194,7 +173,6 @@ test('streak: 3 clean reverifies = 3; interleaved manual run filtered not breaki
     assert.equal(report.versions[0].verification_streak, 3, 'manual run is filtered, not breaking');
     assert.equal(report.versions[0].last_eval_run, manualAt, 'but it IS the newest run overall');
 
-    // (b) clean-fail-clean ⇒ 1 (counts from newest until first sub-gate run).
     await pushOk(storage, { name: 'streak-1', version: '1.0' });
     await reverifyTools(storage, { toolName: 'streak-1', toolVersion: '1.0' });
     await sleep(10);
@@ -210,7 +188,6 @@ test('streak: 3 clean reverifies = 3; interleaved manual run filtered not breaki
     report = (await toolHealth(storage, 'streak-1'))!;
     assert.equal(report.versions[0].verification_streak, 1, 'newest clean, then the fail stops the count');
 
-    // (c) push-only history ⇒ 0 (reverify-triggered only).
     await pushOk(storage, { name: 'streak-0', version: '1.0' });
     report = (await toolHealth(storage, 'streak-0'))!;
     assert.equal(report.versions[0].verification_streak, 0);
@@ -219,14 +196,12 @@ test('streak: 3 clean reverifies = 3; interleaved manual run filtered not breaki
   }
 });
 
-// ---- 3. score_history bounded -----------------------------------------------
-
 test('score_history is bounded at 20, newest-first', async () => {
   const storage = await freshStorage();
   try {
     await pushOk(storage, { name: 'history-cap', version: '1.0' });
     const tool = (await storage.getToolByNameVersion('history-cap', '1.0'))!;
-    const base = Date.now() + 60_000; // strictly newer than the push run
+    const base = Date.now() + 60_000;
     for (let i = 0; i < 25; i++) {
       await storage.insertEvalRun({
         tool_id: tool.id,
@@ -256,13 +231,10 @@ test('score_history is bounded at 20, newest-first', async () => {
   }
 });
 
-// ---- 4. drift_events: root-level, real E3 push, bounded ----------------------
-
 test('drift_events sit at the report root, populated by a real compatible push, bounded at 10', async () => {
   const storage = await freshStorage();
   try {
     await pushOk(storage, { name: 'drifty', version: '1.0' });
-    // Compatible drift: optional property added to the input contract.
     await pushOk(storage, {
       name: 'drifty',
       version: '1.1',
@@ -286,12 +258,10 @@ test('drift_events sit at the report root, populated by a real compatible push, 
     assert.equal(ev.direction, 'input');
     assert.equal(ev.classification, 'compatible');
     assert.equal(typeof ev.created_at, 'string');
-    // Root-level, never duplicated per version (E3 stores drift by tool_name).
     for (const v of report.versions) {
       assert.ok(!('drift_events' in v), 'no per-version drift list');
     }
 
-    // Bound: 12 more events ⇒ report caps at 10, newest-first.
     const base = Date.now() + 60_000;
     for (let i = 0; i < 12; i++) {
       await storage.insertDriftEvent({
@@ -314,8 +284,6 @@ test('drift_events sit at the report root, populated by a real compatible push, 
     await storage.close();
   }
 });
-
-// ---- 5. Usage window ---------------------------------------------------------
 
 test('usage counts are windowed: rows older than 7 days are excluded', async () => {
   const storage = await freshStorage();
@@ -353,8 +321,6 @@ test('usage counts are windowed: rows older than 7 days are excluded', async () 
   }
 });
 
-// ---- 6. Unknown name ⇒ null ⇒ 404 -------------------------------------------
-
 test('unknown name: service returns null, both routes return the standard 404 envelope', async () => {
   const storage = await freshStorage();
   const app = Fastify({ logger: false });
@@ -384,8 +350,6 @@ test('unknown name: service returns null, both routes return the standard 404 en
     await storage.close();
   }
 });
-
-// ---- 7. Route auth -----------------------------------------------------------
 
 test('GET /v1/tools/:name/health: caller role 200, missing key 401', async () => {
   const storage = await freshStorage();
@@ -417,8 +381,6 @@ test('GET /v1/tools/:name/health: caller role 200, missing key 401', async () =>
   }
 });
 
-// ---- 8. Dashboard view route -------------------------------------------------
-
 test('GET /health-view/:name: unauthenticated, payload identical to the /v1 route', async () => {
   const storage = await freshStorage();
   const app = Fastify({ logger: false });
@@ -444,12 +406,7 @@ test('GET /health-view/:name: unauthenticated, payload identical to the /v1 rout
   }
 });
 
-// ---- 9. CLI strict args (spawnSync, no server needed) -------------------------
-
 test('CLI strict args: malformed health invocations die before any fetch', () => {
-  // Spawn the REAL bin (E2 cli-spawn precedent). Both rejection paths die
-  // before any fetch, so no server is needed. The render path is covered by
-  // the route payload tests above — the verb is fetch + format only.
   const bin = resolve('bin/2chain.mjs');
   const cases: Array<{ args: string[]; why: string }> = [
     { args: ['health'], why: 'missing tool name positional' },
@@ -462,13 +419,9 @@ test('CLI strict args: malformed health invocations die before any fetch', () =>
   }
 });
 
-// ---- 10. Catalog kind (importer-created) --------------------------------------
-
 test('catalog kind via importer path: streak 0, score_history is exactly the manual rubric run', async () => {
   const storage = await freshStorage();
   try {
-    // Importer reality (skills-importer.ts): upsertTool + applyKindEval, which
-    // inserts a triggered_by='manual' eval run at import time.
     const inserted = await storage.upsertTool(
       directSpec({
         name: 'imported-skill',
@@ -498,8 +451,6 @@ test('catalog kind via importer path: streak 0, score_history is exactly the man
   }
 });
 
-// ---- 11. Circuit-broken tool ---------------------------------------------------
-
 test('circuit_broken tool: report shows the status and the score (the do-not-trust answer)', async () => {
   const storage = await freshStorage();
   try {
@@ -514,8 +465,6 @@ test('circuit_broken tool: report shows the status and the score (the do-not-tru
   }
 });
 
-// ---- 12. escapeHtml on every health-payload interpolation ----------------------
-
 test('dashboard health renderer: every payload interpolation site is escapeHtml-wrapped', () => {
   const START = '// ---- health panel (E4)';
   const END = '// ---- end health panel (E4)';
@@ -524,13 +473,9 @@ test('dashboard health renderer: every payload interpolation site is escapeHtml-
   assert.ok(si > -1, 'start marker must exist in DASHBOARD_HTML');
   assert.ok(ei > si, 'end marker must exist after the start marker');
   const region = DASHBOARD_HTML.slice(si, ei);
-  // Tautology guard: an empty or gutted region must fail, not vacuously pass.
   assert.ok(region.length > 500, 'renderer region must be non-trivial');
   assert.ok(region.includes('function renderHealth'), 'renderer must live inside the marked region');
 
-  // Every access to a string-bearing health-payload field inside the region
-  // must be the direct argument of escapeHtml( — author-controlled strings
-  // (version, drift paths, triggered_by, ...) must never reach innerHTML raw.
   const FIELD_ACCESS = /\b[A-Za-z_$][\w$]*\.(name|version|from_version|to_version|direction|classification|created_at|last_eval_run|triggered_by|at|status)\b/g;
   const WRAP = 'escapeHtml(';
   let sites = 0;
@@ -547,8 +492,6 @@ test('dashboard health renderer: every payload interpolation site is escapeHtml-
   assert.ok(sites >= 10, `expected >= 10 escaped interpolation sites, found ${sites} (regex rot guard)`);
 });
 
-// ---- 13. Security: changes_json never ships ------------------------------------
-
 test('security: no `changes` key on any drift event in EITHER route payload', async () => {
   const storage = await freshStorage();
   const app = Fastify({ logger: false });
@@ -564,7 +507,6 @@ test('security: no `changes` key on any drift event in EITHER route payload', as
         properties: { secret_field: { type: 'string' } },
       },
     });
-    // A row whose changes payload is unmistakably present in the DB.
     await storage.insertDriftEvent({
       namespace_id: 'default',
       tool_name: 'leaky',
@@ -605,13 +547,9 @@ test('security: no `changes` key on any drift event in EITHER route payload', as
   }
 });
 
-// ---- Version cap (fix-commit regression: HEALTH_VERSIONS_LIMIT) ----------
-
 test('report enumerates only the newest HEALTH_VERSIONS_LIMIT versions', async () => {
   const storage = await freshStorage();
   try {
-    // Raw rows (no evals needed): listToolsByName reads the tools table and
-    // the per-version evidence queries tolerate empty histories.
     const db = rawDb(storage);
     const base = Date.now();
     for (let i = 1; i <= HEALTH_VERSIONS_LIMIT + 5; i++) {
@@ -646,8 +584,6 @@ test('report enumerates only the newest HEALTH_VERSIONS_LIMIT versions', async (
 test('route round-trips URL-encoded HTML-special names safely', async () => {
   const storage = await freshStorage();
   try {
-    // push has no name-charset validation: a name with spaces and angle
-    // brackets is storable and must round-trip through the path param.
     const weird = 'odd <tool> name';
     await pushOk(storage, { name: weird, version: '1.0' });
     const app = Fastify();

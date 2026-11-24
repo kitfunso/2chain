@@ -1,14 +1,3 @@
-// Step 1 of Episode A1: snapshot the v2 corpus + prewarm list with
-// content-addressed signatures.
-//
-// Outputs:
-//   tests/fixtures/v2-corpus-snapshot.json   — canonical entries + signature
-//   tests/fixtures/v2-prewarm-snapshot.json  — frozen prewarm query list
-//
-// Usage:
-//   TWOCHAIN_DB_PATH=C:/tmp/v2.db STORAGE_DRIVER=sqlite EMBEDDER=ollama \
-//     npx tsx scripts/eval/dump-corpus.ts
-
 import 'dotenv/config';
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -55,7 +44,6 @@ console.log(`         corpus_sha256 = ${corpus_sha256}`);
 console.log(`prewarm: ${PREWARM_QUERIES.length} queries -> ${prewarmPath}`);
 console.log(`         prewarm_sha256 = ${prewarm_sha256}`);
 
-// Sanity: demo-arc tools present
 const names = new Set(canonical.map((c) => c.name));
 const expected = ['sec-edgar-financials', 'arxiv-paper-search', 'eslint-snitch', 'security-scanner'];
 const missing = expected.filter((n) => !names.has(n));

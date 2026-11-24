@@ -1,11 +1,3 @@
-// Shared eval invocation for publish (/push) and re-verification sweeps.
-//
-// Grader-policy parity (E1 plan, R1 must-fix 1): the malformed-bot lenient
-// override (Fix 11) lives HERE, keyed on the stub name, so push and reverify
-// can never diverge on grader policy. A tool's eval_runs time series must
-// never mix strict and lenient grading — a reverify sweep that strict-graded
-// malformed-bot would gate-drop the rule-8 demo tool.
-
 import { runEvals, type EvalRunResult } from './evalRunner.js';
 
 export interface ToolEvalInput {

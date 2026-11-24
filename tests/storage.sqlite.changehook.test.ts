@@ -1,6 +1,3 @@
-// SqliteChangeHook integration test. Real :memory: SQLite + real triggers.
-// Phase 1 plan Step 9 verify criterion.
-
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { SqliteStorage } from '../src/storage/sqlite.js';
@@ -44,7 +41,6 @@ test('upsertTool fires a tool_changed event', async () => {
   s.watchChanges((e) => events.push(e));
 
   await s.upsertTool(makeSpec({ name: 'a' }), makeEmbedding(1));
-  // Event drains on next tick — wait one microtask cycle
   await new Promise((r) => setImmediate(r));
 
   assert.ok(events.length >= 1, 'should have at least one event');
@@ -141,7 +137,6 @@ test('rapid writes do not block or crash (200 inserts)', async () => {
   await new Promise((r) => setImmediate(r));
   s.flushChanges();
 
-  // Should complete fast — write queue is sync per row, hook is push-only.
   assert.ok(elapsed < 5000, `200 inserts should be under 5s, got ${elapsed}ms`);
   assert.equal(count, 200, `should see 200 tool events, got ${count}`);
   await s.close();
@@ -152,15 +147,12 @@ test('change events deliver after the writer transaction commits (no re-entry)',
   let listenerSawCount = -1;
   s.watchChanges(async (e) => {
     if (e.table === 'tools' && e.type === 'tool_changed') {
-      // If the hook ran inside the write tx, this read would see 0 rows.
-      // After commit, it sees the row that just landed.
       const tools = await s.listTools({});
       listenerSawCount = tools.length;
     }
   });
 
   await s.upsertTool(makeSpec({ name: 'unique' }), makeEmbedding(1));
-  // Yield to setImmediate so drain runs
   await new Promise((r) => setImmediate(r));
 
   assert.equal(listenerSawCount, 1, 'listener must see committed row, not 0');

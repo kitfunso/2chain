@@ -1,14 +1,3 @@
-// Golden ranking regression. Replays tests/fixtures/golden-queries.json
-// against v2 (SQLite + Ollama) and compares to v1 baseline.
-//
-// Phase 1 plan Step 10. Acceptance:
-//   - top-1 identity match for every query that v1 got right
-//   - top-3 set overlap >= 2/3 with v1
-//   - RRF margin (top1_rrf - top2_rrf) >= baseline_margin * 0.9 on average
-//
-// Usage:
-//   TWOCHAIN_DB_PATH=/tmp/v2.db npx tsx scripts/smoke/v2-golden-regression.ts
-
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { SqliteStorage } from '../../src/storage/sqlite.js';
@@ -62,8 +51,8 @@ interface Result {
   baseline_rrf_margin?: number;
   expected_match: boolean | null;
   v2_matches_v1_top1: boolean;
-  top3_overlap: number;        // 0..3
-  margin_ratio: number;         // v2_margin / baseline_margin
+  top3_overlap: number;
+  margin_ratio: number;
 }
 
 const results: Result[] = [];
@@ -115,7 +104,6 @@ for (const q of golden.queries) {
 
 await storage.close();
 
-// ---- summary ----
 const totalExpected = results.filter((r) => r.expected_match !== null).length;
 const top3OverlapAvg =
   results.reduce((s, r) => s + r.top3_overlap, 0) / results.length;
@@ -135,7 +123,6 @@ console.log(`top-3 overlap with v1 (avg):      ${top3OverlapAvg.toFixed(2)} / 3`
 console.log(`v2 RRF margin / baseline (avg):   ${marginRatioAvg.toFixed(3)}`);
 console.log(`v2 RRF margin / baseline (min):   ${marginRatioMin.toFixed(3)}`);
 
-// ---- failures ----
 const failures = results.filter(
   (r) => r.expected_match === false || (!r.v2_matches_v1_top1 && r.expected_match !== false),
 );
@@ -152,7 +139,6 @@ if (failures.length > 0) {
   }
 }
 
-// Persist a v2 snapshot alongside v1 for diffing.
 writeFileSync(
   resolve('tests/fixtures/v2-baseline.json'),
   JSON.stringify({
@@ -171,16 +157,9 @@ writeFileSync(
 );
 console.log(`\n  wrote tests/fixtures/v2-baseline.json`);
 
-// ---- gates ----
-// Phase 1's job: prove the swap works without catastrophic regression.
-// Embedder swap (Voyage 1024d -> nomic 768d) costs some semantic precision
-// on short keyword queries; that's a known tradeoff documented in
-// docs/perf/phase-1-baseline.md and queued for Phase 1.5 work.
-//
-// Tolerant gates here — strict demo-arc gate lives in v2-demo-prompts.ts.
-const MIN_EXPECTED_PASS = 18;          // accept up to ~10 query regressions
-const MIN_TOP3_OVERLAP = 1.5;          // half of top-3 overlaps with v1
-const MIN_MARGIN_RATIO_AVG = 0.7;      // avg RRF margin no worse than 70%
+const MIN_EXPECTED_PASS = 18;
+const MIN_TOP3_OVERLAP = 1.5;
+const MIN_MARGIN_RATIO_AVG = 0.7;
 
 let abort = false;
 const ABORT_MSGS: string[] = [];

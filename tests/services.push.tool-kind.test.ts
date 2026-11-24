@@ -1,7 +1,3 @@
-// services/push tool_kind test: external authors can register skill/subagent/
-// prompt entries via /push, eval is skipped for non-tool kinds, kind is
-// validated, default is 'tool' for back-compat.
-
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { SqliteStorage } from '../src/storage/sqlite.js';
@@ -74,10 +70,8 @@ test('push with tool_kind=skill persists kind and runs kind eval', async () => {
   }));
   assert.equal(r.ok, true);
   if (!r.ok) return;
-  // Per-kind eval runs (deterministic, microseconds).
   assert.ok(r.total_count > 0, 'kind eval should produce cases');
   assert.equal(r.cases.length, r.total_count);
-  // Status flipped to active. Reliability is now derived from the rubric.
   assert.equal(r.status, 'active');
   assert.ok(r.reliability_score > 0.7, 'a complete skill spec should clear the gate');
 
@@ -112,8 +106,6 @@ test('push with tool_kind=prompt runs prompt rubric', async () => {
   assert.equal(r.ok, true);
   if (!r.ok) return;
   assert.ok(r.total_count > 0);
-  // No template registered for 'pushed-prompt' so template-registered fails.
-  // That's expected behaviour; reliability comes in below 1.0.
   const tool = await storage.getToolByNameVersion('pushed-prompt', '1.0');
   assert.equal(tool!.tool_kind, 'prompt');
 });
@@ -137,6 +129,5 @@ test('push with tool_kind=tool still runs evals (eval_ms > 0)', async () => {
   }));
   assert.equal(r.ok, true);
   if (!r.ok) return;
-  // Real eval ran — total_count > 0 means the eval harness produced cases.
   assert.ok(r.total_count > 0, 'tool kind must run evals');
 });

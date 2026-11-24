@@ -1,8 +1,3 @@
-// JSON Schema bounds enforcement (CLAUDE.md rule 11).
-//
-// Caps schema size + depth + property count to prevent CPU/memory DoS via
-// pathological schemas. Applied at /push time before ajv compile.
-
 const MAX_PROPERTIES = 256;
 const MAX_DEPTH = 8;
 const MAX_SIZE_BYTES = 32 * 1024;

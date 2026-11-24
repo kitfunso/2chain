@@ -1,13 +1,3 @@
-// Curated prompt-template seed list.
-//
-// Prompts are callable units in 2chain: agents discover by capability_text,
-// then /call them with `{ vars: { ... } }`. The prompt-template-stub
-// substitutes `{{var}}` placeholders and returns `{ rendered: string }`.
-//
-// Each entry must have a non-empty description and a non-empty template.
-// `vars` lists the placeholder keys for documentation; the stub does not
-// enforce them (missing vars render as `{{key}}` so callers can iterate).
-
 export interface PromptSeed {
   slug: string;
   description: string;

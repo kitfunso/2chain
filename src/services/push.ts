@@ -1,5 +1,3 @@
-// v2 push — Storage + Embedder via DI. No MongoDB. No Voyage.
-
 import type {
   Storage,
   Embedder,
@@ -80,7 +78,6 @@ export async function push(
   const tStart = Date.now();
   const now = new Date().toISOString();
 
-  // tool_kind defaults to 'tool' for back-compat with existing /push callers.
   const kind: ToolKind = body.tool_kind ?? 'tool';
   if (!VALID_KINDS.has(kind)) {
     return {
@@ -90,20 +87,15 @@ export async function push(
     };
   }
 
-  // CLAUDE.md rule 11: bound JSON Schema size + depth before any compile.
   const inputCheck = validateContract(body.input_contract, 'input');
   if (!inputCheck.ok) return { ok: false, code: 'contract_too_large', message: inputCheck.reason };
   const outputCheck = validateContract(body.output_contract, 'output');
   if (!outputCheck.ok) return { ok: false, code: 'contract_too_large', message: outputCheck.reason };
 
-  // Stub must be registered (CLAUDE.md rule 12: first-party stubs only).
   if (!getStub(body.endpoint_stub_name)) {
     return { ok: false, code: 'unknown_stub', message: `endpoint_stub_name '${body.endpoint_stub_name}' is not a registered first-party stub` };
   }
 
-  // Pre-checks. listToolsByName is an indexed exact-match with no list cap —
-  // the previous listTools({ limit: 5_000 }) scan would silently miss rows
-  // beyond 5k tools and fail open on both ownership and drift.
   const existing = await storage.getToolByNameVersion(body.name, body.version, namespace);
   if (existing) {
     return { ok: false, code: 'duplicate_version', message: `tool ${body.name}@${body.version} already exists` };
@@ -114,29 +106,13 @@ export async function push(
     return { ok: false, code: 'name_owned_by_other', message: `tool ${body.name} is owned by another author` };
   }
 
-  // Contract drift check (E3) — after ownership, BEFORE embed (fail fast, no
-  // wasted embed cost). Baseline = the greatest existing version LOWER than
-  // the pushed one (its predecessor in the version line), NOT the global max:
-  // diffing against the global max both rejects legitimate backports whose
-  // contracts match their own line AND fails open when a lower-line push
-  // matches the newest major while breaking its actual predecessor (codex P2
-  // + independent-review MED, convergent). A push below every existing
-  // version has no predecessor and skips the check, like a first version.
   let prior: ToolV2 | null = null;
   if (majorOf(body.version) === null && sameName.length > 0) {
-    // Unorderable pushed version: a predecessor cannot be determined, so the
-    // check must not silently skip (fail-open). Diff against the global max
-    // and let the unordered-version gate branch reject any breaking change.
     for (const t of sameName) {
       if (!prior || compareVersions(t.version, prior.version) > 0) prior = t;
     }
   } else {
     for (const t of sameName) {
-      // Skip only STRICTLY greater versions: an equal-by-compare alias
-      // ('1.0' vs a pushed '1.0.0') must become the baseline, not be skipped
-      // — skipping it left prior null and bypassed the gate entirely
-      // (codex P2, round 3). Breaking-vs-alias then demands major > major,
-      // which can never hold, so alias pushes can only be compatible.
       if (compareVersions(t.version, body.version) > 0) continue;
       if (!prior || compareVersions(t.version, prior.version) > 0) prior = t;
     }
@@ -161,7 +137,6 @@ export async function push(
       const newMajor = majorOf(body.version);
       const priorMajor = majorOf(prior.version);
       if (newMajor === null || priorMajor === null) {
-        // Unordered versions + breaking change: fail loud, never fail open.
         return {
           ok: false,
           code: 'breaking_contract_requires_major_bump',
@@ -190,7 +165,6 @@ export async function push(
     drift = { from_version: prior.version, input: inputDiff, output: outputDiff };
   }
 
-  // Embed
   const tEmbed = Date.now();
   let embedding: Float32Array;
   try {
@@ -200,7 +174,6 @@ export async function push(
   }
   const embedMs = Date.now() - tEmbed;
 
-  // Insert with status='pending', reliability=0 (D9 invariant).
   const pendingSpec: ToolSpecV2 = {
     name: body.name,
     version: body.version,
@@ -222,14 +195,7 @@ export async function push(
   };
   const inserted = await storage.upsertTool(pendingSpec, embedding, namespace);
 
-  // Persist drift events AFTER upsertTool succeeds (the table records what
-  // the registry ACCEPTED; pushes that fail embed/insert write nothing).
-  // FAIL-SOFT (pinned execute decision): the tool is already registered, so
-  // an event-write failure logs and the push still succeeds — a registered
-  // tool's push must never 500 on a post-commit side effect.
   if (drift) {
-    // Per-direction try/catch: an input-event write failure must not abort
-    // the output event — the audit trail degrades per-row, not wholesale.
     for (const [direction, diff] of [
       ['input', drift.input],
       ['output', drift.output],
@@ -255,10 +221,6 @@ export async function push(
     }
   }
 
-  // Skills, subagents, and prompts run the per-kind rubric instead of the
-  // fixture eval harness. Pass-rate becomes reliability_score so the trust
-  // signal is honest (entries with sparse capability_text or missing
-  // metadata land below the 0.80 RRF gate and don't pollute discover).
   if (NON_EVAL_KINDS.has(kind)) {
     const tEval = Date.now();
     const kindResult = runKindEval(inserted);
@@ -305,9 +267,6 @@ export async function push(
     }
   }
 
-  // Run evals (D34: status always flips to 'active', reliability does the gating).
-  // Shared with reverify so grader policy (incl. the malformed-bot lenient
-  // override) can never diverge between publish and re-verification.
   const tEval = Date.now();
   const evalResult = await runToolEvals({
     endpoint_stub_name: body.endpoint_stub_name,

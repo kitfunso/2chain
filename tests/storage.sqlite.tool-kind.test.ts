@@ -1,6 +1,3 @@
-// Storage layer tests for the tool_kind discriminator (migration 002).
-// Real :memory: SQLite, no mocks.
-
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { SqliteStorage } from '../src/storage/sqlite.js';
@@ -73,7 +70,6 @@ test('listTools filters by kind', async () => {
   assert.ok(onlyPlain.length >= 1);
 
   const mixed = await storage.listTools({});
-  // contains all four kinds
   const kinds = new Set(mixed.map((t) => t.tool_kind));
   assert.deepEqual(
     [...kinds].sort(),
@@ -99,7 +95,6 @@ test('runRRF returns tool_kind on every result', async () => {
 });
 
 test('CHECK constraint rejects an unknown tool_kind value', async () => {
-  // Direct SQL bypasses TypeScript narrowing — confirm the DB-level check.
   const db = (storage as unknown as { db: { prepare: (s: string) => { run: (...a: unknown[]) => unknown } } }).db;
   assert.throws(
     () =>

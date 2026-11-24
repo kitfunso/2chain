@@ -1,8 +1,3 @@
-// Lazy verification helper for the MCP importer. Spawns a server briefly,
-// calls tools/list, returns the advertised tools. Separate from the main
-// importer so unit tests can exercise the dry-run path without ever
-// importing child_process.
-
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import type { McpServerEntry } from './mcp-registry.js';
@@ -18,8 +13,6 @@ const VERIFY_TIMEOUT_MS = 15_000;
 export async function ensureConnectedForVerify(
   server: McpServerEntry,
 ): Promise<AdvertisedTool[]> {
-  // Reject early if required env vars are missing — saves a long npx spawn
-  // that will just fail at runtime.
   if (server.envPassthrough) {
     for (const key of server.envPassthrough) {
       if (!process.env[key]) {

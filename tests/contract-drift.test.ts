@@ -1,7 +1,3 @@
-// E3 contract drift tests — real SQLite :memory:, no mocks, push-level where
-// possible. The rule table in docs/plans/2026-06-10-e3-contract-drift.md is
-// the single normative spec; the matrix test below mirrors it cell by cell.
-
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -51,8 +47,6 @@ after(async () => {
   await storage.close();
 });
 
-// ---- helpers ----------------------------------------------------------------
-
 type Schema = Record<string, unknown>;
 
 const schema = (props: Record<string, unknown>, extra: Schema = {}): Schema => ({
@@ -90,8 +84,6 @@ function deepSchema(depth: number, leafType: string): Schema {
   return node;
 }
 
-// ---- 13. differ unit table-test over the full rule matrix --------------------
-
 test('differ rule matrix: every rule-table cell, both directions', () => {
   const cases: Array<{
     name: string;
@@ -101,97 +93,79 @@ test('differ rule matrix: every rule-table cell, both directions', () => {
     expected: DriftClassification;
     kind?: string;
   }> = [
-    // identical under key/required reorder (canonical comparison, set semantics)
     { name: 'reordered keys + required set', direction: 'input', expected: 'identical',
       prev: { type: 'object', properties: { a: str, b: str }, required: ['a', 'b'] },
       next: { required: ['b', 'a'], properties: { b: str, a: str }, type: 'object' } },
-    // property added (optional): compatible / compatible
     { name: 'optional prop added', direction: 'input', expected: 'compatible', kind: 'property-added-optional',
       prev: schema({ a: str }, { required: ['a'] }), next: schema({ a: str, b: str }, { required: ['a'] }) },
     { name: 'optional prop added', direction: 'output', expected: 'compatible',
       prev: schema({ a: str }, { required: ['a'] }), next: schema({ a: str, b: str }, { required: ['a'] }) },
-    // property added (required): breaking input / compatible output
     { name: 'required prop added', direction: 'input', expected: 'breaking', kind: 'property-added-required',
       prev: schema({ a: str }, { required: ['a'] }), next: schema({ a: str, b: str }, { required: ['a', 'b'] }) },
     { name: 'required prop added', direction: 'output', expected: 'compatible',
       prev: schema({ a: str }, { required: ['a'] }), next: schema({ a: str, b: str }, { required: ['a', 'b'] }) },
-    // PINNED: removed input prop + new-AP false => breaking
     { name: 'prop removed, new AP false', direction: 'input', expected: 'breaking', kind: 'property-removed',
       prev: schema({ a: str, b: str }, { additionalProperties: false }),
       next: schema({ a: str }, { additionalProperties: false }) },
-    // PINNED: removed input prop + new-AP true => compatible
     { name: 'prop removed, new AP true', direction: 'input', expected: 'compatible', kind: 'property-removed',
       prev: schema({ a: str, b: str }, { additionalProperties: true }),
       next: schema({ a: str }, { additionalProperties: true }) },
-    // removed input prop + new-AP ABSENT (absent = true) => compatible
     { name: 'prop removed, new AP absent', direction: 'input', expected: 'compatible',
       prev: schema({ a: str, b: str }), next: schema({ a: str }) },
-    // PINNED combo: prior-AP false -> new-AP true + prop removed => compatible
     { name: 'combo AP false->true + prop removed', direction: 'input', expected: 'compatible',
       prev: schema({ a: str, b: str }, { additionalProperties: false }),
       next: schema({ a: str }, { additionalProperties: true }) },
-    // property removed on output: always breaking
     { name: 'prop removed', direction: 'output', expected: 'breaking', kind: 'property-removed',
       prev: schema({ a: str, b: str }, { additionalProperties: true }),
       next: schema({ a: str }, { additionalProperties: true }) },
-    // retyped: breaking both directions
     { name: 'prop retyped', direction: 'input', expected: 'breaking', kind: 'type-changed',
       prev: schema({ a: str }), next: schema({ a: num }) },
     { name: 'prop retyped', direction: 'output', expected: 'breaking', kind: 'type-changed',
       prev: schema({ a: str }), next: schema({ a: num }) },
-    // enum narrowed: breaking input / compatible output
     { name: 'enum narrowed', direction: 'input', expected: 'breaking', kind: 'enum-narrowed',
       prev: schema({ a: { type: 'string', enum: ['x', 'y', 'z'] } }),
       next: schema({ a: { type: 'string', enum: ['x', 'y'] } }) },
     { name: 'enum narrowed', direction: 'output', expected: 'compatible', kind: 'enum-narrowed',
       prev: schema({ a: { type: 'string', enum: ['x', 'y', 'z'] } }),
       next: schema({ a: { type: 'string', enum: ['x', 'y'] } }) },
-    // enum widened: compatible input / breaking output
     { name: 'enum widened', direction: 'input', expected: 'compatible', kind: 'enum-widened',
       prev: schema({ a: { type: 'string', enum: ['x', 'y'] } }),
       next: schema({ a: { type: 'string', enum: ['x', 'y', 'z'] } }) },
     { name: 'enum widened', direction: 'output', expected: 'breaking', kind: 'enum-widened',
       prev: schema({ a: { type: 'string', enum: ['x', 'y'] } }),
       next: schema({ a: { type: 'string', enum: ['x', 'y', 'z'] } }) },
-    // enum constraint added (narrowed from unconstrained) / removed (widened)
     { name: 'enum added', direction: 'input', expected: 'breaking', kind: 'enum-narrowed',
       prev: schema({ a: str }), next: schema({ a: { type: 'string', enum: ['x'] } }) },
     { name: 'enum removed', direction: 'input', expected: 'compatible', kind: 'enum-widened',
       prev: schema({ a: { type: 'string', enum: ['x'] } }), next: schema({ a: str }) },
     { name: 'enum removed', direction: 'output', expected: 'breaking', kind: 'enum-widened',
       prev: schema({ a: { type: 'string', enum: ['x'] } }), next: schema({ a: str }) },
-    // required added on existing prop: breaking input / compatible output
     { name: 'required added on existing', direction: 'input', expected: 'breaking', kind: 'required-added',
       prev: schema({ a: str, b: str }, { required: ['a'] }),
       next: schema({ a: str, b: str }, { required: ['a', 'b'] }) },
     { name: 'required added on existing', direction: 'output', expected: 'compatible',
       prev: schema({ a: str, b: str }, { required: ['a'] }),
       next: schema({ a: str, b: str }, { required: ['a', 'b'] }) },
-    // required removed (prop kept): compatible input / breaking output
     { name: 'required removed', direction: 'input', expected: 'compatible', kind: 'required-removed',
       prev: schema({ a: str, b: str }, { required: ['a', 'b'] }),
       next: schema({ a: str, b: str }, { required: ['a'] }) },
     { name: 'required removed', direction: 'output', expected: 'breaking', kind: 'required-removed',
       prev: schema({ a: str, b: str }, { required: ['a', 'b'] }),
       next: schema({ a: str, b: str }, { required: ['a'] }) },
-    // additionalProperties true->false: breaking input / compatible output
     { name: 'AP true->false', direction: 'input', expected: 'breaking', kind: 'additional-properties-restricted',
       prev: schema({ a: str }, { additionalProperties: true }),
       next: schema({ a: str }, { additionalProperties: false }) },
     { name: 'AP true->false', direction: 'output', expected: 'compatible',
       prev: schema({ a: str }, { additionalProperties: true }),
       next: schema({ a: str }, { additionalProperties: false }) },
-    // AP absent (= true) -> false: breaking input
     { name: 'AP absent->false', direction: 'input', expected: 'breaking', kind: 'additional-properties-restricted',
       prev: schema({ a: str }), next: schema({ a: str }, { additionalProperties: false }) },
-    // additionalProperties false->true: compatible input / breaking output
     { name: 'AP false->true', direction: 'input', expected: 'compatible',
       prev: schema({ a: str }, { additionalProperties: false }),
       next: schema({ a: str }, { additionalProperties: true }) },
     { name: 'AP false->true', direction: 'output', expected: 'breaking', kind: 'additional-properties-relaxed',
       prev: schema({ a: str }, { additionalProperties: false }),
       next: schema({ a: str }, { additionalProperties: true }) },
-    // unmodeled constructs: conservative breaking, both directions
     { name: 'pattern changed', direction: 'input', expected: 'breaking', kind: 'unknown-construct-changed',
       prev: schema({ a: { type: 'string', pattern: '^a' } }), next: schema({ a: { type: 'string', pattern: '^b' } }) },
     { name: 'pattern changed', direction: 'output', expected: 'breaking', kind: 'unknown-construct-changed',
@@ -200,11 +174,9 @@ test('differ rule matrix: every rule-table cell, both directions', () => {
       prev: schema({ a: { type: 'number', minimum: 0 } }), next: schema({ a: { type: 'number', minimum: 1 } }) },
     { name: 'oneOf changed at root', direction: 'output', expected: 'breaking', kind: 'unknown-construct-changed',
       prev: { oneOf: [{ type: 'string' }] }, next: { oneOf: [{ type: 'number' }] } },
-    // items tuple form: unmodeled
     { name: 'items tuple form', direction: 'input', expected: 'breaking', kind: 'unknown-construct-changed',
       prev: schema({ list: { type: 'array', items: [str] } }),
       next: schema({ list: { type: 'array', items: [num] } }) },
-    // depth cap: conservative breaking
     { name: 'depth exceeded', direction: 'input', expected: 'breaking', kind: 'depth-exceeded',
       prev: deepSchema(MAX_DIFF_DEPTH + 4, 'string'), next: deepSchema(MAX_DIFF_DEPTH + 4, 'number') },
   ];
@@ -243,8 +215,6 @@ test('compareVersions and majorOf: loose numeric segment ordering', () => {
   assert.equal(majorOf('v3'), null);
   assert.equal(majorOf('beta'), null);
 });
-
-// ---- push-level: the breaking gate -------------------------------------------
 
 const IN_BASE = schema({ q: str }, { required: ['q'], additionalProperties: true });
 const OUT_BASE = schema({ value: num }, { required: ['value'], additionalProperties: false });
@@ -353,7 +323,6 @@ test('8. removed output property on minor bump is rejected', async () => {
 
 test('9. identical contracts: accepted, drift reported identical, NO event rows', async () => {
   assert.equal((await pushVersion('drift-identical', '1.0', IN_BASE, OUT_BASE)).ok, true);
-  // Same contracts with reordered keys — canonical comparison must see through it.
   const reorderedIn = { additionalProperties: true, required: ['q'], properties: { q: str }, type: 'object' };
   const r = await pushVersion('drift-identical', '1.1', reorderedIn, OUT_BASE);
   assert.equal(r.ok, true);
@@ -389,8 +358,6 @@ test('12a. prior version picked by numeric order: 1.10 beats 1.9', async () => {
     schema({ q: str, extra: extraType }, { required: ['q'], additionalProperties: true });
   assert.equal((await pushVersion('drift-order', '1.9', IN_BASE, OUT_BASE)).ok, true);
   assert.equal((await pushVersion('drift-order', '1.10', inWithExtra(str), OUT_BASE)).ok, true);
-  // vs 1.10 this retypes `extra` (breaking); vs 1.9 it would merely ADD an
-  // optional prop (compatible) — so a rejection proves the prior was 1.10.
   const r = await pushVersion('drift-order', '1.11', inWithExtra(num), OUT_BASE);
   assert.equal(r.ok, false, 'lexical max 1.9 would have let this through');
   if (r.ok) return;
@@ -408,8 +375,6 @@ test('12b. unparseable version + breaking change rejects fail-loud', async () =>
   assert.equal(r.code, 'breaking_contract_requires_major_bump');
   assert.match(r.message, /not numerically ordered/);
 });
-
-// ---- demo regression (CLAUDE.md rule 8: never break the demo) ----------------
 
 test('demo regression: seeded 3.0 -> demo 3.1 classifies identical/identical', async () => {
   const seed = FIXTURE_TOOLS.find((t) => t.name === 'pdf-extractor' && t.version === '3.0');
@@ -438,12 +403,8 @@ test('demo regression: seeded 3.0 -> demo 3.1 classifies identical/identical', a
   assert.equal(events.length, 0, 'identical drift writes no events');
 });
 
-// ---- fail-soft event write (pinned execute decision) --------------------------
-
 test('drift event write failure is fail-soft: push still succeeds', async () => {
   assert.equal((await pushVersion('drift-failsoft', '1.0', IN_BASE, OUT_BASE)).ok, true);
-  // Failure injection on the NEW write path only — everything else is the
-  // real SQLite storage (this is not a DB mock; the insert genuinely throws).
   const failing = new Proxy(storage as Storage, {
     get(target, prop, receiver) {
       if (prop === 'insertDriftEvent') {
@@ -470,12 +431,6 @@ test('drift event write failure is fail-soft: push still succeeds', async () => 
   const events = await storage.listDriftEvents('drift-failsoft');
   assert.equal(events.length, 0, 'the injected failure prevented the event write');
 });
-
-// ---- Fail-open hole regression (code-review HIGH) -------------------------
-// Identically-malformed guard shapes (`required` as a string, `properties` as
-// an array) used to early-return WITHOUT diffing the structure beneath, so a
-// breaking change under them classified `identical` and bypassed the gate.
-// Malformed-but-equal pieces are now treated as empty and the diff continues.
 
 test('differ: identically-malformed required does not mask a retype beneath', () => {
   const prevSchema = {
@@ -507,27 +462,17 @@ test('differ: identically-malformed properties does not mask a required change',
     properties: ['bogus'],
     required: [],
   } as Record<string, unknown>;
-  // required 'a' removed on OUTPUT = breaking (field may now be absent).
   const diff = diffContracts(prevSchema, nextSchema, 'output');
   assert.equal(diff.classification, 'breaking', 'required change under malformed properties must still classify');
 });
-
-// ---- Baseline selection (codex P2-1 + independent MED, convergent) --------
-// Prior = the predecessor in the version line (greatest version BELOW the
-// push), not the global max. Global-max selection both rejected legitimate
-// backports AND failed open: 1.1 matching 2.0's contract bypassed the gate
-// while breaking 1.0 callers.
 
 test('baseline: lower-line push diffs against its predecessor, not the global max', async () => {
   const OUT_NUM = schema({ v: num }, { required: ['v'], additionalProperties: false });
   const OUT_STR = schema({ v: str }, { required: ['v'], additionalProperties: false });
 
-  // 1.0 returns a number; 2.0 legitimately retyped to string via major bump.
   assert.equal((await pushVersion('line-tool', '1.0', IN_BASE, OUT_NUM)).ok, true);
   assert.equal((await pushVersion('line-tool', '2.0', IN_BASE, OUT_STR)).ok, true);
 
-  // Pushing 1.1 with the STRING contract matches 2.0 but breaks the 1.x
-  // line - must be rejected against predecessor 1.0, not global max 2.0.
   const sneaky = await pushVersion('line-tool', '1.1', IN_BASE, OUT_STR);
   assert.equal(sneaky.ok, false, 'gate must compare 1.1 against 1.0, not 2.0');
   if (sneaky.ok) return;
@@ -535,8 +480,6 @@ test('baseline: lower-line push diffs against its predecessor, not the global ma
   assert.ok(sneaky.details);
   assert.equal(sneaky.details['from_version'], '1.0');
 
-  // A backport compatible with ITS line is allowed (was a false positive
-  // under global-max selection: 1.1 vs 2.0 demanded major > 2).
   const backport = await pushVersion('line-tool', '1.1', IN_BASE, OUT_NUM);
   assert.equal(backport.ok, true, 'line-compatible backport must be allowed');
 });
@@ -548,27 +491,18 @@ test('differ: type-array reorder is not a change', () => {
   assert.equal(diff.classification, 'identical', 'pure type-array reorder is the same contract');
 });
 
-// ---- Version-alias bypass (codex P2, round 3) -----------------------------
-// '1.0' and '1.0.0' compare equal (missing segments = 0). Skipping equal-by-
-// compare versions left prior = null, bypassing the gate entirely for alias
-// pushes. Equal-compare versions are now the baseline: breaking-vs-alias
-// demands major > major, which never holds.
-
 test('baseline: version alias (1.0 vs 1.0.0) cannot bypass the gate', async () => {
   const OUT_NUM = schema({ v: num }, { required: ['v'], additionalProperties: false });
   const OUT_STR = schema({ v: str }, { required: ['v'], additionalProperties: false });
 
   assert.equal((await pushVersion('alias-tool', '1.0', IN_BASE, OUT_NUM)).ok, true);
 
-  // Breaking contract under an alias version string: must be rejected
-  // against the equal-compare baseline, never silently accepted.
   const sneaky = await pushVersion('alias-tool', '1.0.0', IN_BASE, OUT_STR);
   assert.equal(sneaky.ok, false, 'alias version must not bypass the drift gate');
   if (sneaky.ok) return;
   assert.equal(sneaky.code, 'breaking_contract_requires_major_bump');
   assert.equal(sneaky.details?.['from_version'], '1.0');
 
-  // A contract-identical alias push remains allowed (new unique version string).
   const benign = await pushVersion('alias-tool', '1.0.1', IN_BASE, OUT_NUM);
   assert.equal(benign.ok, true);
 });

@@ -1,4 +1,3 @@
-// Quick sanity check: open the seeded DB, run an RRF, print top-5.
 import { SqliteStorage } from '../src/storage/sqlite.js';
 import { OllamaEmbedder } from '../src/embeddings/ollama.js';
 

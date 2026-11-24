@@ -1,6 +1,3 @@
-// Build a 1k subset of the 10k corpus for CI gate reference.
-// Deterministic: first 1000 tools by name+version ascending sort.
-
 import 'dotenv/config';
 import { existsSync, unlinkSync, renameSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
@@ -15,7 +12,6 @@ await src.init();
 const all = await src.listTools({ limit: 20_000 });
 console.log(`source: ${all.length} tools from ${sourcePath}`);
 
-// Sort name+version ascending and take first 1k
 const sorted = [...all].sort((a, b) => {
   const aKey = `${a.name}@${a.version}|${a.namespace_id}`;
   const bKey = `${b.name}@${b.version}|${b.namespace_id}`;

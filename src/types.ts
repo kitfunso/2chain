@@ -1,11 +1,4 @@
-// v1 types (MongoDB-flavored) preserved for backwards compat during transition.
-// v2 types (storage-agnostic) added below the v1 section.
-
 import type { ObjectId } from 'mongodb';
-
-// ====================================================================
-// v1 TYPES — used by remaining MongoDB code paths during the v2 cutover
-// ====================================================================
 
 export type ToolStatus = 'pending' | 'active' | 'circuit_broken';
 export type RepairStrategy = 'llm' | 'fail-fast';
@@ -89,10 +82,6 @@ export interface Agent {
   created_at: Date;
 }
 
-// ====================================================================
-// v2 TYPES — storage-agnostic
-// ====================================================================
-
 export const DEFAULT_NAMESPACE = 'default';
 
 export type ToolKind = 'tool' | 'skill' | 'subagent' | 'prompt';
@@ -110,30 +99,24 @@ export interface ToolSpecV2 {
     cost_per_call_usd: number;
     p95_latency_ms: number;
     reliability_score: number;
-    last_eval_run?: string; // ISO timestamp in v2 (no MongoDB Date)
+    last_eval_run?: string;
     last_eval_run_id?: string;
-    /** Set ONCE at the circuit-break transition (markCircuitBroken), read by
-     *  recovery as the watermark post-break evidence must postdate. Usage
-     *  rows can NOT serve as this watermark: call.ts logs the same outcome
-     *  on every post-break 503 rejection, so retry traffic would advance it
-     *  forever and recovery would never fire. Stale on re-activated tools
-     *  (harmless: recovery only reads it while status='circuit_broken'). */
     broken_at?: string;
   };
   status: ToolStatus;
   domain?: string;
   namespace_id?: string;
   source_registry_id?: string | null;
-  tool_kind?: ToolKind; // defaults to 'tool' on insert
+  tool_kind?: ToolKind;
 }
 
 export interface ToolV2 extends ToolSpecV2 {
-  id: string;                 // uuid
-  namespace_id: string;       // always set after upsert
+  id: string;
+  namespace_id: string;
   source_registry_id: string | null;
-  tool_kind: ToolKind;        // always set after upsert
-  created_at: string;         // ISO
-  updated_at: string;         // ISO
+  tool_kind: ToolKind;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface EvalCaseResultV2 {
@@ -192,7 +175,7 @@ export interface RankingRow {
   query_capability_text: string;
   mode: 'vector' | 'hybrid';
   namespace_id: string;
-  results: unknown;           // top-K snapshot
+  results: unknown;
   occurred_at: string;
 }
 
@@ -228,8 +211,6 @@ export interface AgentRow {
   created_at: string;
 }
 
-// ----- Contract drift (E3) ------------------------------------------------
-
 export type DriftDirection = 'input' | 'output';
 
 /** identical = no semantic change; compatible = additive/loosening only;
@@ -252,7 +233,6 @@ export type ContractChangeKind =
   | 'depth-exceeded';
 
 export interface ContractChange {
-  /** Pointer-ish path, e.g. `properties.user.properties.email`. */
   path: string;
   kind: ContractChangeKind;
   breaking: boolean;
@@ -294,14 +274,9 @@ export interface RrfResult {
   vec_rank?: number;
 }
 
-// ====================================================================
-// Storage interface — single point of contact for the database
-// ====================================================================
-
 export interface Storage {
   init(): Promise<void>;
 
-  // Tool CRUD
   getToolByNameVersion(
     name: string,
     version: string,
@@ -318,49 +293,24 @@ export interface Storage {
     metadata: ToolSpecV2['metadata'],
     status: ToolStatus,
   ): Promise<void>;
-  /** All versions of a tool by exact name. Indexed (namespace_id, name)
-   *  prefix of the UNIQUE(namespace_id, name, version) index — no list cap,
-   *  so push's ownership + prior-version lookups never silently truncate. */
   listToolsByName(name: string, namespace?: string, opts?: { newestFirst?: boolean; limit?: number }): Promise<ToolV2[]>;
-  /** Atomic patch of ONLY reliability_score + last_eval_run; never writes
-   *  status and never replaces whole metadata — safe for sweeps whose
-   *  read-time snapshot may be stale by write time (reverify TOCTOU). */
   recordEvalOutcome(
     toolId: string,
     reliabilityScore: number,
     lastEvalRun: string,
   ): Promise<void>;
 
-  // Reliability lifecycle reads (E2) — evidence inputs for the blend in
-  // src/services/scoreLifecycle.ts, fetched per tool by the reverify sweep.
-  /** Most recent eval runs for one tool, newest first (all triggered_by
-   *  values — the blend reads the whole evidence line). Rides
-   *  idx_eval_runs_tool; the per-tool sort after lookup is fine at
-   *  per-tool scale (a composite (tool_id, triggered_at) index is a
-   *  future option, not added speculatively). */
   listEvalRunsForTool(toolId: string, limit: number, triggeredBy?: string): Promise<EvalRunRow[]>;
-  /** Per-tool usage outcome counts since `sinceIso` (the caller computes
-   *  the window, e.g. USAGE_WINDOW_DAYS). All outcomes are returned; the
-   *  scoring layer decides which count as evidence. */
   usageOutcomeCountsForTool(
     toolId: string,
     sinceIso: string,
   ): Promise<Record<string, number>>;
-  /** Count of `violations` rows WHERE stage='output' for one tool since
-   *  `sinceIso`. Output-stage only: input-stage violations are caller-fault
-   *  and never count against the tool. */
   outputViolationCountForTool(toolId: string, sinceIso: string): Promise<number>;
-  /** The D34 circuit-break flip, atomically: status='circuit_broken' AND
-   *  metadata.broken_at=atIso in one write. broken_at is the watermark
-   *  recovery evidence must postdate; recorded ONCE at the transition
-   *  (post-break 503 rejections must never advance it). */
   markCircuitBroken(toolId: string, atIso: string): Promise<void>;
 
-  // Agent auth (used by /push, /call, /discover guards)
   getAgentByKeyHash(hash: string): Promise<AgentRow | null>;
   upsertAgent(agent: AgentRow): Promise<void>;
 
-  // Retrieval (the heart of /discover)
   runRRF(opts: {
     queryEmbedding: Float32Array;
     queryText: string;
@@ -371,14 +321,11 @@ export interface Storage {
     kind?: ToolKind;
   }): Promise<RrfResult[]>;
 
-  // Logging (write paths from /push, /call, /discover)
   insertViolation(v: ViolationRow): Promise<void>;
   insertUsage(u: UsageRow): Promise<void>;
   insertEvalRun(e: EvalRunRow): Promise<void>;
   insertRanking(r: RankingRow): Promise<void>;
 
-  // Contract drift (E3). Write side fires from /push after upsertTool;
-  // read side is minimal (the operator surface is E4's).
   insertDriftEvent(e: DriftEventRow): Promise<void>;
   listDriftEvents(
     toolName: string,
@@ -386,7 +333,6 @@ export interface Storage {
     limit?: number,
   ): Promise<DriftEventRow[]>;
 
-  // Dashboard reads (the surface /state, /atlas-stats, dashboardHtml use)
   listTools(opts: {
     status?: ToolStatus;
     limit?: number;
@@ -399,8 +345,6 @@ export interface Storage {
     limit: number,
     namespace?: string,
   ): Promise<Record<string, number>>;
-  /** Tools that appeared most often in /discover top-K rankings within the
-   *  last `daysBack` days. Aggregated from the `rankings` snapshot table. */
   getTrending(
     daysBack: number,
     limit: number,
@@ -408,16 +352,10 @@ export interface Storage {
   ): Promise<Array<{ name: string; version: string; hits: number }>>;
   dbStats(): Promise<DbStats>;
 
-  // Live updates (change-stream equivalent)
   watchChanges(onChange: (event: ChangeEvent) => void): void;
 
-  // Lifecycle
   close(): Promise<void>;
 }
-
-// ====================================================================
-// Embedder interface — single point of contact for the embedding model
-// ====================================================================
 
 export interface EmbedResult {
   vec: Float32Array;
@@ -434,16 +372,10 @@ export interface Embedder {
     kind: 'document' | 'query',
   ): Promise<Float32Array[]>;
 
-  // Query-cache contract (per outside-voice review issue #1)
   prewarm(queries: string[]): Promise<void>;
   cachedEmbed(query: string): Promise<EmbedResult>;
 }
 
-// ====================================================================
-// Constants
-// ====================================================================
-
-// v1 (preserved for transition; remove after Phase 2 ships)
 export const RELIABILITY_GATE = 0.80;
 export const CIRCUIT_BREAK_THRESHOLD = 0.80;
 export const RANKING_W_VEC = 0.4;
@@ -451,40 +383,9 @@ export const RANKING_W_RELIABILITY = 0.6;
 export const VOYAGE_EMBEDDING_DIM = 1024;
 export const VECTOR_INDEX_NAME = 'tools_capability_idx';
 
-// v2
 export const NOMIC_EMBEDDING_DIM = 768;
 export const RRF_K_CONSTANT = 60;
-// Calibrated against the 32-query golden set (Step 10 sweep, 2026-05-02).
-// 0.5/0.5 gave the best v1-top1 match (22/32) and top-3 overlap (1.88/3)
-// for nomic-embed-text vs Voyage. v1 default of 0.7/0.3 leaned too hard on
-// vector for nomic's narrower semantic field. See docs/perf/.
 export const RRF_DEFAULT_VECTOR_WEIGHT = 0.5;
 export const RRF_DEFAULT_TEXT_WEIGHT = 0.5;
-// VEC_RELEVANCE_GATE intentionally not set in v2 until Step 6.5 perf tuning
-// recalibrates against nomic-embed-text. v1 used 0.70 against Voyage cosine.
-
-// ----- Freshness re-sort (E5) — post-RRF, in src/services/discover.ts ------
-//
-//   freshness   = 0.5 ^ (age_days(metadata.last_eval_run) / FRESHNESS_HALF_LIFE_DAYS)
-//   final_score = rrf_score + W_FRESHNESS_RRF * freshness
-//
-// Weight calibration on the RRF scale (E5 plan §1 — 0.05 would dominate
-// retrieval; the term must perturb, never gate):
-// - One RRF arm contributes w/(60+rank); with arm weight 0.5 the max is
-//   ≈ 0.0082, and ADJACENT-rank gaps are ≈ 1.3e-4 (rank 1→2) shrinking
-//   with depth.
-// - W_FRESHNESS_RRF = 0.0005: a full freshness delta (fresh 1.0 vs stale
-//   ≈ 0) covers ~3-4 adjacent-rank gaps at shallow ranks — a fresh tool
-//   climbs past NEAR-tied stale neighbours — but is an order of magnitude
-//   below one arm contribution, so it cannot overtake a tool 5+ RRF ranks
-//   ahead. RANK DISTANCE, not raw similarity margin, is the guarantee:
-//   RRF compresses any cosine gap between adjacent ranks to ~1.3e-4, so a
-//   near-tied rank-1 can be passed however large its raw-similarity lead.
-//   (Cumulative gap rank 10→1 ≈ 1.1e-3 > 2× the full term.)
-// - Missing/unparseable last_eval_run ⇒ freshness 0, via a Number.isFinite
-//   guard (NaN in a sort key silently disorders).
-// - Uniform-fresh corpora are ORDER-INVARIANT by construction: an additive
-//   constant shifts every score equally under a plain stable sort.
-// - Reliability gating stays in SQL (rule 7); freshness weights, never gates.
 export const FRESHNESS_HALF_LIFE_DAYS = 7;
 export const W_FRESHNESS_RRF = 0.0005;

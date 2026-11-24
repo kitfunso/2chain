@@ -65,7 +65,6 @@ try {
   }
   console.log('  server up\n');
 
-  // ─── Beat 1 ────────────────────────────────────────────────────────────
   console.log('\x1b[35m▸ Beat 1: discovery\x1b[0m');
   const r1 = await http('GET', `/discover?q=${encodeURIComponent(QUERY)}`, PDF_KEY);
   assert('GET /discover returns 200', r1.status === 200, `got ${r1.status}`);
@@ -75,7 +74,6 @@ try {
   assert('#2 is pdftools-pro v2.0', r1.json.results?.[1]?.name === 'pdftools-pro' && r1.json.results?.[1]?.version === '2.0');
   assert('latency under 200ms (warm cache)', r1.ms < 200, `${r1.ms}ms`);
 
-  // ─── Beat 2: push the buggy v3.1 ───────────────────────────────────────
   console.log('\n\x1b[35m▸ Beat 2: push pdf-extractor v3.1 (buggy)\x1b[0m');
   const v31 = JSON.parse(readFileSync('demo/pdf-extractor-3.1.json', 'utf-8'));
   const r2 = await http('POST', '/push', ADMIN_KEY, v31);
@@ -93,7 +91,6 @@ try {
   assert('multi-page-text passes (integer)', findCase('multi-page-text')?.pass === true);
   assert('currency-symbol-strip passes (integer)', findCase('currency-symbol-strip')?.pass === true);
 
-  // ─── Beat 3: re-discover, v3.1 must be filtered ────────────────────────
   console.log('\n\x1b[35m▸ Beat 3: re-discover, regression protection\x1b[0m');
   const r3 = await http('GET', `/discover?q=${encodeURIComponent(QUERY)}`, PDF_KEY);
   assert('GET /discover returns 200', r3.status === 200);
@@ -104,7 +101,6 @@ try {
     !r3.json.results.some((r: any) => r.name === 'pdf-extractor' && r.reliability_score < 0.80));
   assert('NO v3.1 in results', !r3.json.results.some((r: any) => r.name === 'pdf-extractor' && r.version === '3.1'));
 
-  // ─── Beat 4: malformed-bot circuit-break ───────────────────────────────
   console.log('\n\x1b[35m▸ Beat 4: malformed-bot → circuit-break\x1b[0m');
   const r4 = await http('POST', '/call', CODER_KEY, {
     tool_name: 'malformed-bot', tool_version: '1.0', case_id: 'array-of-issues',
@@ -122,7 +118,6 @@ try {
   assert('subsequent call returns 503 circuit_broken', r4b.status === 503 && r4b.json.error?.code === 'circuit_broken');
   assert('subsequent call is fast (status check, no stub)', r4b.ms < 100, `${r4b.ms}ms`);
 
-  // ─── Beat 4b: reliability gate ─────────────────────────────────────────
   console.log('\n\x1b[35m▸ Beat 4b: reliability gate on /call\x1b[0m');
   const r5 = await http('POST', '/call', PDF_KEY, {
     tool_name: 'pdf-extractor', tool_version: '3.1', case_id: 'financial-numbers',
@@ -132,7 +127,6 @@ try {
   assert('error code is reliability_gate', r5.json.error?.code === 'reliability_gate');
   assert('error details.score is 0.6', r5.json.error?.details?.score === 0.6);
 
-  // ─── Auth ──────────────────────────────────────────────────────────────
   console.log('\n\x1b[35m▸ Auth & shape\x1b[0m');
   const noAuth = await fetch(`${HOST}/discover?q=${encodeURIComponent(QUERY)}`);
   assert('missing api key → 401', noAuth.status === 401);
@@ -141,7 +135,6 @@ try {
   const dup = await http('POST', '/push', ADMIN_KEY, v31);
   assert('duplicate push → 400', dup.status === 400);
 
-  // ─── Summary ───────────────────────────────────────────────────────────
   console.log(`\n\x1b[36m\x1b[1m═══ summary ═══\x1b[0m`);
   console.log(`  ${pass} passed`);
   if (fail > 0) {

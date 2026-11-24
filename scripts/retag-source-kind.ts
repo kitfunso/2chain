@@ -1,12 +1,3 @@
-// One-shot SQL update: re-tag tool_kind for all rows whose author_agent_id
-// matches a given source. Used to fix entries that were imported as kind=tool
-// but really belong to a different kind (e.g. awesome-claude-prompts entries
-// are prompts, not tools).
-//
-// Usage:
-//   tsx scripts/retag-source-kind.ts --author awesome-awesome-claude-prompts --kind prompt
-//   tsx scripts/retag-source-kind.ts --like 'awesome-%-prompts' --kind prompt
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';

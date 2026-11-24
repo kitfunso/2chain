@@ -1,21 +1,3 @@
-// Step 3 of Episode A1: build embedder-independent candidate pool per query.
-//
-// For each of the 100 queries in tests/fixtures/v2-golden.json, collect a
-// union of candidates from 5 sources:
-//   1. BM25-only top-20  (FTS5; no vector — lexical baseline)
-//   2. nomic top-10      (current production embedder, vector-only)
-//   3. mxbai top-10      (opt-in embedder; in-JS cosine since mxbai vectors
-//                         are not in the SQLite vec0 table)
-//   4. random control 10 (deterministic from query-id hash)
-//   5. author top-3      (expected_top3 in v2-golden.json)
-//
-// Dedup by name@version, cap at 50 per query. Output:
-//   tests/fixtures/v2-golden-candidates.json
-//
-// Usage:
-//   TWOCHAIN_DB_PATH=C:/tmp/v2.db STORAGE_DRIVER=sqlite EMBEDDER=ollama \
-//     npx tsx scripts/eval/build-candidate-pool.ts
-
 import 'dotenv/config';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -53,11 +35,9 @@ await storage.init();
 const nomic = new OllamaEmbedder({ model: 'nomic-embed-text' });
 const mxbai = new OllamaEmbedder({ model: 'mxbai-embed-large' });
 
-// Load all tools with their capability_text for mxbai precompute + random sample.
 const allTools = await storage.listTools({ limit: 10_000 });
 console.log(`loaded ${allTools.length} tools`);
 
-// ---- Precompute mxbai embeddings for the whole corpus (one-time) ----
 console.log(`precomputing mxbai embeddings for ${allTools.length} capability_texts...`);
 const tStart = Date.now();
 const capTexts = allTools.map((t) => t.capability_text ?? '');
@@ -65,7 +45,6 @@ const mxbaiToolVecs = await mxbai.embedBatch(capTexts, 'document');
 console.log(`mxbai precompute: ${Date.now() - tStart}ms`);
 
 function cosine(a: Float32Array, b: Float32Array): number {
-  // Both should already be L2-normalised by OllamaEmbedder; dot product = cosine.
   let s = 0;
   const n = Math.min(a.length, b.length);
   for (let i = 0; i < n; i++) s += a[i] * b[i];
@@ -82,7 +61,6 @@ function topKByMxbai(queryVec: Float32Array, k: number): number[] {
 }
 
 function randomSampleForQuery(qid: string, k: number): number[] {
-  // Deterministic seed from query id.
   const h = createHash('sha256').update(qid).digest();
   let seed = h.readUInt32BE(0);
   const rand = () => {
@@ -90,7 +68,6 @@ function randomSampleForQuery(qid: string, k: number): number[] {
     return seed / 0xffffffff;
   };
   const indices = Array.from({ length: allTools.length }, (_, i) => i);
-  // Fisher-Yates partial shuffle
   for (let i = 0; i < k && i < indices.length; i++) {
     const j = i + Math.floor(rand() * (indices.length - i));
     [indices[i], indices[j]] = [indices[j], indices[i]];
@@ -118,8 +95,6 @@ const out: { generated_at: string; corpus_sha256: string; cap_per_query: number;
   queries: [],
 };
 
-// Get corpus_sha256 from snapshot to record alongside (so the candidate file
-// stays paired with the corpus that generated it).
 const corpusSnap = JSON.parse(readFileSync(resolve('tests/fixtures/v2-corpus-snapshot.json'), 'utf-8'));
 out.corpus_sha256 = corpusSnap.corpus_sha256;
 
@@ -128,7 +103,6 @@ for (const q of golden.queries) {
   qIdx++;
   const cands = new Map<string, Candidate>();
 
-  // 1. BM25-only top-20  (text dominates; vector arm weight effectively zero)
   const dummyVec = await nomic.cachedEmbed(q.q);
   const bm25Hits = await storage.runRRF({
     queryEmbedding: dummyVec.vec,
@@ -138,7 +112,6 @@ for (const q of golden.queries) {
     weights: { vector: 0.0001, text: 1.0 },
     namespace: NAMESPACE,
   });
-  // Filter to items with a text_rank (BM25 actually contributed) and take top 20 by text_rank.
   const bm25Only = bm25Hits
     .filter((r) => r.text_rank !== undefined)
     .sort((a, b) => (a.text_rank! - b.text_rank!))
@@ -147,7 +120,6 @@ for (const q of golden.queries) {
     mergeCandidate(cands, `${r.name}@${r.version}`, r.name, r.version, 'bm25');
   }
 
-  // 2. nomic top-10  (vector dominates)
   const nomicHits = await storage.runRRF({
     queryEmbedding: dummyVec.vec,
     queryText: q.q,
@@ -164,7 +136,6 @@ for (const q of golden.queries) {
     mergeCandidate(cands, `${r.name}@${r.version}`, r.name, r.version, 'nomic');
   }
 
-  // 3. mxbai top-10  (in-JS cosine vs precomputed)
   const mxbaiQ = await mxbai.embed(q.q, 'query');
   const mxbaiIdx = topKByMxbai(mxbaiQ, 10);
   for (const idx of mxbaiIdx) {
@@ -172,14 +143,12 @@ for (const q of golden.queries) {
     mergeCandidate(cands, `${t.name}@${t.version}`, t.name, t.version, 'mxbai');
   }
 
-  // 4. random control 10
   const randIdx = randomSampleForQuery(q.id, 10);
   for (const idx of randIdx) {
     const t = allTools[idx];
     mergeCandidate(cands, `${t.name}@${t.version}`, t.name, t.version, 'random');
   }
 
-  // 5. author top-3 (from expected_top3)
   for (const name of q.expected_top3 ?? []) {
     const t = findByName(name);
     if (t) {
@@ -187,11 +156,9 @@ for (const q of golden.queries) {
     }
   }
 
-  // Cap at 50 — prefer keeping items with more sources (cross-validated).
   const list = Array.from(cands.values()).sort((a, b) => b.sources.length - a.sources.length);
   const capped = list.slice(0, CAP_PER_QUERY);
 
-  // Source distribution for verify reporting
   const srcCounts: Record<string, number> = { bm25: 0, nomic: 0, mxbai: 0, random: 0, author: 0 };
   for (const c of capped) {
     for (const s of c.sources) srcCounts[s] = (srcCounts[s] ?? 0) + 1;
@@ -212,7 +179,6 @@ for (const q of golden.queries) {
 writeFileSync(outPath, JSON.stringify(out, null, 2) + '\n');
 console.log(`wrote ${out.queries.length} candidate pools to ${outPath}`);
 
-// Verify lines
 const counts = out.queries.map((q) => q.candidate_count);
 const tooSmall = out.queries.filter((q) => q.candidate_count < 15);
 console.log(`candidates per query: min=${Math.min(...counts)} max=${Math.max(...counts)} mean=${(counts.reduce((a, b) => a + b, 0) / counts.length).toFixed(1)}`);

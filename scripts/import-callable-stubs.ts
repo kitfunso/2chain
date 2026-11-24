@@ -1,7 +1,3 @@
-// Push tool specs for the 3 new callable stubs (github-search, npm-search,
-// wikipedia-search) so they appear in the registry as kind='tool' with a real
-// callable endpoint. Idempotent via importScrapedSpecs skip-existing.
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';

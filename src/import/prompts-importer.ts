@@ -1,9 +1,3 @@
-// Prompts importer — turns curated prompt-template seeds into 2chain
-// ToolSpecV2 rows with tool_kind='prompt'. Unlike skills/subagents, prompts
-// are CALLABLE: agents pass `{ vars: { key: value } }` and get back
-// `{ rendered: string }`. Substitution is `{{var}}` -> vars[var]; missing
-// vars render as the literal `{{var}}` so callers can chain rounds.
-
 import {
   setPromptTemplate,
   getPromptTemplate,
@@ -68,9 +62,7 @@ function specFromPrompt(seed: PromptSeed): ToolSpecV2 {
 }
 
 export interface PromptImportOptions {
-  /** Restrict to specific prompt slugs. */
   only?: string[];
-  /** Override the seed source (used in tests). */
   seeds?: PromptSeed[];
   skipEmbedding?: boolean;
   minImports?: number;
@@ -115,8 +107,6 @@ export async function importPrompts(
 
   for (let i = 0; i < specs.length; i++) {
     try {
-      // Register the template BEFORE the eval — runPromptEval calls the
-      // stub to verify substitution, which needs the template registered.
       setPromptTemplate(specs[i].name, seeds[i].template);
       const inserted = await storage.upsertTool(specs[i], embeddings[i], NAMESPACE);
       await applyKindEval(storage, inserted);

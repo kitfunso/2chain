@@ -1,5 +1,3 @@
-// CLI: ingest curated prompt-template seeds into 2chain.
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';

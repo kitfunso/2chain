@@ -1,15 +1,3 @@
-"""Recover partial grades from truncated raw judge outputs in v2-golden-judge-raw.json.
-
-The .raw field was truncated to 4000 chars at grading time. The original
-parser worked on the full output, but a buggy re-parse step destroyed those.
-This script salvages whatever complete JSON objects we can find in the
-truncated text, then re-applies the corrected name-stripping logic.
-
-For unrecoverable queries (truncated to < N parsed objects), the candidate's
-grade is left as a default (rel=0, 'incomplete-truncation') and flagged for
-re-grading.
-"""
-
 import json
 import re
 import sys

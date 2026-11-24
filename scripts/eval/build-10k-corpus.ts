@@ -1,22 +1,3 @@
-// Step 1 of Episode A2: build the 10k-tool scale-verification corpus.
-//
-// Strategy A (try first): expand the 47 fixture templates × vendor + scenario
-// permutations from src/fixtures/generated-expanded.ts. Run diversity gate on
-// 1k pilot, then on full 10k.
-//
-// Strategy B (fallback if A fails): combine 47 fixture templates + 77 MCP
-// tool stub descriptions with ~80 perms each.
-//
-// Strategy C (escalate): document the negative result, exit non-zero.
-//
-// Output:
-//   C:/tmp/v2-10k.db
-//   tests/fixtures/v2-corpus-10k-snapshot.json
-//
-// Usage:
-//   STORAGE_DRIVER=sqlite EMBEDDER=ollama TWOCHAIN_DB_PATH=C:/tmp/v2-10k.db \
-//     npx tsx scripts/eval/build-10k-corpus.ts
-
 import 'dotenv/config';
 import { existsSync, renameSync, unlinkSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -92,7 +73,7 @@ function dotProduct(a: Float32Array, b: Float32Array): number {
 }
 
 async function diversityCheck(embedder: OllamaEmbedder, specs: ToolSpecV2[]): Promise<{ passed: boolean; passRate: number; sampleSize: number }> {
-  if (specs.length < 50) return { passed: true, passRate: 1, sampleSize: 0 }; // tiny corpora skip the gate
+  if (specs.length < 50) return { passed: true, passRate: 1, sampleSize: 0 };
   const texts = specs.map((s) => s.capability_text);
   const vecs = await embedder.embedBatch(texts, 'document');
   const rng = (function () {
@@ -115,7 +96,6 @@ async function diversityCheck(embedder: OllamaEmbedder, specs: ToolSpecV2[]): Pr
 }
 
 async function buildStrategyA(): Promise<{ specs: ToolSpecV2[]; report: string }> {
-  // Real-corpus core + Strategy A expansion to fill the rest.
   const realSpecs: ToolSpecV2[] = [
     ...FIXTURE_TOOLS.map(fixtureToSpec),
     ...REAL_CORPUS.map(realCorpusToSpec),
@@ -123,7 +103,6 @@ async function buildStrategyA(): Promise<{ specs: ToolSpecV2[]; report: string }
   const remainingTarget = TARGET - realSpecs.length;
   const expanded = generateExpanded({ domains: DOMAINS, targetCount: remainingTarget, seed: 0xa2c0_10c0 });
   const expandedSpecs = expanded.map(fixtureToSpec);
-  // De-dup by (name, version)
   const seen = new Set(realSpecs.map((s) => `${s.name}@${s.version}`));
   const filtered = expandedSpecs.filter((s) => {
     const k = `${s.name}@${s.version}`;
@@ -141,7 +120,6 @@ async function main() {
   console.log(`build-10k-corpus: target=${TARGET}, tolerance=[${COUNT_MIN},${COUNT_MAX}]`);
   console.log(`  db: ${dbPath}`);
 
-  // --- Strategy A: try expanded generator ---
   const a = await buildStrategyA();
   console.log(`  ${a.report}`);
 
@@ -150,7 +128,6 @@ async function main() {
     process.exit(2);
   }
 
-  // Pilot diversity check on first 1k
   const embedder = new OllamaEmbedder();
   console.log(`  pilot diversity check on first ${PILOT_SIZE} entries...`);
   const pilotResult = await diversityCheck(embedder, a.specs.slice(0, PILOT_SIZE));
@@ -160,7 +137,6 @@ async function main() {
     process.exit(3);
   }
 
-  // Full diversity check on 10k
   console.log(`  full diversity check on ${a.specs.length} entries...`);
   const fullResult = await diversityCheck(embedder, a.specs);
   console.log(`    full:  ${(fullResult.passRate * 100).toFixed(1)}% of ${fullResult.sampleSize} pairs have cosine<${DIVERSITY_THRESHOLD} (target ≥${(DIVERSITY_PASS_RATE * 100).toFixed(0)}%)`);
@@ -169,7 +145,6 @@ async function main() {
     process.exit(3);
   }
 
-  // --- Write to DB atomically (same pattern as seed-fixtures.ts) ---
   console.log(`  seeding DB (atomic rename)...`);
   const tmpPath = `${dbPath}.tmp`;
   if (existsSync(tmpPath)) unlinkSync(tmpPath);
@@ -191,12 +166,10 @@ async function main() {
   console.log(`    inserted in ${Date.now() - tInsert}ms`);
   await storage.close();
 
-  // Atomic rename
   if (existsSync(dbPath)) unlinkSync(dbPath);
   renameSync(tmpPath, dbPath);
   console.log(`  DB written to ${dbPath}`);
 
-  // --- Snapshot ---
   const storage2 = new SqliteStorage({ path: dbPath });
   await storage2.init();
   const all = await storage2.listTools({ limit: 20_000 });
@@ -220,7 +193,6 @@ async function main() {
   console.log(`  snapshot: ${canonical.length} entries -> ${snapshotPath}`);
   console.log(`  corpus_sha256 = ${corpusSha}`);
 
-  // Sanity: demo-arc + a few v2-golden expected_top3 tools present
   const names = new Set(canonical.map((c) => c.name));
   const expected = ['sec-edgar-financials', 'arxiv-paper-search', 'eslint-snitch', 'security-scanner', 'pdf-extractor', 'mcp-postgres__query'];
   const missing = expected.filter((n) => !names.has(n));

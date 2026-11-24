@@ -1,19 +1,3 @@
-// Experiment: does adding reliability_score as a third RRF arm recover the
-// scale-break Episode A2 found at 10k corpus? One-off script — does fusion
-// in JS without touching the Storage interface. If results justify it,
-// ship the interface change in a separate PR.
-//
-// Sweep: reliability arm weight ∈ {0, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5}
-// while keeping vector=0.5, text=0.5 fixed.
-//
-// Score per query = sum_{arm} weight / (K + rank), summed across each arm
-// the candidate appears in. The third arm ranks all tools above the
-// reliability gate by reliability_score DESC.
-//
-// Usage:
-//   TWOCHAIN_DB_PATH=C:/tmp/v2.db npx tsx scripts/eval/sweep-reliability-arm.ts
-//   TWOCHAIN_DB_PATH=C:/tmp/v2-10k.db npx tsx scripts/eval/sweep-reliability-arm.ts
-
 import 'dotenv/config';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -41,18 +25,14 @@ await storage.init();
 const embedder = new OllamaEmbedder();
 const allTools = await storage.listTools({ limit: 20_000 });
 
-// Pre-compute reliability ranking: all tools sorted by reliability_score DESC
-// (gated by RELIABILITY_GATE; below-gate tools never enter RRF anyway).
 const reliabilityRanked = allTools
   .filter((t) => t.status === 'active' && t.metadata.reliability_score >= RELIABILITY_GATE)
   .sort((a, b) => {
     if (b.metadata.reliability_score !== a.metadata.reliability_score) return b.metadata.reliability_score - a.metadata.reliability_score;
-    // stable tie-break: name+version ascending
     const aKey = a.name + '@' + a.version;
     const bKey = b.name + '@' + b.version;
     return aKey < bKey ? -1 : aKey > bKey ? 1 : 0;
   });
-// Take a generous top-N for the reliability arm (matches runRRF's 50 vec/text top-N)
 const RELIABILITY_TOP_N = 50;
 const reliabilityTop = reliabilityRanked.slice(0, RELIABILITY_TOP_N);
 const reliabilityRankByKey = new Map<string, number>();
@@ -65,9 +45,6 @@ async function runWithReliabilityWeight(reliabilityWeight: number): Promise<{ nd
   let singleHits = 0, singleTotal = 0;
 
   for (const q of golden.queries) {
-    // Standard discover gives us vector + text arms fused; we need the
-    // pre-fused vec/text top-K to add reliability. Get top-30 from current
-    // RRF, then re-fuse with reliability injected.
     const queryEmbed = await embedder.cachedEmbed(q.q);
     const baseHits = await storage.runRRF({
       queryEmbedding: queryEmbed.vec,
@@ -78,22 +55,16 @@ async function runWithReliabilityWeight(reliabilityWeight: number): Promise<{ nd
       namespace: NAMESPACE,
     });
 
-    // Reconstruct the per-arm ranks from the base RRF result and merge
-    // reliability rank. Note: baseHits already has vec_rank and text_rank set.
     const fused = new Map<string, { score: number; name: string; version: string }>();
     for (const r of baseHits) {
       const key = `${r.name}@${r.version}`;
-      // existing fused score has vector and text contributions already
       let score = r.rrf_score;
-      // Add reliability arm contribution
       const relRank = reliabilityRankByKey.get(key);
       if (relRank !== undefined) {
         score += reliabilityWeight / (K_CONSTANT + relRank);
       }
       fused.set(key, { score, name: r.name, version: r.version });
     }
-    // Also include items from reliability arm that didn't appear in baseHits
-    // (they'd have score = reliabilityWeight / (K + relRank) with no vec/text contribution)
     if (reliabilityWeight > 0) {
       for (const [key, relRank] of reliabilityRankByKey.entries()) {
         if (!fused.has(key)) {

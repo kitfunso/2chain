@@ -1,9 +1,3 @@
-// Benchmarks /discover (runRRF) latency against the 10k synthetic corpus.
-// Reports p50/p95/p99 + cold-vs-warm split. Writes a markdown report to
-// docs/perf/baseline-10k.md.
-//
-// Phase 1 plan Step 6.5.
-
 import { writeFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { SqliteStorage } from '../../src/storage/sqlite.js';
@@ -24,67 +18,55 @@ const stats = await storage.dbStats();
 console.log(`benchmark: ${stats.collection_counts.tools} tools in ${DB_PATH}`);
 console.log(`           ${(stats.data_size_bytes / 1024 / 1024).toFixed(1)} MB`);
 
-// 50 representative queries spanning all 10 corpus domains.
 const QUERIES = [
-  // finance
   'extract income statement from a 10-K filing',
   'calculate cash flow projections for budget',
   'reconcile a payroll record to the bank statement',
   'parse a UK supplier invoice for VAT line items',
   'audit an expense report for policy violations',
-  // research
   'search arxiv for state-space models',
   'summarise a pubmed citation for the latest cancer immunotherapy paper',
   'fetch a thesis abstract',
   'cite a preprint in BibTeX',
   'translate a Chinese conference proceeding',
-  // code
   'lint a TypeScript class for unused imports',
   'format a Go service with goimports',
   'review a Python module for security bugs',
   'compile a Rust crate to wasm',
   'package a shell script as a deb',
-  // data
   'parse a CSV file into JSON',
   'transform an Avro record stream',
   'aggregate Parquet rows by partition',
   'export an XML payload to a database',
   'cleanse log lines for a SIEM',
-  // comms
   'send an email to a customer list',
   'post a Slack message in a channel',
   'reply to an SMS thread',
   'forward a calendar event to attendees',
   'archive an old WhatsApp chat',
-  // docs
   'OCR a scanned receipt for expense filing',
   'extract text from a PDF document',
   'redact PII from a contract',
   'merge multiple driving licence scans into one PDF',
   'sign a lease agreement',
-  // geo
   'geocode a UK postcode',
   'reverse-geocode a lat lng pair',
   'route between two European cities',
   'forecast the weather along a flight path',
   'snap a GPS trace to roads',
-  // ecommerce
   'list Shopify orders for a store',
   'create a Stripe payment for a checkout',
   'cancel an Amazon listing',
   'refund an eBay auction sale',
   'tag a discount code as expired',
-  // health
   'look up an ICD-10 code by description',
   'cross-reference two SNOMED concepts',
   'normalise a drug name',
   'screen a lab result for outliers',
-  // security
   'scan a docker image for CVEs',
   'audit an IAM policy for excessive permissions',
   'rotate an expired API key',
   'verify a JWT signature',
-  // cross-domain edge cases
   'find a tool that extracts financial data from PDFs',
   'find a tool that posts notifications to messaging platforms',
   'find a tool that processes images for OCR',
@@ -101,7 +83,6 @@ interface Sample {
 console.log(`\nrunning ${QUERIES.length} queries cold + warm (2x = ${QUERIES.length * 2} total)...`);
 const samples: Sample[] = [];
 
-// Cold pass — embed each query fresh (no cache hit).
 for (const q of QUERIES) {
   const t0 = Date.now();
   const v = await embedder.embed(q, 'query');
@@ -119,7 +100,6 @@ for (const q of QUERIES) {
   samples.push({ query: q, embed_ms: tEmbed, search_ms: tSearch, total_ms: tEmbed + tSearch, cold: true });
 }
 
-// Warm pass — embed each query again (would hit cache in production via cachedEmbed).
 for (const q of QUERIES) {
   const r0 = await embedder.cachedEmbed(q);
   const tSearch0 = Date.now();
@@ -136,7 +116,6 @@ for (const q of QUERIES) {
 
 await storage.close();
 
-// Stats
 function pct(arr: number[], p: number): number {
   if (arr.length === 0) return NaN;
   const sorted = [...arr].sort((a, b) => a - b);
@@ -158,7 +137,6 @@ console.log('\n=== end-to-end (embed + search) ===');
 console.log(`  cold p50=${pct(colTotal, 50)}ms   p95=${pct(colTotal, 95)}ms   p99=${pct(colTotal, 99)}ms`);
 console.log(`  warm p50=${pct(wmTotal, 50)}ms   p95=${pct(wmTotal, 95)}ms   p99=${pct(wmTotal, 99)}ms`);
 
-// Markdown report
 const lines: string[] = [];
 lines.push(`# 10k synthetic corpus benchmark — v2 personal tier`);
 lines.push('');

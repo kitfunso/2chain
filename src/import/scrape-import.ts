@@ -1,15 +1,10 @@
-// Shared embed + upsert path for the npm + awesome-list scrapers.
-// Dedupes against existing rows so re-running doesn't churn embeddings.
-
 import type { Embedder, Storage, ToolSpecV2 } from '../types.js';
 import { resolveDomain } from './domain-classifier.js';
 
 const NAMESPACE = 'default';
 
 export interface ScrapeImportOptions {
-  /** Skip embedder calls; useful for dry-run. */
   skipEmbedding?: boolean;
-  /** Skip embedding + upserting tools whose name already exists at the same version. */
   skipExisting?: boolean;
 }
 
@@ -36,10 +31,6 @@ export async function importScrapedSpecs(
     duration_ms: 0,
   };
 
-  // Resolve the canonical domain inline before dedup/embed/upsert. This is the
-  // ONLY place imports flow through, so doing it here means every imported row
-  // lands in one of the 11 canonical buckets without a separate cleanup pass.
-  // Curated authors keep the hand-picked domain they passed in.
   const normalized: ToolSpecV2[] = specs.map((s) => ({
     ...s,
     domain: resolveDomain({
@@ -50,7 +41,6 @@ export async function importScrapedSpecs(
     }),
   }));
 
-  // Filter out specs that already exist at the same version (dedupe).
   const fresh: ToolSpecV2[] = [];
   if (opts.skipExisting !== false) {
     for (const s of normalized) {

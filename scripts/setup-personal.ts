@@ -1,16 +1,3 @@
-// Hard preflight for personal-tier deploy. Phase 1 plan Step 8.
-// All checks must pass; otherwise print remediation and exit non-zero.
-//
-// Usage:
-//   npx tsx scripts/setup-personal.ts
-//
-// Checks:
-//   1. Ollama reachable on $OLLAMA_HOST (default http://localhost:11434)
-//   2. nomic-embed-text model present (ollama show)
-//   3. sqlite-vec extension loadable into better-sqlite3
-//   4. ~/.2chain/ writable
-//   5. Embedder warm probe (one tiny embed) so seed time isn't model-load-bound
-
 import { mkdirSync, existsSync, writeFileSync, unlinkSync, accessSync, constants } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
@@ -34,7 +21,6 @@ console.log(`  OLLAMA_HOST=${HOST}`);
 console.log(`  OLLAMA_MODEL=${MODEL}`);
 console.log(`  DATA_DIR=${DATA_DIR}\n`);
 
-// ---- 1. Ollama reachable ----
 console.log('check 1/5: Ollama reachable');
 try {
   const ctrl = new AbortController();
@@ -51,7 +37,6 @@ try {
   );
 }
 
-// ---- 2. Model present ----
 console.log('check 2/5: nomic-embed-text installed');
 try {
   const r = await fetch(`${HOST}/api/show`, {
@@ -69,7 +54,6 @@ try {
   );
 }
 
-// ---- 3. sqlite-vec loadable ----
 console.log('check 3/5: sqlite-vec extension loadable');
 try {
   const db = new Database(':memory:');
@@ -84,7 +68,6 @@ try {
   );
 }
 
-// ---- 4. Data dir writable ----
 console.log('check 4/5: ~/.2chain writable');
 try {
   mkdirSync(DATA_DIR, { recursive: true });
@@ -100,7 +83,6 @@ try {
   );
 }
 
-// ---- 5. Embedder warm probe ----
 console.log('check 5/5: embedder warm probe');
 if (!failed) {
   try {

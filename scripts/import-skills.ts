@@ -1,12 +1,3 @@
-// CLI: ingest Claude Code skills into 2chain.
-//
-// Usage:
-//   npm run import:skills                        # ingest from ~/.claude/skills
-//   npm run import:skills -- --root <dir>
-//   npm run import:skills -- --only office-hours,codex
-//   npm run import:skills -- --verify            # require >=10 found
-//   TWOCHAIN_DB_PATH=/tmp/v2.db npm run import:skills
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';

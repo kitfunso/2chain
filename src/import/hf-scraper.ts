@@ -1,16 +1,9 @@
-// Hugging Face Hub scraper — pulls models, datasets, and spaces metadata.
-// Uses the public Hub API: https://huggingface.co/api/{models,datasets,spaces}
-// (documented at https://huggingface.co/docs/hub/api).
-//
-// Each model becomes a 2chain catalog entry with hf: prefix so it doesn't
-// collide with npm/pypi names.
-
 import type { ToolSpecV2 } from '../types.js';
 
 export type HfResource = 'models' | 'datasets' | 'spaces';
 
 export interface HfModel {
-  id: string;             // e.g. "anthropic/claude-3-haiku-...
+  id: string;
   modelId?: string;
   pipeline_tag?: string;
   tags?: string[];
@@ -23,19 +16,12 @@ export interface HfModel {
 const HF_BASE = 'https://huggingface.co/api';
 
 export interface ScrapeHfOptions {
-  /** Resource type: 'models' | 'datasets' | 'spaces'. */
   resource?: HfResource;
-  /** Search filter (mirrors HF UI filter, e.g. 'pipeline_tag=text-generation'). */
   filter?: string;
-  /** Sort key: downloads | likes | trendingScore | createdAt | lastModified. */
   sort?: string;
-  /** Page size (HF caps at 100 per page; we paginate via cursor). */
   limit?: number;
-  /** 2chain domain bucket. Defaults derive from resource (models -> 'ml-models'). */
   domain?: string;
-  /** Fetch override (tests). */
   fetchImpl?: typeof fetch;
-  /** User-agent. */
   userAgent?: string;
 }
 
@@ -107,7 +93,6 @@ export async function scrapeHuggingFace(opts: ScrapeHfOptions): Promise<ScrapeHf
       specs.push(modelToSpec(m, resource, domain));
     }
     // Cursor pagination via Link header (HF uses RFC5988). For our scope
-    // a single page of 100 is plenty; bail out unless the user asks for more.
     const linkHeader = r.headers.get('link') ?? '';
     const next = /<([^>]+)>;\s*rel="next"/.exec(linkHeader);
     if (!next) break;

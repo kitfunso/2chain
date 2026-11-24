@@ -116,7 +116,6 @@
     </radialGradient>
   </defs>
 
-  <!-- subtle background grid -->
   <g class="grid">
     <line x1="0" y1="225" x2="1400" y2="225"/>
     <line x1="0" y1="450" x2="1400" y2="450"/>
@@ -126,7 +125,6 @@
     <line x1="1050" y1="0" x2="1050" y2="900"/>
   </g>
 
-  <!-- domain cluster halos -->
   <circle cx="280" cy="280" r="130" fill="url(#halo)"/>
   <circle cx="700" cy="220" r="130" fill="url(#halo)"/>
   <circle cx="1120" cy="280" r="130" fill="url(#halo)"/>
@@ -134,7 +132,6 @@
   <circle cx="700" cy="700" r="130" fill="url(#halo)"/>
   <circle cx="1120" cy="650" r="130" fill="url(#halo)"/>
 
-  <!-- cluster labels -->
   <text class="cluster-label" x="280" y="155">FINANCE · 16</text>
   <text class="cluster-label" x="700" y="95">RESEARCH · 12</text>
   <text class="cluster-label" x="1120" y="155">CODE · 24</text>
@@ -142,9 +139,7 @@
   <text class="cluster-label" x="700" y="575">DATA · 12</text>
   <text class="cluster-label" x="1120" y="525">GEO · 14</text>
 
-  <!-- edges -->
   <g>
-    <!-- finance internal -->
     <path class="edge active" d="M280 280 Q260 220 220 250"/>
     <path class="edge active" d="M280 280 Q330 230 360 270"/>
     <path class="edge" d="M280 280 Q220 320 240 350"/>
@@ -153,12 +148,9 @@
     <path class="edge" d="M280 280 Q200 280 180 290"/>
     <path class="edge" d="M280 280 Q380 280 400 295"/>
 
-    <!-- finance to docs (cross domain) -->
     <path class="edge" d="M280 350 Q280 460 280 580"/>
-    <!-- finance to research (DCF query bridges) -->
     <path class="edge" d="M340 250 Q500 230 660 220"/>
 
-    <!-- research internal -->
     <path class="edge" d="M700 220 Q650 180 620 200"/>
     <path class="edge" d="M700 220 Q750 180 780 200"/>
     <path class="edge" d="M700 220 Q670 270 680 300"/>
@@ -166,7 +158,6 @@
     <path class="edge" d="M700 220 Q620 230 600 240"/>
     <path class="edge" d="M700 220 Q800 230 820 240"/>
 
-    <!-- code internal -->
     <path class="edge" d="M1120 280 Q1080 230 1060 250"/>
     <path class="edge" d="M1120 280 Q1180 220 1200 245"/>
     <path class="edge" d="M1120 280 Q1100 340 1080 360"/>
@@ -174,29 +165,24 @@
     <path class="edge" d="M1120 280 Q1040 290 1020 310"/>
     <path class="edge" d="M1120 280 Q1220 280 1240 305"/>
 
-    <!-- code to data -->
     <path class="edge" d="M1080 360 Q900 500 760 700"/>
 
-    <!-- docs internal -->
     <path class="edge" d="M280 650 Q230 610 215 625"/>
     <path class="edge" d="M280 650 Q330 610 350 625"/>
     <path class="edge" d="M280 650 Q260 720 240 730"/>
     <path class="edge" d="M280 650 Q310 720 320 730"/>
 
-    <!-- data internal -->
     <path class="edge" d="M700 700 Q650 660 620 675"/>
     <path class="edge" d="M700 700 Q750 660 780 675"/>
     <path class="edge" d="M700 700 Q670 760 660 770"/>
     <path class="edge" d="M700 700 Q740 760 760 770"/>
 
-    <!-- geo internal -->
     <path class="edge" d="M1120 650 Q1070 610 1060 625"/>
     <path class="edge" d="M1120 650 Q1170 610 1185 625"/>
     <path class="edge" d="M1120 650 Q1100 720 1090 730"/>
     <path class="edge" d="M1120 650 Q1140 720 1155 740"/>
   </g>
 
-  <!-- nodes — finance cluster -->
   <g>
     <g class="node hot" transform="translate(280,280)" style="color:var(--finance)">
       <circle r="22" fill="#fbbf24"/>
@@ -211,7 +197,6 @@
     <g class="node" transform="translate(400,295)"><circle r="9" fill="#fbbf24"/><text x="0" y="25">finnhub-cal</text></g>
   </g>
 
-  <!-- research cluster -->
   <g>
     <g class="node hot" transform="translate(700,220)" style="color:var(--research)"><circle r="20" fill="#f472b6"/><text x="0" y="40">arxiv-paper-search</text></g>
     <g class="node" transform="translate(620,200)"><circle r="13" fill="#f472b6"/><text x="0" y="30">semantic-scholar</text></g>
@@ -222,7 +207,6 @@
     <g class="node" transform="translate(820,240)"><circle r="9" fill="#f472b6"/><text x="0" y="25">openreview</text></g>
   </g>
 
-  <!-- code cluster -->
   <g>
     <g class="node" transform="translate(1120,280)"><circle r="18" fill="#22d3ee"/><text x="0" y="36">mcp-github</text></g>
     <g class="node" transform="translate(1060,250)"><circle r="14" fill="#22d3ee"/><text x="0" y="32">code-review-mini</text></g>
@@ -233,7 +217,6 @@
     <g class="node" transform="translate(1240,305)"><circle r="9" fill="#22d3ee"/><text x="0" y="25">snyk-vuln</text></g>
   </g>
 
-  <!-- docs -->
   <g>
     <g class="node" transform="translate(280,650)"><circle r="15" fill="#fb7185"/><text x="0" y="32">mcp-filesystem</text></g>
     <g class="node" transform="translate(215,625)"><circle r="11" fill="#fb7185"/><text x="0" y="28">tesseract-ocr</text></g>
@@ -242,7 +225,6 @@
     <g class="node" transform="translate(320,730)"><circle r="9" fill="#fb7185"/><text x="0" y="25">azure-doc-int</text></g>
   </g>
 
-  <!-- data -->
   <g>
     <g class="node" transform="translate(700,700)"><circle r="13" fill="#a78bfa"/><text x="0" y="30">mcp-postgres</text></g>
     <g class="node" transform="translate(620,675)"><circle r="11" fill="#a78bfa"/><text x="0" y="28">duckdb-analytics</text></g>
@@ -251,7 +233,6 @@
     <g class="node" transform="translate(760,770)"><circle r="9" fill="#a78bfa"/><text x="0" y="25">parquet-read</text></g>
   </g>
 
-  <!-- geo -->
   <g>
     <g class="node" transform="translate(1120,650)"><circle r="15" fill="#34d399"/><text x="0" y="32">mcp-google-maps</text></g>
     <g class="node" transform="translate(1060,625)"><circle r="11" fill="#34d399"/><text x="0" y="28">osm-nominatim</text></g>
@@ -260,7 +241,6 @@
     <g class="node" transform="translate(1155,740)"><circle r="9" fill="#34d399"/><text x="0" y="25">open-meteo</text></g>
   </g>
 
-  <!-- query echo lines (active query "DCF NVIDIA 10-K" highlights finance cluster) -->
 </svg>
 </div>
 

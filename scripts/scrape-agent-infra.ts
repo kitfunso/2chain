@@ -1,7 +1,3 @@
-// Curated whitelist of personal AI assistants, agent frameworks, memory systems,
-// RAG/orchestration tools. Each entry has a hand-picked domain so reclassify
-// (which now skips author='agent-infra') leaves them alone.
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';
@@ -14,10 +10,7 @@ interface Repo { name: string; description: string | null; html_url: string; sta
 
 interface Entry { repo: string; name: string; domain: string; kind: ToolKind }
 
-// Format: '<owner>/<repo>': { name (slug), domain, kind }.
-// Domains are CANONICAL: ai/code/data/comms/docs/finance/research/media/devops/security/geo
 const WHITELIST: Entry[] = [
-  // Personal AI assistants / coding agents (the openclaw cohort)
   { repo: 'openclaw/openclaw',                name: 'openclaw',          domain: 'ai',   kind: 'tool' },
   { repo: 'cline/cline',                      name: 'cline',             domain: 'ai',   kind: 'tool' },
   { repo: 'Aider-AI/aider',                   name: 'aider',             domain: 'ai',   kind: 'tool' },
@@ -33,7 +26,6 @@ const WHITELIST: Entry[] = [
   { repo: 'BasedHardware/omi',                name: 'omi-wearable',      domain: 'ai',   kind: 'tool' },
   { repo: 'princeton-nlp/SWE-agent',          name: 'swe-agent',         domain: 'ai',   kind: 'tool' },
 
-  // Agent frameworks
   { repo: 'Significant-Gravitas/AutoGPT',     name: 'autogpt',           domain: 'ai',   kind: 'tool' },
   { repo: 'yoheinakajima/babyagi',            name: 'babyagi',           domain: 'ai',   kind: 'tool' },
   { repo: 'TransformerOptimus/SuperAGI',      name: 'superagi',          domain: 'ai',   kind: 'tool' },
@@ -42,14 +34,12 @@ const WHITELIST: Entry[] = [
   { repo: 'microsoft/UFO',                    name: 'ufo-windows-agent', domain: 'ai',   kind: 'tool' },
   { repo: 'mervinpraison/PraisonAI',          name: 'praisonai',         domain: 'ai',   kind: 'tool' },
 
-  // Memory systems (the hippo-memory cohort)
   { repo: 'mem0ai/mem0',                      name: 'mem0',              domain: 'ai',   kind: 'tool' },
   { repo: 'letta-ai/letta',                   name: 'letta',             domain: 'ai',   kind: 'tool' },
   { repo: 'getzep/zep',                       name: 'zep-memory',        domain: 'ai',   kind: 'tool' },
   { repo: 'topoteretes/cognee',               name: 'cognee',            domain: 'ai',   kind: 'tool' },
   { repo: 'microsoft/graphrag',               name: 'graphrag',          domain: 'ai',   kind: 'tool' },
 
-  // RAG / orchestration / LLM frameworks
   { repo: 'run-llama/llama_index',            name: 'llama-index',       domain: 'ai',   kind: 'tool' },
   { repo: 'langchain-ai/langchain',           name: 'langchain',         domain: 'ai',   kind: 'tool' },
   { repo: 'langchain-ai/langgraph',           name: 'langgraph',         domain: 'ai',   kind: 'tool' },
@@ -57,10 +47,8 @@ const WHITELIST: Entry[] = [
   { repo: 'FlowiseAI/Flowise',                name: 'flowise',           domain: 'ai',   kind: 'tool' },
   { repo: 'n8n-io/n8n',                       name: 'n8n',               domain: 'ai',   kind: 'tool' },
 
-  // Token / efficiency utilities (the token-discipline cohort)
   { repo: 'openai/tiktoken',                  name: 'tiktoken',          domain: 'ai',   kind: 'tool' },
 
-  // Inference / local LLM (the ollama cohort, complementary to existing)
   { repo: 'vllm-project/vllm',                name: 'vllm',              domain: 'ai',   kind: 'tool' },
   { repo: 'ggerganov/llama.cpp',              name: 'llama-cpp',         domain: 'ai',   kind: 'tool' },
 ];

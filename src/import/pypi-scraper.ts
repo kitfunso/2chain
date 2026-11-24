@@ -1,18 +1,3 @@
-// PyPI scraper — Python's package index. Uses the JSON simple API for
-// metadata (https://pypi.org/pypi/<name>/json). Discovery happens via
-// libraries.io style topic search OR a curated list of search terms run
-// against the PyPI XMLRPC search... except that endpoint was retired.
-//
-// Pragmatic approach: PyPI's official "search" was deprecated. We use the
-// libraries.io-mirrored search (free public mirror) for discovery, then
-// hit pypi.org/pypi/<name>/json for authoritative metadata. If
-// libraries.io is unreachable, fall back to a hand-curated topic list.
-//
-// For the scope of this scraper we use the simpler "name list" path:
-// caller passes a list of package names (or we resolve from a query
-// against pypi.org's RSS/recent-uploads feed). The CLI default fetches
-// the top-N MCP-related packages by name pattern.
-
 import type { ToolSpecV2 } from '../types.js';
 
 export interface PypiPackageInfo {
@@ -34,18 +19,13 @@ interface PypiJsonResponse {
 }
 
 const PYPI_BASE = 'https://pypi.org/pypi';
-const SEARCH_PROXY = 'https://pypi.org/search/'; // HTML scraping fallback (used when libraries.io is unavailable)
+const SEARCH_PROXY = 'https://pypi.org/search/';
 
 export interface ScrapePypiOptions {
-  /** Explicit list of package names to fetch metadata for. */
   names: string[];
-  /** Fetch override (tests). */
   fetchImpl?: typeof fetch;
-  /** 2chain domain bucket. Defaults to 'python'. */
   domain?: string;
-  /** User-Agent. */
   userAgent?: string;
-  /** Hard cap (defaults to names.length). */
   limit?: number;
 }
 
@@ -61,7 +41,6 @@ function infoToSpec(info: PypiPackageInfo, domain: string): ToolSpecV2 {
   const parts: string[] = [info.name];
   if (info.summary) parts.push(info.summary);
   if (info.keywords) parts.push('Keywords: ' + info.keywords + '.');
-  // First 400 chars of description (often a long README; we only need a snippet for the embed).
   if (info.description) parts.push(info.description.replace(/\s+/g, ' ').slice(0, 400));
   const repo = info.project_urls?.Repository
     ?? info.project_urls?.Source
@@ -136,28 +115,17 @@ export async function scrapePypi(opts: ScrapePypiOptions): Promise<ScrapePypiRes
  * MCP + LLM tooling. Used when no explicit --names list is provided.
  */
 export const PYPI_DEFAULT_NAMES: string[] = [
-  // Anthropic / OpenAI / general LLM
   'anthropic', 'openai', 'mistralai', 'cohere', 'google-genai',
-  // MCP
   'mcp', 'fastmcp', 'mcp-server', 'mcp-cli', 'mcp-client',
-  // Agent frameworks
   'langchain', 'langgraph', 'llama-index', 'haystack-ai', 'autogen-agentchat',
   'crewai', 'pydantic-ai', 'instructor', 'guidance', 'dspy-ai',
-  // Vector / embeddings
   'sqlite-vec', 'chromadb', 'qdrant-client', 'pinecone-client', 'weaviate-client',
   'sentence-transformers', 'voyageai',
-  // Document / unstructured
   'unstructured', 'llama-parse', 'pypdf', 'pdfplumber', 'beautifulsoup4',
-  // Data
   'pandas', 'polars', 'pyarrow', 'duckdb',
-  // Web / browser automation
   'requests', 'httpx', 'playwright', 'selenium',
-  // Testing / dev
   'pytest', 'mypy', 'ruff', 'black',
-  // Cloud SDKs
   'boto3', 'google-cloud-storage', 'azure-storage-blob',
-  // Embedding models
   'transformers', 'torch', 'tiktoken',
-  // Misc real, useful
   'rich', 'typer', 'fastapi', 'pydantic', 'sqlalchemy',
 ];

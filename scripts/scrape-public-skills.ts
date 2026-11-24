@@ -1,8 +1,3 @@
-// Scrape public Claude Code skill collections. Pulls anthropics/skills
-// (the official Anthropic skills repo) by listing its `skills/` dir via the
-// GitHub API, fetching each SKILL.md, and parsing the YAML frontmatter for
-// name + description.
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';
@@ -15,7 +10,7 @@ interface SkillRepo {
   owner: string;
   repo: string;
   branch: string;
-  pathPrefix: string;       // path inside repo where skills live (e.g. 'skills')
+  pathPrefix: string;
   domain: string;
   author: string;
 }

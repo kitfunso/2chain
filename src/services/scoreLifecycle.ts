@@ -1,32 +1,3 @@
-// E2 reliability lifecycle — pure scoring module.
-//
-// No storage imports, no driver imports, no I/O: every input is passed in
-// and `now` is injected, so the module is deterministic and table-testable.
-// reverify.ts is the only production caller; it fetches the evidence
-// (eval history, windowed usage counts, output-stage violation counts) via
-// the Storage interface and hands plain data here.
-//
-// The blend replaces "reliability_score = latest pass_rate" (E1) with an
-// evidence-weighted view: a tool that fails every other sweep can no longer
-// score 1.0 the moment one run passes, and a tool with months of clean
-// history no longer scores 0.0 after one bad run.
-//
-// Tuning constants — named exports, deliberately NOT env-configurable
-// (configurability is speculative until someone needs it; change them here
-// and the tests in tests/score-lifecycle.test.ts pin the consequences):
-//   HALF_LIFE_DAYS        eval evidence loses half its weight every 7 days.
-//   EVAL_LEG_WEIGHT/USAGE_LEG_WEIGHT  0.8/0.2 — eval suites are controlled
-//                         evidence; live usage is noisier, so it nudges
-//                         rather than dominates.
-//   USAGE_WINDOW_DAYS     usage evidence considered for the last 7 days.
-//   EVAL_HISTORY_LIMIT    runs fetched per tool for the blend; 50 daily
-//                         sweeps ≈ 7 half-lives, beyond which weight < 1%.
-//   RECOVERY_CONSECUTIVE_CLEAN / RECOVERY_MIN_SPAN_MINUTES  3 clean
-//                         reverify runs spanning ≥ 60 minutes — three
-//                         back-to-back sweeps of a deterministic suite
-//                         carry the evidence of one, so the span forces
-//                         evidence across time (spam-proof).
-
 export const HALF_LIFE_DAYS = 7;
 export const EVAL_LEG_WEIGHT = 0.8;
 export const USAGE_LEG_WEIGHT = 0.2;
@@ -41,7 +12,7 @@ const MS_PER_DAY = 86_400_000;
  *  line is the tool's whole eval record; only RECOVERY filters by trigger. */
 export interface EvalHistoryPoint {
   pass_rate: number;
-  triggered_at: string; // ISO-8601
+  triggered_at: string;
 }
 
 /** Windowed per-tool usage evidence. Caller-fault never counts against the
@@ -63,15 +34,10 @@ export interface UsageEvidence {
 /** Subset of EvalRunRow that recovery needs. */
 export interface ReverifyRunPoint {
   pass_rate: number;
-  triggered_at: string; // ISO-8601
+  triggered_at: string;
   triggered_by: string;
 }
 
-/** Exponentially-decayed eval leg: w_i = 0.5^(age_days_i / HALF_LIFE_DAYS),
- *  score = Σ(w_i · pass_rate_i) / Σ(w_i). Order-independent (a weighted
- *  mean), so callers may pass history in any order. Negative ages (clock
- *  skew) clamp to 0 so no weight exceeds 1. Returns null when there is no
- *  eval evidence. */
 function decayedEvalScore(
   evalHistory: readonly EvalHistoryPoint[],
   now: Date,
@@ -82,10 +48,6 @@ function decayedEvalScore(
   let total = 0;
   for (const run of evalHistory) {
     const parsedMs = Date.parse(run.triggered_at);
-    // A NaN age would flow into the blend and then into the materialized
-    // score, where NaN bypasses every gate comparison (NaN < gate is false
-    // — fail-open). Skip unparseable timestamps; ignoring a corrupt row is
-    // conservative.
     if (!Number.isFinite(parsedMs)) continue;
     const ageDays = Math.max(0, (nowMs - parsedMs) / MS_PER_DAY);
     const w = Math.pow(0.5, ageDays / HALF_LIFE_DAYS);

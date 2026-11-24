@@ -1,10 +1,3 @@
-// services/call gate test: catalog kinds (skill/subagent/prompt) are
-// discovery-only and must be refused with kind_not_callable instead of
-// falling through to a stub payload. 'prompt' joined the gate in E2
-// (plan §4c): a callable prompt could circuit-break and then be skipped
-// forever by reverify's catalog-kind partition — a dead end recovery could
-// never reach.
-
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { SqliteStorage } from '../src/storage/sqlite.js';
@@ -97,10 +90,6 @@ test('call rejects tool_kind=subagent with kind_not_callable', async () => {
 });
 
 test('call rejects tool_kind=prompt with kind_not_callable (E2: prompts are discovery-only)', async () => {
-  // REVERSES the E1-era assertion that prompts pass the gate. A prompt that
-  // reaches the stub can circuit-break (e.g. unregistered template), and
-  // reverify's catalog-kind partition would then skip it forever — recovery
-  // could never flip it back. Discovery-only is the root fix.
   const r = await call(storage, 'agent-1', 'caller', {
     tool_name: 'commit-prompt',
     tool_version: '1.0',
@@ -115,10 +104,6 @@ test('call rejects tool_kind=prompt with kind_not_callable (E2: prompts are disc
 });
 
 test('a circuit-broken catalog kind answers kind_not_callable, not circuit_broken (pre-E2 dead-end rows)', async () => {
-  // The kind gate sits ABOVE the status checks: a prompt circuit-broken
-  // BEFORE E2 closed the gate must get the truthful discovery-only error
-  // forever, not 503 circuit_broken (reverify skips catalog kinds, so
-  // recovery can never reach it - the dead end is answered, not hidden).
   const row = (storage as unknown as {
     db: { prepare: (s: string) => { get: (...a: unknown[]) => { id: string } } };
   }).db

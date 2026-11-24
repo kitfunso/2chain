@@ -9,7 +9,6 @@ const subscribers = new Map<string, Subscriber>();
 
 export function addSubscriber(id: string, reply: FastifyReply): void {
   subscribers.set(id, { id, reply });
-  // SSE handshake comment
   reply.raw.write(`: connected\n\n`);
   reply.raw.on('close', () => subscribers.delete(id));
 }

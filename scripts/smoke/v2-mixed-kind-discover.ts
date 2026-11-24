@@ -1,11 +1,3 @@
-// Mixed-kind discover smoke. Builds a tmp DB, imports a handful of real
-// skills, the prompt seed list, and a couple of fixture tools, then runs
-// three queries and asserts the top-5 contains at least one 'skill' and
-// at least one 'tool' row. Exits 1 on failure.
-//
-// Requires Ollama with nomic-embed-text. If Ollama is unreachable the
-// script exits 1 with a clear message; install per docs/perf/ if missing.
-
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync, existsSync } from 'node:fs';
 import { tmpdir, homedir } from 'node:os';
 import { resolve } from 'node:path';
@@ -20,8 +12,6 @@ const TMPDIR = mkdtempSync(resolve(tmpdir(), '2chain-mixed-'));
 const DB_PATH = resolve(TMPDIR, 'mixed.sqlite');
 const SKILLS_ROOT = resolve(TMPDIR, 'skills');
 
-// Plant a small skills tree so the smoke is self-contained even on a
-// machine without ~/.claude/skills (e.g. CI or a fresh dev box).
 function plantSkills(): void {
   mkdirSync(SKILLS_ROOT, { recursive: true });
   const fixtures = [
@@ -56,7 +46,6 @@ function plantSkills(): void {
   }
 }
 
-// Two fixture tools so the corpus has 'tool' rows, not just skills/prompts.
 async function plantTools(storage: SqliteStorage, embedder: OllamaEmbedder): Promise<void> {
   const tools: ToolSpecV2[] = [
     {

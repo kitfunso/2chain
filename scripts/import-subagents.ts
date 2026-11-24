@@ -1,5 +1,3 @@
-// CLI: ingest Claude Code subagents (~/.claude/agents/*.md) into 2chain.
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';

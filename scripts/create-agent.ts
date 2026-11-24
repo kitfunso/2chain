@@ -1,10 +1,3 @@
-// Insert (or update) an agent in the deployed DB so the server has an
-// API key to authenticate /discover, /push, /call.
-//
-// Usage:
-//   tsx scripts/create-agent.ts --name <name> --role caller|tool_author|admin --key <raw_api_key>
-//   tsx scripts/create-agent.ts --name public-demo --role caller --key sk_public_demo_<random>
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';

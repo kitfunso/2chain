@@ -1,7 +1,3 @@
-// Skills importer integration test.
-// Real SQLite, real on-disk SKILL.md fixtures, deterministic stub embedder.
-// CLAUDE.md rule 5: no mocks of the storage layer.
-
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
@@ -43,7 +39,6 @@ before(async () => {
   storage = new SqliteStorage({ path: ':memory:' });
   await storage.init();
 
-  // Build a tmp ~/.claude/skills/ tree with three real skills.
   tmpRoot = mkdtempSync(resolve(tmpdir(), '2chain-skills-'));
   writeSkill(tmpRoot, 'office-hours', {
     name: 'office-hours',
@@ -60,7 +55,6 @@ before(async () => {
     description: 'Visual QA audit of a frontend with iterative fixes',
     body: 'Walk through key pages, screenshot, identify polish issues, fix iteratively.',
   });
-  // A malformed entry (no description) — should be skipped, not crash.
   writeSkill(tmpRoot, 'broken', {
     name: 'broken',
     description: '',
@@ -94,9 +88,6 @@ test('parseSkillFile returns null when frontmatter missing', () => {
 });
 
 test('parseSkillFile only reads single-line description (documents limitation)', () => {
-  // YAML block-scalar (description: |) is NOT supported. The first line is
-  // captured; subsequent lines fall back to body. If we ever support YAML
-  // block-scalars, change this test, do not silently start parsing them.
   const text = `---\nname: x\ndescription: |\n  this is a multi\n  line description\n---\n\nbody`;
   const parsed = parseSkillFile(text, 'x', '/x');
   assert.ok(parsed);
@@ -135,7 +126,6 @@ test('importSkills minImports throws when fewer found than required', async () =
 });
 
 test('importSkills with --only filters to subset', async () => {
-  // Fresh storage so we can assert on counts cleanly.
   const fresh = new SqliteStorage({ path: ':memory:' });
   await fresh.init();
   const embedder = new StubEmbedder();
@@ -147,7 +137,6 @@ test('importSkills with --only filters to subset', async () => {
   await fresh.close();
 });
 
-// ---- helpers ----
 function writeSkill(
   root: string,
   slug: string,

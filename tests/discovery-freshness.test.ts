@@ -1,19 +1,3 @@
-// E5 discovery-freshness tests (plan §5). Real SQLite (:memory:), stub
-// embedder with CRAFTED vectors — NO mocks (CLAUDE.md rule 5), no Ollama.
-//
-// Vec ranks are constructed, not hoped for: every tool's embedding is
-// mixVec(queryVec, offAxis, eps) and cosine distance is strictly monotonic
-// in eps (proof: f(eps)^2 = (1+eps*c)^2/(1+2*eps*c+eps^2) has derivative
-// proportional to eps*(c^2-1) <= 0), so eps order IS vec-rank order.
-// Capability texts share no terms with the query, so the FTS arm is empty
-// and every candidate is single-arm vec — RRF gaps are exactly the
-// adjacent-rank gaps the W_FRESHNESS_RRF calibration is stated against.
-//
-// Backdating goes through recordEvalOutcome (interface-level, no raw SQL).
-// It patches reliability_score AND last_eval_run together — always pass a
-// score >= 0.80 or the tool falls below the SQL reliability gate and the
-// perturbation test degenerates to a gating test.
-
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import Fastify, { type FastifyInstance } from 'fastify';
@@ -21,17 +5,12 @@ import { SqliteStorage } from '../src/storage/sqlite.js';
 import { registerDiscoverRoute } from '../src/server/routes/discover.js';
 import { discover } from '../src/services/discover.js';
 import { verificationStreak } from '../src/services/streak.js';
-// Side-effect-free formatter module — NEVER import bin/2chain-mcp.mjs here:
-// the shim connects the stdio transport at module top level and hangs the
-// test runner.
 // eslint-disable-next-line import/no-relative-packages
 // @ts-ignore — plain .mjs module, outside tsconfig's src include
 import { formatDiscoverTools } from '../bin/mcp-format.mjs';
 import { hashKey } from '../src/server/auth.js';
 import type { Embedder, EvalRunRow, ToolSpecV2 } from '../src/types.js';
 import { RELIABILITY_GATE } from '../src/types.js';
-
-// ---- Crafted-vector stub embedder ----------------------------------------
 
 function makeUnitVec(seed: number): Float32Array {
   const v = new Float32Array(768);
@@ -49,7 +28,6 @@ function hashTextToSeed(s: string): number {
   return Math.abs(h % 1000) + 100;
 }
 
-/** normalize(a + eps*b): cosine distance to `a` strictly increases with eps. */
 function mixVec(a: Float32Array, b: Float32Array, eps: number): Float32Array {
   const v = new Float32Array(768);
   for (let i = 0; i < 768; i++) v[i] = a[i] + eps * b[i];
@@ -83,8 +61,6 @@ class StubEmbedder implements Embedder {
 const embedder = new StubEmbedder();
 const API_KEY = 'sk_test_key_freshness';
 
-// ---- Harness helpers (pattern from tests/routes.discover.test.ts) --------
-
 async function freshStorage(): Promise<SqliteStorage> {
   const storage = new SqliteStorage({ path: ':memory:' });
   await storage.init();
@@ -105,8 +81,6 @@ async function buildApp(storage: SqliteStorage): Promise<FastifyInstance> {
   return app;
 }
 
-// Capability texts share NO terms with QUERY — the FTS arm stays empty and
-// every candidate is single-arm vec (adjacent-rank gaps as calibrated).
 const spec = (name: string): ToolSpecV2 => ({
   name,
   version: '1.0',
@@ -142,8 +116,6 @@ const evalRun = (
   duration_ms: 10,
 });
 
-// ---- 1. Acceptance: adjacent-rank perturbation (route-level) -------------
-
 test('fresh tool at vec rank 2 overtakes near-tied stale tool at rank 1; both stay present', async () => {
   const storage = await freshStorage();
   try {
@@ -152,9 +124,6 @@ test('fresh tool at vec rank 2 overtakes near-tied stale tool at rank 1; both st
       spec('fresh-near-tie'),
       mixVec(QUERY_VEC, OFF_AXIS, 0.05),
     );
-    // Backdate the better-matched tool 90 days; freshen the runner-up.
-    // score 0.95 >= 0.80 keeps both above the SQL gate (recordEvalOutcome
-    // patches reliability_score too — below the gate this degenerates).
     await storage.recordEvalOutcome(stale.id, 0.95, daysAgoIso(90));
     await storage.recordEvalOutcome(fresh.id, 0.95, daysAgoIso(0));
 
@@ -171,7 +140,6 @@ test('fresh tool at vec rank 2 overtakes near-tied stale tool at rank 1; both st
       assert.equal(body.results[0].name, 'fresh-near-tie',
         'full freshness delta (~5e-4) must cover the rank-1→2 RRF gap (~1.3e-4)');
       assert.equal(body.results[1].name, 'stale-near-tie');
-      // rank_score keeps its pre-E5 definition; final_score is the ordering key.
       assert.ok(body.results[0].final_score > body.results[1].final_score);
     } finally {
       await app.close();
@@ -181,15 +149,10 @@ test('fresh tool at vec rank 2 overtakes near-tied stale tool at rank 1; both st
   }
 });
 
-// ---- 2. Dominance counter-test --------------------------------------------
-
 test('stale tool with a clear retrieval margin stays first — freshness never leapfrogs a better match', async () => {
   const storage = await freshStorage();
   try {
     const stale = await storage.upsertTool(spec('stale-dominant'), QUERY_VEC);
-    // Six mid tools fill vec ranks 2-7; the fresh competitor lands at rank 8,
-    // where the cumulative RRF gap to rank 1 (~8.4e-4) exceeds the full
-    // freshness term (5e-4) — calibration pinned.
     for (let i = 0; i < 6; i++) {
       await storage.upsertTool(
         spec(`mid-${i}`),
@@ -211,8 +174,6 @@ test('stale tool with a clear retrieval margin stays first — freshness never l
     await storage.close();
   }
 });
-
-// ---- 3. NaN guard ----------------------------------------------------------
 
 test('missing or unparseable last_eval_run yields freshness 0 and a total, finite ordering', async () => {
   const storage = await freshStorage();
@@ -244,8 +205,6 @@ test('missing or unparseable last_eval_run yields freshness 0 and a total, finit
   }
 });
 
-// ---- 4. Uniform freshness ⇒ order-invariance -------------------------------
-
 test('uniform freshness leaves the order identical to rrf_score order', async () => {
   const storage = await freshStorage();
   try {
@@ -275,16 +234,12 @@ test('uniform freshness leaves the order identical to rrf_score order', async ()
   }
 });
 
-// ---- 5. Payload + streak semantics on the discover route -------------------
-
 test('payload carries last_verified_at, verification_streak, freshness; clean-fail-clean streak = 1', async () => {
   const storage = await freshStorage();
   try {
     const tool = await storage.upsertTool(spec('streaky-tool'), QUERY_VEC);
     const verifiedAt = daysAgoIso(0);
     await storage.recordEvalOutcome(tool.id, 0.95, verifiedAt);
-    // newest-first window: clean (1d) → streak counts; fail (2d) → breaks;
-    // clean (3d) → unreached. clean-fail-clean ⇒ 1.
     await storage.insertEvalRun(evalRun(tool.id, 'streaky-tool', 1.0, 'reverify', daysAgoIso(3)));
     await storage.insertEvalRun(evalRun(tool.id, 'streaky-tool', 0.5, 'reverify', daysAgoIso(2)));
     await storage.insertEvalRun(evalRun(tool.id, 'streaky-tool', 1.0, 'reverify', daysAgoIso(1)));
@@ -313,8 +268,6 @@ test('payload carries last_verified_at, verification_streak, freshness; clean-fa
     await storage.close();
   }
 });
-
-// ---- 6. MCP formatter (exported, side-effect-free) -------------------------
 
 test('formatDiscoverTools renders final_score + freshness under refreshed (non-Atlas) headers', () => {
   const text = formatDiscoverTools({
@@ -347,8 +300,6 @@ test('formatDiscoverTools renders final_score + freshness under refreshed (non-A
 test('formatDiscoverTools is unknown/empty safe', () => {
   const empty = formatDiscoverTools({});
   assert.ok(empty.includes('(no candidates passed the gates)'));
-  // Pre-E5 server shape: no final_score/freshness — falls back to rrf_score
-  // (rank_score would look mis-sorted post-E5) and renders without throwing.
   const sparse = formatDiscoverTools({
     query: 'q',
     results: [{ name: 'old-server-tool', version: '1.0', rrf_score: 0.0081 }],
@@ -358,8 +309,6 @@ test('formatDiscoverTools is unknown/empty safe', () => {
   const degenerate = formatDiscoverTools({ results: [{}] });
   assert.ok(degenerate.includes('?'), 'fully unknown result rows render placeholders');
 });
-
-// ---- 7. Structural top-K bound ---------------------------------------------
 
 test('top=5 over a 30-tool corpus returns exactly 5 results, each carrying the freshness fields', async () => {
   const storage = await freshStorage();
@@ -383,8 +332,6 @@ test('top=5 over a 30-tool corpus returns exactly 5 results, each carrying the f
   }
 });
 
-// ---- 8. Backdating determinism: freshness in bands -------------------------
-
 test('freshness decays on the 7-day half-life: bands at 0d/7d/14d', async () => {
   const storage = await freshStorage();
   try {
@@ -399,8 +346,6 @@ test('freshness decays on the 7-day half-life: bands at 0d/7d/14d', async () => 
 
     const { results } = await discover(storage, embedder, QUERY, 5);
     const byName = new Map(results.map((r) => [r.name, r]));
-    // BANDS, not exact floats — the term uses request-time now, so the test's
-    // ISO stamps are milliseconds older by the time discover computes age.
     const f0 = byName.get('band-fresh')!.freshness;
     assert.ok(f0 > 0.99 && f0 <= 1.0, `0-day freshness ~1, got ${f0}`);
     const f7 = byName.get('band-half')!.freshness;
@@ -412,26 +357,18 @@ test('freshness decays on the 7-day half-life: bands at 0d/7d/14d', async () => 
   }
 });
 
-// ---- 10. Streak helper unit matrix (pure — no storage) ----------------------
-// (Item 9, the NDCG suite, is tests/v2-eval-ndcg.test.ts — untouched by E5
-// and asserted green by the full-suite run.)
-
 test('verificationStreak unit matrix', () => {
   const r = (passRate: number, by: EvalRunRow['triggered_by'], d: number) =>
     evalRun('tool-x', 'tool-x', passRate, by, daysAgoIso(d));
 
-  // 3-clean ⇒ 3
   assert.equal(
     verificationStreak([r(1, 'reverify', 1), r(1, 'reverify', 2), r(0.9, 'reverify', 3)], RELIABILITY_GATE),
     3,
   );
-  // clean-fail-clean ⇒ 1
   assert.equal(
     verificationStreak([r(1, 'reverify', 1), r(0.5, 'reverify', 2), r(1, 'reverify', 3)], RELIABILITY_GATE),
     1,
   );
-  // interleaved manual runs are skipped, never streak-breaking (the storage
-  // query pre-filters via triggeredBy; the helper's skip is defence in depth)
   assert.equal(
     verificationStreak(
       [r(1, 'reverify', 1), r(0, 'manual', 2), r(1, 'reverify', 3), r(0, 'push', 4), r(1, 'reverify', 5)],
@@ -439,20 +376,14 @@ test('verificationStreak unit matrix', () => {
     ),
     3,
   );
-  // empty ⇒ 0
   assert.equal(verificationStreak([], RELIABILITY_GATE), 0);
-  // sub-gate newest ⇒ 0
   assert.equal(verificationStreak([r(0.5, 'reverify', 1), r(1, 'reverify', 2)], RELIABILITY_GATE), 0);
 });
-
-// ---- Future-date clamp (code-review MED) + snapshot order ------------------
 
 test('future-dated last_eval_run clamps to freshness 1 (never leapfrogs via clock skew)', async () => {
   const storage = await freshStorage();
   try {
     const tool = await storage.upsertTool(spec('time-traveler'), QUERY_VEC);
-    // +30 days: unclamped this would be freshness ~19.5 - a term larger
-    // than one full RRF arm contribution (the leapfrog invariant breaks).
     await storage.recordEvalOutcome(
       tool.id,
       0.95,
@@ -471,9 +402,6 @@ test('future-dated last_eval_run clamps to freshness 1 (never leapfrogs via cloc
 test('rankings snapshot records the re-sorted order agents actually saw', async () => {
   const storage = await freshStorage();
   try {
-    // Same construction as the acceptance test: stale tool at the better
-    // vec rank, fresh runner-up adjacent - fresh overtakes in the RETURNED
-    // order, and the trending snapshot must record that same order.
     const stale = await storage.upsertTool(spec('snap-stale'), QUERY_VEC);
     const fresh = await storage.upsertTool(spec('snap-fresh'), mixVec(QUERY_VEC, OFF_AXIS, 0.05));
     await storage.recordEvalOutcome(stale.id, 0.95, daysAgoIso(90));
@@ -483,8 +411,6 @@ test('rankings snapshot records the re-sorted order agents actually saw', async 
     const returnedOrder = results.map((r) => r.name);
     assert.equal(returnedOrder[0], 'snap-fresh');
 
-    // rankings stores a JSON top-K snapshot per query (001_init.sql), not
-    // per-tool rows - parse the newest snapshot's results blob.
     const row = (storage as unknown as {
       db: { prepare: (s: string) => { get: () => { results: string } } };
     }).db
@@ -500,8 +426,6 @@ test('rankings snapshot records the re-sorted order agents actually saw', async 
     await storage.close();
   }
 });
-
-// ---- Agent-visible output injection (independent-review HIGH) -------------
 
 test('mcp formatter neutralizes newlines/control chars in author-controlled text', async () => {
   const { formatDiscoverTools } = await import('../bin/mcp-format.mjs');
@@ -520,8 +444,6 @@ test('mcp formatter neutralizes newlines/control chars in author-controlled text
     meta: {},
   });
   const lines = out.split('\n');
-  // The mitigation: author newlines collapse to spaces, so forged content
-  // stays INSIDE its cell on one line and can never start its own row.
   assert.ok(
     !lines.some((l) => /^\s*fake-entry/.test(l)),
     'forged table row must not start its own line',
@@ -530,12 +452,9 @@ test('mcp formatter neutralizes newlines/control chars in author-controlled text
     !lines.some((l) => l.trimStart().startsWith('• forged@')),
     'forged description bullet must not appear as its own line',
   );
-  // Exactly ONE data row renders for the single result.
   const dataRows = lines.filter((l) => /^\s+1\s/.test(l));
   assert.equal(dataRows.length, 1, 'one result renders exactly one table row');
   assert.ok(!out.includes('\x07'), 'control characters stripped');
-  // Unicode line separators (codex P2): U+2028/U+2029/C1 NEL must also
-  // collapse - many consumers render them as hard breaks.
   const uni = formatDiscoverTools({
     query: 'q',
     results: [{
@@ -547,8 +466,6 @@ test('mcp formatter neutralizes newlines/control chars in author-controlled text
     meta: {},
   });
   const uniLines = uni.split('\n');
-  // split cannot see U+2028 anyway; the real guard is the includes() check
-  // below - assert the collapsed name stays on ONE rendered line instead.
   assert.ok(uniLines.some((l) => l.includes('sneaky forged-row')), 'U+2028 collapsed to a space inside the cell');
   assert.ok(!uni.includes('\u2028') && !uni.includes('\u2029') && !uni.includes('\u0085'), 'separators collapsed');
 });

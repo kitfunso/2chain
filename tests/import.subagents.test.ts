@@ -1,6 +1,3 @@
-// Subagents importer integration test.
-// Real SQLite, real on-disk fixtures, deterministic stub embedder.
-
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
@@ -54,10 +51,8 @@ before(async () => {
     description: 'Build React components, implement responsive layouts, manage client-side state.',
     body: 'Masters React 19 and Next.js 15.',
   });
-  // README and dotfile must be ignored
   writeFileSync(resolve(tmpRoot, 'README.md'), '# readme\n');
   writeFileSync(resolve(tmpRoot, '.hidden.md'), '---\nname: x\ndescription: hidden\n---\nbody');
-  // Malformed (no description) — should be skipped
   writeAgent(tmpRoot, 'broken.md', {
     name: 'broken',
     description: '',

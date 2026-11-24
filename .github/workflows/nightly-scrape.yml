@@ -1,12 +1,5 @@
 name: nightly-scrape
 
-# Pulls fresh metadata from npm, awesome-* lists, PyPI, and Hugging Face Hub.
-# Commits the resulting snapshot + a stats markdown so contributors / forks
-# always have a recent picture of the live registry without running Ollama.
-#
-# The snapshot is metadata only — embeddings happen on `npm run import:snapshot`
-# locally where Ollama is available.
-
 on:
   schedule:
     - cron: '0 6 * * *'      # daily 06:00 UTC
@@ -37,8 +30,6 @@ jobs:
         id: scrape
         run: npm run scrape:snapshot
         env:
-          # Some upstream APIs throttle anonymous traffic; a UA header is
-          # already sent by the scrapers but a token unlocks higher caps.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Capture stats for commit body

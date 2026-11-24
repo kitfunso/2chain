@@ -1,10 +1,3 @@
-// Subagents importer — turns Claude Code subagents (single-file *.md with
-// YAML frontmatter under ~/.claude/agents/) into 2chain ToolSpecV2 rows
-// with tool_kind='subagent'.
-//
-// Subagents are discovery-only like skills: agents spawn them via the Task
-// tool, the registry's job is to surface "which subagent fits this query".
-
 import { readdirSync, readFileSync, lstatSync } from 'node:fs';
 import { resolve, basename, extname } from 'node:path';
 import type { Embedder, Storage, ToolSpecV2 } from '../types.js';
@@ -34,8 +27,6 @@ export function findSubagentFiles(root: string): Array<{ slug: string; path: str
     } catch {
       continue;
     }
-    // lstatSync doesn't follow symlinks; skip them so a malicious link in
-    // ~/.claude/agents/ can't slurp arbitrary files outside the agents root.
     if (lst.isSymbolicLink()) continue;
     if (!lst.isFile()) continue;
     out.push({ slug: basename(entry, '.md'), path: full });
@@ -71,7 +62,6 @@ function specFromSubagent(parsed: ParsedSkill): ToolSpecV2 {
 }
 
 export interface SubagentImportOptions {
-  /** Root directory to scan. Defaults to $HOME/.claude/agents. */
   root?: string;
   only?: string[];
   skipEmbedding?: boolean;

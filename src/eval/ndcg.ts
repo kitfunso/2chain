@@ -1,22 +1,8 @@
-// NDCG@k for the v2-native golden ranking set.
-//
-// Canonical formula (pinned, see plan rev 4 Step 6 and CLAUDE.md Rule 14):
-//
-//   gain(rel)    = 2^rel - 1            // exponential gain
-//   discount(r)  = log2(r + 1)          // r starts at 1, so rank 1 = log2(2) = 1.0
-//   DCG@k        = Σ_{i=1..k} gain(rel_i) / discount(i)
-//   IDCG@k       = Σ_{i=1..k} gain(sorted_rel_i) / discount(i)  // ideal order
-//   NDCG@k       = DCG@k / IDCG@k    (0 if IDCG == 0)
-//
-// Tie-break for equal rankings: stable name+version ascending. Documented
-// here and pinned by tests/v2-eval-ndcg.test.ts.
-
 export type Relevance = 0 | 1 | 2 | 3;
 
 export interface RankedResult {
   name: string;
   version: string;
-  /** Sort key used for tie-breaking (typically RRF score, descending). */
   score: number;
 }
 
@@ -53,7 +39,6 @@ export function ndcgAtK(
   relevance: Record<string, number>,
   k: number,
 ): number {
-  // 1. DCG@k from the system's ordering (after canonical tie-break).
   const ordered = applyTieBreak(ranked).slice(0, k);
   let dcg = 0;
   for (let i = 0; i < ordered.length; i++) {
@@ -62,7 +47,6 @@ export function ndcgAtK(
     dcg += gain(rel) / discount(i + 1);
   }
 
-  // 2. IDCG@k from the best possible ordering of the relevance map.
   const gold = Object.entries(relevance)
     .map(([_, rel]) => rel)
     .filter((r) => r > 0)

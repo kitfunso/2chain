@@ -1,12 +1,3 @@
-// Nightly snapshot orchestrator. Hits every live source we know about,
-// merges into a single JSON manifest at data/registry-snapshot.json.
-// No embedder dependency — pure metadata fetch, safe to run on a CI
-// runner without Ollama.
-//
-// The local `npm run import:snapshot` command loads this file, embeds
-// each spec with the configured Embedder, and upserts via the same
-// dedupe path the scrapers use.
-
 import 'dotenv/config';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -30,9 +21,6 @@ interface Snapshot {
   specs: ToolSpecV2[];
 }
 
-// Curated awesome-* lists. Each one becomes a separate scrape with its own
-// domain bucket. Adding a new list here is the standard way to grow the
-// catalog with no code changes.
 const AWESOME_LISTS: Array<{ name: string; url: string; domain: string; limit: number }> = [
   {
     name: 'awesome-mcp-servers',
@@ -103,7 +91,6 @@ function pushSpecs(specs: ToolSpecV2[]): number {
 
 console.log('snapshot-scrape-all: fetching from all sources...\n');
 
-// 1. npm
 for (const q of NPM_QUERIES) {
   const t0 = Date.now();
   const r = await safe(`npm:${q.q}`, () =>
@@ -119,7 +106,6 @@ for (const q of NPM_QUERIES) {
   }
 }
 
-// 2. awesome-* lists
 for (const list of AWESOME_LISTS) {
   const t0 = Date.now();
   const r = await safe(`awesome:${list.name}`, () =>
@@ -135,7 +121,6 @@ for (const list of AWESOME_LISTS) {
   }
 }
 
-// 3. PyPI
 {
   const t0 = Date.now();
   const r = await safe('pypi:default', () =>
@@ -151,7 +136,6 @@ for (const list of AWESOME_LISTS) {
   }
 }
 
-// 4. Hugging Face
 for (const q of HF_QUERIES) {
   const t0 = Date.now();
   const r = await safe(`hf:${q.resource}`, () =>
@@ -178,7 +162,6 @@ const outPath = resolve('data/registry-snapshot.json');
 mkdirSync(dirname(outPath), { recursive: true });
 writeFileSync(outPath, JSON.stringify(snapshot, null, 2));
 
-// Also write a human-readable summary for the commit body / dashboard.
 const statsPath = resolve('docs/registry-stats.md');
 mkdirSync(dirname(statsPath), { recursive: true });
 const statsLines = [

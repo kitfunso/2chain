@@ -1,5 +1,3 @@
-// Fast reset for between recording takes: wipes violations, usage, rankings,
-// and clears any circuit_broken status — without re-seeding (no Voyage cost).
 import 'dotenv/config';
 import { MongoClient } from 'mongodb';
 

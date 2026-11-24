@@ -1,23 +1,3 @@
-// Step 4 of Episode A1: two-judge ensemble grading.
-//
-// Judge 1: Claude 4.7 via `claude -p` headless mode.
-// Judge 2: Codex (default model) via `codex exec --json`.
-//
-// Each judge sees one query + all its candidates from
-// v2-golden-candidates.json in a single batched call, returns a JSON array
-// of {name, version, relevance: 0|1|2|3, rationale}. Both judges' raw
-// outputs are recorded; disagreements (|claude - codex| >= 2 on any
-// candidate of a query) routed to v2-golden-disagreements.json.
-//
-// Usage:
-//   npx tsx scripts/eval/grade-llm-judge.ts            # full 100 queries
-//   PILOT=5 npx tsx scripts/eval/grade-llm-judge.ts    # first 5 queries only
-//
-// Outputs (incremental — script can resume):
-//   tests/fixtures/v2-golden-judge-raw.json
-//   tests/fixtures/v2-golden-disagreements.json
-//   trajectories/grading-actions.log (per-query band + retries)
-
 import 'dotenv/config';
 import { spawn } from 'node:child_process';
 import { readFileSync, writeFileSync, existsSync, appendFileSync } from 'node:fs';
@@ -40,7 +20,7 @@ interface CandidateEntry {
 interface Grade {
   name: string;
   version: string;
-  relevance: number; // 0|1|2|3
+  relevance: number;
   rationale: string;
 }
 interface JudgeOutput {
@@ -64,13 +44,11 @@ const golden = JSON.parse(readFileSync(goldenPath, 'utf-8')) as { queries: Query
 const cands = JSON.parse(readFileSync(candidatesPath, 'utf-8')) as { queries: CandidateEntry[] };
 const candsById = new Map(cands.queries.map((q) => [q.id, q]));
 
-// Load tools (for capability_text lookups)
 const storage = new SqliteStorage({ path: process.env.TWOCHAIN_DB_PATH ?? 'C:/tmp/v2.db' });
 await storage.init();
 const allTools = await storage.listTools({ limit: 10_000 });
 const toolByKey = new Map(allTools.map((t) => [`${t.name}@${t.version}`, t]));
 
-// Resume support: load existing raw file if present
 let raw: { queries: Array<{ id: string; q: string; claude?: JudgeOutput; codex?: JudgeOutput }> } = { queries: [] };
 if (existsSync(rawPath)) {
   raw = JSON.parse(readFileSync(rawPath, 'utf-8'));
@@ -100,11 +78,9 @@ Return ONLY a single JSON array (no prose, no markdown fence) with one object pe
 }
 
 function extractJsonArray(text: string): unknown {
-  // Strip markdown fences if present
   let s = text.trim();
   const fenceMatch = s.match(/```(?:json)?\s*([\s\S]*?)```/);
   if (fenceMatch) s = fenceMatch[1].trim();
-  // Find first [ and last ]
   const start = s.indexOf('[');
   const end = s.lastIndexOf(']');
   if (start < 0 || end < 0 || end <= start) throw new Error('no JSON array found');
@@ -123,7 +99,6 @@ function normaliseGrades(parsed: unknown, candidateList: Array<{ name: string; v
     const rationale = String(item.rationale ?? '').slice(0, 240);
     if (name && version) byKey.set(`${name}@${version}`, { name, version, relevance: rel, rationale });
   }
-  // For any candidate the judge skipped, fill with relevance=0 (treat as wrong-by-omission)
   return candidateList.map((c) => byKey.get(`${c.name}@${c.version}`) ?? {
     name: c.name,
     version: c.version,
@@ -162,7 +137,7 @@ async function callCodex(prompt: string, queryId: string): Promise<{ text: strin
   return new Promise((resolveP, rejectP) => {
     const t = Date.now();
     // Invoke real codex via node directly (codex.cmd is the hippo wrapper; codex without ext is a shell script).
-    const codexJs = 'C:/Users/skf_s/AppData/Roaming/npm/node_modules/@openai/codex/bin/codex.js';
+    const codexJs ='C:/Users/skf_s/AppData/Roaming/npm/node_modules/@openai/codex/bin/codex.js';
     const child = spawn('node', [codexJs, 'exec', '--skip-git-repo-check', '--json', '-'], {
       shell: false,
       stdio: ['pipe', 'pipe', 'pipe'],
@@ -175,7 +150,6 @@ async function callCodex(prompt: string, queryId: string): Promise<{ text: strin
     child.on('close', (code) => {
       const latencyMs = Date.now() - t;
       if (code !== 0) return rejectP(new Error(`codex exit ${code}: ${err.slice(0, 200)}`));
-      // codex --json emits per-event JSONL; the final agent_message is what we want
       const lines = out.split('\n').filter((l) => l.trim().startsWith('{'));
       let text = '';
       for (const ln of lines.reverse()) {
@@ -228,7 +202,6 @@ async function gradeOne(q: Query): Promise<void> {
   const entry = existing ?? { id: q.id, q: q.q };
   const t0 = Date.now();
 
-  // Run both judges in parallel for this query.
   const [claudeRes, codexRes] = await Promise.allSettled([
     entry.claude ? Promise.resolve(null) : callClaude(prompt, q.id),
     entry.codex ? Promise.resolve(null) : callCodex(prompt, q.id),
@@ -268,7 +241,6 @@ async function gradeOne(q: Query): Promise<void> {
   if (entry.claude?.error) logAction(`${q.id} claude error: ${entry.claude.error.slice(0, 200)}`);
   if (entry.codex?.error) logAction(`${q.id} codex error: ${entry.codex.error.slice(0, 200)}`);
 
-  // Update raw map + persist
   if (!rawById.has(q.id)) {
     raw.queries.push(entry);
     rawById.set(q.id, entry);
@@ -278,7 +250,6 @@ async function gradeOne(q: Query): Promise<void> {
   writeFileSync(rawPath, JSON.stringify(raw, null, 2) + '\n');
 }
 
-// Bounded concurrency runner
 async function runPool(items: Query[], k: number): Promise<void> {
   let idx = 0;
   const workers: Array<Promise<void>> = [];
@@ -302,7 +273,6 @@ const tRun = Date.now();
 await runPool(queriesToGrade, CONCURRENCY);
 console.log(`\nrun complete in ${Math.round((Date.now() - tRun) / 1000)}s`);
 
-// Compute disagreements + bands
 const disagreements: { queries: Array<{ id: string; q: string; pairs: Array<{ name: string; claude_rel: number; codex_rel: number; gap: number }> }> } = { queries: [] };
 let pairsTotal = 0;
 let pairsDisagree = 0;

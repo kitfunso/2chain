@@ -1,7 +1,3 @@
-// Captures v1 retrieval baseline against the live v1 server.
-// For each golden query, records top-1 + top-3 + RRF margin.
-// v2 must match this baseline within tolerance (see Phase 1 plan Step 10).
-
 import 'dotenv/config';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';

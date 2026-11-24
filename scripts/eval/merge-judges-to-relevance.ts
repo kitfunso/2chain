@@ -1,16 +1,3 @@
-// Step 5 prep: merge judge-raw grades into v2-golden.json relevance maps.
-//
-// For each (query, candidate) pair:
-//   - if both judges graded AND |claude - codex| <= 1: use rounded mean
-//   - if |claude - codex| >= 2: NOT merged, must be adjudicated by human
-//   - if only one judge graded (rare; the other errored): use that one
-//
-// The script writes:
-//   - tests/fixtures/v2-golden.json (updated with merged relevance maps)
-//   - tests/fixtures/v2-golden-disagreements.json (queries+pairs awaiting Keith adjudication)
-//
-// Re-running the script is idempotent: relevance maps are recomputed from scratch each time.
-
 import 'dotenv/config';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -64,9 +51,6 @@ for (const gq of golden.queries) {
   }
   const cByKey = new Map<string, Grade>();
   const xByKey = new Map<string, Grade>();
-  // Normalise: claude sometimes echoes the prompt's "name@version" format into
-  // the name field. If the name already contains "@", treat the whole string
-  // as the key; otherwise build key = name@version.
   function normKey(g: Grade): string {
     return g.name.includes('@') ? g.name : `${g.name}@${g.version}`;
   }
@@ -84,19 +68,12 @@ for (const gq of golden.queries) {
     if (c && x) {
       const gap = Math.abs(c.relevance - x.relevance);
       if (gap >= 2) {
-        // Known parser bug in grade-llm-judge.ts: Claude sometimes echoed the
-        // prompt's "name@version" string into the `name` field, causing
-        // `${name}@${version}` lookups to miss and grade to default to 0.
-        // Detect: if Claude's rationale says "did not grade — defaulting" AND
-        // Codex graded the same candidate >= 2, treat Claude's "0" as a parser
-        // artifact (not a real Claude judgment) and auto-accept Codex's grade.
         const claudeIsArtifact = !!c.rationale.match(/^\((judge did not grade|re-parse failed|not array)/);
         if (claudeIsArtifact && x.relevance >= 2) {
           mergedPairs++;
           newRelevance[key] = x.relevance;
           continue;
         }
-        // Mirror: if Codex defaulted to 0 (same parser issue) and Claude graded >= 2.
         const codexIsArtifact = !!x.rationale.match(/^\((judge did not grade|re-parse failed|not array)/);
         if (codexIsArtifact && c.relevance >= 2) {
           mergedPairs++;
@@ -128,11 +105,7 @@ for (const gq of golden.queries) {
     }
   }
 
-  // Also include author top3 entries as rel=2 (acceptable) if not already graded.
-  // This is a safety net — author's hint should at least be considered for the
-  // relevance map even if the judges didn't cover it.
   for (const name of gq.expected_top3 ?? []) {
-    // Find any version (judges might have named ANY version; we keep all entries that resolve)
     if (!Object.keys(newRelevance).some((k) => k.startsWith(name + '@'))) {
       // Skip: author-only entries without judge coverage aren't graded.
     }

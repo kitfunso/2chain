@@ -1,7 +1,3 @@
-// Real Ollama tests for OllamaEmbedder. Skips if Ollama unreachable so CI
-// can run without an Ollama service. Personal-tier developers running
-// `npm test` locally will hit the real model — that's the point.
-
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { OllamaEmbedder } from '../src/embeddings/ollama.js';
@@ -45,7 +41,6 @@ test('OllamaEmbedder: embedBatch preserves input order', { skip }, async () => {
   const texts = ['alpha', 'beta', 'gamma', 'delta', 'epsilon'];
   const vecs = await e.embedBatch(texts, 'document');
   assert.equal(vecs.length, texts.length);
-  // Embedding the first text twice should give identical vectors
   const v0Again = await e.embed('alpha', 'document');
   for (let i = 0; i < 768; i++) {
     assert.ok(Math.abs(vecs[0][i] - v0Again[i]) < 1e-6, `index ${i} should match deterministically`);
@@ -70,7 +65,6 @@ test('OllamaEmbedder: prewarm populates the cache', { skip }, async () => {
   assert.equal(r.cached, true);
 });
 
-// LRU cache unit tests don't need Ollama
 test('LruEmbeddingCache: evicts oldest at capacity', () => {
   const c = new LruEmbeddingCache(2);
   c.set('a', { vec: new Float32Array(1), ms: 0, insertedAt: 0 });
@@ -85,7 +79,7 @@ test('LruEmbeddingCache: get refreshes recency', () => {
   const c = new LruEmbeddingCache(2);
   c.set('a', { vec: new Float32Array(1), ms: 0, insertedAt: 0 });
   c.set('b', { vec: new Float32Array(1), ms: 0, insertedAt: 0 });
-  c.get('a'); // touches 'a' — now 'b' is the oldest
+  c.get('a');
   c.set('c', { vec: new Float32Array(1), ms: 0, insertedAt: 0 });
   assert.equal(c.has('a'), true, 'a was recently used, should survive');
   assert.equal(c.has('b'), false, 'b should be evicted');

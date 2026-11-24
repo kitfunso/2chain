@@ -1,12 +1,4 @@
 #!/usr/bin/env node
-// 2chain MCP server — exposes the registry to Claude Code (and any
-// MCP-compatible agent) as discover_tools + call_tool. Returns rich,
-// trace-style output so the agent (and the human watching Claude Code)
-// can see MongoDB Atlas + the registry doing real work.
-//
-// Configure via environment:
-//   TWOCHAIN_HOST     — base URL of the 2chain API (default: http://127.0.0.1:3030)
-//   TWOCHAIN_API_KEY  — caller agent api key (default: sk_demo_pdf_agent_8f2c4a)
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
@@ -15,7 +7,7 @@ import { formatDiscoverTools } from './mcp-format.mjs';
 
 const HOST = process.env.TWOCHAIN_HOST || 'http://127.0.0.1:3030';
 const API_KEY = process.env.TWOCHAIN_API_KEY || 'sk_demo_pdf_agent_8f2c4a';
-const VERBOSE = process.env.TWOCHAIN_VERBOSE !== 'false';  // default ON
+const VERBOSE = process.env.TWOCHAIN_VERBOSE !== 'false';
 
 const server = new Server(
   { name: '2chain-mcp', version: '0.1.0' },

@@ -1,12 +1,3 @@
-// Scrape public Claude Code subagent collections and import them into the
-// live DB. Currently pulls wshobson/agents (185+ specialist subagents).
-// Each entry is tagged kind='subagent' and the relative path is rewritten
-// to an absolute github.com URL so the dashboard "click name to open repo"
-// works as expected.
-//
-// Usage:
-//   STORAGE_DRIVER=sqlite EMBEDDER=ollama tsx scripts/scrape-public-subagents.ts
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';
@@ -19,7 +10,7 @@ import type { ToolSpecV2 } from '../src/types.js';
 interface SubagentSource {
   name: string;
   url: string;
-  base: string;          // base for absolutising relative links
+  base: string;
   domain: string;
   limit: number;
 }
@@ -47,8 +38,6 @@ function absolutiseUrls(specs: ToolSpecV2[], base: string): ToolSpecV2[] {
       /Source:\s*(\.\.[^\s)]+|[^\s)]+\.md)/i,
       (_m, p) => {
         try {
-          // node:url doesn't fold ".." correctly with raw markdown paths,
-          // so do it manually: strip leading "../" segments from base.
           let b = base;
           let p2 = p;
           while (p2.startsWith('../')) {

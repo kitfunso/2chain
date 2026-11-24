@@ -1,8 +1,3 @@
-// Import the curated REAL_CORPUS fixtures into the live DB.
-// Skips existing entries via the shared scrape-import path. Adds the
-// finance / code / research / docs / geo / comms / etc. domain coverage
-// the snapshot scrape doesn't produce.
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';

@@ -1,14 +1,3 @@
-// Fix-up: the original grading run normalised Claude's output using key
-// `${name}@${version}`, but Claude sometimes echoed the prompt's full
-// "name@version" string back into the `name` field — causing the lookup to
-// miss and ~21 candidates across 8 queries to be defaulted to rel=0 instead
-// of getting Claude's actual grades.
-//
-// This script re-parses the raw text we captured at grading time (the first
-// 4000 chars of each judge's stdout), applies the corrected key normalisation
-// (strip @-suffix when present), and overwrites v2-golden-judge-raw.json with
-// the corrected grades. Idempotent.
-
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -32,12 +21,10 @@ function extractJsonArray(text: string): unknown {
   return JSON.parse(s.slice(start, end + 1));
 }
 
-// Strip trailing @vN.M from name so "foo@1.0" → "foo".
 function stripVerSuffix(name: string): string {
   const at = name.lastIndexOf('@');
   if (at < 0) return name;
   const suffix = name.slice(at + 1);
-  // Heuristic: only treat as version suffix if it looks like a version string
   if (/^[\d.]+[a-z0-9-]*$/.test(suffix)) return name.slice(0, at);
   return name;
 }

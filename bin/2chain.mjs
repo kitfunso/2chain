@@ -73,9 +73,6 @@ async function call(toolNameVer, caseId, inputJson) {
 
 async function reverify(args) {
   let body = {};
-  // Strict args on a mutating verb: a forgotten '--tool' (e.g.
-  // `2chain reverify pdf-extractor@3.0`) must never silently widen into an
-  // unfiltered fleet sweep. Only [] or ['--tool', '<spec>'] are accepted.
   if (args.length !== 0 && !(args.length === 2 && args[0] === '--tool')) {
     die('usage: 2chain reverify [--tool name@version]');
   }
@@ -85,8 +82,6 @@ async function reverify(args) {
     if (!spec) die('usage: 2chain reverify [--tool name@version]');
     const [name, version] = spec.split('@');
     if (!name) die('usage: 2chain reverify [--tool name@version]');
-    // A trailing '@' (empty version) on a mutating verb must error, not
-    // silently widen scope to every version of the name.
     if (spec.includes('@') && !version) die('--tool: version is empty; use name@version or bare name');
     body = version ? { tool_name: name, tool_version: version } : { tool_name: name };
   }
@@ -120,8 +115,6 @@ async function reverify(args) {
 }
 
 async function health(args) {
-  // Strict args: exactly one positional (the tool name). A second positional
-  // is a typo, not a request — die before any fetch.
   if (args.length !== 1) die('usage: 2chain health <name>');
   const name = args[0];
   const t = Date.now();
@@ -143,7 +136,6 @@ async function health(args) {
     console.log(`  ${v.version.padEnd(9)} ${statusCol} ${score}   ${String(v.verification_streak).padEnd(7)} ${v.last_eval_run ?? '(never)'}`);
   }
   if (j.drift_events.length) {
-    // The payload is capped at the newest 10 events; never imply totality.
     console.log(`  drift (newest ${j.drift_events.length}):`);
     for (const d of j.drift_events) {
       const cls = d.classification === 'breaking' ? `\x1b[31m${d.classification}\x1b[0m` : d.classification;

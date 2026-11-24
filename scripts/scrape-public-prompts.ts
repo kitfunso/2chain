@@ -1,6 +1,3 @@
-// Scrape public prompt collections. Pulls f/awesome-chatgpt-prompts CSV
-// (200+ real prompts), parses, imports as kind='prompt'.
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';
@@ -25,13 +22,8 @@ const SOURCES: CsvSource[] = [
   },
 ];
 
-// Cap on rows imported per source. The full chatgpt-prompts CSV has ~1700
-// rows but the long tail is noisy/repetitive. The first ~250 are the
-// canonical catalog (Linux Terminal, English Translator, etc.) and represent
-// the high-signal subset.
 const MAX_PER_SOURCE = Number(process.env.MAX_PROMPTS_PER_SOURCE ?? 250);
 
-// Minimal CSV parser tolerant of quoted fields with commas + escaped quotes.
 function parseCsv(text: string): string[][] {
   const rows: string[][] = [];
   let row: string[] = [];

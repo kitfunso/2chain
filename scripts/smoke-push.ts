@@ -76,7 +76,6 @@ try {
   if (!(await waitFor(`${BASE}/health`))) { console.error('server failed to start'); console.error(serverOut); process.exit(1); }
   console.log('server up\n');
 
-  // Pre-state: /discover should show pdf-extractor v3.0 #1, pdftools-pro v2.0 #2
   console.log('=== pre-push: /discover snapshot ===');
   const before = await fetch(`${BASE}/discover?q=${encodeURIComponent(DEMO_QUERY)}`, {
     headers: { 'x-api-key': PDF_AGENT_KEY },
@@ -86,7 +85,6 @@ try {
     throw new Error('pre-push: expected pdf-extractor v3.0 at #1');
   }
 
-  // Push pdf-extractor v3.1
   console.log('\n=== push pdf-extractor@3.1 (buggy stub) ===');
   const tPush = Date.now();
   const pushResp = await fetch(`${BASE}/push`, {
@@ -106,7 +104,6 @@ try {
     console.log(`    ${c.pass ? '✓' : '✗'} ${c.case_id}${c.error ? '  (' + c.error + ')' : ''}`);
   }
 
-  // Beat-2 EVALS assertions:
   const a = [
     { n: 'push 200', pass: pushResp.status === 200 },
     { n: 'push within 5s', pass: pushElapsed < 5000 },
@@ -115,7 +112,6 @@ try {
     { n: 'reliability_score === 0.6', pass: pushJson.reliability_score === 0.6 },
     { n: 'pass_count === 3', pass: pushJson.pass_count === 3 },
     { n: 'total_count === 5', pass: pushJson.total_count === 5 },
-    // Per spec, financial-numbers, negative-number fail (decimal); single-row, multi-page, currency-symbol-strip pass.
     { n: 'financial-numbers fails', pass: pushJson.cases.find((c: any) => c.case_id === 'financial-numbers')?.pass === false },
     { n: 'single-row passes', pass: pushJson.cases.find((c: any) => c.case_id === 'single-row')?.pass === true },
     { n: 'negative-number fails', pass: pushJson.cases.find((c: any) => c.case_id === 'negative-number')?.pass === false },
@@ -125,7 +121,6 @@ try {
   for (const x of a) { console.log(`  ${x.pass ? '✓' : '✗'} ${x.n}`); if (x.pass) passCount++; }
   if (passCount !== a.length) throw new Error(`Beat 2: ${passCount}/${a.length}`);
 
-  // Verify in DB
   console.log('\n=== DB verification ===');
   const c2 = new MongoClient(process.env.MONGODB_URI!);
   try {
@@ -139,7 +134,6 @@ try {
     console.log('  ✓ DB matches push response');
   } finally { await c2.close(); }
 
-  // Beat 3: /discover should still return v3.0 #1, pdftools-pro #2, NO v3.1
   console.log('\n=== Beat 3: /discover after push (regression protection) ===');
   const after = await fetch(`${BASE}/discover?q=${encodeURIComponent(DEMO_QUERY)}`, {
     headers: { 'x-api-key': PDF_AGENT_KEY },
@@ -155,7 +149,6 @@ try {
   for (const x of b) { console.log(`  ${x.pass ? '✓' : '✗'} ${x.n}`); if (x.pass) bCount++; }
   if (bCount !== b.length) throw new Error(`Beat 3: ${bCount}/${b.length}`);
 
-  // Negative push: duplicate
   console.log('\n=== negative: duplicate push → 400 ===');
   const dup = await fetch(`${BASE}/push`, {
     method: 'POST',
@@ -166,7 +159,6 @@ try {
   if (dup.status !== 400) throw new Error(`expected 400, got ${dup.status}`);
   console.log('  ✓');
 
-  // Negative push: caller role attempts push
   console.log('\n=== negative: caller role pushing → 403 ===');
   const callerPush = await fetch(`${BASE}/push`, {
     method: 'POST',

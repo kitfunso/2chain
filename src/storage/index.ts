@@ -1,8 +1,3 @@
-// Storage factory. Reads STORAGE_DRIVER env, returns the concrete impl.
-//   sqlite   -> SqliteStorage (Phase 1, default for personal tier)
-//   postgres -> Phase 2
-//   mongodb  -> v1 legacy (no longer wired into v2 routes)
-
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';
 import type { Storage } from '../types.js';
@@ -19,7 +14,6 @@ export async function createStorage(): Promise<Storage> {
   const driver = getStorageDriver();
   switch (driver) {
     case 'sqlite': {
-      // Lazy import so non-sqlite deployments don't pay the better-sqlite3 load cost.
       const { SqliteStorage } = await import('./sqlite.js');
       const path = resolve(
         process.env.TWOCHAIN_DB_PATH ?? `${homedir()}/.2chain/db.sqlite`,

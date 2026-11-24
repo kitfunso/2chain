@@ -1,11 +1,3 @@
-// CLI: scrape a curated awesome-list README from GitHub and import
-// each `- [Name](url) - description.` bullet as a 2chain catalog entry.
-//
-// Usage:
-//   npm run scrape:awesome -- --url https://raw.githubusercontent.com/punkpeye/awesome-mcp-servers/main/README.md
-//   npm run scrape:awesome -- --url <url> --limit 200 --domain mcp
-//   npm run scrape:awesome -- --url <url> --dry-run
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';

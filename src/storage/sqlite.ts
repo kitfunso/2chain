@@ -1,10 +1,3 @@
-// SqliteStorage — Phase 1 personal-tier driver.
-// better-sqlite3 + sqlite-vec + FTS5. Cosine distance, L2-normalized embeddings.
-// All writes routed through SqliteWriteQueue; reads use the shared sync handle
-// (better-sqlite3 reads are non-blocking in WAL mode).
-//
-// Step 4 implements everything except runRRF() (Step 6).
-
 import { randomUUID } from 'node:crypto';
 import { readFileSync, statSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
@@ -32,11 +25,9 @@ import { SqliteWriteQueue } from './sqlite-write-queue.js';
 import { SqliteChangeHook } from '../live/sqlite-hook.js';
 
 export interface SqliteStorageOpts {
-  path: string;                 // ':memory:' for tests, real path for prod
-  migrationsDir?: string;       // override (defaults to src/storage/migrations/sqlite)
-  readonly?: boolean;           // for read-snapshot consumers
-  /** Embedding dim for the vec0 virtual table. Defaults to 768 (nomic).
-   *  1024 for mxbai-embed-large parity tests. Locks at first init. */
+  path: string;
+  migrationsDir?: string;
+  readonly?: boolean;
   embeddingDim?: number;
 }
 
@@ -61,10 +52,6 @@ interface ToolRow {
   updated_at: string;
 }
 
-// FTS5 query sanitizer: strip characters that conflict with the FTS5 query
-// grammar, then OR-join remaining tokens. Empty result means "no text arm".
-// Defensive: drops anything that could be parsed as a column-filter or
-// boolean operator. The user query is untrusted text, not query syntax.
 function sanitizeFtsQuery(raw: string): string {
   const tokens = raw
     .toLowerCase()
@@ -73,9 +60,6 @@ function sanitizeFtsQuery(raw: string): string {
     .map((t) => t.trim())
     .filter((t) => t.length >= 2);
   if (tokens.length === 0) return '';
-  // Wrap each in double-quotes to disable phrase-operator interpretation.
-  // FTS5 requires the special "delete" command for content sync (see
-  // migration), but at MATCH time double-quoted terms are treated as literal.
   return tokens.map((t) => `"${t}"`).join(' OR ');
 }
 
@@ -111,7 +95,6 @@ export class SqliteStorage implements Storage {
     this.hook = new SqliteChangeHook();
   }
 
-  /** Test-only: synchronously flush the change-hook queue. */
   flushChanges(): void {
     this.hook.flush();
   }
@@ -128,9 +111,6 @@ export class SqliteStorage implements Storage {
     this.db.exec('PRAGMA busy_timeout = 5000');
     this.db.exec('PRAGMA foreign_keys = ON');
     if (!this.opts.readonly) {
-      // Hook must install BEFORE migrations so that triggers created in any
-      // future migration which references notify_change() find the function.
-      // Triggers themselves are created inside install() — idempotent.
       await this.runMigrations();
       this.hook.install(this.db);
     }
@@ -139,7 +119,6 @@ export class SqliteStorage implements Storage {
   private async runMigrations(): Promise<void> {
     const migrationsDir =
       this.opts.migrationsDir ?? resolve('src/storage/migrations/sqlite');
-    // Bootstrap the tracker table so the first migration can record itself.
     this.db
       .prepare(
         `CREATE TABLE IF NOT EXISTS _migrations (
@@ -148,7 +127,7 @@ export class SqliteStorage implements Storage {
           )`,
       )
       .run();
-    const files = ['001_init.sql', '002_tool_kind.sql', '003_drift_events.sql']; // explicit list, in apply order
+    const files = ['001_init.sql', '002_tool_kind.sql', '003_drift_events.sql'];
     for (const file of files) {
       const already = this.db
         .prepare('SELECT 1 FROM _migrations WHERE name = ?')
@@ -162,16 +141,12 @@ export class SqliteStorage implements Storage {
         throw new Error(`migration file missing: ${path}`);
       }
       let sql = readFileSync(path, 'utf-8');
-      // Allow overriding the vec0 embedding dim from opts so parity
-      // checks against 1024-dim embedders (mxbai-embed-large) can use a
-      // separate DB without forking the migration file.
       const dim = this.opts.embeddingDim ?? 768;
       if (dim !== 768) {
         sql = sql.replace(/float\[768\]/g, `float[${dim}]`);
       }
       this.db.transaction(() => {
         this.db.exec(sql);
-        // Ensure _migrations exists even if 001 forgot to create it (it does).
         this.db
           .prepare(
             'CREATE TABLE IF NOT EXISTS _migrations (name TEXT PRIMARY KEY, applied_at TEXT NOT NULL DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\', \'now\')))',
@@ -181,8 +156,6 @@ export class SqliteStorage implements Storage {
       })();
     }
   }
-
-  // ----- Tool CRUD ---------------------------------------------------------
 
   async getToolByNameVersion(
     name: string,
@@ -296,12 +269,6 @@ export class SqliteStorage implements Storage {
     namespace = DEFAULT_NAMESPACE,
     opts?: { newestFirst?: boolean; limit?: number },
   ): Promise<ToolV2[]> {
-    // Prefix of the UNIQUE(namespace_id, name, version) index — exact match.
-    // Default: ALL versions, oldest-first (push's ownership + predecessor
-    // checks need the full set — the 5k listTools scan this replaced was the
-    // fail-open hazard). With opts, the bound runs IN SQL: the health
-    // surface must not fetch-and-sort unbounded author-controlled rows per
-    // unauthenticated request (codex P2).
     if (opts?.limit !== undefined) {
       const rows = this.db
         .prepare<[string, string, number], ToolRow>(
@@ -347,11 +314,6 @@ export class SqliteStorage implements Storage {
     reliabilityScore: number,
     lastEvalRun: string,
   ): Promise<void> {
-    // Atomic JSON patch of ONLY the eval-result fields, inside the serialized
-    // write queue. Never touches the status column and never rewrites the
-    // rest of metadata, so a re-verification sweep cannot resurrect a
-    // concurrently circuit-broken tool (the sweep's read-time status may be
-    // minutes stale by write time) nor clobber a concurrent metadata write.
     await this.queue.run(() => {
       this.db
         .prepare(
@@ -363,8 +325,6 @@ export class SqliteStorage implements Storage {
         .run(reliabilityScore, lastEvalRun, new Date().toISOString(), toolId);
     }, 'tools');
   }
-
-  // ----- Agents ------------------------------------------------------------
 
   async getAgentByKeyHash(hash: string): Promise<AgentRow | null> {
     const row = this.db
@@ -390,8 +350,6 @@ export class SqliteStorage implements Storage {
     }, 'agents');
   }
 
-  // ----- Retrieval ---------------------------------------------------------
-
   async runRRF(opts: {
     queryEmbedding: Float32Array;
     queryText: string;
@@ -407,14 +365,10 @@ export class SqliteStorage implements Storage {
       opts.queryEmbedding.byteOffset,
       opts.queryEmbedding.byteLength,
     );
-    // FTS5 query: tokenize the user query into terms, OR-join. Matches v1's
-    // implicit OR-of-terms behavior and tolerates noisy queries that have
-    // some terms not in capability_text.
     const ftsQuery = sanitizeFtsQuery(opts.queryText);
 
     const kindClause = opts.kind ? ' AND t.tool_kind = ?' : '';
 
-    // ---- Vector arm ----
     const vecParams: Array<Buffer | number | string> = [queryBuf, 50, opts.gate, namespace];
     if (opts.kind) vecParams.push(opts.kind);
     const vecRows = this.db
@@ -431,7 +385,6 @@ export class SqliteStorage implements Storage {
       )
       .all(...vecParams);
 
-    // ---- Text arm ---- (FTS5 with bm25 ASC; lower-is-better)
     let txtRows: Array<{ rowid: number }> = [];
     if (ftsQuery.length > 0) {
       const txtParams: Array<string | number> = [ftsQuery, namespace, opts.gate];
@@ -452,8 +405,6 @@ export class SqliteStorage implements Storage {
         .all(...txtParams) as Array<{ rowid: number }>;
     }
 
-    // ---- RRF fusion (in JS — far simpler than the equivalent SQL CTE,
-    // and the vec/text arrays are already small at this point). ----
     const K_CONSTANT = 60;
     const fused = new Map<number, { score: number; vec_rank?: number; text_rank?: number; vec_distance?: number }>();
     vecRows.forEach((r, idx) => {
@@ -474,12 +425,10 @@ export class SqliteStorage implements Storage {
 
     if (fused.size === 0) return [];
 
-    // Top-K by RRF
     const ranked = [...fused.entries()]
       .sort((a, b) => b[1].score - a[1].score)
       .slice(0, opts.topK);
 
-    // Hydrate tool rows
     const placeholders = ranked.map(() => '?').join(',');
     const rowids = ranked.map(([rowid]) => rowid);
     const toolRows = this.db
@@ -512,8 +461,6 @@ export class SqliteStorage implements Storage {
     }
     return out;
   }
-
-  // ----- Logging writes ----------------------------------------------------
 
   async insertViolation(v: ViolationRow): Promise<void> {
     await this.queue.run(() => {
@@ -615,8 +562,6 @@ export class SqliteStorage implements Storage {
     }, 'rankings');
   }
 
-  // ----- Contract drift (E3) -------------------------------------------------
-
   async insertDriftEvent(e: DriftEventRow): Promise<void> {
     await this.queue.run(() => {
       const id = e.id ?? randomUUID();
@@ -679,8 +624,6 @@ export class SqliteStorage implements Storage {
       created_at: r.created_at,
     }));
   }
-
-  // ----- Dashboard reads ---------------------------------------------------
 
   async listTools(opts: {
     status?: ToolStatus;
@@ -761,18 +704,11 @@ export class SqliteStorage implements Storage {
     return rows.map((r) => this.mapEvalRun(r));
   }
 
-  // ----- Reliability lifecycle reads (E2) ----------------------------------
-
   async listEvalRunsForTool(
     toolId: string,
     limit: number,
     triggeredBy?: string,
   ): Promise<EvalRunRow[]> {
-    // Rides idx_eval_runs_tool for the lookup; sorting the per-tool slice is
-    // fine at per-tool scale (composite (tool_id, triggered_at) index noted
-    // as a future option, not added speculatively). The optional triggeredBy
-    // filter applies BEFORE the limit: recovery's reverify-only window must
-    // not be starved by other-trigger rows filling the cap (codex cap round).
     const rows = triggeredBy
       ? this.db
           .prepare<[string, string, number], any>(
@@ -823,18 +759,9 @@ export class SqliteStorage implements Storage {
   }
 
   async markCircuitBroken(toolId: string, atIso: string): Promise<void> {
-    // The break transition, recorded ONCE: usage rows cannot serve as the
-    // recovery watermark because call.ts logs outcome='circuit_broken' on
-    // every post-break 503 rejection too — retry traffic would advance a
-    // MAX(occurred_at) watermark forever and recovery would never fire
-    // (codex P2 + independent-review HIGH, convergent).
     await this.queue.run(() => {
       this.db
         .prepare(
-          // Transition-winner-only (codex cap round): two in-flight calls
-          // can both fail validation and both queue this write; the loser
-          // must not re-stamp broken_at (recovery evidence would be
-          // measured from the wrong, later transition).
           `UPDATE tools
            SET status = 'circuit_broken',
                metadata = json_set(metadata, '$.broken_at', ?),
@@ -849,7 +776,6 @@ export class SqliteStorage implements Storage {
     limit: number,
     namespace = DEFAULT_NAMESPACE,
   ): Promise<Record<string, number>> {
-    // Look at the most recent N usage rows and count outcomes.
     const rows = this.db
       .prepare<[string, number], { outcome: string; n: number }>(
         `SELECT outcome, COUNT(*) AS n FROM (
@@ -873,9 +799,6 @@ export class SqliteStorage implements Storage {
     limit: number,
     namespace = DEFAULT_NAMESPACE,
   ): Promise<Array<{ name: string; version: string; hits: number }>> {
-    // Expand each ranking's results JSON array, count distinct (name,version)
-    // appearances within the cutoff window, return the top N. SQLite json_each
-    // makes this a single query with no app-side parsing.
     const cutoffMs = Date.now() - daysBack * 86400_000;
     const cutoff = new Date(cutoffMs).toISOString();
     return this.db
@@ -938,13 +861,9 @@ export class SqliteStorage implements Storage {
     };
   }
 
-  // ----- Live updates ------------------------------------------------------
-
   watchChanges(onChange: (e: ChangeEvent) => void): void {
     this.hook.addListener(onChange);
   }
-
-  // ----- Lifecycle ---------------------------------------------------------
 
   async close(): Promise<void> {
     if (this.db && this.db.open) this.db.close();

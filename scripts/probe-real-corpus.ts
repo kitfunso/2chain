@@ -1,4 +1,3 @@
-// Probe the expanded catalog with queries that should route to real-corpus tools.
 import { SqliteStorage } from '../src/storage/sqlite.js';
 import { OllamaEmbedder } from '../src/embeddings/ollama.js';
 import { discover } from '../src/services/discover.js';

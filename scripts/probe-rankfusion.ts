@@ -16,7 +16,6 @@ try {
 
   console.log('\n=== probe 2: try $rankFusion (will error if not supported) ===');
   try {
-    // Minimal $rankFusion — uses two cheap pipelines, doesn't depend on indexes existing.
     const result = await db.collection('tools').aggregate([
       {
         $rankFusion: {
@@ -45,7 +44,6 @@ try {
 
   console.log('\n=== probe 4: try $search (Atlas Search) ===');
   try {
-    // If no text index exists, this will fail with "index not found".
     const r = await db.collection('tools').aggregate([
       { $search: { index: 'tools_text_idx', text: { query: 'pdf', path: 'capability_text' } } },
       { $limit: 1 },

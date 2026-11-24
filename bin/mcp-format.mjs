@@ -1,26 +1,5 @@
-// 2chain MCP shim — discover_tools result formatter (E5).
-//
-// SIDE-EFFECT-FREE on purpose: bin/2chain-mcp.mjs connects the stdio
-// transport at module top level, so importing the shim from a test hangs
-// the runner. The shim imports THIS module; tests import this module; the
-// shim itself must NEVER be imported by tests.
-//
-// Header copy reflects the real v2 stack (SQLite RRF 0.5/0.5, Ollama
-// nomic-embed-text 768-dim) — the v1 'Atlas $rankFusion' / 'Voyage
-// voyage-3' trace text was provably false and the freshness column must
-// not sit under it.
-
-// Author-controlled strings (name/version/capability_text) render into
-// AGENT-VISIBLE text: a newline inside capability_text could forge extra
-// table rows with fake reliability/final scores, and control characters
-// could impersonate the trace header (independent-review HIGH). One line
-// of neutralization closes row-forging; rendering stays single-line.
 function clean(s) {
   // eslint-disable-next-line no-control-regex
-  // ALL line-break/control categories (codex P2): C0 + DEL + C1 (incl.
-  // U+0085 NEL) + U+2028/U+2029 Unicode separators - many consumers
-  // render the separators as hard breaks, re-opening row-forging past a
-  // C0-only strip.
   return String(s).replace(/[\r\n\u0000-\u001f\u007f-\u009f\u2028\u2029]/g, ' ');
 }
 

@@ -1,8 +1,3 @@
-// Real arxiv.org API client. No baked content.
-// Hits https://export.arxiv.org/api/query — returns Atom XML, we parse the
-// <entry> blocks for title, abstract, authors, id, published date.
-// Free, no API key, used by hundreds of papers-related tools.
-
 const ARXIV_ENDPOINT = 'https://export.arxiv.org/api/query';
 const FETCH_TIMEOUT_MS = 4000;
 const USER_AGENT = '2chain hackathon demo (skfskf27@gmail.com)';
@@ -38,8 +33,6 @@ export async function searchArxiv(query: string, limit = 3): Promise<ArxivSearch
   }
   const cappedLimit = Math.min(Math.max(limit, 1), 10);
 
-  // arxiv search query syntax: all:term1+AND+all:term2 — keeps it simple by
-  // joining query tokens with AND so multi-word queries narrow results.
   const tokens = cleanQuery.split(/\s+/).filter((t) => t.length > 1);
   const searchQuery = tokens.length > 1
     ? tokens.map((t) => `all:${encodeURIComponent(t)}`).join('+AND+')

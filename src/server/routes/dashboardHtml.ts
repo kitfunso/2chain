@@ -1,8 +1,3 @@
-// v2 dashboard — JK-hybrid TUI on cream, ink-bordered, K-palette colored.
-// Wires /state (initial snapshot) + /events (SSE) + /atlas-stats (driver info).
-// Replaces the v1 MongoDB-flavored single-page dashboard. Same exported name
-// (DASHBOARD_HTML) so the route handler in dashboard.ts is unchanged.
-
 export const DASHBOARD_HTML = `<!doctype html>
 <html lang="en">
 <head>

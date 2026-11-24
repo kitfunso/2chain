@@ -1,14 +1,8 @@
-// Real SEC EDGAR fetcher. No baked numbers, no API key.
-// Hits https://data.sec.gov/api/xbrl/companyfacts/CIK{10-padded}.json
-// Filters XBRL facts to the latest annual 10-K (form=10-K, fp=FY).
 // SEC rule: must send a User-Agent with contact info.
 
 const USER_AGENT = '2chain hackathon demo (skfskf27@gmail.com)';
 const FETCH_TIMEOUT_MS = 4000;
 
-// Top ~40 US tickers → CIK (zero-padded to 10 digits, as the URL requires).
-// The numbers we return don't come from this table; this table only resolves
-// "ticker NVDA → SEC entity 1045810" so we can hit the right URL.
 const CIK_BY_TICKER: Record<string, { cik: string; name: string }> = {
   NVDA:  { cik: '0001045810', name: 'NVIDIA Corporation' },
   AAPL:  { cik: '0000320193', name: 'Apple Inc.' },
@@ -52,7 +46,6 @@ const CIK_BY_TICKER: Record<string, { cik: string; name: string }> = {
   F:     { cik: '0000037996', name: 'Ford Motor Company' },
 };
 
-// XBRL concept fallback chain. Different filers use different us-gaap tags.
 const CONCEPT_CHAIN = {
   revenue: ['Revenues', 'RevenueFromContractWithCustomerExcludingAssessedTax', 'SalesRevenueNet', 'SalesRevenueGoodsNet'],
   cost_of_revenue: ['CostOfRevenue', 'CostOfGoodsAndServicesSold', 'CostOfGoodsSold'],
@@ -112,18 +105,13 @@ function fetchWithTimeout(url: string): Promise<Response> {
   }).finally(() => clearTimeout(t));
 }
 
-// Pick the latest annual 10-K fact from a list of XBRL facts.
 function latestAnnual(facts: XbrlFact[] | undefined): XbrlFact | undefined {
   if (!facts) return undefined;
   const annuals = facts.filter((f) => f.form === '10-K' && f.fp === 'FY');
   if (annuals.length === 0) return undefined;
-  // Most recent end date wins.
   return annuals.sort((a, b) => (a.end < b.end ? 1 : -1))[0];
 }
 
-// Pick the concept whose latest annual fact is the most recent. Filers swap
-// XBRL tags over time (e.g. AAPL moved Revenues -> RevenueFromContract...),
-// so the *first* hit in the chain isn't always the freshest.
 function pickConcept(usgaap: NonNullable<NonNullable<CompanyFacts['facts']>['us-gaap']>, chain: readonly string[]): XbrlFact | undefined {
   let best: XbrlFact | undefined;
   for (const concept of chain) {
@@ -136,8 +124,6 @@ function pickConcept(usgaap: NonNullable<NonNullable<CompanyFacts['facts']>['us-
   return best;
 }
 
-// Pick a fact for `concepts` matching the anchor fiscal_year_end exactly, so
-// every line item lines up to the same period. Falls back to nearest annual.
 function pickConceptForEnd(
   usgaap: NonNullable<NonNullable<CompanyFacts['facts']>['us-gaap']>,
   chain: readonly string[],
@@ -190,7 +176,6 @@ export async function fetchIncomeStatement(rawTicker: string): Promise<IncomeSta
     throw new SecFetchError(`no us-gaap facts in companyfacts response for ${ticker}`, 'no_facts');
   }
 
-  // Anchor on revenue's most recent annual end date so all line items match periods.
   const revenueFact = pickConcept(usgaap, CONCEPT_CHAIN.revenue);
   if (!revenueFact) {
     throw new SecFetchError(`no annual revenue concept found for ${ticker}`, 'no_revenue');
@@ -209,7 +194,6 @@ export async function fetchIncomeStatement(rawTicker: string): Promise<IncomeSta
   const operating_expenses = opexFact?.val ?? Math.max(0, gross_profit - operating_income);
   const net_income = netIncFact?.val ?? 0;
 
-  // SEC reports raw USD; expose in millions for analyst readability.
   const toMillions = (n: number): number => Math.round(n / 1_000) / 1_000;
 
   return {

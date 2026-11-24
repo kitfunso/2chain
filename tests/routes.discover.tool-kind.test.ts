@@ -1,6 +1,3 @@
-// Route-level test: /discover JSON shape includes tool_kind on every result,
-// and the kind survives the full route -> service -> storage round trip.
-
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import Fastify, { type FastifyInstance } from 'fastify';
@@ -127,7 +124,6 @@ test('GET /discover returns at least one of each kind across the corpus', async 
   });
   const body = r.json();
   const kinds = new Set(body.results.map((x: { tool_kind: string }) => x.tool_kind));
-  // top-K=10 against 4 inserted rows means we should see all of them
   assert.deepEqual(
     [...kinds].sort(),
     ['prompt', 'skill', 'subagent', 'tool'],

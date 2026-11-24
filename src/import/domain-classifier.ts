@@ -1,21 +1,8 @@
-// Single source of truth for domain classification.
-//
-// Used by:
-//   - src/import/scrape-import.ts → classifies every imported spec inline so
-//     no row ever lands with a non-canonical domain.
-//   - scripts/reclassify-domains.ts → retroactive cleanup tool, identical
-//     logic, runs over the existing DB to fix legacy rows.
-//
-// The keyword lists and CANONICAL set live here so adding a new domain (or
-// a new keyword) is a one-file change.
-
 export const CANONICAL_DOMAINS = new Set([
   'finance', 'code', 'research', 'docs', 'geo',
   'data', 'comms', 'ai', 'devops', 'security', 'media',
 ]);
 
-// Authors whose domains were chosen by hand. Inline classify and the
-// reclassify tool both skip these so curated taxonomies are never overridden.
 export const CURATED_AUTHORS = new Set([
   'kitfunso', 'agent-infra', 'skills-extra', 'skills-discovery', 'first-party',
 ]);
@@ -25,9 +12,6 @@ interface Rule { domain: string; keywords: string[] }
 const RULES: Rule[] = [
   { domain: 'finance', keywords: ['stripe','payment','crypto','bitcoin','ethereum','exchange','trading','stock','sec edgar','accounting','accountant','invoice','xero','quickbooks','plaid','coinbase','binance','wallet','financial','tax','treasury','ledger','bookkeeping','revenue','billing','subscription','investor','stock broker','financial planner','financial analyst','salesperson','sales pitcher','real estate','realtor','startup pitch','pitch generator','venture capital','statistician'] },
   { domain: 'code', keywords: [
-      // 'go ' and 'java ' are too generic alone (match argot/lego/javascript spam)
-      // and too restrictive with the trailing space (won't match end-of-string).
-      // 'golang' is unambiguous; 'javascript' covers the JS family. Drop both.
       'typescript','javascript','python','rust','golang','c++','c#','php','ruby','kotlin','swift','scala','elixir','clojure','haskell','dart',
       'react','vue','angular','svelte','next.js','nextjs','nuxt','express','fastapi','django','flask','rails','spring','laravel','tailwind',
       'frontend','backend','full-stack','fullstack','full stack','web dev','app dev','software','developer','engineer','programmer','code review','code quality','linter','refactor','debug','testing','unit test','e2e','tdd','bdd','regex','it expert','it architect','it support','code reviewer','quality assurance','qa engineer',

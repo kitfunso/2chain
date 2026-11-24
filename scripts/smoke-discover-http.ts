@@ -37,13 +37,11 @@ try {
 
   console.log('server up\n');
 
-  // Test 1: Auth required
   console.log('=== test 1: missing api key → 401 ===');
   const noAuth = await fetch(`${BASE}/discover?q=${encodeURIComponent(DEMO_QUERY)}`);
   console.log(`  status: ${noAuth.status}`);
   if (noAuth.status !== 401) throw new Error(`expected 401, got ${noAuth.status}`);
 
-  // Test 2: Bad api key
   console.log('\n=== test 2: bad api key → 401 ===');
   const badAuth = await fetch(`${BASE}/discover?q=${encodeURIComponent(DEMO_QUERY)}`, {
     headers: { 'x-api-key': 'sk_not_a_real_key' },
@@ -51,7 +49,6 @@ try {
   console.log(`  status: ${badAuth.status}`);
   if (badAuth.status !== 401) throw new Error(`expected 401, got ${badAuth.status}`);
 
-  // Test 3: Missing q
   console.log('\n=== test 3: missing query → 400 ===');
   const noQ = await fetch(`${BASE}/discover`, {
     headers: { 'x-api-key': PDF_AGENT_KEY },
@@ -59,7 +56,6 @@ try {
   console.log(`  status: ${noQ.status}`);
   if (noQ.status !== 400) throw new Error(`expected 400, got ${noQ.status}`);
 
-  // Test 4: Demo query → expected top-N
   console.log('\n=== test 4: demo query → 200 + ranked top-N ===');
   const t = Date.now();
   const ok = await fetch(`${BASE}/discover?q=${encodeURIComponent(DEMO_QUERY)}`, {
@@ -84,7 +80,6 @@ try {
   if (a4.some((x) => !x)) throw new Error(`test 4 failed: ${JSON.stringify(a4)}`);
   console.log('  ✓ all 7 assertions');
 
-  // Test 5: Same query cached → fast
   console.log('\n=== test 5: cached embed → fast ===');
   const t5 = Date.now();
   const cached = await fetch(`${BASE}/discover?q=${encodeURIComponent(DEMO_QUERY)}`, {
@@ -97,7 +92,6 @@ try {
   if (elapsed >= 200) throw new Error(`expected <200ms cached, got ${elapsed}ms`);
   console.log(`  ✓ embed cached, total ${elapsed}ms < 200ms target`);
 
-  // Test 6: Negative — irrelevant query
   console.log('\n=== test 6: irrelevant query → 200 with [] ===');
   const negative = await fetch(`${BASE}/discover?q=${encodeURIComponent('how to bake a sourdough loaf')}`, {
     headers: { 'x-api-key': PDF_AGENT_KEY },

@@ -29,7 +29,6 @@ export function registerDiscoverRoute(
       return;
     }
     const top = req.query.top ? Math.max(1, Math.min(20, Number(req.query.top))) : 5;
-    // Mode is accepted for v1 wire-compat but v2 always runs hybrid (RRF).
     const mode = req.query.mode === 'vector' ? 'vector' : 'hybrid';
 
     let kind: ToolKind | undefined;

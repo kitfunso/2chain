@@ -36,7 +36,6 @@ try {
     console.log(`text index ${TEXT_INDEX} queued for build`);
   }
 
-  // Poll for readiness
   console.log('polling for queryable...');
   const start = Date.now();
   while (Date.now() - start < 90_000) {
@@ -51,7 +50,6 @@ try {
   }
   console.log();
 
-  // Quick smoke test
   console.log('smoke: $search "pdf table"');
   const hits = await tools.aggregate([
     {

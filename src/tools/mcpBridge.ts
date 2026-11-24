@@ -1,32 +1,14 @@
-// MCP bridge — runtime forwarder. Spawns external MCP server processes on
-// demand via stdio, caches connected clients, forwards /call requests to
-// the right server+tool. This is the "runnable code attached" piece —
-// 2chain ingests MCP server metadata (mcp-registry.ts) and routes calls
-// through this bridge to real subprocess implementations.
-//
-// Trust boundary (CLAUDE.md rule 12): the MCP server runs in its own
-// process, talks to 2chain over stdio JSON-RPC. 2chain's main process
-// never evals or imports the foreign code; it only exchanges messages.
-
 import { spawn, type ChildProcessWithoutNullStreams } from 'node:child_process';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 
 export interface McpServerConfig {
-  /** Stable slug, e.g. "mcp-filesystem", "mcp-github". */
   serverId: string;
-  /** Human label. */
   name: string;
-  /** The command used to spawn the server (e.g. "npx"). */
   command: string;
-  /** Arguments to the command (e.g. ["-y", "@modelcontextprotocol/server-filesystem", "/some/path"]). */
   args: string[];
-  /** Required env vars to be passed through (read from process.env). */
   envPassthrough?: string[];
-  /** Optional working directory. */
   cwd?: string;
-  /** Override for tools/list — useful when the server needs a one-off arg
-   *  to list tools. Defaults to standard listTools(). */
   listToolsOverride?: () => Promise<unknown>;
 }
 
@@ -75,7 +57,6 @@ async function ensureConnected(serverId: string): Promise<ConnectedClient> {
       }
     }
 
-    // Use the SDK's StdioClientTransport — it handles spawn + framing for us.
     const transport = new StdioClientTransport({
       command: cfg.command,
       args: cfg.args,
@@ -102,11 +83,8 @@ async function ensureConnected(serverId: string): Promise<ConnectedClient> {
       clearTimeout(timer);
     }
 
-    // Capture the proc handle for future kill on shutdown
-    // The SDK exposes a private _process; we treat it opaquely.
     const proc = (transport as unknown as { _process?: ChildProcessWithoutNullStreams })._process!;
 
-    // Cache the tool name set for fast existence checks.
     const list = await client.listTools();
     const toolNames = new Set(list.tools.map((t) => t.name));
 
@@ -124,11 +102,8 @@ async function ensureConnected(serverId: string): Promise<ConnectedClient> {
 }
 
 export interface BridgeCallInput {
-  /** MCP server slug to dispatch to. */
   __mcp_server: string;
-  /** Tool name as advertised by the MCP server's tools/list. */
   __mcp_tool: string;
-  /** Args forwarded to the server tool. */
   args: Record<string, unknown>;
 }
 
@@ -165,9 +140,7 @@ export async function shutdownAll(): Promise<void> {
   CLIENTS.clear();
 }
 
-// For tests/diagnostics:
 export function _testInternals() {
   return { REGISTRY, CLIENTS };
 }
-// Avoid unused-spawn-import warning in case a future change drops the line.
 void spawn;

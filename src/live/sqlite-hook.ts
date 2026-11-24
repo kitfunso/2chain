@@ -1,13 +1,3 @@
-// SqliteChangeHook — turns SQL trigger pings into in-process ChangeEvents.
-//
-// Rule 13 (CLAUDE.md): the hook callback only enqueues — no DB reads, no I/O.
-// A separate async worker drains the queue and dispatches to listeners. By
-// the time the worker runs, the writer transaction has committed, so reads
-// (if a listener does them) are against a consistent snapshot.
-//
-// Backpressure: queue capped at MAX_QUEUE; oldest events drop. SSE clients
-// always get the most recent ranking, never starve the writer.
-
 import type Database from 'better-sqlite3';
 import type { ChangeEvent } from '../types.js';
 
@@ -26,17 +16,12 @@ export class SqliteChangeHook {
   private draining = false;
   private dropped = 0;
 
-  /**
-   * Register the `notify_change(op, table, rowid)` SQL function and create
-   * the AFTER INSERT/UPDATE/DELETE triggers that call it. Idempotent.
-   */
   install(db: Database.Database): void {
     db.function('notify_change', { deterministic: false }, (
       op: unknown,
       table: unknown,
       rowid: unknown,
     ) => {
-      // Inside a write transaction. Push only — never read, never await.
       this.enqueue(String(op) as Op, String(table) as ChangeEvent['table'], BigInt(rowid as number));
       return null;
     });
@@ -75,12 +60,10 @@ export class SqliteChangeHook {
     this.listeners.push(fn);
   }
 
-  /** For tests/diagnostics. Number of events dropped due to backpressure. */
   get droppedCount(): number {
     return this.dropped;
   }
 
-  /** For tests. Synchronously drain pending events. */
   flush(): void {
     this.drain();
   }
@@ -92,8 +75,6 @@ export class SqliteChangeHook {
     }
     this.queue.push({ op, table, rowid });
     if (!this.draining) {
-      // setImmediate yields out of the writer's call frame so listeners
-      // run after the current transaction commits.
       setImmediate(() => this.drain());
     }
   }
@@ -112,7 +93,6 @@ export class SqliteChangeHook {
           try {
             fn(event);
           } catch (err) {
-            // Listener error must not stop the drain. Stderr only.
             console.error('SqliteChangeHook listener error:', err);
           }
         }

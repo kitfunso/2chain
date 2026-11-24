@@ -1,54 +1,27 @@
-// Curated registry of well-known MCP servers.
-//
-// Source of truth for each entry:
-//   - github.com/modelcontextprotocol/servers (Anthropic official + community)
-//   - npm packages under @modelcontextprotocol/server-*
-//   - awesome-mcp-servers (community lists)
-//
-// Each entry names: how to spawn it, what env it needs, and the tools it
-// is known to advertise. The advertised tool list is verified at import
-// time when --verify is passed (mcp-importer.ts spawns the server briefly,
-// calls tools/list, and asserts the metadata matches).
-//
-// This is the OPPOSITE of the catalog-only-stub mocks — every entry
-// resolves to real working code that 2chain spawns as a subprocess.
-
 export interface McpServerEntry {
-  serverId: string;                // stable slug (used as the server cache key)
-  name: string;                    // human label
-  /** Spawn primitive. 'npx' for npm-distributed Node servers (default).
-   *  'uvx' for Python servers in the official registry. 'docker' supported
-   *  but each Docker entry needs an image instead of a package. */
+  serverId: string;
+  name: string;
   runtime?: 'npx' | 'uvx' | 'docker';
-  /** npm or PyPI package name; spawn via `<runtime> <package> <args>`. */
   npmPackage: string;
-  args?: string[];                 // extra args (e.g. allowed-paths for filesystem)
-  envPassthrough?: string[];       // env vars to forward
-  description: string;             // one-line description for the registry capability text
-  domain: string;                  // 2chain domain bucket
-  tools: McpToolStub[];            // advertised tools, used for retrieval seeding
+  args?: string[];
+  envPassthrough?: string[];
+  description: string;
+  domain: string;
+  tools: McpToolStub[];
   homepage?: string;
 }
 
 export interface McpToolStub {
-  name: string;                    // MCP tool name (must match server's advertisement)
-  capabilityText: string;          // 2chain capability_text (1-3 sentences)
-  inputSchema?: Record<string, unknown>;  // optional override; usually populated from MCP
+  name: string;
+  capabilityText: string;
+  inputSchema?: Record<string, unknown>;
 }
-
-// =============================================================================
-// Anthropic-maintained official servers
-// (github.com/modelcontextprotocol/servers/tree/main/src)
-// =============================================================================
 
 export const MCP_SERVERS: McpServerEntry[] = [
   {
     serverId: 'mcp-filesystem',
     name: 'Filesystem',
     npmPackage: '@modelcontextprotocol/server-filesystem',
-    // Filesystem requires explicit allowed paths.
-    // Default to a safe, isolated per-tenant area at runtime; the importer
-    // resolves $TWOCHAIN_MCP_FILESYSTEM_ROOTS or falls back to ~/2chain-mcp-fs.
     args: [],
     envPassthrough: [],
     description: 'Local filesystem read/write/list/search inside an explicitly allowed directory tree.',

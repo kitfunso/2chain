@@ -1,11 +1,3 @@
-// Awesome-list scraper — fetches a markdown README from a curated GitHub
-// list (e.g. awesome-mcp-servers) and parses each `- [Name](url) - desc.`
-// bullet into a ToolSpecV2. Resilient to leading emoji prefixes and bold
-// markers (the popular punkpeye/awesome-mcp-servers list uses 🐍🟦 prefixes
-// for language hints).
-//
-// Like npm-scraper, we fetch real bytes; tests inject `fetchImpl` to replay.
-
 import type { ToolSpecV2 } from '../types.js';
 
 export interface AwesomeEntry {
@@ -15,21 +7,12 @@ export interface AwesomeEntry {
 }
 
 export interface ScrapeAwesomeOptions {
-  /** Raw markdown URL — typically https://raw.githubusercontent.com/<owner>/<repo>/main/README.md */
   url: string;
-  /** Maximum entries to extract. Default 500. */
   limit?: number;
-  /** 2chain domain bucket. Defaults to 'awesome-list'. */
   domain?: string;
-  /** Override the fetch implementation (tests). */
   fetchImpl?: typeof fetch;
-  /** User-agent for the GitHub fetch. */
   userAgent?: string;
-  /** Author tag for resulting specs. */
   author?: string;
-  /** tool_kind override. Defaults to 'tool'. Use 'prompt' for prompt
-   *  collections, 'subagent' for agent/persona lists, 'skill' for
-   *  skill catalogs. */
   kind?: 'tool' | 'skill' | 'subagent' | 'prompt';
 }
 
@@ -40,31 +23,10 @@ export interface ScrapeAwesomeResult {
   duration_ms: number;
 }
 
-// Match `- [Name](url) - description.` with optional leading prefix matter
-// (emoji, bold markers, hashtags) and optional trailing prefix matter
-// (closing bold). Handles all four common awesome-list shapes:
-//   - [Name](url) - desc
-//   - 🐍 [Name](url) - desc
-//   - **[Name](url)** - desc
-//   - **🐍 [Name](url)** - desc
-//
-// `[^\[\n]*` swallows the prefix matter (anything that isn't another link
-// or a newline). `[^-\n:]*` between the closing paren and the separator
-// accepts the trailing `**` / spaces of bold-wrapped names.
 const BULLET = /^\s*[-*]\s+[^\[\n]*\[([^\]\n]+)\]\(([^)\s]+)\)[^-\n:]*[-:–—]+\s+(.+?)\s*$/;
 
-// Markdown table form, common in awesome-llmops / awesome-rag style lists:
-//   | [Name](url) | description | extra column...
-// We capture the FIRST link in the row + the FIRST description column.
-// Header rows ('| Project | ... |') and separator rows ('| --- |') don't
-// contain `[name](url)` so they fall through naturally.
 const TABLE = /^\|\s*\[([^\]\n]+)\]\(([^)\s]+)\)\s*\|\s*([^|\n]+?)\s*(?:\||$)/;
 
-// Description-less bullet form, used by some lists that just point at a
-// repo/page without inline copy:
-//   - [Name](url)
-// We synthesize the description from the name. Only accepts external URLs
-// (skips '#anchor' TOC entries) and drops single-word names.
 const BARE_BULLET = /^\s*[-*]\s+\[([^\]\n]{4,})\]\((https?:\/\/[^)\s]+)\)\s*$/;
 
 export function parseAwesomeMarkdown(md: string): { entries: AwesomeEntry[]; totalLines: number } {
@@ -78,7 +40,6 @@ export function parseAwesomeMarkdown(md: string): { entries: AwesomeEntry[]; tot
     }
     if (inCodeBlock) continue;
 
-    // Try bullet form first, then markdown-table, then bare-bullet form.
     let name: string | undefined;
     let url: string | undefined;
     let description: string | undefined;
@@ -98,19 +59,16 @@ export function parseAwesomeMarkdown(md: string): { entries: AwesomeEntry[]; tot
         if (bb) {
           name = bb[1];
           url = bb[2];
-          // Synthesize a placeholder description from the name; downstream
-          // filter will keep entries whose name itself is descriptive (4+ chars).
           description = `${bb[1]} — see ${bb[2]}`;
         }
       }
     }
     if (!name || !url || !description) continue;
 
-    name = name.trim().replace(/^\*+|\*+$/g, ''); // strip bold markers
+    name = name.trim().replace(/^\*+|\*+$/g, '');
     url = url.trim();
-    // Strip image-only descriptions (e.g. "![GitHub Badge](shields.io/...)").
     description = description.trim()
-      .replace(/!\[[^\]]*\]\([^)]*\)/g, '')           // drop inline images
+      .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
       .replace(/\.$/, '')
       .trim();
     if (!description || description.length < 5) continue;
@@ -162,8 +120,6 @@ export async function scrapeAwesomeList(opts: ScrapeAwesomeOptions): Promise<Scr
   const md = await r.text();
   const { entries, totalLines } = parseAwesomeMarkdown(md);
 
-  // Dedup by slug (multiple bullets occasionally point at the same project
-  // under different names in long awesome lists).
   const seen = new Set<string>();
   const specs: ToolSpecV2[] = [];
   for (const e of entries) {

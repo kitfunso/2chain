@@ -1,16 +1,3 @@
-// CLI: ingest the curated MCP server registry into 2chain.
-//
-// Usage:
-//   npm run import:mcp                # ingest all (no verify, fast)
-//   npm run import:mcp -- --verify    # spawn each server briefly, check tools/list
-//   npm run import:mcp -- --only mcp-filesystem,mcp-time
-//   TWOCHAIN_DB_PATH=/tmp/v2.db npm run import:mcp
-//
-// This is the "automated import pipeline" — no hand-curated specs, no
-// mock-ups. The runtime bridge (src/tools/mcpBridge.ts) forwards /call
-// requests to real subprocess MCP servers using the @modelcontextprotocol
-// /sdk Client. Each ingested tool advertises its real input/output schema.
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';

@@ -1,18 +1,3 @@
-// E2 reliability lifecycle tests (plan §6). Real SQLite (:memory:), real
-// stubs, real graders — NO mocks (CLAUDE.md rule 5).
-//
-// Two layers:
-//   - pure table tests against scoreLifecycle.ts (deterministic `now`);
-//   - push/reverify-level integration tests where rot is constructed with a
-//     REAL state change (endpoint_stub_name re-pointed at the deterministic
-//     'rotten-pdf-v1' stub via test-side raw SQL — E1 precedent), recovery
-//     spacing is injected via raw-SQL triggered_at updates (never sleeps),
-//     and usage evidence is produced by REAL /call invocations.
-//
-// Float discipline (E1 carry-in): every assertion on a score is
-// epsilon-based — 1e-9 for pure math, looser bands where runtime decay
-// (seconds between sweeps) shifts the blend.
-
 import { randomUUID } from 'node:crypto';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -37,7 +22,6 @@ const EPS = 1e-9;
 const DAY_MS = 86_400_000;
 const MIN_MS = 60_000;
 
-// ---- Deterministic stub embedder (no Ollama dependency) ----
 function makeUnitVec(seed: number): Float32Array {
   const v = new Float32Array(768);
   for (let i = 0; i < 768; i++) v[i] = Math.sin(seed * (i + 1) * 0.001);
@@ -84,8 +68,6 @@ async function freshStorage(): Promise<SqliteStorage> {
   return storage;
 }
 
-// Test-side raw handle (same precedent as tests/reverify.test.ts) for
-// constructing rot and injecting triggered_at spacing.
 function rawDb(storage: SqliteStorage): { prepare: (s: string) => { run: (...a: unknown[]) => unknown } } {
   return (storage as unknown as { db: { prepare: (s: string) => { run: (...a: unknown[]) => unknown } } }).db;
 }
@@ -96,16 +78,10 @@ function repointStub(storage: SqliteStorage, name: string, stub: string): void {
     .run(stub, name, '1.0');
 }
 
-// The REAL break transition (call.ts's D34 flip path): status +
-// metadata.broken_at in one atomic write. The watermark is recorded ONCE
-// here — post-break 503 rejections log usage rows with the same outcome
-// and must never advance it (codex P2 + independent HIGH, convergent).
 async function recordBreak(storage: SqliteStorage, toolId: string, minutesAgo: number): Promise<void> {
   await storage.markCircuitBroken(toolId, new Date(Date.now() - minutesAgo * MIN_MS).toISOString());
 }
 
-// A post-break 503 rejection's usage row (what call.ts logs when an agent
-// retries a broken tool) — used to prove retry traffic cannot block recovery.
 let rejSeq = 0;
 function recordRejection(storage: SqliteStorage, toolId: string, minutesAgo: number): void {
   rejSeq += 1;
@@ -161,8 +137,6 @@ function reverifyRun(passRate: number, minutesAgo: number, now: Date, by = 'reve
   };
 }
 
-// ---- 1. Blend: alternating history is strictly below clean history --------
-
 test('blend: alternating 0.6/1.0 history sits strictly below an all-1.0 history', () => {
   const now = new Date('2026-06-10T12:00:00.000Z');
   const alternating: EvalHistoryPoint[] = [];
@@ -175,79 +149,57 @@ test('blend: alternating 0.6/1.0 history sits strictly below an all-1.0 history'
   const b = blendReliability(clean, NO_USAGE, now);
   assert.ok(Math.abs(b - 1.0) < EPS, `all-clean history blends to 1.0, got ${b}`);
   assert.ok(a < b - EPS, `a point sample becomes a history: ${a} must be strictly below ${b}`);
-  // The flapping tool can never present as fully reliable again.
   assert.ok(a > 0.6 && a < 1.0, `alternating blend lands between the extremes, got ${a}`);
 });
-
-// ---- 2. Blend: old failures fade -------------------------------------------
 
 test('blend: a failure 30 days ago with clean runs since is within tolerance of clean (but never equal)', () => {
   const now = new Date('2026-06-10T12:00:00.000Z');
   const history: EvalHistoryPoint[] = [point(0.0, 30, now)];
   for (let d = 0; d < 30; d++) history.push(point(1.0, d, now));
   const score = blendReliability(history, NO_USAGE, now);
-  // 30d = ~4.3 half-lives: the failure's weight is ≈0.051 against ≈10 of
-  // clean weight → ≈0.995. Tolerance band, not equality (the plan's words).
   assert.ok(score > 0.97, `old failure must have faded, got ${score}`);
   assert.ok(score < 1.0 - EPS, 'history is evidence: the failure never fully disappears');
 });
-
-// ---- 3. Blend: empty fallbacks + leg weights --------------------------------
 
 test('blend: empty-evidence fallbacks (eval-only, usage-only, both empty) and the 0.8/0.2 split', () => {
   const now = new Date('2026-06-10T12:00:00.000Z');
   const oneClean = [point(1.0, 0, now)];
 
-  // No usage evidence ⇒ eval leg gets weight 1.0.
   assert.ok(Math.abs(blendReliability(oneClean, NO_USAGE, now) - 1.0) < EPS);
 
-  // No eval history ⇒ usage-only.
   const usageOnly = blendReliability([], { ok: 3, output_violations: 1, timeout: 0 }, now);
   assert.ok(Math.abs(usageOnly - 0.75) < EPS, `usage-only = ok/(ok+ov+to), got ${usageOnly}`);
 
-  // Usage evidence of pure failure is still evidence, not absence.
   const allBad = blendReliability([], { ok: 0, output_violations: 2, timeout: 1 }, now);
   assert.ok(Math.abs(allBad - 0) < EPS);
 
-  // Both empty ⇒ 0.
   assert.equal(blendReliability([], NO_USAGE, now), 0);
 
-  // Both legs present ⇒ 0.8 * eval + 0.2 * usage.
   const both = blendReliability(oneClean, { ok: 1, output_violations: 1, timeout: 0 }, now);
   const expected = EVAL_LEG_WEIGHT * 1.0 + USAGE_LEG_WEIGHT * 0.5;
   assert.ok(Math.abs(both - expected) < EPS, `expected ${expected}, got ${both}`);
 });
 
-// ---- 4. Blend: negative ages clamp ------------------------------------------
-
 test('blend: a future-dated run (clock skew) clamps to weight 1 — no weight exceeds 1', () => {
   const now = new Date('2026-06-10T12:00:00.000Z');
-  // Failure dated tomorrow + clean now. Clamped, both weigh 1 → exactly 0.5.
-  // Unclamped, the future failure would weigh 0.5^(-1/7) ≈ 1.104 → ≈0.475.
   const history = [point(0.0, -1, now), point(1.0, 0, now)];
   const score = blendReliability(history, NO_USAGE, now);
   assert.ok(Math.abs(score - 0.5) < EPS, `clamped blend is 0.5, got ${score}`);
 });
 
-// ---- 5. evaluateRecovery table ----------------------------------------------
-
 test('evaluateRecovery: 3 clean spaced reverify runs recover; spam, gaps, and mixed runs do not', () => {
   const now = new Date('2026-06-10T12:00:00.000Z');
   const gate = RELIABILITY_GATE;
-  // Break recorded BEFORE the oldest run in every legacy case below.
   const broke = (minutesAgo: number) => new Date(now.getTime() - minutesAgo * MIN_MS).toISOString();
 
-  // Exactly 3 cleans spanning 90 minutes → true.
   assert.equal(
     evaluateRecovery([reverifyRun(1.0, 0, now), reverifyRun(1.0, 45, now), reverifyRun(1.0, 90, now)], gate, broke(200)),
     true,
   );
-  // 2 cleans → false.
   assert.equal(
     evaluateRecovery([reverifyRun(1.0, 0, now), reverifyRun(1.0, 90, now)], gate, broke(200)),
     false,
   );
-  // Older failure beyond the 3 most recent does not block: clean-fail-clean-clean-clean.
   assert.equal(
     evaluateRecovery(
       [
@@ -259,7 +211,6 @@ test('evaluateRecovery: 3 clean spaced reverify runs recover; spam, gaps, and mi
     ),
     true,
   );
-  // A failure inside the 3 most recent blocks.
   assert.equal(
     evaluateRecovery(
       [reverifyRun(1.0, 0, now), reverifyRun(0.4, 45, now), reverifyRun(1.0, 90, now), reverifyRun(1.0, 150, now)],
@@ -268,18 +219,14 @@ test('evaluateRecovery: 3 clean spaced reverify runs recover; spam, gaps, and mi
     ),
     false,
   );
-  // Back-to-back spam (span < 60min) → false: three sweeps of a
-  // deterministic suite in two minutes carry the evidence of one.
   assert.equal(
     evaluateRecovery([reverifyRun(1.0, 0, now), reverifyRun(1.0, 1, now), reverifyRun(1.0, 2, now)], gate, broke(200)),
     false,
   );
-  // Exactly 60 minutes is inclusive.
   assert.equal(
     evaluateRecovery([reverifyRun(1.0, 0, now), reverifyRun(1.0, 30, now), reverifyRun(1.0, 60, now)], gate, broke(200)),
     true,
   );
-  // Non-reverify runs are ignored: 3 clean push runs + 2 clean reverify → false.
   assert.equal(
     evaluateRecovery(
       [
@@ -291,30 +238,23 @@ test('evaluateRecovery: 3 clean spaced reverify runs recover; spam, gaps, and mi
     ),
     false,
   );
-  // Input order is irrelevant (module sorts); pass_rate exactly at the gate counts as clean.
   assert.equal(
     evaluateRecovery([reverifyRun(gate, 90, now), reverifyRun(gate, 0, now), reverifyRun(gate, 45, now)], gate, broke(200)),
     true,
   );
-  // POST-BREAK evidence only (code-review HIGH): a break newer than every
-  // run means zero post-break evidence -> false, however clean the history.
   assert.equal(
     evaluateRecovery([reverifyRun(1.0, 120, now), reverifyRun(1.0, 60, now), reverifyRun(1.0, 5, now)], gate, now.toISOString()),
     false,
   );
-  // No recorded break timestamp -> fail CLOSED, never guess.
   assert.equal(
     evaluateRecovery([reverifyRun(1.0, 0, now), reverifyRun(1.0, 45, now), reverifyRun(1.0, 90, now)], gate, null),
     false,
   );
 });
 
-// ---- 6. Usage drag with caller-fault exclusion (integration) ----------------
-
 test('usage leg: output violations drag the blend; input violations and consequence outcomes move nothing', async () => {
   const storage = await freshStorage();
   try {
-    // Tool A — will receive caller-fault traffic only.
     await pushOk(storage, {
       name: 'caller-fault-target',
       input_contract: {
@@ -324,7 +264,6 @@ test('usage leg: output violations drag the blend; input violations and conseque
         additionalProperties: true,
       },
     });
-    // Tool B — will receive one ok call and one genuine output violation.
     await pushOk(storage, {
       name: 'tool-fault-target',
       input_contract: {
@@ -339,12 +278,9 @@ test('usage leg: output violations drag the blend; input violations and conseque
         required: ['rows'],
         additionalProperties: true,
       },
-      // 'llm' repair: an output violation logs evidence without the
-      // fail-fast circuit-break, so the sweep below can still run evals.
       output_repair_strategy: 'llm',
     });
 
-    // Caller-fault spam: 5 REAL /call invocations with malformed input.
     for (let i = 0; i < 5; i++) {
       const r = await call(storage, 'agent-spammer', 'caller', {
         tool_name: 'caller-fault-target', tool_version: '1.0', input: {},
@@ -353,9 +289,6 @@ test('usage leg: output violations drag the blend; input violations and conseque
       if (!r.ok) assert.equal(r.error.code, 'input_contract_violation');
     }
 
-    // Tool-fault evidence on B: one ok call, then one output violation
-    // produced by re-pointing the stub at malformed-bot-v1 (returns prose,
-    // violating the rows contract) — a REAL state change, then restored.
     const okCall = await call(storage, 'agent-user', 'caller', {
       tool_name: 'tool-fault-target', tool_version: '1.0', input: { pdf_text: 'Total: 42.0' },
     });
@@ -372,20 +305,13 @@ test('usage leg: output violations drag the blend; input violations and conseque
     const sweep1 = await reverifyTools(storage);
     assert.equal(sweep1.executed, 2);
 
-    // Caller-fault: input violations appear NOWHERE in the formula. The
-    // usage 'violation' outcome alone (ok=0, output_violations=0, timeout=0)
-    // is no usage evidence, so the eval leg keeps weight 1.0 → exactly 1.0.
     const spammed = await scoreOf(storage, 'caller-fault-target');
     assert.ok(Math.abs(spammed - 1.0) < EPS, `malformed-input spam must not move the score, got ${spammed}`);
 
-    // Tool-fault: eval leg 1.0, usage leg ok/(ok+output_violations+timeout)
-    // = 1/2 → blend 0.8*1.0 + 0.2*0.5 = 0.9.
     const dragged = await scoreOf(storage, 'tool-fault-target');
     assert.ok(Math.abs(dragged - 0.9) < 1e-6, `output violation must drag the blend to ≈0.9, got ${dragged}`);
     assert.ok(dragged < spammed - 1e-3, 'tool-fault evidence ranks below caller-fault noise');
 
-    // Consequence outcomes (circuit_broken/gated) are EXCLUDED from the
-    // denominator — feeding them back would double-count the scoring.
     const toolB = await storage.getToolByNameVersion('tool-fault-target', '1.0');
     for (const outcome of ['circuit_broken', 'gated'] as const) {
       for (let i = 0; i < 3; i++) {
@@ -408,40 +334,27 @@ test('usage leg: output violations drag the blend; input violations and conseque
   }
 });
 
-// ---- 7. End-to-end recovery --------------------------------------------------
-
 test('recovery e2e: rot, circuit-break, restore, 3 spaced clean sweeps → active with a blended (not 1.0) score', async () => {
   const storage = await freshStorage();
   try {
     const pushed = await pushOk(storage, { name: 'phoenix' });
 
-    // Rot (real state change) + the sweep that records the failure.
     repointStub(storage, 'phoenix', 'rotten-pdf-v1');
     const rotSweep = await reverifyTools(storage);
     assert.deepEqual(rotSweep.gate_dropped, ['phoenix@1.0']);
 
-    // Circuit-break via the REAL transition path (markCircuitBroken: atomic
-    // status + broken_at watermark), backdated 23h: after the rot run,
-    // before every clean run.
     await recordBreak(storage, pushed.tool_id, 23 * 60);
 
-    // Upstream recovers.
     repointStub(storage, 'phoenix', 'pdf-extractor-v3');
 
-    // Clean sweep 1: only 2 reverify runs exist afterwards → no recovery.
     const s1 = await reverifyTools(storage);
     assert.deepEqual(s1.recovered, []);
     assert.equal((await storage.getToolByNameVersion('phoenix', '1.0'))!.status, 'circuit_broken');
 
-    // Clean sweep 2: latest 3 reverify runs still include the rot run → no
-    // recovery (and this is also the "2 cleans are not enough" negative).
     const s2 = await reverifyTools(storage);
     assert.deepEqual(s2.recovered, []);
     assert.equal((await storage.getToolByNameVersion('phoenix', '1.0'))!.status, 'circuit_broken');
 
-    // Inject real time spacing (E1 precedent — raw SQL, never sleep):
-    // push → 2d ago, rot run → 1d ago, oldest clean → 90min ago. After the
-    // next sweep the 3 most recent reverify runs are clean and span ≥ 60min.
     const runs = await storage.listEvalRunsForTool(pushed.tool_id, 10);
     const pushRun = runs.find((r) => r.triggered_by === 'push')!;
     const rotRun = runs.find((r) => r.triggered_by === 'reverify' && r.pass_rate < RELIABILITY_GATE)!;
@@ -452,14 +365,11 @@ test('recovery e2e: rot, circuit-break, restore, 3 spaced clean sweeps → activ
     backdateRun(storage, rotRun.id!, 24 * 60);
     backdateRun(storage, cleanRuns[0].id!, 90);
 
-    // Clean sweep 3: recovery fires in this UNFILTERED sweep.
     const s3 = await reverifyTools(storage);
     assert.deepEqual(s3.recovered, ['phoenix@1.0']);
 
     const recovered = await storage.getToolByNameVersion('phoenix', '1.0');
     assert.equal(recovered!.status, 'active', 'circuit_broken -> active is the ONE flip reverify may make');
-    // The score is the evidence blend, not a clean slate: the day-old rot
-    // run is still well inside the 7-day half-life.
     assert.ok(
       recovered!.metadata.reliability_score < 1.0 - EPS,
       `recovered score must be blended, got ${recovered!.metadata.reliability_score}`,
@@ -470,8 +380,6 @@ test('recovery e2e: rot, circuit-break, restore, 3 spaced clean sweeps → activ
   }
 });
 
-// ---- 8. Recovery negatives ----------------------------------------------------
-
 test('recovery: never fires while the tool is still rotten, even with spacing', async () => {
   const storage = await freshStorage();
   try {
@@ -481,8 +389,6 @@ test('recovery: never fires while the tool is still rotten, even with spacing', 
 
     await reverifyTools(storage);
     await reverifyTools(storage);
-    // Give the dirty runs the same spacing a recovering tool would have —
-    // cleanliness, not spacing, must be the blocker here.
     const runs = await storage.listEvalRunsForTool(pushed.tool_id, 10);
     const dirty = runs
       .filter((r) => r.triggered_by === 'reverify')
@@ -504,15 +410,12 @@ test('recovery: 3 back-to-back clean sweeps do NOT recover (no 60min span); spac
     const pushed = await pushOk(storage, { name: 'sprinter' });
     await recordBreak(storage, pushed.tool_id, 240);
 
-    // Three clean sweeps within milliseconds: deterministic-suite spam.
     await reverifyTools(storage);
     await reverifyTools(storage);
     const s3 = await reverifyTools(storage);
     assert.deepEqual(s3.recovered, [], 'back-to-back cleans carry the evidence of one sweep');
     assert.equal((await storage.getToolByNameVersion('sprinter', '1.0'))!.status, 'circuit_broken');
 
-    // Positive control: spread the SAME runs across real time and the next
-    // sweep recovers — proving spacing was the only blocker.
     const runs = await storage.listEvalRunsForTool(pushed.tool_id, 10);
     const cleans = runs
       .filter((r) => r.triggered_by === 'reverify')
@@ -545,8 +448,6 @@ test('recovery: filtered requests refresh scores but NEVER flip status; the unfi
     backdateRun(storage, cleans[1].id!, 120);
     backdateRun(storage, cleans[2].id!, 90);
 
-    // Eligible by evidence — but the tool_author filtered path must never
-    // flip status (routes/reverify.ts authz rationale depends on this).
     const filtered = await reverifyTools(storage, { toolName: 'gatekeeper', toolVersion: '1.0' });
     assert.equal(filtered.executed, 1);
     assert.deepEqual(filtered.recovered, []);
@@ -556,7 +457,6 @@ test('recovery: filtered requests refresh scores but NEVER flip status; the unfi
       'filtered path can re-score but never flips status',
     );
 
-    // The same evidence recovers in an unfiltered sweep.
     const unfiltered = await reverifyTools(storage);
     assert.deepEqual(unfiltered.recovered, ['gatekeeper@1.0']);
     assert.equal((await storage.getToolByNameVersion('gatekeeper', '1.0'))!.status, 'active');
@@ -568,8 +468,6 @@ test('recovery: filtered requests refresh scores but NEVER flip status; the unfi
 test('recovery direction guards: pending is never touched; active tools never get recovery writes', async () => {
   const storage = await freshStorage();
   try {
-    // Pending tool with recovery-shaped evidence: the sweep must skip it
-    // (pending-status partition) — recovery can never promote a pending row.
     await storage.upsertTool(
       {
         name: 'limbo', version: '1.0', author_agent_id: 'agent-author',
@@ -594,7 +492,6 @@ test('recovery direction guards: pending is never touched; active tools never ge
       });
     }
 
-    // Active tool with the same evidence shape: nothing to recover.
     const steady = await pushOk(storage, { name: 'steady' });
     await reverifyTools(storage);
     await reverifyTools(storage);
@@ -617,8 +514,6 @@ test('recovery direction guards: pending is never touched; active tools never ge
   }
 });
 
-// ---- 9. Reverify writes the blend (and the SQL gate reads it) ----------------
-
 test('reverify score is blended: prior bad runs hold a clean latest run below its pass_rate and out of discover', async () => {
   const storage = await freshStorage();
   try {
@@ -629,7 +524,6 @@ test('reverify score is blended: prior bad runs hold a clean latest run below it
     repointStub(storage, 'historian', 'rotten-pdf-v1');
     await reverifyTools(storage);
     const afterRot = await scoreOf(storage, 'historian');
-    // [push 1.0, rot 0.0] at near-equal weights ≈ 0.5 (plan's documented value).
     assert.ok(Math.abs(afterRot - 0.5) < 1e-3, `rot blend ≈ 0.5, got ${afterRot}`);
 
     repointStub(storage, 'historian', 'pdf-extractor-v3');
@@ -637,14 +531,9 @@ test('reverify score is blended: prior bad runs hold a clean latest run below it
     assert.equal(restoreSweep.passed, 1, 'the raw restore run is clean');
 
     const afterRestore = await scoreOf(storage, 'historian');
-    // [1.0, 0.0, 1.0] at near-equal weights ≈ 2/3 (plan's documented value):
-    // strictly below the latest run's pass_rate of 1.0 — the E1 snap-back
-    // semantics are gone.
     assert.ok(Math.abs(afterRestore - 2 / 3) < 1e-3, `restore blend ≈ 0.667, got ${afterRestore}`);
     assert.ok(afterRestore < 1.0 - EPS);
 
-    // Gate interaction: the SQL gate reads the materialized blend — a clean
-    // raw run with a below-gate blend stays out of discover.
     const gated = await discover(storage, embedder, HIST_QUERY, 5);
     assert.ok(
       !gated.results.some((r) => r.name === 'historian'),
@@ -655,15 +544,10 @@ test('reverify score is blended: prior bad runs hold a clean latest run below it
   }
 });
 
-// ---- 10. Summary semantics under the blend (plan §4b) -------------------------
-
 test('summary: a run can be passed yet gate_dropped (clean run, history still bad)', async () => {
   const storage = await freshStorage();
   try {
     const pushed = await pushOk(storage, { name: 'sleeper' });
-    // Three recent dirty runs land in the evidence line WITHOUT updating the
-    // materialized score (real insertEvalRun writes — the orphan-window
-    // shape, which the blend tolerates by design).
     for (const minutesAgo of [30, 20, 10]) {
       await storage.insertEvalRun({
         tool_id: pushed.tool_id, tool_name: 'sleeper', tool_version: '1.0',
@@ -680,7 +564,6 @@ test('summary: a run can be passed yet gate_dropped (clean run, history still ba
     assert.equal(sweep.failed, 0);
     assert.deepEqual(sweep.gate_dropped, ['sleeper@1.0'], 'but the blend crossed the gate downward');
     const score = await scoreOf(storage, 'sleeper');
-    // [1, 0, 0, 0, 1] near-equal weights ≈ 0.4.
     assert.ok(Math.abs(score - 0.4) < 1e-3, `expected ≈0.4, got ${score}`);
   } finally {
     await storage.close();
@@ -691,7 +574,6 @@ test('summary: a run can fail without gate_dropped (deep clean history keeps the
   const storage = await freshStorage();
   try {
     const pushed = await pushOk(storage, { name: 'veteran' });
-    // 20 clean reverify runs over the last ~2.5 days.
     for (let i = 1; i <= 20; i++) {
       await storage.insertEvalRun({
         tool_id: pushed.tool_id, tool_name: 'veteran', tool_version: '1.0',
@@ -714,16 +596,12 @@ test('summary: a run can fail without gate_dropped (deep clean history keeps the
   }
 });
 
-// ---- 11. errored diagnostics ---------------------------------------------------
-
 test('errored entries carry {tool, error} diagnostics and the sweep continues', async () => {
   const storage = await freshStorage();
   try {
     await pushOk(storage, { name: 'doomed-a' });
     await pushOk(storage, { name: 'doomed-b' });
 
-    // Real storage failure: the eval_runs table disappears out from under
-    // the sweep (no mocks — better-sqlite3 throws on the real write).
     rawDb(storage).prepare(`ALTER TABLE eval_runs RENAME TO eval_runs_hidden`).run();
 
     const summary = await reverifyTools(storage);
@@ -741,14 +619,11 @@ test('errored entries carry {tool, error} diagnostics and the sweep continues', 
   }
 });
 
-// ---- 9. Post-break evidence (code-review HIGH fail-open regression) ----------
-
 test('recovery: a clean PRE-break history never recovers a live-broken tool', async () => {
   const storage = await freshStorage();
   try {
     const pushed = await pushOk(storage, { name: 'sleeper' });
 
-    // A healthy daily-sweep history: 3 clean spaced reverify runs.
     await reverifyTools(storage);
     await reverifyTools(storage);
     await reverifyTools(storage);
@@ -760,12 +635,8 @@ test('recovery: a clean PRE-break history never recovers a live-broken tool', as
     backdateRun(storage, cleans[1].id!, 120);
     backdateRun(storage, cleans[2].id!, 90);
 
-    // NOW the live break lands (suite-undetectable rot: the eval suite
-    // still passes, live calls do not).
     await recordBreak(storage, pushed.tool_id, 30);
 
-    // The next sweep records ONE more clean run — yesterday's history must
-    // not count; one post-break run is not 3 spanning 60min.
     const s = await reverifyTools(storage);
     assert.deepEqual(s.recovered, [], 'pre-break evidence must never recover a tool');
     assert.equal((await storage.getToolByNameVersion('sleeper', '1.0'))!.status, 'circuit_broken');
@@ -778,7 +649,6 @@ test('recovery: no recorded break evidence fails CLOSED', async () => {
   const storage = await freshStorage();
   try {
     const pushed = await pushOk(storage, { name: 'ghost' });
-    // Broken without a usage trail (legacy/manual setStatus only).
     await storage.setStatus(pushed.tool_id, 'circuit_broken');
 
     await reverifyTools(storage);
@@ -806,7 +676,6 @@ test('recovery: post-break 503 rejections never advance the watermark (liveness)
     const pushed = await pushOk(storage, { name: 'retried' });
     await recordBreak(storage, pushed.tool_id, 300);
 
-    // 3 clean spaced sweeps after the break...
     await reverifyTools(storage);
     await reverifyTools(storage);
     await reverifyTools(storage);
@@ -818,10 +687,6 @@ test('recovery: post-break 503 rejections never advance the watermark (liveness)
     backdateRun(storage, cleans[1].id!, 120);
     backdateRun(storage, cleans[2].id!, 90);
 
-    // ...with agents RETRYING the broken tool the whole time — rejection
-    // rows land between and after the clean runs. Under the old
-    // usage-derived watermark these advanced brokenAt forever; the
-    // transition marker must ignore them.
     recordRejection(storage, pushed.tool_id, 150);
     recordRejection(storage, pushed.tool_id, 60);
     recordRejection(storage, pushed.tool_id, 5);
@@ -841,8 +706,6 @@ test('markCircuitBroken: the transition winner stamps broken_at; losers are no-o
     const first = new Date(Date.now() - 120 * MIN_MS).toISOString();
     const second = new Date(Date.now() - 5 * MIN_MS).toISOString();
 
-    // Two in-flight calls both fail validation and both queue the flip;
-    // the second write must not re-stamp the watermark.
     await storage.markCircuitBroken(pushed.tool_id, first);
     await storage.markCircuitBroken(pushed.tool_id, second);
 

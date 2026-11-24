@@ -8,7 +8,6 @@ const CODER_KEY = 'sk_demo_coder_agent_1d9b3e';
 const ADMIN_KEY = 'sk_demo_tool_author_7e5f1c';
 const QUERY = 'Extract tables from this financial report PDF';
 
-// Colors for terminal output
 const C = {
   reset: '\x1b[0m', dim: '\x1b[2m', bold: '\x1b[1m',
   green: '\x1b[32m', red: '\x1b[31m', cyan: '\x1b[36m', yellow: '\x1b[33m', magenta: '\x1b[35m',
@@ -61,7 +60,6 @@ const main = async (): Promise<void> => {
   console.log(`\n${C.green}seed complete (${Math.round(performance.now() - t0)}ms)${C.reset}`);
   await pause(2, 'state reset, allow change-streams to settle');
 
-  // ─────────────────────────────────────────────────────────────────────
   banner('DEMO BEAT SEQUENCE', C.cyan);
 
   const tBeat1 = beat(1, 'Discovery: agent queries the registry', 30);
@@ -121,14 +119,12 @@ const main = async (): Promise<void> => {
   }
   console.log(`${C.dim}   beat 4 elapsed: ${Math.round(performance.now() - tBeat4)}ms${C.reset}`);
 
-  // Verify follow-up call returns the gated state
   const r4b = await http('POST', '/call', CODER_KEY, {
     tool_name: 'malformed-bot', tool_version: '1.0', case_id: 'array-of-issues',
     input: { code: 'irrelevant' },
   });
   console.log(`   ${C.dim}follow-up call: ${r4b.status} ${r4b.json.error?.code} (${r4b.ms}ms — short-circuit at status check)${C.reset}`);
 
-  // ─────────────────────────────────────────────────────────────────────
   banner('SUMMARY', C.green);
   console.log(`Total wall time across 4 beats: ${C.bold}${Math.round(performance.now() - tBeat1)}ms${C.reset}`);
   console.log(`Per-beat:`);

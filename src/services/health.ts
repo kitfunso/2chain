@@ -1,15 +1,3 @@
-// E4 tool health surface — READ-ONLY aggregator. Answers "can I trust this
-// tool right now?" in one query surface instead of four manual ones (tools
-// row, eval_runs history, drift_events, usage counts).
-//
-// Scope guard: this module performs NO writes, NO status flips, NO score
-// recompute — lifecycle logic lives in E2, not here. It talks to the
-// database exclusively through the Storage interface (CLAUDE.md rule 1).
-//
-// Every list in the report is bounded (history 20 / drift 10 / usage
-// windowed 7d): an unbounded history endpoint on a hot name is a DoS
-// vector (rule 11 spirit).
-
 import {
   DEFAULT_NAMESPACE,
   RELIABILITY_GATE,
@@ -35,17 +23,9 @@ export interface HealthVersion {
   status: ToolStatus;
   tool_kind: ToolKind;
   reliability_score: number;
-  /** Newest eval_runs.triggered_at for this version, null if never run. */
   last_eval_run: string | null;
-  /** Consecutive most-recent reverify-triggered runs with
-   *  pass_rate >= RELIABILITY_GATE, counted until the first sub-gate run
-   *  (0 if none / none clean). Interleaved push/manual runs are FILTERED
-   *  OUT by the storage query (triggeredBy applies before the limit) —
-   *  they are skipped, never streak-breaking. */
   verification_streak: number;
-  /** Newest-first, bounded SCORE_HISTORY_LIMIT. */
   score_history: Array<{ at: string; pass_rate: number; triggered_by: string }>;
-  /** Outcome counts over the USAGE_WINDOW_DAYS window. */
   usage: Record<string, number>;
 }
 
@@ -63,9 +43,6 @@ export interface HealthDriftEvent {
 export interface HealthReport {
   name: string;
   versions: HealthVersion[];
-  /** ROOT-level: E3 stores drift by tool_name, not tool_id — one list per
-   *  report, never duplicated per version. Bounded DRIFT_EVENTS_LIMIT,
-   *  newest-first. */
   drift_events: HealthDriftEvent[];
 }
 
@@ -78,10 +55,6 @@ export async function toolHealth(
   name: string,
   namespace: string = DEFAULT_NAMESPACE,
 ): Promise<HealthReport | null> {
-  // Newest HEALTH_VERSIONS_LIMIT versions, bounded IN the query (codex P2:
-  // each version costs ~3 evidence queries and /health-view is
-  // unauthenticated, so neither the report NOR the lookup may scale with
-  // author-controlled version count).
   const tools = await storage.listToolsByName(name, namespace, {
     limit: HEALTH_VERSIONS_LIMIT,
   });
@@ -104,7 +77,6 @@ export async function toolHealth(
     );
     let verificationStreak = 0;
     for (const run of reverifyRuns) {
-      // newest-first: count until the first sub-gate run.
       if (run.pass_rate >= RELIABILITY_GATE) verificationStreak += 1;
       else break;
     }
@@ -135,8 +107,6 @@ export async function toolHealth(
   return {
     name,
     versions,
-    // Explicit projection — never spread the storage row: `changes` (the
-    // parsed changes_json) must not leak into either route's payload.
     drift_events: driftRows.map((d) => ({
       from_version: d.from_version,
       to_version: d.to_version,

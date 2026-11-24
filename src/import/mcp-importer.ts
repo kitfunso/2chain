@@ -1,15 +1,3 @@
-// MCP importer — turns MCP server registry entries into 2chain ToolSpecV2
-// rows + registers them in the runtime bridge.
-//
-// Pipeline:
-//   read mcp-registry entries
-//     -> upsert one ToolSpecV2 per advertised tool
-//     -> register the bridge for /call to resolve
-//
-// Optional --verify mode: spawn each server briefly, call tools/list, and
-// fail if the advertised tools differ from the static registry — catches
-// drift between the registry file and the actual server version.
-
 import type { Embedder, Storage, ToolSpecV2 } from '../types.js';
 import { MCP_SERVERS, type McpServerEntry } from './mcp-registry.js';
 import { registerMcpServer, callViaMcp } from '../tools/mcpBridge.js';
@@ -21,9 +9,6 @@ const DEFAULT_AUTHOR = 'mcp-import';
 let bridgeStubRegistered = false;
 function ensureBridgeStub(): void {
   if (bridgeStubRegistered) return;
-  // mcp-bridge: derives routing from the parent tool's 2chain name
-  // (format: <server-id>__<mcp-tool-name>) so the caller passes the
-  // MCP tool's real input schema directly — no envelope wrapping.
   registerStub('mcp-bridge', async (input, _caseId, ctx) => {
     if (!ctx?.tool_name) {
       throw new Error('mcp-bridge: missing tool ctx (call.ts must pass it)');
@@ -39,16 +24,8 @@ function ensureBridgeStub(): void {
   bridgeStubRegistered = true;
 }
 
-/**
- * Build a 2chain ToolSpecV2 from one MCP-server-tool advertisement.
- * The 2chain tool name is namespaced: <server-id>__<tool-name>
- * to avoid collisions across servers that re-use names like "list".
- */
 function specFromMcp(server: McpServerEntry, tool: { name: string; capabilityText: string; inputSchema?: Record<string, unknown> }): ToolSpecV2 {
   const compositeName = `${server.serverId}__${tool.name}`;
-  // Input schema: pass the MCP-advertised schema through verbatim. The
-  // bridge derives routing from ctx.tool_name (set by call.ts), so the
-  // caller never has to wrap args in an envelope.
   // additionalProperties: true on the top-level guards against MCP clients
   // (Claude Code etc.) tacking on metadata fields — see CLAUDE.md
   // common-mistakes "additionalProperties: false breaks MCP clients".
@@ -115,11 +92,8 @@ export function registerAllMcpServers(): { registered: number } {
 }
 
 export interface ImportOptions {
-  /** When true, actually spawn each server and assert tools/list matches. Slower. */
   verify?: boolean;
-  /** Restrict import to specific server IDs. Default: all. */
   only?: string[];
-  /** Skip embedding (used for dry-run). */
   skipEmbedding?: boolean;
 }
 
@@ -153,7 +127,6 @@ export async function importMcpServers(
     : MCP_SERVERS;
 
   for (const server of targetServers) {
-    // 1. Register in the runtime bridge so /call can later route to it.
     const runtime = server.runtime ?? 'npx';
     const command = runtime;
     const args = runtime === 'npx'
@@ -172,23 +145,17 @@ export async function importMcpServers(
     let tools = server.tools;
     let verifyOk = true;
 
-    // 2. Optional verification: spawn the server, ask it for its real tool list.
     if (opts.verify) {
       try {
-        // Lazy import so unit tests don't pull child_process unless needed.
         const { ensureConnectedForVerify } = await import('./mcp-verify.js');
         const advertised = await ensureConnectedForVerify(server);
         const declared = new Set(server.tools.map((t) => t.name));
         const actual = new Set(advertised.map((t) => t.name));
 
-        // Server advertised a different set: trust the server.
-        // We log + count drift but don't fail the whole import.
         const missingFromRegistry = [...actual].filter((n) => !declared.has(n));
         const missingFromServer = [...declared].filter((n) => !actual.has(n));
         if (missingFromRegistry.length > 0 || missingFromServer.length > 0) {
           result.tools_failed_verify += missingFromRegistry.length + missingFromServer.length;
-          // Replace static stubs with what the server actually advertises,
-          // copying the registry capabilityText where names overlap.
           const declaredByName = new Map(server.tools.map((t) => [t.name, t]));
           tools = advertised.map((a) => ({
             name: a.name,
@@ -207,7 +174,6 @@ export async function importMcpServers(
       continue;
     }
 
-    // 3. Embed + upsert each tool spec.
     const specs = tools.map((t) => specFromMcp(server, t));
     const embeddings = opts.skipEmbedding
       ? specs.map(() => new Float32Array(768))

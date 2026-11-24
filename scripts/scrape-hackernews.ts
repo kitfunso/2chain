@@ -1,8 +1,3 @@
-// Scrape HackerNews via Algolia search API for "Show HN" posts about
-// MCP servers, AI agents, and Claude Code tooling. Each result becomes a
-// kind='tool' spec tagged source=catalog with the original GitHub or project
-// URL preserved.
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';

@@ -1,10 +1,3 @@
-// The hackathon demo prompts. CLAUDE.md rule 8 gate.
-// Three demos are STRICT (must pass): 1 DCF, 2 arxiv, 4 security.
-// These are the unambiguous routing cases the on-stage demo arc depends on.
-// Demos 3 and 5 are TOLERANT — the v1 baseline embeds the same trade-offs,
-// and v2's near-misses route to legitimately reasonable alternatives.
-// Source of truth: tests/fixtures/golden-queries.json (category=demo-prompt).
-
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { SqliteStorage } from '../../src/storage/sqlite.js';
@@ -23,7 +16,6 @@ const golden = JSON.parse(
   readFileSync(resolve('tests/fixtures/golden-queries.json'), 'utf-8'),
 ) as { queries: GQ[] };
 
-// Strict gate: these MUST pass for Phase 1 to ship.
 const STRICT_DEMO_IDS = new Set(['demo-1-dcf', 'demo-2-arxiv', 'demo-4-security']);
 
 const demos = golden.queries.filter((q) => q.category === 'demo-prompt');

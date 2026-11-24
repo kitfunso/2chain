@@ -1,10 +1,3 @@
-// Route-level integration test for /discover.
-// Real SQLite + a stub Embedder returning canned vectors so we don't depend
-// on Ollama in CI. Exercises the full Fastify route -> service -> storage
-// path and asserts the JSON wire shape, not just types.
-//
-// Phase 1 plan Step 7 verify criterion (outside-voice issue #8).
-
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import Fastify, { type FastifyInstance } from 'fastify';
@@ -17,7 +10,6 @@ import { hashKey } from '../src/server/auth.js';
 import { LruEmbeddingCache } from '../src/embeddings/cache.js';
 import '../src/services/stubs.js';
 
-// ---- Deterministic stub embedder (no Ollama dependency) ----
 function makeVec(seed: number): Float32Array {
   const v = new Float32Array(768);
   for (let i = 0; i < 768; i++) v[i] = Math.sin(seed * (i + 1) * 0.001);
@@ -30,7 +22,6 @@ function makeVec(seed: number): Float32Array {
 
 class StubEmbedder implements Embedder {
   private cache = new LruEmbeddingCache(64);
-  // Map specific text to seeds so similar queries route to similar tools.
   private seeds = new Map<string, number>([
     ['extract financial line items from a 10-K filing', 1],
     ['extract income statement from 10-K for DCF model', 1],
@@ -76,7 +67,6 @@ before(async () => {
   storage = new SqliteStorage({ path: ':memory:' });
   await storage.init();
 
-  // Seed an agent
   await storage.upsertAgent({
     id: 'agent-test',
     name: 'test-agent',
@@ -85,7 +75,6 @@ before(async () => {
     created_at: new Date().toISOString(),
   });
 
-  // Seed tools
   const specs: Array<[string, ToolSpecV2]> = [
     ['extract financial line items from a 10-K filing', {
       name: 'sec-edgar-financials',
@@ -186,7 +175,6 @@ test('GET /discover for finance query routes sec-edgar to top-1', async () => {
   assert.equal(body.results[0].name, 'sec-edgar-financials',
     `expected sec-edgar-financials top-1, got ${body.results[0].name}`);
 
-  // Wire-shape contract
   const r0 = body.results[0];
   for (const k of ['name', 'version', 'capability_text', 'endpoint_stub_name',
                    'reliability_score', 'vec_score', 'rank_score', 'rrf_score',
@@ -194,7 +182,6 @@ test('GET /discover for finance query routes sec-edgar to top-1', async () => {
     assert.ok(k in r0, `missing key: ${k}`);
   }
 
-  // Meta shape
   for (const k of ['query', 'embed_ms', 'search_ms', 'total_ms',
                    'candidates_after_filter', 'embedder', 'storage']) {
     assert.ok(k in body.meta, `missing meta key: ${k}`);

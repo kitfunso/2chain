@@ -1,9 +1,3 @@
-// Chunked snapshot importer: splits the 1200-spec snapshot into batches of
-// 50 specs and commits after each batch. Survives partial completion (each
-// chunk is its own DB transaction) and avoids choking the embedder by
-// limiting concurrent embeds. The full import on a 2GB shared-CPU VM takes
-// ~10-15 minutes; resumable on next boot via skip-existing.
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { readFileSync } from 'node:fs';

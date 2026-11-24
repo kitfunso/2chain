@@ -1,10 +1,3 @@
-// CLI: scrape PyPI metadata for a list of packages.
-// Usage:
-//   npm run scrape:pypi                       # default curated AI/MCP list
-//   npm run scrape:pypi -- --names mcp,fastmcp,langgraph
-//   npm run scrape:pypi -- --names-file pkgs.txt --limit 200
-//   npm run scrape:pypi -- --dry-run
-
 import 'dotenv/config';
 import { homedir } from 'node:os';
 import { resolve } from 'node:path';
